@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% load static %}
+<html>
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>TTable Login</title>
+	<link rel="icon" type="image/x-icon" href="{% static 'images/favico.png' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@900&display=swap" rel="stylesheet">
+
+</head>
+<body>
+	<div class="container-sm Login">
+		<h1>Login</h1>
+		<form method="post" class="form">
+  			{% csrf_token %}
+  			{% bootstrap_form form bound_css_class='' %}
+  			{% buttons %}
+    			<button type="submit" class="btn btn-primary">
+      				Login
+    			</button>
+  			{% endbuttons %}
+		</form>
+	</div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+.WelcomeText{
+	text-align: center;
+	margin-bottom: 50px;
+	margin-top: 50px;
+}
+
+.UserForm{
+	margin-bottom: 70px;
+}
+
+.FilterNav{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.WebFooter{
+	font-family: 'Source Serif Pro', serif;
+	color: black;
+	margin: auto;
+}
+
+.hidden{
+	background-color: #e9ecef;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.hidden-table{
+	width: 700px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-bottom: 20px;
+	padding-top: 20px;
+}
+
+.hidden-buttons{
+	width: 700px;
+	margin: auto;
+	padding-bottom: 20px;
+}
+
+.table td{
+	padding: 0px;
+}
+
+.tableIcons{
+	width: 25px;
+	height: 25px;
+}
+
+.EditOrderIcons{
+	width: 22px;
+	height: 17px;
+}
+
+.navbarIcons{
+	width: 40px;
+	height: 40px;
+}
+
+.NewOrderClientDetails{
+	width: 800px;
+	margin: auto;
+}
+
+.TableValue{
+	background-color: red;
+}

@@ -1,0 +1,13 @@
+h1{
+	text-align: center;
+	font-family: 'Azeret Mono', monospace;
+}
+
+.Login{
+	text-align: center;
+	width: 20%;
+	margin-top: 10%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: auto;
+}

@@ -1,0 +1,430 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% block content %}
+
+{% for external in externals %}
+
+<!-- MODAL PROGRESS WINDOW -->
+<div class="modal fade" id="Progress{{external}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+
+  	<div class="modal-dialog">
+	    <div class="modal-content">
+
+	      	<div class="modal-header">
+		        <h5 class="modal-title" id="staticBackdropLabel">
+		        	<div style="text-align: center; color: red;">
+		        		UPDATE PROGRESS
+		        	</div>
+		        	<div>
+		        		ORDER {{external}}
+		        	</div>
+		        </h5>
+
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		    </div>
+
+		    <form method="POST" action="{% url 'table:updateOrder' pk=external.pk %}">
+
+	      		<div class="modal-body">
+
+		      		<div class="ALERT-S" style="display: none;">
+		      			<div class="alert alert-success alert-dismissible fade show" role="alert" id="#myAlert">
+			  				<strong><div style="text-align: center;">SUCCESS ALERT</div></strong>
+			  				<button type="button" class="btn-close closeAlert" aria-label="Close"></button>
+						</div>
+					</div>
+
+					{% csrf_token %}
+
+					<table class="table">
+						<thead>
+							<th scope="col">Material</th>
+							<th scope="col">Ordered</th>
+							<th scope="col">Delivered</th>
+							<th scope="col">Cutted</th>
+							<th scope="col">Edged</th>
+						</thead>
+						<tbody>
+							<tr>
+								<th scope="row" colspan="8">EGGER</th>
+							</tr>
+							
+								{% for plate_form in update_forms %}
+									{% if plate_form.order_id == external.ID %}
+									{{plate_form.form.management_form}}
+										{% for item in plate_form.form %}
+											{% if item.manufacturer.value == 'Egger' %}
+												{{item.id}}
+												<tr>
+													<td>{{item.material}}</td>
+													<td>{{item.ordered}}</td>
+													<td>{{item.delivered}}</td>
+													<td>{{item.cutted}}</td>
+													<td>{{item.edged}}</td>
+												</tr>
+											{% endif %}
+										{% endfor %}
+									{% endif %}
+								{% endfor %}
+
+							<tr>
+								<th scope="row" colspan="8">KRONO</th>
+							</tr>
+								{% for plate_form in update_forms %}
+									{% if plate_form.order_id == external.ID %}
+										{{plate_form.form.management_form}}
+										{% for item in plate_form.form %}
+											{% if item.manufacturer.value == 'Kronospan' %}
+												{{item.id}}
+												<tr>
+													<td>{{item.material}}</td>
+													<td>{{item.ordered}}</td>
+													<td>{{item.delivered}}</td>
+													<td>{{item.cutted}}</td>
+													<td>{{item.edged}}</td>
+												</tr>
+											{% endif %}
+										{% endfor %}
+									{% endif %}
+								{% endfor %}
+							
+							<tr>
+								<th scope="row" colspan="8">EDGE</th>
+							</tr>
+								{% for edge_form in edge_forms %}
+									{% if edge_form.order_id == external.ID %}
+										{{edge_form.form.management_form}}
+										{% for item in edge_form.form %}
+											{{item.id}}
+											<tr>
+												<td>{{item.color_code}}{{item.edge_type}}</td>
+												<td style="margin-right: auto; margin-top: auto;">{{item.ordered}}</td>
+												<td>{{item.delivered}}</td>
+											</tr>
+										{% endfor %}
+									{% endif %}
+								{% endfor %}
+
+						</tbody>
+					</table>
+	      			
+	      		</div>
+
+	      		<div class="modal-footer">
+	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	      			<input type="submit" class="btn btn-primary" value="Update">
+	      			<button type="button" class="btn btn-secondary showAlert">Show Alert</button>
+	      		</div>
+
+      		</form>
+
+	    </div>
+  	</div>
+
+</div> 
+<!-- MODAL PROGRESS WINDOW END -->
+
+<!-- MODAL DELETE WINDOW -->
+<div class="modal fade" id="Delete{{external}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+
+  	<div class="modal-dialog">
+	    <div class="modal-content">
+
+	      	<div class="modal-header">
+		        <h5 class="modal-title" id="staticBackdropLabel">DELETE ORDER</h5>
+		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		    </div>
+
+		    <form method="POST" action="{% url 'table:deleteOrder' pk=external.pk %}">
+		    	{% csrf_token %}
+
+	      		<div class="modal-body" style="text-align: center;">
+		      		<h5>Are you sure you want to delete Order: <strong>#{{external.pk}}</strong></h5>
+	      		</div>
+
+	      		<div class="modal-footer">
+	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	      			<input type="submit" class="btn btn-danger" value="Confirm">
+	      		</div>
+
+	      	</form>
+	      		
+	    </div>
+  	</div>
+
+</div> 
+<!-- MODAL DELETE WINDOW END -->
+
+{% endfor %}
+
+	<div class="WelcomeText">
+		<h2>Good {{current_time}}</h2>
+	</div>
+
+	<!-- NAVIGATION PANEL -->
+
+	<div class="container shadow-lg">
+
+		<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
+	  		<li class="nav-item" role="presentation">
+	    		<a class="nav-link" href="{% url 'internals' %}">Internals</a>
+	  		</li>
+
+			<li class="nav-item" role="presentation">
+			    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Externals</button>
+			</li>
+
+		</ul>
+
+		<div class="tab-content" id="myTabContent">
+			<div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+				<!-- INTERNALS BUTTON TAB -->
+
+				<div class="container FilterNav">
+
+					<div class="row">
+						<div class="col">
+
+							<nav class="nav">
+
+								<!-- BUTTON ORDER CREATION -->
+								<a class="btn btn-outline-primary" style="margin-right: 2px;" href="{% url 'table:newOrder' %}" target="_blank" role="button" aria-expanded="false" aria-controls="collapseExample">
+								    <img src="{% static 'images/add.png' %}" class="tableIcons">
+								</a>
+
+							  	<!-- BUTTON FILTER -->
+							  	<button class="btn btn-outline-primary" style="margin-right: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+							    	<img src="{% static 'images/filter.png' %}" class="tableIcons">
+							  	</button>
+
+						 	</nav>
+							
+						</div>
+						<div class="col">
+
+							<nav class="nav justify-content-end">
+
+							  	<!-- BUTTTON SEARCH --> 
+							  	<button type="button" class="btn btn-outline-primary position-relative" data-bs-toggle="modal" data-bs-target="#Search">
+								  <img src="{% static 'images/search.png' %}" class="tableIcons">
+								  {% if badges %}
+								  	<span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" style="display: inline;"></span>
+								  {% else %}
+								  	<span class="badge bg-danger" style="display: none;"></span>
+								  {% endif %}
+								</button>
+
+							</nav>
+							
+						</div>
+					</div>
+
+<!-- 					<div class="collapse" id="collapseExample">
+					  <div class="card card-body">
+					    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+					  </div>
+					</div> -->
+
+					<!-- MODAL SEARCH WINDOW -->
+					<div class="modal fade" id="Search" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+
+					  	<div class="modal-dialog">
+						    <div class="modal-content">
+
+						      	<div class="modal-header">
+							        <h5 class="modal-title" id="staticBackdropLabel">Search</h5>
+							        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							    </div>
+
+						      	<form method="POST">
+						      		{% csrf_token %}
+
+						      		<div class="modal-body">
+							      		{% bootstrap_form search_form bound_css_class='' %}
+						      		</div>
+
+						      		<div class="modal-footer">
+						      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						      			<input type="submit" class="btn btn-primary" value="Search">
+						      		</div>
+						      		
+						      	</form>
+						      		
+						    </div>
+					  	</div>
+
+					</div> 
+					<!-- MODAL SEARCH WINDOW END -->
+					
+				</div>
+
+				<!-- INTERNALS BUTTONS TAB END -->
+
+				{% if badges %}
+					<div style="text-align: center; display: block;">
+						<h5>
+							<span class="badge rounded-pill bg-warning text-dark">
+								Search results for "{{search_string}}"
+							</span>
+							<span class="badge text-bg-primary">
+								<a href="{% url 'externals' %}">Clear</a>
+							</span>
+						</h5>
+					</div>
+				{% endif %}
+
+				<div class="container">
+
+					<table class="table table-hover">
+
+						<thead>
+						    <tr>
+						      	<th scope="col">#</th>
+						      	<th scope="col">Date</th>
+						      	<th scope="col">Client</th>
+						      	<th scope="col">EGGER</th>
+						      	<th scope="col">Krono</th>
+						      	<th scope="col">EDGE</th>
+						      	<th scope="col">Notes</th>
+						      	<th scope="col">Balance</th>
+						    </tr>
+						</thead>
+
+						<tbody>
+
+							{% for external in externals %}
+					 		<tr class="click" id="{{external.pk}}" href="{% url 'table:editOrder' pk=external.pk %}">
+							    <th scope="row">{{external.ID}}</th>
+							    <td>{{external.created_date}}</td>
+							    <td>{{external.owner}}<br>{{external.telephone}}</td>
+
+							    <td>
+							    	{% for item in external.material_eger %}
+							    		{% if item.ordered %}
+							    			<div style="color: green;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% else %}
+							    			<div style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% endif %}
+							    	{% endfor %}
+							    </td>
+
+							    <td>
+							    	{% for item in external.material_krono %}
+							    		{% if item.ordered %}
+							    			<div style="color: green;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% else %}
+							    			<div style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% endif %}
+							    	{% endfor %}
+							    </td>
+							    <td>
+							    	{% for item in external.material_edge %}
+							    		{% if item.ordered %}
+							    			<div style="color: green;" >{{item.edge_type}} - {{item.quantity}}</div>
+							    		{% else %}
+							    			<div style="color: red;" >{{item.edge_type}} - {{item.quantity}}</div>
+							    		{% endif %}
+							    	{% endfor %}
+							    </td>
+							    <td>
+							    	{% for item in external.notes %}
+							    		<div>
+							    			{{item.user}} -> {{item.content}}
+							    		</div>
+							    	{% endfor %}
+							    </td>
+							    <td>{{external.balance}}</td>
+						    </tr>
+
+						    <tr>
+						    	<td colspan="8">
+						    		<div class="hidden" id="{{external.pk}}" style="display: none">
+
+						    			<div class="hidden-table">
+
+							    			<table class="table">
+							    				<thead>
+							    					<tr>
+							    						<th scope="col">Material</th>
+												      	<th scope="col">Ordered</th>
+												      	<th scope="col">Delivered</th>
+												      	<th scope="col">Cutted</th>
+												      	<th scope="col">Edged</th>
+							    					</tr>
+							    				</thead>
+
+							    				<tbody>
+							    					<tr>
+							    						<th scope="row" colspan="8">EGGER</th>
+							    					</tr>
+							    					{% for item in external.material_eger %}
+							    						<tr>
+							    							<td>{{item.material}}</td>
+							    							<td>{{item.ordered}}</td>
+							    							<td>{{item.delivered}}</td>
+							    							<td>{{item.cutted}}</td>
+							    							<td>{{item.edged}}</td>
+							    						</tr>
+							    					{% endfor %}
+							    					<tr>
+							    						<th scope="row" colspan="8">KRONO</th>
+							    					</tr>
+							    					{% for item in external.material_krono %}
+							    						<tr>
+							    							<td>{{item.material}}</td>
+							    							<td>{{item.ordered}}</td>
+							    							<td>{{item.delivered}}</td>
+							    							<td>{{item.cutted}}</td>
+							    							<td>{{item.edged}}</td>
+							    						</tr>
+							    					{% endfor %}
+							    					<tr>
+							    						<th scope="row" colspan="8">EDGE</th>
+							    					</tr>
+							    					{% for item in external.material_edge %}
+							    						<tr>
+							    							<td>{{item.color_code}} - {{item.edge_type}}</td>
+							    							<td>{{item.ordered}}</td>
+							    							<td>{{item.delivered}}</td>
+							    						</tr>
+							    					{% endfor %}
+							    				</tbody>
+							    			</table>
+								 
+								    	</div>
+
+							    		<div class="hidden-buttons">
+							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=external.pk %}" role="button" title="Edit Order">
+							    				<img src="{% static 'images/edit.png' %}" class="tableIcons">
+							    			</a>
+
+							    			<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Delete{{external}}" title="Delete Order">
+							    				<img src="{% static 'images/delete-can.png' %}" class="tableIcons">
+							    			</button>
+
+							    			<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#Progress{{external}}" title="Update Order">
+							    				<img src="{% static 'images/check-list.png' %}" class="tableIcons">
+							    			</button>
+
+							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=external.pk %}" role="button" target="_blank" title="Print View">
+							    				<img src="{% static 'images/printer.png' %}" class="tableIcons">
+							    			</a>
+							    		</div>
+
+						    		</div>
+						    	</td>
+						    </tr>
+
+						    {% endfor %}
+							
+						</tbody>
+
+					</table>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

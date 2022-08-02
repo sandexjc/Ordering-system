@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>TTable Print View</title>
+	<link rel="icon" type="image/x-icon" href="{% static 'images/printer.png' %}">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+	<!-- JavaScript Bundle with Popper -->
+	<!-- JavaScript Bundle with Popper -->
+	<!-- JavaScript Bundle with Popper -->
+	<!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+</head>
+<body>
+
+{% for order in order_details %}
+	<div class="container" style="padding-top: 20px;">
+
+		<table class="table table-bordered border-dark">
+
+			<thead>
+				<tr>
+					<th scope="col" rowspan="3" 
+					style="text-align: left; ">
+						MEGA TRADING <br>
+						Магазин: гр.София - Ж.К Модерно Предградие <br>
+						ул. Адам Мицкевич (на ъгъла с ул. 3019) <br>
+						Склад: гр. София ул.Илиянско шосе 8А <br>
+						Тел: 0895 79 54 40, 0893 45 70 87 <br>
+						e-mail: kkmital@abv.bg, site: www.megatrading.bg
+					</th>
+					<th scope="col">
+						Поръчка № {{order.ID}} <br>   
+						Дата: {{order.created_date}}
+					</th>
+				</tr>
+				<tr>
+					<th>Клиент: {{order.owner}}</th>
+				</tr>
+				<tr>
+					<th>Тел: {{order.telephone}}</th>
+				</tr>
+			</thead>
+
+		</table>
+
+	</div>
+	<div class="container" style="padding-top: 10px">
+		<div class="row">
+			<div class="col">
+
+				<table class="table table-sm table-bordered border-dark">
+					<thead>
+						<tr>
+							<th scope="col">Материал</th>
+							<th scope="col">Брой</th>
+							<th scope="col">Ед. цена</th>
+							<th scope="col">Ст-ст</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for plate in order_plates %}
+							<tr>
+								<td>{{plate.material}}</td>
+								<td>{{plate.quantity}}</td>
+								<td>{{plate.price}}</td>
+								<td>{{plate.value}}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				
+			</div>
+
+			<div class="col">
+				<table class="table table-sm table-bordered border-dark">
+					<thead>
+						<tr>
+							<th scope="col">Разкрояване</th>
+							<th scope="col">Брой</th>
+							<th scope="col">Ед. цена</th>
+							<th scope="col">Ст-ст</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for cut in order_cutting %}
+							<tr>
+								<td>{{cut.cutting_type}}</td>
+								<td>{{cut.quantity}}</td>
+								<td>{{cut.price}}</td>
+								<td>{{cut.value}}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				
+			</div>
+			
+		</div>
+		<div class="row">
+			<div class="col">
+				<table class="table table-sm table-bordered border-dark">
+					<thead>
+						<tr>
+							<th scope="col">Кант</th>
+							<th scope="col">Цвят</th>
+							<th scope="col">л.м.</th>
+							<th scope="col">Ед. цена</th>
+							<th scope="col">Ст-ст</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for edge in order_edges %}
+							<tr>
+								<td>{{edge.edge_type}}</td>
+								<td>{{edge.color_code}}</td>
+								<td>{{edge.quantity}}</td>
+								<td>{{edge.price}}</td>
+								<td>{{edge.value}}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+
+				
+			</div>
+			<div class="col">
+				<table class="table table-sm table-bordered border-dark">
+					<thead>
+						<tr>
+							<th scope="col">Кантиране</th>
+							<th scope="col">л.м.</th>
+							<th scope="col">Ед. цена</th>
+							<th scope="col">Ст-ст</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for edging in order_edging %}
+							<tr>
+								<td>{{edging.edging_type}}</td>
+								<td>{{edging.quantity}}</td>
+								<td>{{edging.price}}</td>
+								<td>{{edging.value}}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				
+			</div>
+			
+		</div>
+		<div class="row">
+			<div class="col">
+
+				<table class="table table-sm table-bordered border-dark">
+					<thead>
+						<tr>
+							<th scope="col">Други услуги</th>
+							<th scope="col">Брой</th>
+							<th scope="col">Ед. цена</th>
+							<th scope="col">Ст-ст</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for other in order_others %}
+							<tr>
+								<td>{{other.description}}</td>
+								<td>{{other.quantity}}</td>
+								<td>{{other.price}}</td>
+								<td>{{other.value}}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+
+			</div>
+			<div class="col">
+
+				<table class="table table-sm table-bordered border-dark">
+					<thead>
+						<tr>
+							<th scope="col" colspan="2">
+								Обща стойност:
+							</th>
+							{% for order in order_details %}
+								<th scope="col"><strong>{{order.total_price}}</strong></th>
+							{% endfor %}
+						</tr>
+					</thead>
+					<tbody>
+						{% for payment in order_payments %}
+						<tr>
+							<td>Авансово</td>
+							<td>{{payment.payment_method}}</td>
+							<td>{{payment.value}}</td>
+						</tr>
+						{% endfor %}
+						<tr>
+							<td colspan="2">
+								Остатък<br>
+								за доплащане
+							</td>
+							{% for order in order_details %}
+							<td>
+								{{order.balance}}
+							</td>
+							{% endfor %}
+						</tr>
+					</tbody>
+				</table>
+				
+			</div>
+			
+		</div>
+		
+	</div>
+
+{% endfor %}
+
+</body>
+</html>

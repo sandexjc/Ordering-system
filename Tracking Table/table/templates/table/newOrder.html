@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+{% block content %}
+
+<div class="container">
+
+	<div style="text-align: center; margin: 20px;">
+		<h1>Create Order</h1>
+	</div>
+
+	<form method="POST">
+		{% csrf_token %}
+		{% bootstrap_form form %}
+		{% bootstrap_form add_note %}
+		<input type="submit" class="btn btn-primary" value="Create">
+	</form>
+	
+</div>
+
+{% endblock %}
