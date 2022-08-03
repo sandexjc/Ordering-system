@@ -28,7 +28,7 @@ class Order(models.Model):
     total_price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
-    notes = models.TextField(max_length=500, blank=True)
+    # notes = models.TextField(max_length=500, blank=True)
 
     order_ready = models.BooleanField(default=False)
     order_taken = models.BooleanField(default=False)

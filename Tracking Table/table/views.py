@@ -265,7 +265,10 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
 
     def post(self, request, pk, *args, **kwargs):
 
+        print('UPDATE ORDER', type(pk) ,pk)
+
         self.object = Order.objects.get(pk=pk)
+        print(self.object)
         PLATES_PROG = PlateProgressFormSet(self.request.POST, instance=self.object)
         EDGES_PROG = EdgeProgressFormSet(self.request.POST, instance=self.object)
 
