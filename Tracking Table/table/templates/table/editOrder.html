@@ -25,17 +25,21 @@
 		<h1>Edit Order</h1>
 	</div>
 
-	<label class="form-label" for="OrderID">ID</label>
+<!-- 	<label class="form-label" for="OrderID">ID</label>
 	<input type="text" id="OrderID" class="form-control" readonly value="{{current_order.ID}}">
-	<br>
+	<br> -->
 
 	<form method="POST">
 		{% csrf_token %}
-		<!-- CLIENT INFO -->
+															<!-- CLIENT INFO -->
+		<label class="form-label" for="OrderID">ID</label>
+		<input type="text" id="OrderID" class="form-control" readonly value="{{current_order.ID}}">
+		<br>
+
 		{% bootstrap_form form bound_css_class='' %}
 		{% bootstrap_form add_note %}
 
-		<!-- CLIENT INFO END -->
+															<!-- CLIENT INFO END -->
 
 		{{plate_forms.management_form}}
 		{{cutting_forms.management_form}}

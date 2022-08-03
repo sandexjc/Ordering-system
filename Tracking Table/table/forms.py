@@ -19,7 +19,8 @@ class UpdateOrderForm(ModelForm):
         model = models.Order
         fields = (
             'ID', 'created_date', 'owner',
-            'client', 'telephone')
+            'client', 'telephone'
+            )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -40,7 +41,7 @@ class AddNoteForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['content'].widget.attrs = {
         'cols': 5,
-        'rows': 5,
+        'rows': 3,
         'placeholder': 'Add Note..'
         }
         self.fields['content'].label = 'Notes'

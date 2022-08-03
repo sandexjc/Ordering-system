@@ -292,7 +292,7 @@ class PrintOrder(LoginRequiredMixin, TemplateView):
 
         context = super(PrintOrder, self).get_context_data(**kwargs)
 
-        context['order_details'] = Order.objects.filter(pk=pk)
+        context['order'] = Order.objects.get(pk=pk)
         context['order_plates'] = Plate.objects.filter(cutID=pk)
         context['order_edges'] = Edge.objects.filter(cutID=pk)
         context['order_cutting'] = Cutting.objects.filter(cutID=pk)

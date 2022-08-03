@@ -11,7 +11,7 @@
 </head>
 <body>
 
-{% for order in order_details %}
+
 	<div class="container" style="padding-top: 20px;">
 
 		<table class="table table-bordered border-dark">
@@ -65,6 +65,8 @@
 								<td>{{plate.value}}</td>
 							</tr>
 						{% endfor %}
+						<th colspan="3">Всичко Плочи</th>
+						<th>{{order.plates_total}}</th>
 					</tbody>
 				</table>
 				
@@ -89,6 +91,8 @@
 								<td>{{cut.value}}</td>
 							</tr>
 						{% endfor %}
+						<th colspan="3">Всичко разкрояване</th>
+						<th>{{order.cutting_total}}</th>
 					</tbody>
 				</table>
 				
@@ -117,6 +121,8 @@
 								<td>{{edge.value}}</td>
 							</tr>
 						{% endfor %}
+						<th colspan="4">Всичко кант</th>
+						<th>{{order.edge_total}}</th>
 					</tbody>
 				</table>
 
@@ -141,6 +147,8 @@
 								<td>{{edging.value}}</td>
 							</tr>
 						{% endfor %}
+						<th colspan="3">Всичко Кантиране</th>
+						<th>{{order.edging_total}}</th>
 					</tbody>
 				</table>
 				
@@ -168,6 +176,8 @@
 								<td>{{other.value}}</td>
 							</tr>
 						{% endfor %}
+						<th colspan="3">Всичко Други</th>
+						<th>{{order.others_total}}</th>
 					</tbody>
 				</table>
 
@@ -180,9 +190,7 @@
 							<th scope="col" colspan="2">
 								Обща стойност:
 							</th>
-							{% for order in order_details %}
 								<th scope="col"><strong>{{order.total_price}}</strong></th>
-							{% endfor %}
 						</tr>
 					</thead>
 					<tbody>
@@ -194,15 +202,15 @@
 						</tr>
 						{% endfor %}
 						<tr>
-							<td colspan="2">
+							<th colspan="2">Всичко платено</th>
+							<th>{{order.paid}}</th>
+						</tr>
+						<tr>
+							<th colspan="2">
 								Остатък<br>
 								за доплащане
-							</td>
-							{% for order in order_details %}
-							<td>
-								{{order.balance}}
-							</td>
-							{% endfor %}
+							</th>
+							<th>{{order.balance}}</th>
 						</tr>
 					</tbody>
 				</table>
@@ -213,7 +221,7 @@
 		
 	</div>
 
-{% endfor %}
+
 
 </body>
 </html>
