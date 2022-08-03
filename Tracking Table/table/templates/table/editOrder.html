@@ -82,7 +82,7 @@
 							<th colspan="4">All</th>
 							<th>
 								<div>
-									{{plates_total}}
+									{{current_order.plates_total}}
 								</div>
 							</th>
 						</tr>
@@ -125,7 +125,7 @@
 							<th colspan="3">All</th>
 							<th>
 								<div>
-									{{cutting_total}}
+									{{current_order.cutting_total}}
 								</div>
 							</th>
 						</tr>
@@ -174,7 +174,7 @@
 							<th colspan="4">All</th>
 							<th>
 								<div>
-									{{edge_total}}
+									{{current_order.edge_total}}
 								</div>
 							</th>
 						</tr>
@@ -217,7 +217,7 @@
 							<th colspan="3">All</th>
 							<th>
 								<div>
-									{{edging_total}}
+									{{current_order.edging_total}}
 								</div>
 							</th>
 						</tr>
@@ -265,7 +265,7 @@
 							<th colspan="3">All</th>
 							<th>
 								<div>
-									{{other_total}}
+									{{current_order.others_total}}
 								</div>
 							</th>
 						</tr>
@@ -293,7 +293,7 @@
 						<tr>
 							<td scope="3"><strong>All</strong></td>
 							<td></td>
-							<td><strong>{{payment_total}}</strong></td>
+							<td><strong>{{current_order.paid}}</strong></td>
 						</tr>
 						<tr>
 							<td><strong>LEFT</strong></td>

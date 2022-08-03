@@ -11,20 +11,9 @@ class Internals(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(Internals, self).get_context_data(**kwargs)
-        plate_forms = []
-        edge_forms = []
         context['internals'] = []
 
-        # class ProgressForm:
-
-        #     def __init__(self, order_id, form):
-        #         self.order_id = order_id
-        #         self.form = form
-
-        #     def __str__(self):
-        #         return self.form
-
-        class Object:
+        class OrderObject:
 
             def __init__(self, internal):
                 self.order = internal
@@ -35,14 +24,10 @@ class Internals(LoginRequiredMixin, TemplateView):
                 self.plate_forms = forms.PlateProgressFormSet(instance=internal)
                 self.edge_forms = forms.EdgeProgressFormSet(instance=internal)
 
-            def update(self):
-                internal.update()
-
             def __str__(self):
                 return str(self.order)
 
         if self.request.POST:
-            # print(f'SEARCHED {kwargs["search_string"]}')
             context['search_form'] = forms.SearchForm(self.request.POST)
             context['search_string'] = kwargs["search_string"]
 
@@ -91,26 +76,7 @@ class Internals(LoginRequiredMixin, TemplateView):
             context['badges'] = False
 
         for internal in all_internals:
-
-            # internal.material_eger = Plate.objects.filter(cutID=internal.pk, manufacturer='Egger')
-            # internal.material_krono = Plate.objects.filter(cutID=internal.pk, manufacturer='Kronospan')
-            # internal.material_edge = Edge.objects.filter(cutID=internal.pk)
-            # internal.notes = Note.objects.filter(cutID=internal.pk)
-
-            context['internals'].append(Object(internal))
-
-            # plate_form = forms.PlateProgressFormSet(instance=internal)
-            # form_object = ProgressForm(internal.ID, plate_form)
-            # plate_forms.append(form_object)
-
-            # edge_form = forms.EdgeProgressFormSet(instance=internal)
-            # form_object = ProgressForm(internal.ID, edge_form)
-            # edge_forms.append(form_object)
-
-        # print(type(internals)) --> QUERY SET !!!
-        # context['internals'] = internals
-        # context['update_forms'] = plate_forms
-        # context['edge_forms'] = edge_forms
+            context['internals'].append(OrderObject(internal))
 
         current_time = time.localtime(time.time())
 
