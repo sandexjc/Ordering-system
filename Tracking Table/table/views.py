@@ -243,8 +243,8 @@ class EditOrder(LoginRequiredMixin, UpdateView):
             item.cutID = self.object
             item.save()
 
-        self.object.get_total()
-        self.object.get_balance()
+
+        self.object.update()
         self.object.save()
 
         return redirect('table:editOrder', self.object.pk)

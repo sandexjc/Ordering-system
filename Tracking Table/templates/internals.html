@@ -9,7 +9,7 @@
 {% for internal in internals %}
 
 <!-- MODAL PROGRESS WINDOW -->
-<div class="modal fade" id="Progress{{internal}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="Progress{{internal.order}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 
   	<div class="modal-dialog">
 	    <div class="modal-content">
@@ -20,14 +20,14 @@
 		        		UPDATE PROGRESS
 		        	</div>
 		        	<div>
-		        		ORDER {{internal}}
+		        		ORDER {{internal.order}}
 		        	</div>
 		        </h5>
 
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:updateOrder' pk=internal.pk %}">
+		    <form method="POST" action="{% url 'table:updateOrder' pk=internal.order %}">
 
 	      		<div class="modal-body">
 
@@ -129,7 +129,7 @@
 <!-- MODAL PROGRESS WINDOW END -->
 
 <!-- MODAL DELETE WINDOW -->
-<div class="modal fade" id="Delete{{internal}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="Delete{{internal.pk}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 
   	<div class="modal-dialog">
 	    <div class="modal-content">
@@ -139,7 +139,7 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:deleteOrder' pk=internal.pk %}">
+		    <form method="POST" action="{% url 'table:deleteOrder' pk=internal.order %}">
 		    	{% csrf_token %}
 
 	      		<div class="modal-body" style="text-align: center;">
@@ -302,10 +302,10 @@
 						<tbody>
 
 							{% for internal in internals %}
-					 		<tr class="click" id="{{internal.pk}}">
-							    <th scope="row">{{internal.ID}}</th>
-							    <td>{{internal.created_date}}</td>
-							    <td>{{internal.owner}}<br>{{internal.telephone}}</td>
+					 		<tr class="click" id="{{internal}}">
+							    <th scope="row">{{internal.order.ID}}</th>
+							    <td>{{internal.order.created_date}}</td>
+							    <td>{{internal.order.owner}}<br>{{internal.order.telephone}}</td>
 
 							    <td>
 							    	{% for item in internal.material_eger %}
@@ -342,12 +342,12 @@
 							    		</div>
 							    	{% endfor %}
 							    </td>
-							    <td>{{internal.balance}}</td>
+							    <td>{{internal.order.balance}}</td>
 						    </tr>
 
 						    <tr>
 						    	<td colspan="8">
-						    		<div class="hidden" id="{{internal.pk}}" style="display: none">
+						    		<div class="hidden" id="{{internal}}" style="display: none">
 
 						    			<div class="hidden-table">
 
@@ -403,7 +403,7 @@
 								    	</div>
 
 							    		<div class="hidden-buttons">
-							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=internal.pk %}" role="button" title="Edit Order">
+							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=internal.order %}" role="button" title="Edit Order">
 							    				<img src="{% static 'images/edit.png' %}" class="tableIcons">
 							    			</a>
  
@@ -415,7 +415,7 @@
 							    				<img src="{% static 'images/check-list.png' %}" class="tableIcons">
 							    			</button>
 
-							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=internal.pk %}" role="button" target="_blank" title="Print View">
+							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=internal %}" role="button" target="_blank" title="Print View">
 							    				<img src="{% static 'images/printer.png' %}" class="tableIcons">
 							    			</a>
 							    		</div>

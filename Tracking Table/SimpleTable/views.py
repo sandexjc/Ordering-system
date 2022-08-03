@@ -13,6 +13,7 @@ class Internals(LoginRequiredMixin, TemplateView):
         context = super(Internals, self).get_context_data(**kwargs)
         plate_forms = []
         edge_forms = []
+        context['internals'] = []
 
         class ProgressForm:
 
@@ -23,17 +24,20 @@ class Internals(LoginRequiredMixin, TemplateView):
             def __str__(self):
                 return self.form
 
-        # class Object:
+        class Object:
 
-        #     def __init__(self, internal):
-        #         self.order = internal
-        #         self.material_eger = Plate.objects.filter(cutID=internal.pk, manufacturer='Egger')
-        #         self.material_krono = Plate.objects.filter(cutID=internal.pk, manufacturer='Kronospan')
-        #         self.material_edge = Edge.objects.filter(cutID=internal.pk)
-        #         self.notes = Note.objects.filter(cutID=internal.pk)
+            def __init__(self, internal):
+                self.order = internal
+                self.material_eger = Plate.objects.filter(cutID=internal.pk, manufacturer='Egger')
+                self.material_krono = Plate.objects.filter(cutID=internal.pk, manufacturer='Kronospan')
+                self.material_edge = Edge.objects.filter(cutID=internal.pk)
+                self.notes = Note.objects.filter(cutID=internal.pk)
 
-        #     def __str__(self):
-        #         return self.order
+            def update(self):
+                internal.update()
+
+            def __str__(self):
+                return str(self.order)
 
         if self.request.POST:
             # print(f'SEARCHED {kwargs["search_string"]}')
@@ -80,16 +84,18 @@ class Internals(LoginRequiredMixin, TemplateView):
                 context['badges'] = True
 
         else:
-            internals = Order.objects.filter(client='Internal')
+            all_internals = Order.objects.filter(client='Internal')
             context['search_form'] = forms.SearchForm
             context['badges'] = False
 
-        for internal in internals:
+        for internal in all_internals:
 
-            internal.material_eger = Plate.objects.filter(cutID=internal.pk, manufacturer='Egger')
-            internal.material_krono = Plate.objects.filter(cutID=internal.pk, manufacturer='Kronospan')
-            internal.material_edge = Edge.objects.filter(cutID=internal.pk)
-            internal.notes = Note.objects.filter(cutID=internal.pk)
+            # internal.material_eger = Plate.objects.filter(cutID=internal.pk, manufacturer='Egger')
+            # internal.material_krono = Plate.objects.filter(cutID=internal.pk, manufacturer='Kronospan')
+            # internal.material_edge = Edge.objects.filter(cutID=internal.pk)
+            # internal.notes = Note.objects.filter(cutID=internal.pk)
+
+            context['internals'].append(Object(internal))
 
             plate_form = forms.PlateProgressFormSet(instance=internal)
             form_object = ProgressForm(internal.ID, plate_form)
@@ -100,7 +106,7 @@ class Internals(LoginRequiredMixin, TemplateView):
             edge_forms.append(form_object)
 
         # print(type(internals)) --> QUERY SET !!!
-        context['internals'] = internals
+        # context['internals'] = internals
         context['update_forms'] = plate_forms
         context['edge_forms'] = edge_forms
 

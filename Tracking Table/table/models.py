@@ -15,9 +15,15 @@ class Order(models.Model):
     client = models.CharField(choices=client_statuses, default='Internal', max_length=50)
     telephone = models.CharField(max_length=14, blank=True)
 
-    material_eger = models.CharField(max_length=500, default='', blank=True)
-    material_krono = models.CharField(max_length=500, default='', blank=True)
-    material_edge = models.CharField(max_length=500, default='', blank=True)
+    # material_eger = models.CharField(max_length=500, default='', blank=True)
+    # material_krono = models.CharField(max_length=500, default='', blank=True)
+    # material_edge = models.CharField(max_length=500, default='', blank=True)
+
+    plates_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    edge_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    cutting_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    edging_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    others_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
     total_price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
@@ -26,6 +32,29 @@ class Order(models.Model):
 
     order_ready = models.BooleanField(default=False)
     order_taken = models.BooleanField(default=False)
+
+    def update(self):
+
+        self.get_total()
+        self.get_balance()
+
+        all_plates = Plate.objects.filter(cutID=self.ID)
+        for item in all_plates:
+            self.plates_total += item.value
+
+        all_edges = Edge.objects.filter(cutID=self.ID)
+        for item in all_edges:
+            self.edge_total += item.value
+
+        all_cutting = Cutting.objects.filter(cutID=self.ID)
+        for item in all_cutting:
+            self.cutting_total += item.value
+
+        for item in Edging.objects.filter(cutID=self.ID):
+            self.edging_total += item.value
+
+        for item in Other.objects.filter(cutID=self.ID):
+            self.others_total += item.value
 
     def get_total(self):
 
