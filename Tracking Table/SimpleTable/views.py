@@ -32,7 +32,7 @@ class Internals(LoginRequiredMixin, TemplateView):
             context['search_string'] = kwargs["search_string"]
 
             results = []
-            internals = []
+            all_internals = []
 
             internals_ids = Order.objects.filter(
                 client='Internal', 
@@ -61,8 +61,8 @@ class Internals(LoginRequiredMixin, TemplateView):
             for item in results:
                 if len(item) != 0:
                     for res in item:
-                        if res not in internals:
-                            internals.append(res)
+                        if res not in all_internals:
+                            all_internals.append(res)
                             # print(f'APPENDED {res}')
 
             if len(kwargs['search_string']) == 0:
