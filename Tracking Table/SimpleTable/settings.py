@@ -31,8 +31,12 @@ ALLOWED_HOSTS = []
 # runserver.default_port = '80'
 # runserver.default_addr = '192.168.1.5'
 
-
 # Application definition
+
+CSRF_COOKIE_AGE = None
+SESSION_COOKIE_AGE = 43200
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',

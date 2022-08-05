@@ -39,22 +39,33 @@ class Internals(LoginRequiredMixin, TemplateView):
             all_internals = []
 
             if kwargs['category'] == 'ID':
-                all_internals.extend(search_id('Internal', kwargs['search_field']))
+                all_internals = search_id('Internal', kwargs['search_field']).order_by('-ID')
+                # all_internals.extend(search_id('Internal', kwargs['search_field']))
 
             elif kwargs['category'] == 'Date':
-                all_internals.extend(search_date('Internal', kwargs['search_field']))
+                all_internals = search_date('Internal', kwargs['search_field']).order_by('-ID')
+                # all_internals.extend(search_date('Internal', kwargs['search_field']))
 
             elif kwargs['category'] == 'Telephone':
-                all_internals.extend(search_telephone('Internal', kwargs['search_field']))
+                all_internals = search_telephone('Internal', kwargs['search_field']).order_by('-ID')
+                # all_internals.extend(search_telephone('Internal', kwargs['search_field']))
 
             elif kwargs['category'] == 'Client Name':
-                all_internals.extend(search_name('Internal', kwargs['search_field']))
+                all_internals = search_name('Internal', kwargs['search_field']).order_by('-ID')
+                # all_internals.extend(search_name('Internal', kwargs['search_field']))
 
             else:
                 all_internals.extend(search_id('Internal', kwargs['search_field']))
                 all_internals.extend(search_date('Internal', kwargs['search_field']))
                 all_internals.extend(search_telephone('Internal', kwargs['search_field']))
                 all_internals.extend(search_name('Internal', kwargs['search_field']))
+                # id_filter = search_id('Internal', kwargs['search_field']).order_by('-ID')
+                # date_filter = search_date('Internal', kwargs['search_field']).order_by('-ID')
+                # telephone_filter = search_telephone('Internal', kwargs['search_field']).order_by('-ID')
+                # name_filter = search_name('Internal', kwargs['search_field']).order_by('-ID')
+
+                # id_filter.union(date_filter, telephone_filter, name_filter)
+                # all_internals = id_filter
 
             all_internals = list(set(all_internals))
 
