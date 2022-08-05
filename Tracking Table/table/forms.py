@@ -17,19 +17,18 @@ class UpdateOrderForm(ModelForm):
 
     class Meta:
         model = models.Order
-        fields = '__all__'
-        exclude = (
-            'material_eger', 'material_krono', 
-            'material_edge', 'total_price', 
-            'balance', 'order_ready',
-            'order_taken', 'notes')
+        fields = (
+            'ID', 'created_date', 'owner',
+            'client', 'telephone'
+            )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['owner'].widget.attrs['placeholder'] = 'Client Name'
+        self.fields['owner'].widget.attrs = {
+        'placeholder': 'Client Name',
+        'readonly': True,
+        }    
         self.fields['owner'].label = 'Client Name'
-
-        self.fields['owner'].widget.attrs['readonly'] = True
         self.fields['created_date'].widget.attrs['readonly'] = True
 
 class AddNoteForm(ModelForm):
@@ -40,9 +39,11 @@ class AddNoteForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['content'].widget.attrs['cols'] = 20
-        self.fields['content'].widget.attrs['rows'] = 5
-        self.fields['content'].widget.attrs['placeholder'] = 'Add Note..'
+        self.fields['content'].widget.attrs = {
+        'cols': 5,
+        'rows': 3,
+        'placeholder': 'Add Note..'
+        }
         self.fields['content'].label = 'Notes'
 
 class AddPlateForm(ModelForm):

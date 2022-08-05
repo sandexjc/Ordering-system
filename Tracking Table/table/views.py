@@ -54,8 +54,7 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
         context = super(EditOrder, self).get_context_data(**kwargs)
 
-        self.object.get_total()
-        self.object.get_balance()
+        self.object.update()
 
         if self.request.POST:
             context['plate_forms'] = kwargs['PLATES']
@@ -79,21 +78,7 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         context['current_payments'] = Payment.objects.filter(cutID=self.object)
         context['current_order'] = self.object
 
-        context['plates_total'] = self.get_local_total(Plate.objects.filter(cutID=self.object))
-        context['cutting_total'] = self.get_local_total(Cutting.objects.filter(cutID=self.object))
-        context['edge_total'] = self.get_local_total(Edge.objects.filter(cutID=self.object))
-        context['edging_total'] = self.get_local_total(Edging.objects.filter(cutID=self.object))
-        context['other_total'] = self.get_local_total(Other.objects.filter(cutID=self.object))
-        context['payment_total'] = self.get_local_total(Payment.objects.filter(cutID=self.object))
-
         return context
-
-    def get_local_total(self, table):
-        current_total = 0
-        for item in table:
-            current_total += item.value
-
-        return current_total
 
     def post(self, request, pk, *args, **kwargs):
 
@@ -243,8 +228,8 @@ class EditOrder(LoginRequiredMixin, UpdateView):
             item.cutID = self.object
             item.save()
 
-        self.object.get_total()
-        self.object.get_balance()
+
+        self.object.update()
         self.object.save()
 
         return redirect('table:editOrder', self.object.pk)
@@ -265,7 +250,10 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
 
     def post(self, request, pk, *args, **kwargs):
 
+        print('UPDATE ORDER', type(pk) ,pk)
+
         self.object = Order.objects.get(pk=pk)
+        print(self.object)
         PLATES_PROG = PlateProgressFormSet(self.request.POST, instance=self.object)
         EDGES_PROG = EdgeProgressFormSet(self.request.POST, instance=self.object)
 
@@ -304,7 +292,7 @@ class PrintOrder(LoginRequiredMixin, TemplateView):
 
         context = super(PrintOrder, self).get_context_data(**kwargs)
 
-        context['order_details'] = Order.objects.filter(pk=pk)
+        context['order'] = Order.objects.get(pk=pk)
         context['order_plates'] = Plate.objects.filter(cutID=pk)
         context['order_edges'] = Edge.objects.filter(cutID=pk)
         context['order_cutting'] = Cutting.objects.filter(cutID=pk)

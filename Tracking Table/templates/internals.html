@@ -9,7 +9,7 @@
 {% for internal in internals %}
 
 <!-- MODAL PROGRESS WINDOW -->
-<div class="modal fade" id="Progress{{internal}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="Progress{{internal.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 
   	<div class="modal-dialog">
 	    <div class="modal-content">
@@ -20,14 +20,14 @@
 		        		UPDATE PROGRESS
 		        	</div>
 		        	<div>
-		        		ORDER {{internal}}
+		        		ORDER {{internal.order.ID}}
 		        	</div>
 		        </h5>
 
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:updateOrder' pk=internal.pk %}">
+		    <form method="POST" action="{% url 'table:updateOrder' pk=internal.order.ID %}">
 
 	      		<div class="modal-body">
 
@@ -52,62 +52,51 @@
 							<tr>
 								<th scope="row" colspan="8">EGGER</th>
 							</tr>
+							{{internal.plate_forms.management_form}}
 							
-								{% for plate_form in update_forms %}
-									{% if plate_form.order_id == internal.ID %}
-									{{plate_form.form.management_form}}
-										{% for item in plate_form.form %}
-											{% if item.manufacturer.value == 'Egger' %}
-												{{item.id}}
-												<tr>
-													<td>{{item.material}}</td>
-													<td>{{item.ordered}}</td>
-													<td>{{item.delivered}}</td>
-													<td>{{item.cutted}}</td>
-													<td>{{item.edged}}</td>
-												</tr>
-											{% endif %}
-										{% endfor %}
-									{% endif %}
-								{% endfor %}
+							{% for item in internal.plate_forms %}
+								{% if item.manufacturer.value == 'Egger' %}
+									{{item.id}}
+									<tr>
+										<td>{{item.material}}</td>
+										<td>{{item.ordered}}</td>
+										<td>{{item.delivered}}</td>
+										<td>{{item.cutted}}</td>
+										<td>{{item.edged}}</td>
+									</tr>
+								{% endif %}
+							{% endfor %}
 
 							<tr>
 								<th scope="row" colspan="8">KRONO</th>
 							</tr>
-								{% for plate_form in update_forms %}
-									{% if plate_form.order_id == internal.ID %}
-										{{plate_form.form.management_form}}
-										{% for item in plate_form.form %}
-											{% if item.manufacturer.value == 'Kronospan' %}
-												{{item.id}}
-												<tr>
-													<td>{{item.material}}</td>
-													<td>{{item.ordered}}</td>
-													<td>{{item.delivered}}</td>
-													<td>{{item.cutted}}</td>
-													<td>{{item.edged}}</td>
-												</tr>
-											{% endif %}
-										{% endfor %}
-									{% endif %}
-								{% endfor %}
+						
+							{% for item in internal.plate_forms %}
+								{% if item.manufacturer.value == 'Kronospan' %}
+									{{item.id}}
+									<tr>
+										<td>{{item.material}}</td>
+										<td>{{item.ordered}}</td>
+										<td>{{item.delivered}}</td>
+										<td>{{item.cutted}}</td>
+										<td>{{item.edged}}</td>
+									</tr>
+								{% endif %}
+							{% endfor %}
 							
 							<tr>
 								<th scope="row" colspan="8">EDGE</th>
 							</tr>
-								{% for edge_form in edge_forms %}
-									{% if edge_form.order_id == internal.ID %}
-										{{edge_form.form.management_form}}
-										{% for item in edge_form.form %}
-											{{item.id}}
-											<tr>
-												<td>{{item.color_code}}{{item.edge_type}}</td>
-												<td style="margin-right: auto; margin-top: auto;">{{item.ordered}}</td>
-												<td>{{item.delivered}}</td>
-											</tr>
-										{% endfor %}
-									{% endif %}
-								{% endfor %}
+							{{internal.edge_forms.management_form}}
+
+							{% for item in internal.edge_forms %}
+								{{item.id}}
+								<tr>
+									<td>{{item.color_code}}{{item.edge_type}}</td>
+									<td style="margin-right: auto; margin-top: auto;">{{item.ordered}}</td>
+									<td>{{item.delivered}}</td>
+								</tr>
+							{% endfor %}
 
 						</tbody>
 					</table>
@@ -129,7 +118,7 @@
 <!-- MODAL PROGRESS WINDOW END -->
 
 <!-- MODAL DELETE WINDOW -->
-<div class="modal fade" id="Delete{{internal}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="Delete{{internal.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 
   	<div class="modal-dialog">
 	    <div class="modal-content">
@@ -139,12 +128,12 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:deleteOrder' pk=internal.pk %}">
+		    <form method="POST" action="{% url 'table:deleteOrder' pk=internal.order.ID %}">
 		    	{% csrf_token %}
 
 	      		<div class="modal-body" style="text-align: center;">
 		      		<h5>Are you sure you want to delete Order: 
-		      			<strong>#{{internal.pk}}</strong>
+		      			<strong>#{{internal.order.ID}}</strong>
 		      		</h5>
 	      		</div>
 
@@ -273,7 +262,7 @@
 					<div style="text-align: center; display: block;">
 						<h5>
 							<span class="badge rounded-pill bg-warning text-dark">
-								Search results for "{{search_string}}"
+								Search results for "{{category}}"="{{search_string}}"
 							</span>
 							<span class="badge text-bg-primary">
 								<a href="{% url 'home' %}">Clear</a>
@@ -302,10 +291,10 @@
 						<tbody>
 
 							{% for internal in internals %}
-					 		<tr class="click" id="{{internal.pk}}">
-							    <th scope="row">{{internal.ID}}</th>
-							    <td>{{internal.created_date}}</td>
-							    <td>{{internal.owner}}<br>{{internal.telephone}}</td>
+					 		<tr class="click" id="{{internal}}">
+							    <th scope="row">{{internal.order.ID}}</th>
+							    <td>{{internal.order.created_date}}</td>
+							    <td>{{internal.order.owner}}<br>{{internal.order.telephone}}</td>
 
 							    <td>
 							    	{% for item in internal.material_eger %}
@@ -342,12 +331,12 @@
 							    		</div>
 							    	{% endfor %}
 							    </td>
-							    <td>{{internal.balance}}</td>
+							    <td>{{internal.order.balance}}</td>
 						    </tr>
 
 						    <tr>
 						    	<td colspan="8">
-						    		<div class="hidden" id="{{internal.pk}}" style="display: none">
+						    		<div class="hidden" id="{{internal}}" style="display: none">
 
 						    			<div class="hidden-table">
 
@@ -403,7 +392,7 @@
 								    	</div>
 
 							    		<div class="hidden-buttons">
-							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=internal.pk %}" role="button" title="Edit Order">
+							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=internal.order %}" role="button" title="Edit Order">
 							    				<img src="{% static 'images/edit.png' %}" class="tableIcons">
 							    			</a>
  
@@ -415,7 +404,7 @@
 							    				<img src="{% static 'images/check-list.png' %}" class="tableIcons">
 							    			</button>
 
-							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=internal.pk %}" role="button" target="_blank" title="Print View">
+							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=internal %}" role="button" target="_blank" title="Print View">
 							    				<img src="{% static 'images/printer.png' %}" class="tableIcons">
 							    			</a>
 							    		</div>
