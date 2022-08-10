@@ -4,6 +4,8 @@ var hidden_alert = document.getElementsByClassName("ALERT-S");
 var alert_button = document.getElementsByClassName("showAlert");
 var alert_close_btn = document.getElementsByClassName("closeAlert");
 
+$("#demo").html("Hello World");
+
 for (var i=0; i<clickable_rows.length; i++) {
 	clickable_rows[i].addEventListener('click', function() {
 
