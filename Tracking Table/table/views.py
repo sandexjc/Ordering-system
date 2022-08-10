@@ -260,7 +260,7 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
         print('<<--------------------------------->>')
 
         if PLATES_PROG.is_valid() and EDGES_PROG.is_valid():
-            # print('FORM VALID')
+            print('FORM VALID')
             return self.form_valid(PLATES_PROG, EDGES_PROG)
         else:
             print('FORM INVALID _____________')
