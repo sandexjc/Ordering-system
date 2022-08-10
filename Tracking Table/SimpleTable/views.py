@@ -6,26 +6,26 @@ from SimpleTable import forms
 import time
 import table
 
+class OrderObject:
+
+    def __init__(self, order):
+        self.order = order
+        self.material_eger = Plate.objects.filter(cutID=order, manufacturer='Egger')
+        self.material_krono = Plate.objects.filter(cutID=order, manufacturer='Kronospan')
+        self.material_edge = Edge.objects.filter(cutID=order)
+        self.notes = Note.objects.filter(cutID=order)
+        self.plate_forms = forms.PlateProgressFormSet(instance=order)
+        self.edge_forms = forms.EdgeProgressFormSet(instance=order)
+
+    def __str__(self):
+        return str(self.order)
+
 class Internals(LoginRequiredMixin, TemplateView):
     template_name = 'internals.html'
 
     def get_context_data(self, **kwargs):
         context = super(Internals, self).get_context_data(**kwargs)
         context['internals'] = []
-
-        class OrderObject:
-
-            def __init__(self, internal):
-                self.order = internal
-                self.material_eger = Plate.objects.filter(cutID=internal, manufacturer='Egger')
-                self.material_krono = Plate.objects.filter(cutID=internal, manufacturer='Kronospan')
-                self.material_edge = Edge.objects.filter(cutID=internal)
-                self.notes = Note.objects.filter(cutID=internal)
-                self.plate_forms = forms.PlateProgressFormSet(instance=internal)
-                self.edge_forms = forms.EdgeProgressFormSet(instance=internal)
-
-            def __str__(self):
-                return str(self.order)
 
         if self.request.POST:
 
@@ -107,21 +107,6 @@ class Externals(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Externals, self).get_context_data(**kwargs)
         context['externals'] = []
-
-        class OrderObject:
-
-            def __init__(self, external):
-                self.order = external
-                self.material_eger = Plate.objects.filter(cutID=external, manufacturer='Egger')
-                self.material_krono = Plate.objects.filter(cutID=external, manufacturer='Kronospan')
-                self.material_edge = Edge.objects.filter(cutID=external)
-                self.notes = Note.objects.filter(cutID=external)
-                self.plate_forms = forms.PlateProgressFormSet(instance=external)
-                self.edge_forms = forms.EdgeProgressFormSet(instance=external)
-
-            def __str__(self):
-                return str(self.order)
-
 
         if self.request.POST:
             context['search_form'] = forms.SearchForm(self.request.POST)

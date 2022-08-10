@@ -3,6 +3,9 @@
 {% load bootstrap5 %}
 {% block content %}
 
+<!-- ##############################################
+############################################## -->
+
 {% for external in externals %}
 
 <!-- MODAL PROGRESS WINDOW -->
@@ -17,7 +20,7 @@
 		        		UPDATE PROGRESS
 		        	</div>
 		        	<div>
-		        		ORDER {{external.ID}}
+		        		ORDER {{internal.order.ID}}
 		        	</div>
 		        </h5>
 
@@ -178,7 +181,7 @@
 							<nav class="nav">
 
 								<!-- BUTTON ORDER CREATION -->
-								<a class="btn btn-outline-primary" style="margin-right: 2px;" href="{% url 'table:newOrder' %}" target="_blank" role="button" aria-expanded="false" aria-controls="collapseExample">
+								<a class="btn btn-outline-primary" style="margin-right: 2px;" href="{% url 'table:newOrder' %}" role="button" aria-expanded="false" aria-controls="collapseExample">
 								    <img src="{% static 'images/add.png' %}" class="tableIcons">
 								</a>
 
@@ -254,7 +257,7 @@
 					<div style="text-align: center; display: block;">
 						<h5>
 							<span class="badge rounded-pill bg-warning text-dark">
-								Search results for "{{search_string}}"
+								Search results for "{{category}}"="{{search_string}}"
 							</span>
 							<span class="badge text-bg-primary">
 								<a href="{% url 'externals' %}">Clear</a>

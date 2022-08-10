@@ -70,7 +70,6 @@
 							<tr>
 								<th scope="row" colspan="8">KRONO</th>
 							</tr>
-						
 							{% for item in internal.plate_forms %}
 								{% if item.manufacturer.value == 'Kronospan' %}
 									{{item.id}}
@@ -186,7 +185,7 @@
 							<nav class="nav">
 
 								<!-- BUTTON ORDER CREATION -->
-								<a class="btn btn-outline-primary" style="margin-right: 2px;" href="{% url 'table:newOrder' %}" target="_blank" role="button" aria-expanded="false" aria-controls="collapseExample">
+								<a class="btn btn-outline-primary" style="margin-right: 2px;" href="{% url 'table:newOrder' %}" role="button" aria-expanded="false" aria-controls="collapseExample">
 								    <img src="{% static 'images/add.png' %}" class="tableIcons">
 								</a>
 
