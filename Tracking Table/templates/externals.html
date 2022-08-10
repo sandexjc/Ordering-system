@@ -20,7 +20,7 @@
 		        		UPDATE PROGRESS
 		        	</div>
 		        	<div>
-		        		ORDER {{internal.order.ID}}
+		        		ORDER {{external.order.ID}}
 		        	</div>
 		        </h5>
 
@@ -86,7 +86,7 @@
 							<tr>
 								<th scope="row" colspan="8">EDGE</th>
 							</tr>
-							{{internal.edge_forms.management_form}}
+							{{external.edge_forms.management_form}}
 
 							{% for item in external.edge_forms %}
 								{{item.id}}
