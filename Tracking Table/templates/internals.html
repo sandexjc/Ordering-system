@@ -29,7 +29,7 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:updateOrder' pk=internal.order.ID %}">
+		    <form id="{{internal.order.ID}}" class="updateForms">
 
 	      		<div class="modal-body">
 
@@ -106,7 +106,7 @@
 
 	      		<div class="modal-footer">
 	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<input type="submit" class="btn btn-primary" value="Update">
+	      			<button type="button" class="btn btn-primary updateButtons" id="{{internal.order.ID}}">Update</button>
 	      			<button type="button" class="btn btn-secondary showAlert">Show Alert</button>
 	      		</div>
 
@@ -292,7 +292,7 @@
 						<tbody>
 
 							{% for internal in internals %}
-					 		<tr class="click" id="{{internal}}">
+					 		<tr class="visibleRows" id="{{internal.order.ID}}">
 							    <th scope="row">{{internal.order.ID}}</th>
 							    <td>{{internal.order.created_date}}</td>
 							    <td>{{internal.order.owner}}<br>{{internal.order.telephone}}</td>
@@ -337,7 +337,7 @@
 
 						    <tr>
 						    	<td colspan="8">
-						    		<div class="hidden" id="{{internal}}" style="display: none">
+						    		<div class="hiddenRows" id="{{internal}}" style="display: none">
 
 						    			<div class="hidden-table">
 
