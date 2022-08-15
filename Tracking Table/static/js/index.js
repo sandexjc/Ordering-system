@@ -1,8 +1,6 @@
 var clickable_rows = document.getElementsByClassName('visibleRows');
 var hidden_rows = document.getElementsByClassName('hiddenRows');
 
-$("#demo").html("Hello World");
-
 for (var i=0; i<clickable_rows.length; i++) {
 	clickable_rows[i].addEventListener('click', function() {
 		for (var k=0; k<hidden_rows.length; k++) {

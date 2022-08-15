@@ -26,7 +26,7 @@ class Internals(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Internals, self).get_context_data(**kwargs)
         context['internals'] = []
-
+        
         if self.request.POST:
 
             print(kwargs['search_field'])
