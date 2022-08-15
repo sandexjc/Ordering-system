@@ -87,6 +87,7 @@ class Plate(models.Model):
     manufacturers = [
         ('Egger', 'Egger'),
         ('Kronospan', 'Kronospan'),
+        ('Other', 'Other'),
     ]
 
     cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
