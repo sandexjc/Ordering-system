@@ -41,6 +41,7 @@
 
 .table td{
 	padding: 0px;
+	font-weight: bold;
 }
 
 .tableIcons{
@@ -65,4 +66,8 @@
 
 .TableValue{
 	background-color: red;
+}
+
+th{
+	font-size: 18px;
 }
