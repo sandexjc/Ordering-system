@@ -82,6 +82,22 @@
 									</tr>
 								{% endif %}
 							{% endfor %}
+
+							<tr>
+								<th scope="row" colspan="8">OTHERS</th>
+							</tr>
+							{% for item in external.plate_forms %}
+								{% if item.manufacturer.value == 'Other' %}
+									{{item.id}}
+									<tr>
+										<td>{{item.material}}</td>
+										<td>{{item.ordered}}</td>
+										<td>{{item.delivered}}</td>
+										<td>{{item.cutted}}</td>
+										<td>{{item.edged}}</td>
+									</tr>
+								{% endif %}
+							{% endfor %}
 							
 							<tr>
 								<th scope="row" colspan="8">EDGE</th>
@@ -105,7 +121,6 @@
 	      		<div class="modal-footer">
 	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 	      			<input type="submit" class="btn btn-primary" value="Update">
-	      			<button type="button" class="btn btn-secondary showAlert">Show Alert</button>
 	      		</div>
 
       		</form>
@@ -271,13 +286,23 @@
 					<table class="table table-hover">
 
 						<thead>
+							<tr>
+								<th scope="col" colspan="3">Основна Информация</th>
+								<th scope="col" colspan="3">Плочи</th>
+								<th scope="col">Кант</th>
+								<th scope="col">Бележки</th>
+								<th scope="col">Други услуги</th>
+								<th scope="col">Други</th>
+							</tr>
 						    <tr>
 						      	<th scope="col">#</th>
 						      	<th scope="col">Date</th>
 						      	<th scope="col">Client</th>
 						      	<th scope="col">EGGER</th>
-						      	<th scope="col">Krono</th>
+						      	<th scope="col">KRONO</th>
+						      	<th scope="col">OTHERS</th>
 						      	<th scope="col">EDGE</th>
+						      	<th scope="col">Other Services</th>
 						      	<th scope="col">Notes</th>
 						      	<th scope="col">Balance</th>
 						    </tr>
@@ -286,37 +311,61 @@
 						<tbody>
 
 							{% for external in externals %}
-					 		<tr class="click" id="{{external.order.ID}}" href="{% url 'table:editOrder' pk=external.order.ID %}">
+					 		<tr class="visibleRows" id="{{external.order.ID}}" href="{% url 'table:editOrder' pk=external.order.ID %}">
 							    <th scope="row">{{external.order.ID}}</th>
 							    <td>{{external.order.created_date}}</td>
 							    <td>{{external.order.owner}}<br>{{external.order.telephone}}</td>
 
 							    <td>
 							    	{% for item in external.material_eger %}
-							    		{% if item.ordered %}
-							    			<div style="color: green;" >{{item.material}} - {{item.quantity}}</div>
-							    		{% else %}
+							    		{% if item.ordered and not item.delivered %}
 							    			<div style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% elif item.delivered and item.ordered %}
+							    			<div style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% else %}
+							    			<div style="color: black;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
 							    	{% endfor %}
 							    </td>
 
 							    <td>
 							    	{% for item in external.material_krono %}
-							    		{% if item.ordered %}
-							    			<div style="color: green;" >{{item.material}} - {{item.quantity}}</div>
-							    		{% else %}
+							    		{% if item.ordered and not item.delivered %}
 							    			<div style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% elif item.delivered and item.ordered %}
+							    			<div style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% else %}
+							    			<div style="color: black;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% endif %}
+							    	{% endfor %}
+							    </td>
+							    <td>
+							    	{% for item in external.material_other %}
+							    		{% if item.ordered and not item.delivered %}
+							    			<div style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% elif item.delivered and item.ordered %}
+							    			<div style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% else %}
+							    			<div style="color: black;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
 							    	{% endfor %}
 							    </td>
 							    <td>
 							    	{% for item in external.material_edge %}
-							    		{% if item.ordered %}
-							    			<div style="color: green;" >{{item.edge_type}} - {{item.quantity}}</div>
-							    		{% else %}
+							    		{% if item.ordered and not item.delivered %}
 							    			<div style="color: red;" >{{item.edge_type}} - {{item.quantity}}</div>
+							    		{% elif item.delivered and item.ordered %}
+							    			<div style="color: #8ac926;" >{{item.edge_type}} - {{item.quantity}}</div>
+							    		{% else %}
+							    			<div style="color: black;" >{{item.edge_type}} - {{item.quantity}}</div>
 							    		{% endif %}
+							    	{% endfor %}
+							    </td>
+							    <td>
+							    	{% for item in external.other_services %}
+							    		<div>
+							    			{{item.description}} - {{item.quantity}}
+							    		</div>
 							    	{% endfor %}
 							    </td>
 							    <td>
@@ -330,8 +379,8 @@
 						    </tr>
 
 						    <tr>
-						    	<td colspan="8">
-						    		<div class="hidden" id="{{external.order.ID}}" style="display: none">
+						    	<td colspan="10">
+						    		<div class="hiddenRows" id="{{external.order.ID}}" style="display: none">
 
 						    			<div class="hidden-table">
 
@@ -363,6 +412,18 @@
 							    						<th scope="row" colspan="8">KRONO</th>
 							    					</tr>
 							    					{% for item in external.material_krono %}
+							    						<tr>
+							    							<td>{{item.material}}</td>
+							    							<td>{{item.ordered}}</td>
+							    							<td>{{item.delivered}}</td>
+							    							<td>{{item.cutted}}</td>
+							    							<td>{{item.edged}}</td>
+							    						</tr>
+							    					{% endfor %}
+							    					<tr>
+							    						<th scope="row" colspan="8">OTHERS</th>
+							    					</tr>
+							    					{% for item in external.material_other %}
 							    						<tr>
 							    							<td>{{item.material}}</td>
 							    							<td>{{item.ordered}}</td>

@@ -87,6 +87,7 @@ class Plate(models.Model):
     manufacturers = [
         ('Egger', 'Egger'),
         ('Kronospan', 'Kronospan'),
+        ('Other', 'Other'),
     ]
 
     cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -146,7 +147,7 @@ class Edging(models.Model):
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
-        return str(self.cutID) + ' / ' + self.material
+        return str(self.cutID) + ' / ' + self.edging_type
 
 
 class Other(models.Model):

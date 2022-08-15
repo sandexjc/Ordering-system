@@ -1,40 +1,74 @@
-var clickable_rows = document.getElementsByClassName('click');
-var hidden_rows = document.getElementsByClassName('hidden');
-var hidden_alert = document.getElementsByClassName("ALERT-S");
-var alert_button = document.getElementsByClassName("showAlert");
-var alert_close_btn = document.getElementsByClassName("closeAlert");
+var clickable_rows = document.getElementsByClassName('visibleRows');
+var hidden_rows = document.getElementsByClassName('hiddenRows');
 
 for (var i=0; i<clickable_rows.length; i++) {
 	clickable_rows[i].addEventListener('click', function() {
-
 		for (var k=0; k<hidden_rows.length; k++) {
-
 			if (hidden_rows[k].getAttribute('id') === this.getAttribute('id')) {
 				if (hidden_rows[k].style.display === 'none') {
-
 					hidden_rows[k].style.display = 'block';
 					this.style.backgroundColor = '#e5e5e5';
 					console.log(this.id)
-
 				}else{
-
 					hidden_rows[k].style.display = 'none';
 					this.style.backgroundColor = document.body.style.backgroundColor;
 				}
 			}
-
 		}
 	});
 }
 
-alert_button[0].addEventListener('click', function() {
-	console.log('SHOW ALERT CLICKED');
-	hidden_alert[0].style.display = "inline";
-	console.log(hidden_alert[0].style.display);
+// $(".visibleRows").each(function() {
+// 	$(this).click(function() {
+
+// 		console.log(this.style.backgroundColor);
+
+// 		if (this.style.backgroundColor === "white") {
+// 			$(this).css("backgroundColor", "#e5e5e5");
+// 		}else{
+// 			$(this).css("backgroundColor", "white");
+// 		}
+
+// 		var row_id = this.getAttribute('id');
+
+// 		$(".hiddenRows").each(function() {
+// 			if (this.getAttribute('id') === row_id) {
+// 				if (this.style.display === 'none') {
+// 					$(this).css("display", "block");
+// 					$(this).css("backgroundColor", "#e5e5e5");
+// 				}else{
+// 					$(this).css("display", "none");
+// 					$(this).css("backgroundColor", document.body.style.backgroundColor);
+// 				}
+// 			}
+// 		})
+// 	})
+// })
+
+$(".updateButtons").each(function() {
+	$(this).click(function() {
+		console.log("Button clicked", this.getAttribute('id'));
+		var btn_id = this.getAttribute('id');
+		// GETTING FORMS SYNCH
+		$(".updateForms").each(function() {
+			if (this.getAttribute("id") === btn_id) {
+				console.log("FORM TO BE SEND", this.getAttribute("id"));
+				// SENDING POST REQUEST
+				var serializedData = $(this).serialize();
+				$.ajax({
+					method: "POST",
+					url: '/table/updateOrder/' + this.getAttribute('id'),
+					data: serializedData,
+					success: function() {
+						$(".ALERT-S").css("display","inline");
+					},
+
+					})
+			}
+		})
+	})
 })
 
-alert_close_btn[0].addEventListener('click', function() {
-	console.log('BUTTON CLOSED');
-	hidden_alert[0].style.display = 'none';
-	console.log(hidden_alert[0].style.display);
+$(".closeAlert").click(function() {
+	$(".ALERT-S").css("display","none");
 })

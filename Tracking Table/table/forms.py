@@ -50,7 +50,10 @@ class AddPlateForm(ModelForm):
 
     class Meta:
         model = models.Plate
-        fields = '__all__'
+        fields = (
+            'material', 'manufacturer',
+            'quantity', 'price', 'value',
+            )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -81,7 +84,10 @@ class AddCuttingForm(ModelForm):
 
     class Meta:
         model = models.Cutting
-        fields = '__all__'
+        fields = (
+            'cutting_type', 'quantity',
+            'price', 'value',
+            )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -107,7 +113,10 @@ class AddEdgeForm(ModelForm):
 
     class Meta:
         model = models.Edge
-        fields = '__all__'
+        fields = (
+            'edge_type', 'color_code',
+            'quantity', 'price', 'value',
+            )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -138,7 +147,10 @@ class AddEdgingForm(ModelForm):
 
     class Meta:
         model = models.Edging
-        fields = '__all__'
+        fields = (
+            'edging_type', 'quantity',
+            'price', 'value',
+            )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -165,7 +177,10 @@ class AddOtherForm(ModelForm):
 
     class Meta:
         model = models.Other
-        fields = '__all__'
+        fields = (
+            'description', 'quantity',
+            'price', 'value',
+            )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -192,7 +207,9 @@ class AddPaymentForm(ModelForm):
 
     class Meta:
         model = models.Payment
-        fields = '__all__'
+        fields = (
+            'payment_method', 'value',
+            )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

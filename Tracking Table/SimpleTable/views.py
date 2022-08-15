@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from table.models import Order, Plate, Edge, Payment, Note
+from table.models import Order, Plate, Edge, Payment, Note, Other
 from SimpleTable import forms
 import time
 import table
@@ -12,7 +12,9 @@ class OrderObject:
         self.order = order
         self.material_eger = Plate.objects.filter(cutID=order, manufacturer='Egger')
         self.material_krono = Plate.objects.filter(cutID=order, manufacturer='Kronospan')
+        self.material_other = Plate.objects.filter(cutID=order, manufacturer='Other')
         self.material_edge = Edge.objects.filter(cutID=order)
+        self.other_services = Other.objects.filter(cutID=order)
         self.notes = Note.objects.filter(cutID=order)
         self.plate_forms = forms.PlateProgressFormSet(instance=order)
         self.edge_forms = forms.EdgeProgressFormSet(instance=order)
@@ -26,7 +28,7 @@ class Internals(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(Internals, self).get_context_data(**kwargs)
         context['internals'] = []
-
+        
         if self.request.POST:
 
             print(kwargs['search_field'])
