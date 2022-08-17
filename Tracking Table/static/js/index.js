@@ -45,10 +45,11 @@ $(".updateButtons").each(function() {
 	})
 })
 
-$("#SuccessAlertBtn").click(function() {
+$(".SuccessAlertBtn").click(function() {
+	console.log("SuccessAlertBtn clicked");
 	$(".ALERT-S").css("display","none");
 })
 
-$("#ErrorAlertBtn").click(function() {
+$(".ErrorAlertBtn").click(function() {
 	$(".ALERT-E").css("display","none");
 })
