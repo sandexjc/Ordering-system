@@ -34,9 +34,16 @@
 	      		<div class="modal-body">
 
 		      		<div class="ALERT-S" style="display: none;">
-		      			<div class="alert alert-success alert-dismissible fade show" role="alert" id="#myAlert">
-			  				<strong><div style="text-align: center;">SUCCESS ALERT</div></strong>
-			  				<button type="button" class="btn-close closeAlert" aria-label="Close"></button>
+		      			<div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
+			  				<strong><div style="text-align: center;">SUCCESSFULLY SAVED</div></strong>
+			  				<button type="button" class="btn-close SuccessAlertBtn" aria-label="Close"></button>
+						</div>
+					</div>
+
+					<div class="ALERT-E" style="display: none;">
+		      			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
+			  				<strong><div style="text-align: center;">ERROR</div></strong>
+			  				<button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
 						</div>
 					</div>
 
@@ -319,7 +326,7 @@
 							{% for internal in internals %}
 					 		<tr class="visibleRows" id="{{internal.order.ID}}">
 							    <th scope="row">{{internal.order.ID}}</th>
-							    <td>{{internal.order.created_date}}</td>
+							    <td>{{internal.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{internal.order.owner}}<br>{{internal.order.telephone}}</td>
 
 							    <td>
@@ -359,11 +366,17 @@
 							    <td>
 							    	{% for item in internal.material_edge %}
 							    		{% if item.ordered and not item.delivered %}
-							    			<div style="color: red;" >{{item.edge_type}} - {{item.quantity}}</div>
+							    			<div style="color: red;" >
+							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+							    			</div>
 							    		{% elif item.delivered and item.ordered %}
-							    			<div style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    			<div style="color: #8ac926;">
+							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+							    			</div>
 							    		{% else %}
-							    			<div style="color: black;" >{{item.edge_type}} - {{item.quantity}}</div>
+							    			<div style="color: black;">
+							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+							    			</div>
 							    		{% endif %}
 							    	{% endfor %}
 							    </td>

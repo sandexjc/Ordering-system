@@ -18,33 +18,6 @@ for (var i=0; i<clickable_rows.length; i++) {
 	});
 }
 
-// $(".visibleRows").each(function() {
-// 	$(this).click(function() {
-
-// 		console.log(this.style.backgroundColor);
-
-// 		if (this.style.backgroundColor === "white") {
-// 			$(this).css("backgroundColor", "#e5e5e5");
-// 		}else{
-// 			$(this).css("backgroundColor", "white");
-// 		}
-
-// 		var row_id = this.getAttribute('id');
-
-// 		$(".hiddenRows").each(function() {
-// 			if (this.getAttribute('id') === row_id) {
-// 				if (this.style.display === 'none') {
-// 					$(this).css("display", "block");
-// 					$(this).css("backgroundColor", "#e5e5e5");
-// 				}else{
-// 					$(this).css("display", "none");
-// 					$(this).css("backgroundColor", document.body.style.backgroundColor);
-// 				}
-// 			}
-// 		})
-// 	})
-// })
-
 $(".updateButtons").each(function() {
 	$(this).click(function() {
 		console.log("Button clicked", this.getAttribute('id'));
@@ -62,6 +35,9 @@ $(".updateButtons").each(function() {
 					success: function() {
 						$(".ALERT-S").css("display","inline");
 					},
+					error: function() {
+						$(".ALERT-E").css("display","inline");
+					}
 
 					})
 			}
@@ -69,6 +45,11 @@ $(".updateButtons").each(function() {
 	})
 })
 
-$(".closeAlert").click(function() {
+$(".SuccessAlertBtn").click(function() {
+	console.log("SuccessAlertBtn clicked");
 	$(".ALERT-S").css("display","none");
+})
+
+$(".ErrorAlertBtn").click(function() {
+	$(".ALERT-E").css("display","none");
 })
