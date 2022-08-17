@@ -326,7 +326,7 @@
 							{% for internal in internals %}
 					 		<tr class="visibleRows" id="{{internal.order.ID}}">
 							    <th scope="row">{{internal.order.ID}}</th>
-							    <td>{{internal.order.created_date}}</td>
+							    <td>{{internal.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{internal.order.owner}}<br>{{internal.order.telephone}}</td>
 
 							    <td>
