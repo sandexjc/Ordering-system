@@ -1,0 +1,55 @@
+.progressbar {
+	width: 100%;
+	text-align: left;
+}
+
+.progressbar li{
+	list-style-type: none;
+	float: left;
+	width: 25%;
+	position: relative;
+	text-align: left;
+}
+.progressbar li:before {
+	content: '';
+	position: relative;
+	width: 30px;
+	height: 30px;
+	line-height: 25px;
+	border: 3px solid #ddd;
+	display: block;
+	text-align: center;
+	margin: 0 auto 10px auto;
+	border-radius: 50%;
+	background-color: white;
+	z-index: 2;
+}
+
+.progressbar li:after {
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 3px;
+	background-color: #ddd;
+	top: 15px;
+	left: -50%;
+	z-index: 1;
+}
+
+.progressbar li:first-child:after {
+	content: none;
+}
+
+.progressbar li.active {
+	color: #16c60c;
+	font-weight: bold;
+}
+
+.progressbar li.active:before {
+	border-color: #16c60c;
+	content: "✔️";
+}
+
+.progressbar li.active + li:after {
+	background-color: #16c60c;
+}

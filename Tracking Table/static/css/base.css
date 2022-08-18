@@ -42,6 +42,7 @@
 .table td{
 	padding: 0px;
 	font-weight: bold;
+	text-align: center;
 }
 
 .tableIcons{
@@ -68,15 +69,8 @@
 	background-color: red;
 }
 
-th{
+.table th{
 	font-size: 18px;
+	text-align: left;
 }
 
-/*body{
-	background: rgb(9,9,121);
-background: linear-gradient(0deg, rgba(9,9,121,0.07326680672268904) 0%, rgba(230,230,233,1) 100%, rgba(9,9,121,0.07326680672268904) 100%);
-}
-
-.sticky-bottom{
-	padding-bottom: 200px;
-}*/
