@@ -14,18 +14,19 @@
 
 	<div class="container" style="padding-top: 20px;">
 
-		<table class="table table-bordered border-dark">
+		<table class="table table-sm table-bordered border-dark">
 
 			<thead>
 				<tr>
 					<th scope="col" rowspan="3" 
 					style="text-align: left; ">
-						MEGA TRADING <br>
-						Магазин: гр.София - Ж.К Модерно Предградие <br>
+						МЕГА ТРЕЙДИНГ ЕООД <br>
+						магазин "Всичко за мебелиста" <br>
+						Магазин: гр.София, ж.к. Модерно Предградие <br>
 						ул. Адам Мицкевич (на ъгъла с ул. 3019) <br>
-						Склад: гр. София ул.Илиянско шосе 8А <br>
-						Тел: 0895 79 54 40, 0893 45 70 87 <br>
-						e-mail: kkmital@abv.bg, site: www.megatrading.bg
+						Склад: гр. София, ул. Илиянско шосе 8А  <br>
+						Тел: 0895 75 03 75; 0893 45 70 87 <br>
+						e-mail: razkroi_mt@abv.bg; www.megatrading.bg
 					</th>
 					<th scope="col">
 						Поръчка № {{order.ID}} <br>   
@@ -65,7 +66,7 @@
 								<td>{{plate.value}}</td>
 							</tr>
 						{% endfor %}
-						<th colspan="3">Всичко Плочи</th>
+						<th colspan="3">Обща стойност</th>
 						<th>{{order.plates_total}}</th>
 					</tbody>
 				</table>
@@ -91,7 +92,7 @@
 								<td>{{cut.value}}</td>
 							</tr>
 						{% endfor %}
-						<th colspan="3">Всичко разкрояване</th>
+						<th colspan="3">Обща стойност</th>
 						<th>{{order.cutting_total}}</th>
 					</tbody>
 				</table>
@@ -121,7 +122,7 @@
 								<td>{{edge.value}}</td>
 							</tr>
 						{% endfor %}
-						<th colspan="4">Всичко кант</th>
+						<th colspan="4">Обща стойност</th>
 						<th>{{order.edge_total}}</th>
 					</tbody>
 				</table>
@@ -147,7 +148,7 @@
 								<td>{{edging.value}}</td>
 							</tr>
 						{% endfor %}
-						<th colspan="3">Всичко Кантиране</th>
+						<th colspan="3">Обща стойност</th>
 						<th>{{order.edging_total}}</th>
 					</tbody>
 				</table>
@@ -176,7 +177,7 @@
 								<td>{{other.value}}</td>
 							</tr>
 						{% endfor %}
-						<th colspan="3">Всичко Други</th>
+						<th colspan="3">Обща стойност</th>
 						<th>{{order.others_total}}</th>
 					</tbody>
 				</table>
@@ -201,10 +202,10 @@
 							<td>{{payment.value}}</td>
 						</tr>
 						{% endfor %}
-						<tr>
-							<th colspan="2">Всичко платено</th>
-							<th>{{order.paid}}</th>
-						</tr>
+						<!-- <tr>
+							<th colspan="3">{{order.paid}}</th>
+							
+						</tr> -->
 						<tr>
 							<th colspan="2">
 								Остатък<br>

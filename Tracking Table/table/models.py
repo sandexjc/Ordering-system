@@ -95,7 +95,7 @@ class Plate(models.Model):
 
     material = models.CharField(max_length=50)
     quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
-    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.001)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     ordered = models.BooleanField(default=False)
