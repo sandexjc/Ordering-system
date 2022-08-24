@@ -53,3 +53,4 @@ $(".SuccessAlertBtn").click(function() {
 $(".ErrorAlertBtn").click(function() {
 	$(".ALERT-E").css("display","none");
 })
+

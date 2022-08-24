@@ -415,10 +415,30 @@
 							    					{% for item in external.material_eger %}
 							    						<tr>
 							    							<td>{{item.material}}</td>
-							    							<td>{{item.ordered}}</td>
-							    							<td>{{item.delivered}}</td>
-							    							<td>{{item.cutted}}</td>
-							    							<td>{{item.edged}}</td>
+							    							<td colspan="4">
+								    							<ul class="progressbar">
+								    								{% if item.ordered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.delivered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.cutted %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.edged %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    							</ul>
+							    							</td>
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
@@ -427,10 +447,30 @@
 							    					{% for item in external.material_krono %}
 							    						<tr>
 							    							<td>{{item.material}}</td>
-							    							<td>{{item.ordered}}</td>
-							    							<td>{{item.delivered}}</td>
-							    							<td>{{item.cutted}}</td>
-							    							<td>{{item.edged}}</td>
+							    							<td colspan="4">
+								    							<ul class="progressbar">
+								    								{% if item.ordered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.delivered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.cutted %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.edged %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    							</ul>
+							    							</td>
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
@@ -439,10 +479,30 @@
 							    					{% for item in external.material_other %}
 							    						<tr>
 							    							<td>{{item.material}}</td>
-							    							<td>{{item.ordered}}</td>
-							    							<td>{{item.delivered}}</td>
-							    							<td>{{item.cutted}}</td>
-							    							<td>{{item.edged}}</td>
+							    							<td colspan="4">
+								    							<ul class="progressbar">
+								    								{% if item.ordered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.delivered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.cutted %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.edged %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    							</ul>
+							    							</td>
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
@@ -451,8 +511,20 @@
 							    					{% for item in external.material_edge %}
 							    						<tr>
 							    							<td>{{item.color_code}} - {{item.edge_type}}</td>
-							    							<td>{{item.ordered}}</td>
-							    							<td>{{item.delivered}}</td>
+							    							<td colspan="4">
+								    							<ul class="progressbar">
+								    								{% if item.ordered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.delivered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    							</ul>
+							    							</td>
 							    						</tr>
 							    					{% endfor %}
 							    				</tbody>
