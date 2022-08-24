@@ -149,7 +149,7 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:deleteOrder' pk=internal.order.ID %}">
+		    <form id="Delete{{internal.order.ID}}" class="deleteForms">
 		    	{% csrf_token %}
 
 	      		<div class="modal-body" style="text-align: center;">
@@ -160,7 +160,7 @@
 
 	      		<div class="modal-footer">
 	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<input type="submit" class="btn btn-danger" value="Confirm">
+	      			<button type="submit" class="btn btn-danger deleteButtons" id="{{internal.order.ID}}">Confirm</button>
 	      		</div>
 
 	      	</form>

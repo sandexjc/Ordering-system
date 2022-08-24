@@ -149,16 +149,18 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:deleteOrder' pk=external.order.ID %}">
+		    <form id="Delete{{external.order.ID}}" class="deleteForms">
 		    	{% csrf_token %}
 
 	      		<div class="modal-body" style="text-align: center;">
-		      		<h5>Are you sure you want to delete Order: <strong>#{{external.order.ID}}</strong></h5>
+		      		<h5>Are you sure you want to delete Order: 
+		      			<strong>#{{external.order.ID}}</strong>
+		      		</h5>
 	      		</div>
 
 	      		<div class="modal-footer">
 	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<input type="submit" class="btn btn-danger" value="Confirm">
+	      			<button type="submit" class="btn btn-danger deleteButtons" id="{{external.order.ID}}">Confirm</button>
 	      		</div>
 
 	      	</form>

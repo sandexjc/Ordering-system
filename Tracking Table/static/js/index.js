@@ -23,7 +23,7 @@ $(".updateButtons").each(function() {
 
 		$(this).prop('disabled', true);
 		$(this).html("Loading...");
-		$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span');
+		$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
 		var updateButton = this;
 
 		$.ajax({
@@ -33,7 +33,7 @@ $(".updateButtons").each(function() {
 
 			context: updateButton,
 
-			success: function(updateButton) {
+			success: function() {
 				$(".ALERT-E").css("display","none");
 				$(".ALERT-S").css("display","inline");
 				$(this).prop('disabled', false);
@@ -50,6 +50,23 @@ $(".updateButtons").each(function() {
 
 			})
 
+	})
+})
+
+$('.deleteButtons').each(function() {
+	$(this).click(function() {
+		$(this).prop('disabled', true);
+		$(this).html("Loading...");
+		$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+
+		$.ajax({
+			method: "POST",
+			url: '/table/deleteOrder/' + this.getAttribute('id'),
+			data: $("#Delete"+this.getAttribute('id')+" .deleteForms").serialize(),
+			success: function() {
+				location.reload();
+			}
+		})
 	})
 })
 
