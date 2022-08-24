@@ -27,7 +27,7 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:updateOrder' pk=external.order.ID %}">
+		    <form id="{{external.order.ID}}" class="updateForms">
 
 	      		<div class="modal-body">
 
@@ -127,7 +127,7 @@
 
 	      		<div class="modal-footer">
 	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<input type="submit" class="btn btn-primary" value="Update">
+	      			<button type="button" class="btn btn-primary updateButtons" id="{{external.order.ID}}">Update</button>
 	      		</div>
 
       		</form>
