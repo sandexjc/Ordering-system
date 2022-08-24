@@ -20,28 +20,36 @@ for (var i=0; i<clickable_rows.length; i++) {
 
 $(".updateButtons").each(function() {
 	$(this).click(function() {
-		console.log("Button clicked", this.getAttribute('id'));
-		var btn_id = this.getAttribute('id');
-		// GETTING FORMS SYNCH
-		$(".updateForms").each(function() {
-			if (this.getAttribute("id") === btn_id) {
-				console.log("FORM TO BE SEND", this.getAttribute("id"));
-				// SENDING POST REQUEST
-				var serializedData = $(this).serialize();
-				$.ajax({
-					method: "POST",
-					url: '/table/updateOrder/' + this.getAttribute('id'),
-					data: serializedData,
-					success: function() {
-						$(".ALERT-S").css("display","inline");
-					},
-					error: function() {
-						$(".ALERT-E").css("display","inline");
-					}
 
-					})
+		$(this).prop('disabled', true);
+		$(this).html("Loading...");
+		$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span');
+		var updateButton = this;
+
+		$.ajax({
+			method: "POST",
+			url: '/table/updateOrder/' + this.getAttribute('id'),
+			data: $("#Progress"+this.getAttribute('id')+" .updateForms").serialize(),
+
+			context: updateButton,
+
+			success: function(updateButton) {
+				$(".ALERT-E").css("display","none");
+				$(".ALERT-S").css("display","inline");
+				$(this).prop('disabled', false);
+				$(this).html("Update");
+				$(this).find('span').remove();
+			},
+			error: function() {
+				$(".ALERT-E").css("display","inline");
+				$(".ALERT-S").css("display","none");
+				$(this).prop('disabled', false);
+				$(this).html("Update");
+				$(this).find('span').remove();
 			}
-		})
+
+			})
+
 	})
 })
 
@@ -53,4 +61,6 @@ $(".SuccessAlertBtn").click(function() {
 $(".ErrorAlertBtn").click(function() {
 	$(".ALERT-E").css("display","none");
 })
+
+$(".alertmsg").focus();
 

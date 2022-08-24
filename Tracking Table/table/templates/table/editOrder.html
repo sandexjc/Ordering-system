@@ -8,12 +8,12 @@
 	{% if messages %}
 		{% for message in messages %}
 			{% if message.tags == 'success' %}
-				<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<div class="alert alert-success alert-dismissible fade show alertmsg" role="alert">
 	  				<strong><div style="text-align: center;">{{ message }}</div></strong>
 	  				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 				</div>
 			{% else %}
-				<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<div class="alert alert-danger alert-dismissible fade show alertmsg" role="alert">
 	  				<strong><div style="text-align: center;">{{ message }}</div></strong>
 	  				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 				</div>
