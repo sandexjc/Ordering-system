@@ -70,6 +70,15 @@ $('.deleteButtons').each(function() {
 	})
 })
 
+$('#editButton').click(function() {
+	$('#editOrderForm').submit();
+	$(this).html("Loading...");
+	$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+	$(this).prop('disabled', true);
+})
+
+// $('#editOrderForm').submit()
+
 $(".SuccessAlertBtn").click(function() {
 	console.log("SuccessAlertBtn clicked");
 	$(".ALERT-S").css("display","none");

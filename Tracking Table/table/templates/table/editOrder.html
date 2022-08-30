@@ -29,7 +29,7 @@
 	<input type="text" id="OrderID" class="form-control" readonly value="{{current_order.ID}}">
 	<br> -->
 
-	<form method="POST">
+	<form method="POST" id="editOrderForm">
 		{% csrf_token %}
 															<!-- CLIENT INFO -->
 		<label class="form-label" for="OrderID">ID</label>
@@ -37,7 +37,7 @@
 		<br>
 
 		{% bootstrap_form form bound_css_class='' %}
-		{% bootstrap_form add_note %}
+		{% bootstrap_form add_note bound_css_class=''%}
 
 															<!-- CLIENT INFO END -->
 
@@ -312,7 +312,8 @@
 		<br><br><br>
 
 		<div class="d-grid gap-2 col-3 mx-auto">
-			<input type="submit" class="btn btn-primary" value="Update">
+			<!-- <input type="submit" class="btn btn-primary" value="Update" id="editButton"> -->
+			<button type="submit" class="btn btn-primary" id="editButton">Update</button>
 		</div>
 	</form>
 	
