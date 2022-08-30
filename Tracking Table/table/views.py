@@ -261,7 +261,7 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
 
         if PLATES_PROG.is_valid() and EDGES_PROG.is_valid():
             print('FORM VALID')
-            return self.form_valid(PLATES_PROG, EDGES_PROG)
+            return self.form_valid(PLATES_PROG, EDGES_PROG, self.object)
         else:
             print('FORM INVALID _____________')
             print('PLATES ERRORS:')
@@ -270,7 +270,7 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
             print(EDGES_PROG.errors)
             return redirect('/')
 
-    def form_valid(self, PLATES_PROG, EDGES_PROG):
+    def form_valid(self, PLATES_PROG, EDGES_PROG, order):
 
         plates_data = PLATES_PROG.save(commit=False)
         edges_data = EDGES_PROG.save(commit=False)
@@ -281,7 +281,20 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
         for item in edges_data:
             item.save()
 
+        order.order_ready = self.check_if_ready(order, plates_data, edges_data)
+        order.save()
+
         return redirect('/')
+
+    def check_if_ready(self, order, plates, edges):
+
+        for item in plates:
+            if not item.ordered or not item.delivered or not item.cutted or not item.edged:
+                return False
+
+        return True
+
+
 
 class PrintOrder(LoginRequiredMixin, TemplateView):
 
