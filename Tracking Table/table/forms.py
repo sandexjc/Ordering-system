@@ -29,7 +29,7 @@ class UpdateOrderForm(ModelForm):
         'readonly': True,
         }    
         self.fields['owner'].label = 'Client Name'
-        self.fields['created_date'].widget.attrs['readonly'] = True
+        self.fields['created_date'].widget.attrs['readonly'] = False
 
 class AddNoteForm(ModelForm):
 

@@ -78,7 +78,7 @@ class Internals(LoginRequiredMixin, TemplateView):
                 context['badges'] = True
 
         else:
-            all_internals = Order.objects.filter(client='Internal').order_by('-ID')
+            all_internals = Order.objects.filter(client='Internal').order_by('-created_date')
             context['search_form'] = forms.SearchForm
             context['badges'] = False
 

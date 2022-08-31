@@ -328,12 +328,13 @@
 						<tbody>
 
 							{% for internal in internals %}
-							
+
 								{% if internal.order.order_taken %}
 						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: #eae2b7;">
 						 		{% else %}
 						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: white;">
 						 		{% endif %}
+
 							    <th scope="row">{{internal.order.ID}}</th>
 							    <td>{{internal.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{internal.order.owner}}<br>{{internal.order.telephone}}</td>
@@ -392,14 +393,18 @@
 							    <td>
 							    	{% for item in internal.other_services %}
 							    		<div>
-							    			{{item.description}} - {{item.quantity}}
+							    			{{item.description}} - {{item.quantity}} 
 							    		</div>
 							    	{% endfor %}
 							    </td>
 							    <td>
 							    	{% for item in internal.notes %}
 							    		<div>
-							    			{{item.user}} -> {{item.content}}
+							    			{{item.user}} -> 
+							    			<div style="color: red;">
+							    				{{item.content}}
+							    			</div>
+							    			
 							    		</div>
 							    	{% endfor %}
 							    </td>
@@ -429,7 +434,7 @@
 							    					</tr>
 							    					{% for item in internal.material_eger %}
 							    						<tr>
-							    							<td>{{item.material}}</td>
+							    							<td>{{item.material}} - {{item.quantity}}</td>
 
 							    							<td colspan="4">
 								    							<ul class="progressbar">
@@ -463,7 +468,7 @@
 							    					</tr>
 							    					{% for item in internal.material_krono %}
 							    						<tr>
-							    							<td>{{item.material}}</td>
+							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}
@@ -495,7 +500,7 @@
 							    					</tr>
 							    					{% for item in internal.material_other %}
 							    						<tr>
-							    							<td>{{item.material}}</td>
+							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}
@@ -527,7 +532,7 @@
 							    					</tr>
 							    					{% for item in internal.material_edge %}
 							    						<tr>
-							    							<td>{{item.color_code}} - {{item.edge_type}}</td>
+							    							<td>{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}

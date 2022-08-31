@@ -33,12 +33,16 @@ $(".updateButtons").each(function() {
 
 			context: updateButton,
 
-			success: function() {
+			success: function(data) {
 				$(".ALERT-E").css("display","none");
 				$(".ALERT-S").css("display","inline");
 				$(this).prop('disabled', false);
 				$(this).html("Update");
 				$(this).find('span').remove();
+
+				// $('.newCont').replaceWith(data);
+				
+
 			},
 			error: function() {
 				$(".ALERT-E").css("display","inline");
