@@ -7,7 +7,7 @@ from django.contrib import messages
 from accounts.models import User
 from table.models import Order, Plate, Edge, Payment, Cutting, Edging, Other 
 from table import forms
-from SimpleTable.forms import PlateProgressFormSet, EdgeProgressFormSet
+from SimpleTable.forms import PlateProgressFormSet, EdgeProgressFormSet, UpdateOrderProgressForm
 
 class CreateOrder(LoginRequiredMixin, CreateView):
 
@@ -256,12 +256,13 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
         print(self.object)
         PLATES_PROG = PlateProgressFormSet(self.request.POST, instance=self.object)
         EDGES_PROG = EdgeProgressFormSet(self.request.POST, instance=self.object)
+        ORDER_PROG = UpdateOrderProgressForm(self.request.POST, instance=self.object)
 
         print('<<--------------------------------->>')
 
-        if PLATES_PROG.is_valid() and EDGES_PROG.is_valid():
+        if PLATES_PROG.is_valid() and EDGES_PROG.is_valid() and ORDER_PROG.is_valid():
             print('FORM VALID')
-            return self.form_valid(PLATES_PROG, EDGES_PROG, self.object)
+            return self.form_valid(PLATES_PROG, EDGES_PROG, ORDER_PROG, self.object)
         else:
             print('FORM INVALID _____________')
             print('PLATES ERRORS:')
@@ -270,7 +271,7 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
             print(EDGES_PROG.errors)
             return redirect('/')
 
-    def form_valid(self, PLATES_PROG, EDGES_PROG, order):
+    def form_valid(self, PLATES_PROG, EDGES_PROG, ORDER_PROG, order):
 
         plates_data = PLATES_PROG.save(commit=False)
         edges_data = EDGES_PROG.save(commit=False)
@@ -281,8 +282,14 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
         for item in edges_data:
             item.save()
 
-        order.order_ready = self.check_if_ready(order, plates_data, edges_data)
-        order.save()
+        if self.check_if_ready(order, plates_data, edges_data):
+            order.order_ready = True
+            order.save()
+            ORDER_PROG.save()
+        else:
+            order.order_ready = False
+            order.order_taken = False
+            order.save()
 
         return redirect('/')
 
@@ -293,8 +300,6 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
                 return False
 
         return True
-
-
 
 class PrintOrder(LoginRequiredMixin, TemplateView):
 

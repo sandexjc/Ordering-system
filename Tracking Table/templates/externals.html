@@ -120,6 +120,12 @@
 								</tr>
 							{% endfor %}
 
+							{% if external.order.order_ready %}
+								<tr>
+									<td>{{external.order_progress}}</td>
+								</tr>
+							{% endif %}
+
 						</tbody>
 					</table>
 	      			

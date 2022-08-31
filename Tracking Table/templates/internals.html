@@ -120,6 +120,12 @@
 								</tr>
 							{% endfor %}
 
+							{% if internal.order.order_ready %}
+								<tr>
+									<td>{{internal.order_progress}}</td>
+								</tr>
+							{% endif %}
+
 						</tbody>
 					</table>
 	      			
@@ -322,7 +328,12 @@
 						<tbody>
 
 							{% for internal in internals %}
-					 		<tr class="visibleRows" id="{{internal.order.ID}}">
+							
+								{% if internal.order.order_taken %}
+						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: #eae2b7;">
+						 		{% else %}
+						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: white;">
+						 		{% endif %}
 							    <th scope="row">{{internal.order.ID}}</th>
 							    <td>{{internal.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{internal.order.owner}}<br>{{internal.order.telephone}}</td>

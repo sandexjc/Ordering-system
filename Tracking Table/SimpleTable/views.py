@@ -18,6 +18,7 @@ class OrderObject:
         self.notes = Note.objects.filter(cutID=order)
         self.plate_forms = forms.PlateProgressFormSet(instance=order)
         self.edge_forms = forms.EdgeProgressFormSet(instance=order)
+        self.order_progress = forms.UpdateOrderProgressForm(instance=order)
 
     def __str__(self):
         return str(self.order)
