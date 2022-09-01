@@ -39,7 +39,9 @@ class CreateOrder(LoginRequiredMixin, CreateView):
         add_note.cutID = self.object
         add_note.user = user
         add_note.content = note
-        add_note.save()
+
+        if note != '':
+            add_note.save()
 
         return redirect('table:editOrder', self.object.pk)
 
