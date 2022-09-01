@@ -28,6 +28,8 @@ class Order(models.Model):
     order_ready = models.BooleanField(default=False)
     order_taken = models.BooleanField(default=False)
 
+    invoice = models.BooleanField(default=False)
+
     def update(self):
 
         self.clear()
@@ -94,7 +96,7 @@ class Plate(models.Model):
     manufacturer = models.CharField(choices=manufacturers, default='Egger', max_length=10)
 
     material = models.CharField(max_length=50)
-    quantity = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
+    quantity = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.49)])
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -113,7 +115,7 @@ class Cutting(models.Model):
 
     cutting_type = models.CharField(max_length=50)
     quantity = models.PositiveSmallIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.001)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
@@ -126,12 +128,14 @@ class Edge(models.Model):
 
     edge_type = models.CharField(max_length=50)
     color_code = models.CharField(max_length=50, default='')
-    quantity = models.PositiveSmallIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.001)])
+    quantity = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.49)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     ordered = models.BooleanField(default=False)
     delivered = models.BooleanField(default=False)
+
+    visible = models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.cutID) + ' / ' + self.color_code
@@ -143,7 +147,7 @@ class Edging(models.Model):
 
     edging_type = models.CharField(max_length=50)
     quantity = models.PositiveSmallIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.001)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
@@ -155,8 +159,8 @@ class Other(models.Model):
     cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     description = models.CharField(max_length=50)
-    quantity = models.PositiveSmallIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.001)])
+    quantity = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.49)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):

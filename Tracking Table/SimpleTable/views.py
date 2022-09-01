@@ -18,6 +18,7 @@ class OrderObject:
         self.notes = Note.objects.filter(cutID=order)
         self.plate_forms = forms.PlateProgressFormSet(instance=order)
         self.edge_forms = forms.EdgeProgressFormSet(instance=order)
+        self.order_progress = forms.UpdateOrderProgressForm(instance=order)
 
     def __str__(self):
         return str(self.order)
@@ -77,7 +78,7 @@ class Internals(LoginRequiredMixin, TemplateView):
                 context['badges'] = True
 
         else:
-            all_internals = Order.objects.filter(client='Internal').order_by('-ID')
+            all_internals = Order.objects.filter(client='Internal').order_by('-created_date')
             context['search_form'] = forms.SearchForm
             context['badges'] = False
 

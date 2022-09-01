@@ -6,8 +6,6 @@
 <!-- ##############################################
 ############################################## -->
 
-<p id="demo"></p>
-
 {% for internal in internals %}
 
 <!-- MODAL PROGRESS WINDOW -->
@@ -33,14 +31,14 @@
 
 	      		<div class="modal-body">
 
-		      		<div class="ALERT-S" style="display: none;">
+		      		<div class="ALERT-S alertmsg" style="display: none;">
 		      			<div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
 			  				<strong><div style="text-align: center;">SUCCESSFULLY SAVED</div></strong>
 			  				<button type="button" class="btn-close SuccessAlertBtn" aria-label="Close"></button>
 						</div>
 					</div>
 
-					<div class="ALERT-E" style="display: none;">
+					<div class="ALERT-E alertmsg" style="display: none;">
 		      			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
 			  				<strong><div style="text-align: center;">ERROR</div></strong>
 			  				<button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
@@ -122,6 +120,12 @@
 								</tr>
 							{% endfor %}
 
+							{% if internal.order.order_ready %}
+								<tr>
+									<td>{{internal.order_progress}}</td>
+								</tr>
+							{% endif %}
+
 						</tbody>
 					</table>
 	      			
@@ -151,7 +155,7 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:deleteOrder' pk=internal.order.ID %}">
+		    <form id="Delete{{internal.order.ID}}" class="deleteForms">
 		    	{% csrf_token %}
 
 	      		<div class="modal-body" style="text-align: center;">
@@ -162,7 +166,7 @@
 
 	      		<div class="modal-footer">
 	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<input type="submit" class="btn btn-danger" value="Confirm">
+	      			<button type="submit" class="btn btn-danger deleteButtons" id="{{internal.order.ID}}">Confirm</button>
 	      		</div>
 
 	      	</form>
@@ -324,7 +328,13 @@
 						<tbody>
 
 							{% for internal in internals %}
-					 		<tr class="visibleRows" id="{{internal.order.ID}}">
+
+								{% if internal.order.order_taken %}
+						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: #eae2b7;">
+						 		{% else %}
+						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: white;">
+						 		{% endif %}
+
 							    <th scope="row">{{internal.order.ID}}</th>
 							    <td>{{internal.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{internal.order.owner}}<br>{{internal.order.telephone}}</td>
@@ -383,14 +393,18 @@
 							    <td>
 							    	{% for item in internal.other_services %}
 							    		<div>
-							    			{{item.description}} - {{item.quantity}}
+							    			{{item.description}} - {{item.quantity}} 
 							    		</div>
 							    	{% endfor %}
 							    </td>
 							    <td>
 							    	{% for item in internal.notes %}
 							    		<div>
-							    			{{item.user}} -> {{item.content}}
+							    			{{item.user}} -> 
+							    			<div style="color: red;">
+							    				{{item.content}}
+							    			</div>
+							    			
 							    		</div>
 							    	{% endfor %}
 							    </td>
@@ -420,7 +434,7 @@
 							    					</tr>
 							    					{% for item in internal.material_eger %}
 							    						<tr>
-							    							<td>{{item.material}}</td>
+							    							<td>{{item.material}} - {{item.quantity}}</td>
 
 							    							<td colspan="4">
 								    							<ul class="progressbar">
@@ -454,7 +468,7 @@
 							    					</tr>
 							    					{% for item in internal.material_krono %}
 							    						<tr>
-							    							<td>{{item.material}}</td>
+							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}
@@ -486,7 +500,7 @@
 							    					</tr>
 							    					{% for item in internal.material_other %}
 							    						<tr>
-							    							<td>{{item.material}}</td>
+							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}
@@ -518,7 +532,7 @@
 							    					</tr>
 							    					{% for item in internal.material_edge %}
 							    						<tr>
-							    							<td>{{item.color_code}} - {{item.edge_type}}</td>
+							    							<td>{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}

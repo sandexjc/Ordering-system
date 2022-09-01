@@ -27,18 +27,18 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:updateOrder' pk=external.order.ID %}">
+		    <form id="{{external.order.ID}}" class="updateForms">
 
 	      		<div class="modal-body">
 
-		      		<div class="ALERT-S" style="display: none;">
+		      		<div class="ALERT-S alertmsg" style="display: none;">
 		      			<div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
 			  				<strong><div style="text-align: center;">SUCCESSFULLY SAVED</div></strong>
 			  				<button type="button" class="btn-close SuccessAlertBtn" aria-label="Close"></button>
 						</div>
 					</div>
 
-					<div class="ALERT-E" style="display: none;">
+					<div class="ALERT-E alertmsg" style="display: none;">
 		      			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
 			  				<strong><div style="text-align: center;">ERROR</div></strong>
 			  				<button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
@@ -120,6 +120,12 @@
 								</tr>
 							{% endfor %}
 
+							{% if external.order.order_ready %}
+								<tr>
+									<td>{{external.order_progress}}</td>
+								</tr>
+							{% endif %}
+
 						</tbody>
 					</table>
 	      			
@@ -127,7 +133,7 @@
 
 	      		<div class="modal-footer">
 	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<input type="submit" class="btn btn-primary" value="Update">
+	      			<button type="button" class="btn btn-primary updateButtons" id="{{external.order.ID}}">Update</button>
 	      		</div>
 
       		</form>
@@ -149,16 +155,18 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form method="POST" action="{% url 'table:deleteOrder' pk=external.order.ID %}">
+		    <form id="Delete{{external.order.ID}}" class="deleteForms">
 		    	{% csrf_token %}
 
 	      		<div class="modal-body" style="text-align: center;">
-		      		<h5>Are you sure you want to delete Order: <strong>#{{external.order.ID}}</strong></h5>
+		      		<h5>Are you sure you want to delete Order: 
+		      			<strong>#{{external.order.ID}}</strong>
+		      		</h5>
 	      		</div>
 
 	      		<div class="modal-footer">
 	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<input type="submit" class="btn btn-danger" value="Confirm">
+	      			<button type="submit" class="btn btn-danger deleteButtons" id="{{external.order.ID}}">Confirm</button>
 	      		</div>
 
 	      	</form>
@@ -318,9 +326,15 @@
 						<tbody>
 
 							{% for external in externals %}
-					 		<tr class="visibleRows" id="{{external.order.ID}}" href="{% url 'table:editOrder' pk=external.order.ID %}">
+
+					 			{% if external.order.order_taken %}
+						 			<tr class="visibleRows" id="{{external.order.ID}}" style="background-color: #eae2b7;">
+						 		{% else %}
+						 			<tr class="visibleRows" id="{{external.order.ID}}" style="background-color: white;">
+						 		{% endif %}
+
 							    <th scope="row">{{external.order.ID}}</th>
-							    <td>{{external.order.created_date}}</td>
+							    <td>{{external.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{external.order.owner}}<br>{{external.order.telephone}}</td>
 
 							    <td>
@@ -415,10 +429,30 @@
 							    					{% for item in external.material_eger %}
 							    						<tr>
 							    							<td>{{item.material}}</td>
-							    							<td>{{item.ordered}}</td>
-							    							<td>{{item.delivered}}</td>
-							    							<td>{{item.cutted}}</td>
-							    							<td>{{item.edged}}</td>
+							    							<td colspan="4">
+								    							<ul class="progressbar">
+								    								{% if item.ordered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.delivered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.cutted %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.edged %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    							</ul>
+							    							</td>
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
@@ -427,10 +461,30 @@
 							    					{% for item in external.material_krono %}
 							    						<tr>
 							    							<td>{{item.material}}</td>
-							    							<td>{{item.ordered}}</td>
-							    							<td>{{item.delivered}}</td>
-							    							<td>{{item.cutted}}</td>
-							    							<td>{{item.edged}}</td>
+							    							<td colspan="4">
+								    							<ul class="progressbar">
+								    								{% if item.ordered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.delivered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.cutted %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.edged %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    							</ul>
+							    							</td>
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
@@ -439,10 +493,30 @@
 							    					{% for item in external.material_other %}
 							    						<tr>
 							    							<td>{{item.material}}</td>
-							    							<td>{{item.ordered}}</td>
-							    							<td>{{item.delivered}}</td>
-							    							<td>{{item.cutted}}</td>
-							    							<td>{{item.edged}}</td>
+							    							<td colspan="4">
+								    							<ul class="progressbar">
+								    								{% if item.ordered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.delivered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.cutted %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.edged %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    							</ul>
+							    							</td>
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
@@ -451,8 +525,20 @@
 							    					{% for item in external.material_edge %}
 							    						<tr>
 							    							<td>{{item.color_code}} - {{item.edge_type}}</td>
-							    							<td>{{item.ordered}}</td>
-							    							<td>{{item.delivered}}</td>
+							    							<td colspan="4">
+								    							<ul class="progressbar">
+								    								{% if item.ordered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    								{% if item.delivered %}
+								    									<li class="active"></li>
+								    								{% else %}
+								    									<li></li>
+								    								{% endif %}
+								    							</ul>
+							    							</td>
 							    						</tr>
 							    					{% endfor %}
 							    				</tbody>
