@@ -388,19 +388,21 @@
 							    </td>
 							    <td>
 							    	{% for item in internal.material_edge %}
-							    		{% if item.ordered and not item.delivered %}
-							    			<div style="color: red;" >
-							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
-							    			</div>
-							    		{% elif item.delivered and item.ordered %}
-							    			<div style="color: #8ac926;">
-							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
-							    			</div>
-							    		{% else %}
-							    			<div style="color: black;">
-							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
-							    			</div>
-							    		{% endif %}
+							    		{% if item.visible %}
+								    		{% if item.ordered and not item.delivered %}
+								    			<div style="color: red;" >
+								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+								    			</div>
+								    		{% elif item.delivered and item.ordered %}
+								    			<div style="color: #8ac926;">
+								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+								    			</div>
+								    		{% else %}
+								    			<div style="color: black;">
+								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+								    			</div>
+								    		{% endif %}
+								    	{% endif %}
 							    	{% endfor %}
 							    </td>
 							    <td>
@@ -433,17 +435,17 @@
 							    			<table class="table">
 							    				<thead>
 							    					<tr>
-							    						<th scope="col">Material</th>
-												      	<th scope="col">Ordered</th>
-												      	<th scope="col">Delivered</th>
-												      	<th scope="col">Cutted</th>
-												      	<th scope="col">Edged</th>
+							    						<th scope="col">Материал</th>
+												      	<th scope="col">Поръчано</th>
+												      	<th scope="col">Доставено</th>
+												      	<th scope="col">Нарязано</th>
+												      	<th scope="col">Кантирано</th>
 							    					</tr>
 							    				</thead>
 
 							    				<tbody>
 							    					<tr>
-							    						<th scope="row" colspan="8">EGGER</th>
+							    						<th scope="row" colspan="8">ЕГЕР</th>
 							    					</tr>
 							    					{% for item in internal.material_eger %}
 							    						<tr>
@@ -477,7 +479,7 @@
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
-							    						<th scope="row" colspan="8">KRONO</th>
+							    						<th scope="row" colspan="8">КРОНО</th>
 							    					</tr>
 							    					{% for item in internal.material_krono %}
 							    						<tr>
@@ -509,7 +511,7 @@
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
-							    						<th scope="row" colspan="8">OTHERS</th>
+							    						<th scope="row" colspan="8">ДРУГИ</th>
 							    					</tr>
 							    					{% for item in internal.material_other %}
 							    						<tr>
@@ -541,7 +543,7 @@
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
-							    						<th scope="row" colspan="8">EDGE</th>
+							    						<th scope="row" colspan="8">КАНТ</th>
 							    					</tr>
 							    					{% for item in internal.material_edge %}
 							    						<tr>
@@ -567,7 +569,7 @@
 								 
 								    	</div>
 
-							    		<div class="hidden-buttons">
+							    		<div class="hidden-buttons" style="margin-left: 41%">
 							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=internal.order %}" role="button" title="Edit Order">
 							    				<img src="{% static 'images/edit.png' %}" class="tableIcons">
 							    			</a>
