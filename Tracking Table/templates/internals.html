@@ -49,15 +49,15 @@
 
 					<table class="table">
 						<thead>
-							<th scope="col">Material</th>
-							<th scope="col">Ordered</th>
-							<th scope="col">Delivered</th>
-							<th scope="col">Cutted</th>
-							<th scope="col">Edged</th>
+							<th scope="col">Материал</th>
+							<th scope="col">Поръчано</th>
+							<th scope="col">Доставено</th>
+							<th scope="col">Нарязано</th>
+							<th scope="col">Кантирано</th>
 						</thead>
 						<tbody>
 							<tr>
-								<th scope="row" colspan="8">EGGER</th>
+								<th scope="row" colspan="5">EGGER</th>
 							</tr>
 							{{internal.plate_forms.management_form}}
 							
@@ -75,7 +75,7 @@
 							{% endfor %}
 
 							<tr>
-								<th scope="row" colspan="8">KRONO</th>
+								<th scope="row" colspan="5">KRONO</th>
 							</tr>
 							{% for item in internal.plate_forms %}
 								{% if item.manufacturer.value == 'Kronospan' %}
@@ -91,7 +91,7 @@
 							{% endfor %}
 
 							<tr>
-								<th scope="row" colspan="8">OTHERS</th>
+								<th scope="row" colspan="5">Други</th>
 							</tr>
 							{% for item in internal.plate_forms %}
 								{% if item.manufacturer.value == 'Other' %}
@@ -107,7 +107,7 @@
 							{% endfor %}
 							
 							<tr>
-								<th scope="row" colspan="8">EDGE</th>
+								<th scope="row" colspan="5">Кант</th>
 							</tr>
 							{{internal.edge_forms.management_form}}
 
@@ -120,11 +120,21 @@
 								</tr>
 							{% endfor %}
 
+							<tr>
+								<th scope="row" colspan="5"></th>
+							</tr>
+
 							{% if internal.order.order_ready %}
 								<tr>
-									<td>{{internal.order_progress}}</td>
+									<td>Поръчката е взета</td>
+									<td>{{internal.order_progress.order_taken}}</td>
 								</tr>
 							{% endif %}
+
+							<tr>
+								<td>Издадена фактура</td>
+								<td>{{internal.order_progress.invoice}}</td>
+							</tr>
 
 						</tbody>
 					</table>
@@ -235,7 +245,7 @@
 								  {% if badges %}
 								  	<span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" style="display: inline;"></span>
 								  {% else %}
-								  	<span class="badge bg-danger" style="display: none;"></span>
+								   	<span class="badge bg-danger" style="display: none;"></span>
 								  {% endif %}
 								</button>
 
@@ -285,7 +295,7 @@
 
 				<!-- INTERNALS BUTTONS TAB END -->
 
-				{% if badges %}
+				{% if badges %} 
 					<div style="text-align: center; display: block;">
 						<h5>
 							<span class="badge rounded-pill bg-warning text-dark">
@@ -300,28 +310,26 @@
 
 				<div class="container">
 
-					<table class="table table-hover">
+					<table class="table table-hover table-bordered table-responsive">
 
 						<thead>
 							<tr>
 								<th scope="col" colspan="3">Основна Информация</th>
 								<th scope="col" colspan="3">Плочи</th>
 								<th scope="col">Кант</th>
-								<th scope="col">Други услуги</th>
-								<th scope="col">Бележки</th>
-								<th scope="col">Баланс</th>
+								<th scope="col" colspan="3">Други</th>
 							</tr>
 						    <tr>
 						      	<th scope="col">#</th>
-						      	<th scope="col">Date</th>
-						      	<th scope="col">Client</th>
-						      	<th scope="col">EGGER</th>
-						      	<th scope="col">KRONO</th>
-						      	<th scope="col">OTHERS</th>
-						      	<th scope="col">EDGE</th>
-						      	<th scope="col">Other Services</th>
-						      	<th scope="col">Notes</th>
-						      	<th scope="col">Balance</th>
+						      	<th scope="col">Дата</th>
+						      	<th scope="col">Клиент</th>
+						      	<th scope="col">Егер</th>
+						      	<th scope="col">Кроно</th>
+						      	<th scope="col">Други</th>
+						      	<th scope="col">Кант</th>
+						      	<th scope="col">Други услуги</th>
+						      	<th scope="col">Бележки</th>
+						      	<th scope="col">Баланс</th>
 						    </tr>
 						</thead>
 
@@ -330,12 +338,17 @@
 							{% for internal in internals %}
 
 								{% if internal.order.order_taken %}
-						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: #eae2b7;">
+						 			<tr class="visibleRows orderTaken" id="{{internal.order.ID}}">
 						 		{% else %}
-						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: white;">
+						 			<tr class="visibleRows normalOrder" id="{{internal.order.ID}}">
 						 		{% endif %}
 
-							    <th scope="row">{{internal.order.ID}}</th>
+						 		{% if internal.order.invoice %}
+							    	<th scope="row" style="color: black;">{{internal.order.ID}}</th>
+							    {% else %}
+							    	<th scope="row" style="color: red;">{{internal.order.ID}}</th>
+							    {% endif %}
+
 							    <td>{{internal.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{internal.order.owner}}<br>{{internal.order.telephone}}</td>
 
@@ -375,19 +388,21 @@
 							    </td>
 							    <td>
 							    	{% for item in internal.material_edge %}
-							    		{% if item.ordered and not item.delivered %}
-							    			<div style="color: red;" >
-							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
-							    			</div>
-							    		{% elif item.delivered and item.ordered %}
-							    			<div style="color: #8ac926;">
-							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
-							    			</div>
-							    		{% else %}
-							    			<div style="color: black;">
-							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
-							    			</div>
-							    		{% endif %}
+							    		{% if item.visible %}
+								    		{% if item.ordered and not item.delivered %}
+								    			<div style="color: red;" >
+								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+								    			</div>
+								    		{% elif item.delivered and item.ordered %}
+								    			<div style="color: #8ac926;">
+								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+								    			</div>
+								    		{% else %}
+								    			<div style="color: black;">
+								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+								    			</div>
+								    		{% endif %}
+								    	{% endif %}
 							    	{% endfor %}
 							    </td>
 							    <td>
@@ -420,17 +435,17 @@
 							    			<table class="table">
 							    				<thead>
 							    					<tr>
-							    						<th scope="col">Material</th>
-												      	<th scope="col">Ordered</th>
-												      	<th scope="col">Delivered</th>
-												      	<th scope="col">Cutted</th>
-												      	<th scope="col">Edged</th>
+							    						<th scope="col">Материал</th>
+												      	<th scope="col">Поръчано</th>
+												      	<th scope="col">Доставено</th>
+												      	<th scope="col">Нарязано</th>
+												      	<th scope="col">Кантирано</th>
 							    					</tr>
 							    				</thead>
 
 							    				<tbody>
 							    					<tr>
-							    						<th scope="row" colspan="8">EGGER</th>
+							    						<th scope="row" colspan="8">ЕГЕР</th>
 							    					</tr>
 							    					{% for item in internal.material_eger %}
 							    						<tr>
@@ -464,7 +479,7 @@
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
-							    						<th scope="row" colspan="8">KRONO</th>
+							    						<th scope="row" colspan="8">КРОНО</th>
 							    					</tr>
 							    					{% for item in internal.material_krono %}
 							    						<tr>
@@ -496,7 +511,7 @@
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
-							    						<th scope="row" colspan="8">OTHERS</th>
+							    						<th scope="row" colspan="8">ДРУГИ</th>
 							    					</tr>
 							    					{% for item in internal.material_other %}
 							    						<tr>
@@ -528,7 +543,7 @@
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
-							    						<th scope="row" colspan="8">EDGE</th>
+							    						<th scope="row" colspan="8">КАНТ</th>
 							    					</tr>
 							    					{% for item in internal.material_edge %}
 							    						<tr>
@@ -554,7 +569,7 @@
 								 
 								    	</div>
 
-							    		<div class="hidden-buttons">
+							    		<div class="hidden-buttons" style="margin-left: 41%">
 							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=internal.order %}" role="button" title="Edit Order">
 							    				<img src="{% static 'images/edit.png' %}" class="tableIcons">
 							    			</a>

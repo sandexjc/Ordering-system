@@ -321,6 +321,12 @@
 		</div>
 		<br><br><br>
 
+		<div style="margin-left: 48%; margin-right: 50%; padding-bottom: 20px;">
+			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=current_order %}" role="button" target="_blank" title="Print View">
+				<img src="{% static 'images/printer.png' %}" class="tableIcons">
+			</a>
+		</div>
+
 		<div class="d-grid gap-2 col-3 mx-auto">
 			<!-- <input type="submit" class="btn btn-primary" value="Update" id="editButton"> -->
 			<button type="submit" class="btn btn-primary" id="editButton">Update</button>

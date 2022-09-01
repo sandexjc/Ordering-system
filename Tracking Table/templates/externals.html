@@ -120,11 +120,21 @@
 								</tr>
 							{% endfor %}
 
+							<tr>
+								<th scope="row" colspan="8"></th>
+							</tr>
+
 							{% if external.order.order_ready %}
 								<tr>
-									<td>{{external.order_progress}}</td>
+									<td>ORDER_TAKEN</td>
+									<td>{{external.order_progress.order_taken}}</td>
 								</tr>
 							{% endif %}
+
+							<tr>
+								<td>INVOICE</td>
+								<td>{{external.order_progress.invoice}}</td>
+							</tr>
 
 						</tbody>
 					</table>
@@ -305,21 +315,19 @@
 								<th scope="col" colspan="3">Основна Информация</th>
 								<th scope="col" colspan="3">Плочи</th>
 								<th scope="col">Кант</th>
-								<th scope="col">Бележки</th>
-								<th scope="col">Други услуги</th>
-								<th scope="col">Други</th>
+								<th scope="col" colspan="3">Други</th>
 							</tr>
 						    <tr>
 						      	<th scope="col">#</th>
-						      	<th scope="col">Date</th>
-						      	<th scope="col">Client</th>
-						      	<th scope="col">EGGER</th>
-						      	<th scope="col">KRONO</th>
-						      	<th scope="col">OTHERS</th>
-						      	<th scope="col">EDGE</th>
-						      	<th scope="col">Other Services</th>
-						      	<th scope="col">Notes</th>
-						      	<th scope="col">Balance</th>
+						      	<th scope="col">Дата</th>
+						      	<th scope="col">Клиент</th>
+						      	<th scope="col">Егер</th>
+						      	<th scope="col">Кроно</th>
+						      	<th scope="col">Други</th>
+						      	<th scope="col">Кант</th>
+						      	<th scope="col">Други услуги</th>
+						      	<th scope="col">Бележки</th>
+						      	<th scope="col">Баланс</th>
 						    </tr>
 						</thead>
 
@@ -333,7 +341,12 @@
 						 			<tr class="visibleRows" id="{{external.order.ID}}" style="background-color: white;">
 						 		{% endif %}
 
-							    <th scope="row">{{external.order.ID}}</th>
+							    {% if external.order.invoice %}
+							    	<th scope="row" style="color: black;">{{external.order.ID}}</th>
+							    {% else %}
+							    	<th scope="row" style="color: red;">{{external.order.ID}}</th>
+							    {% endif %}
+
 							    <td>{{external.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{external.order.owner}}<br>{{external.order.telephone}}</td>
 
@@ -373,19 +386,21 @@
 							    </td>
 							    <td>
 							    	{% for item in external.material_edge %}
-							    		{% if item.ordered and not item.delivered %}
-							    			<div style="color: red;">
-							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
-							    			</div>
-							    		{% elif item.delivered and item.ordered %}
-							    			<div style="color: #8ac926;">
-							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
-							    			</div>
-							    		{% else %}
-							    			<div style="color: black;">
-							    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
-							    			</div>
-							    		{% endif %}
+							    		{% if item.visible %}
+								    		{% if item.ordered and not item.delivered %}
+								    			<div style="color: red;">
+								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+								    			</div>
+								    		{% elif item.delivered and item.ordered %}
+								    			<div style="color: #8ac926;">
+								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+								    			</div>
+								    		{% else %}
+								    			<div style="color: black;">
+								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+								    			</div>
+								    		{% endif %}
+								    	{% endif %}
 							    	{% endfor %}
 							    </td>
 							    <td>
@@ -414,21 +429,21 @@
 							    			<table class="table">
 							    				<thead>
 							    					<tr>
-							    						<th scope="col">Material</th>
-												      	<th scope="col">Ordered</th>
-												      	<th scope="col">Delivered</th>
-												      	<th scope="col">Cutted</th>
-												      	<th scope="col">Edged</th>
+							    						<th scope="col">Материал</th>
+												      	<th scope="col">Поръчано</th>
+												      	<th scope="col">Доставено</th>
+												      	<th scope="col">Нарязано</th>
+												      	<th scope="col">Кантирано</th>
 							    					</tr>
 							    				</thead>
 
 							    				<tbody>
 							    					<tr>
-							    						<th scope="row" colspan="8">EGGER</th>
+							    						<th scope="row" colspan="5">ЕГЕР</th>
 							    					</tr>
 							    					{% for item in external.material_eger %}
 							    						<tr>
-							    							<td>{{item.material}}</td>
+							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}
@@ -456,11 +471,11 @@
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
-							    						<th scope="row" colspan="8">KRONO</th>
+							    						<th scope="row" colspan="8">КРОНО</th>
 							    					</tr>
 							    					{% for item in external.material_krono %}
 							    						<tr>
-							    							<td>{{item.material}}</td>
+							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}
@@ -488,11 +503,11 @@
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
-							    						<th scope="row" colspan="8">OTHERS</th>
+							    						<th scope="row" colspan="8">ДРУГИ</th>
 							    					</tr>
 							    					{% for item in external.material_other %}
 							    						<tr>
-							    							<td>{{item.material}}</td>
+							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}
@@ -520,11 +535,11 @@
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
-							    						<th scope="row" colspan="8">EDGE</th>
+							    						<th scope="row" colspan="8">КАНТ</th>
 							    					</tr>
 							    					{% for item in external.material_edge %}
 							    						<tr>
-							    							<td>{{item.color_code}} - {{item.edge_type}}</td>
+							    							<td>{{item.color_code}} - {{item.edge_type}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}
@@ -546,7 +561,7 @@
 								 
 								    	</div>
 
-							    		<div class="hidden-buttons">
+							    		<div class="hidden-buttons" style="margin-left: 41%">
 							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=external.order.ID %}" role="button" title="Edit Order">
 							    				<img src="{% static 'images/edit.png' %}" class="tableIcons">
 							    			</a>
