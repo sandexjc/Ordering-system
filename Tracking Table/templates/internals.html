@@ -120,11 +120,21 @@
 								</tr>
 							{% endfor %}
 
+							<tr>
+								<th scope="row" colspan="8"></th>
+							</tr>
+
 							{% if internal.order.order_ready %}
 								<tr>
-									<td>{{internal.order_progress}}</td>
+									<td>ORDER_TAKEN</td>
+									<td>{{internal.order_progress.order_taken}}</td>
 								</tr>
 							{% endif %}
+
+							<tr>
+								<td>INVOICE</td>
+								<td>{{internal.order_progress.invoice}}</td>
+							</tr>
 
 						</tbody>
 					</table>
@@ -235,7 +245,7 @@
 								  {% if badges %}
 								  	<span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" style="display: inline;"></span>
 								  {% else %}
-								  	<span class="badge bg-danger" style="display: none;"></span>
+								   	<span class="badge bg-danger" style="display: none;"></span>
 								  {% endif %}
 								</button>
 
@@ -285,7 +295,7 @@
 
 				<!-- INTERNALS BUTTONS TAB END -->
 
-				{% if badges %}
+				{% if badges %} 
 					<div style="text-align: center; display: block;">
 						<h5>
 							<span class="badge rounded-pill bg-warning text-dark">
@@ -335,7 +345,12 @@
 						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: white;">
 						 		{% endif %}
 
-							    <th scope="row">{{internal.order.ID}}</th>
+						 		{% if internal.order.invoice %}
+							    	<th scope="row" style="color: black;">{{internal.order.ID}}</th>
+							    {% else %}
+							    	<th scope="row" style="color: red;">{{internal.order.ID}}</th>
+							    {% endif %}
+
 							    <td>{{internal.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{internal.order.owner}}<br>{{internal.order.telephone}}</td>
 

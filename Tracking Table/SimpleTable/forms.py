@@ -26,7 +26,7 @@ class UpdateOrderProgressForm(forms.ModelForm):
 
     class Meta:
         model = table.models.Order
-        fields = ('order_taken',)
+        fields = ('order_taken', 'invoice',)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,6 +35,25 @@ class UpdateOrderProgressForm(forms.ModelForm):
         'class': 'form-check-input',
         'role': 'checkbox',
         }
+        self.fields['invoice'].widget.attrs = {
+        'style': 'width: 90px; height: 30px; margin-left: auto; margin-right: auto;',
+        'class': 'form-check-input',
+        'role': 'checkbox',
+        }
+
+# class UpdateOrderInvoiceForm(forms.ModelForm):
+
+#     class Meta:
+#         model = table.models.Order
+#         fields = ('invoice',)
+
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.fields['invoice'].widget.attrs = {
+#         'style': 'width: 90px; height: 30px; margin-left: auto; margin-right: auto;',
+#         'class': 'form-check-input',
+#         'role': 'checkbox',
+#         }
 
 class UpdatePlateProgressForm(forms.ModelForm):
 

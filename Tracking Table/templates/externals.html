@@ -120,11 +120,21 @@
 								</tr>
 							{% endfor %}
 
+							<tr>
+								<th scope="row" colspan="8"></th>
+							</tr>
+
 							{% if external.order.order_ready %}
 								<tr>
-									<td>{{external.order_progress}}</td>
+									<td>ORDER_TAKEN</td>
+									<td>{{external.order_progress.order_taken}}</td>
 								</tr>
 							{% endif %}
+
+							<tr>
+								<td>INVOICE</td>
+								<td>{{external.order_progress.invoice}}</td>
+							</tr>
 
 						</tbody>
 					</table>
