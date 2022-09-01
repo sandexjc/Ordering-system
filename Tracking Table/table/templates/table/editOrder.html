@@ -153,6 +153,11 @@
 							<th>Value</th>
 							<th>
 								<div style="text-align: center">
+									<img src="{% static 'images/eye2.png' %}" class="EditOrderIcons">
+								</div>
+							</th>
+							<th>
+								<div style="text-align: center">
 									<img src="{% static 'images/delete-can.png' %}" class="EditOrderIcons">
 								</div>
 							</th>
@@ -167,6 +172,11 @@
 								<td>{{item.quantity}}</td>
 								<td>{{item.price}}</td>
 								<td>{{item.value}}</td>
+								<td>
+									<div class="form-check form-switch" style="margin-left: 10px; margin-top: 5px;">
+										{{item.visible}}
+									</div>
+								</td>
 								<td>
 									<div class="form-check form-switch" style="margin-left: 10px; margin-top: 5px;">
 										{{item.DELETE}}

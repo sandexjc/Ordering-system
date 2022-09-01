@@ -28,6 +28,8 @@ class Order(models.Model):
     order_ready = models.BooleanField(default=False)
     order_taken = models.BooleanField(default=False)
 
+    invoice = models.BooleanField(default=False)
+
     def update(self):
 
         self.clear()
@@ -132,6 +134,8 @@ class Edge(models.Model):
 
     ordered = models.BooleanField(default=False)
     delivered = models.BooleanField(default=False)
+
+    visible = models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.cutID) + ' / ' + self.color_code

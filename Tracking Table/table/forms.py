@@ -116,6 +116,7 @@ class AddEdgeForm(ModelForm):
         fields = (
             'edge_type', 'color_code',
             'quantity', 'price', 'value',
+            'visible',
             )
 
     def __init__(self, *args, **kwargs):
@@ -125,11 +126,11 @@ class AddEdgeForm(ModelForm):
         'class': 'form-control form-control-sm'
         }
         self.fields['color_code'].widget.attrs = {
-        'style': 'width: 100px', 
+        'style': 'width: 80px', 
         'class': 'form-control form-control-sm'
         }
         self.fields['quantity'].widget.attrs = {
-        'style': 'width: 75px', 
+        'style': 'width: 80px', 
         'class': 'form-control form-control-sm'
         }
         self.fields['price'].widget.attrs = {
@@ -139,8 +140,14 @@ class AddEdgeForm(ModelForm):
         }
         self.fields['value'].widget.attrs = {
         'readonly': 'True', 
-        'style': 'background-color: #e9ecef; font-weight: bold; width: 190px;', 
-        'class': 'form-control form-control-sm'}
+        'style': 'background-color: #e9ecef; font-weight: bold; width: 150px;', 
+        'class': 'form-control form-control-sm',
+        }
+        self.fields['visible'].widget.attrs = {
+        'style':'width: 30px; height: 15px;',
+        'class': 'form-check-input',
+        'role': 'switch'
+        }
 
 
 class AddEdgingForm(ModelForm):
