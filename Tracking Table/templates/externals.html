@@ -326,7 +326,13 @@
 						<tbody>
 
 							{% for external in externals %}
-					 		<tr class="visibleRows" id="{{external.order.ID}}" href="{% url 'table:editOrder' pk=external.order.ID %}">
+
+					 			{% if external.order.order_taken %}
+						 			<tr class="visibleRows" id="{{external.order.ID}}" style="background-color: #eae2b7;">
+						 		{% else %}
+						 			<tr class="visibleRows" id="{{external.order.ID}}" style="background-color: white;">
+						 		{% endif %}
+
 							    <th scope="row">{{external.order.ID}}</th>
 							    <td>{{external.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{external.order.owner}}<br>{{external.order.telephone}}</td>
