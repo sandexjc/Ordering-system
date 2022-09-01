@@ -49,15 +49,15 @@
 
 					<table class="table">
 						<thead>
-							<th scope="col">Material</th>
-							<th scope="col">Ordered</th>
-							<th scope="col">Delivered</th>
-							<th scope="col">Cutted</th>
-							<th scope="col">Edged</th>
+							<th scope="col">Материал</th>
+							<th scope="col">Поръчано</th>
+							<th scope="col">Доставено</th>
+							<th scope="col">Нарязано</th>
+							<th scope="col">Кантирано</th>
 						</thead>
 						<tbody>
 							<tr>
-								<th scope="row" colspan="8">EGGER</th>
+								<th scope="row" colspan="5">EGGER</th>
 							</tr>
 							{{internal.plate_forms.management_form}}
 							
@@ -75,7 +75,7 @@
 							{% endfor %}
 
 							<tr>
-								<th scope="row" colspan="8">KRONO</th>
+								<th scope="row" colspan="5">KRONO</th>
 							</tr>
 							{% for item in internal.plate_forms %}
 								{% if item.manufacturer.value == 'Kronospan' %}
@@ -91,7 +91,7 @@
 							{% endfor %}
 
 							<tr>
-								<th scope="row" colspan="8">OTHERS</th>
+								<th scope="row" colspan="5">Други</th>
 							</tr>
 							{% for item in internal.plate_forms %}
 								{% if item.manufacturer.value == 'Other' %}
@@ -107,7 +107,7 @@
 							{% endfor %}
 							
 							<tr>
-								<th scope="row" colspan="8">EDGE</th>
+								<th scope="row" colspan="5">Кант</th>
 							</tr>
 							{{internal.edge_forms.management_form}}
 
@@ -121,18 +121,18 @@
 							{% endfor %}
 
 							<tr>
-								<th scope="row" colspan="8"></th>
+								<th scope="row" colspan="5"></th>
 							</tr>
 
 							{% if internal.order.order_ready %}
 								<tr>
-									<td>ORDER_TAKEN</td>
+									<td>Поръчката е взета</td>
 									<td>{{internal.order_progress.order_taken}}</td>
 								</tr>
 							{% endif %}
 
 							<tr>
-								<td>INVOICE</td>
+								<td>Издадена фактура</td>
 								<td>{{internal.order_progress.invoice}}</td>
 							</tr>
 
@@ -338,9 +338,9 @@
 							{% for internal in internals %}
 
 								{% if internal.order.order_taken %}
-						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: #eae2b7;">
+						 			<tr class="visibleRows orderTaken" id="{{internal.order.ID}}">
 						 		{% else %}
-						 			<tr class="visibleRows" id="{{internal.order.ID}}" style="background-color: white;">
+						 			<tr class="visibleRows normalOrder" id="{{internal.order.ID}}">
 						 		{% endif %}
 
 						 		{% if internal.order.invoice %}

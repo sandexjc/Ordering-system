@@ -1,22 +1,21 @@
-var clickable_rows = document.getElementsByClassName('visibleRows');
-var hidden_rows = document.getElementsByClassName('hiddenRows');
+//Last change
 
-for (var i=0; i<clickable_rows.length; i++) {
-	clickable_rows[i].addEventListener('click', function() {
-		for (var k=0; k<hidden_rows.length; k++) {
-			if (hidden_rows[k].getAttribute('id') === this.getAttribute('id')) {
-				if (hidden_rows[k].style.display === 'none') {
-					hidden_rows[k].style.display = 'block';
-					this.style.backgroundColor = '#e5e5e5';
-					console.log(this.id)
+$(".visibleRows").each(function() {
+	$(this).click(function() {
+		row_id = this.getAttribute('id');
+		$(".hiddenRows").each(function() {
+			if (this.getAttribute('id') == row_id) {
+				if (this.style.display === 'none') {
+					this.style.display = 'block';
+					this.classList.add("orderClicked");
 				}else{
-					hidden_rows[k].style.display = 'none';
-					this.style.backgroundColor = document.body.style.backgroundColor;
+					this.style.display = 'none';
+					this.classList.remove("orderClicked");
 				}
 			}
-		}
-	});
-}
+		})
+	})
+})
 
 $(".updateButtons").each(function() {
 	$(this).click(function() {
