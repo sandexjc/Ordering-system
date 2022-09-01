@@ -343,7 +343,12 @@
 						 			<tr class="visibleRows" id="{{external.order.ID}}" style="background-color: white;">
 						 		{% endif %}
 
-							    <th scope="row">{{external.order.ID}}</th>
+							    {% if external.order.invoice %}
+							    	<th scope="row" style="color: black;">{{external.order.ID}}</th>
+							    {% else %}
+							    	<th scope="row" style="color: red;">{{external.order.ID}}</th>
+							    {% endif %}
+
 							    <td>{{external.order.created_date|date:"d.m.Y"}}</td>
 							    <td>{{external.order.owner}}<br>{{external.order.telephone}}</td>
 
