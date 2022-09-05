@@ -8,6 +8,7 @@ $(".visibleRows").each(function() {
 				if (this.style.display === 'none') {
 					this.style.display = 'block';
 					this.classList.add("orderClicked");
+					$(this).focus();
 				}else{
 					this.style.display = 'none';
 					this.classList.remove("orderClicked");
@@ -29,6 +30,7 @@ $(".updateButtons").each(function() {
 			method: "POST",
 			url: '/table/updateOrder/' + this.getAttribute('id'),
 			data: $("#Progress"+this.getAttribute('id')+" .updateForms").serialize(),
+			timeout: 10000,
 
 			context: updateButton,
 
@@ -43,7 +45,9 @@ $(".updateButtons").each(function() {
 				
 
 			},
-			error: function() {
+			error: function(status) {
+				console.log(status.statusText);
+				$(".alertmsgdiv").append("<div>"+status.statusText+"</div>");
 				$(".ALERT-E").css("display","inline");
 				$(".ALERT-S").css("display","none");
 				$(this).prop('disabled', false);
@@ -66,6 +70,7 @@ $('.deleteButtons').each(function() {
 			method: "POST",
 			url: '/table/deleteOrder/' + this.getAttribute('id'),
 			data: $("#Delete"+this.getAttribute('id')+" .deleteForms").serialize(),
+			timeout: 10000,
 			success: function() {
 				location.reload();
 			}
