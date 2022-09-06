@@ -19,7 +19,6 @@ class OrderObject:
         self.plate_forms = forms.PlateProgressFormSet(instance=order)
         self.edge_forms = forms.EdgeProgressFormSet(instance=order)
         self.order_progress = forms.UpdateOrderProgressForm(instance=order)
-        # self.order_invoice = forms.UpdateOrderInvoiceForm(instance=order)
 
     def __str__(self):
         return str(self.order)

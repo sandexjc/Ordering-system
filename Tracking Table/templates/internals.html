@@ -168,6 +168,20 @@
 		    <form id="Delete{{internal.order.ID}}" class="deleteForms">
 		    	{% csrf_token %}
 
+		    	<div class="ALERT-S-DEL-VIEW" style="display: none;">
+	      			<div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
+		  				<strong><div style="text-align: center;">SUCCESSFULLY DELETED</div></strong>
+		  				<button type="button" class="btn-close SuccessAlertBtn" aria-label="Close"></button>
+					</div>
+				</div>
+
+				<div class="ALERT-E-DEL-VIEW" style="display: none;">
+	      			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
+		  				<strong><div class="alertmsgdiv" style="text-align: center;">ERROR OCCURRED</div></strong>
+		  				<button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
+					</div>
+				</div>
+
 	      		<div class="modal-body" style="text-align: center;">
 		      		<h5>Are you sure you want to delete Order: 
 		      			<strong>#{{internal.order.ID}}</strong>
@@ -202,15 +216,15 @@
 
 			<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
 		  		<li class="nav-item" role="presentation">
-		    		<button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Internals</button>
+		    		<button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Вътрешни</button>
 		  		</li>
 
 				<li class="nav-item" role="presentation">
-				    <a class="nav-link" href="{% url 'externals' %}">Externals</a>
+				    <a class="nav-link" href="{% url 'externals' %}">Външни</a>
 				</li>
 
 				<li class="nav-item" role="presentation">
-					<a class="nav-link" href="#">STORE ORDERS</a>
+					<a class="nav-link" href="#">Магазин</a>
 				</li>
 
 			</ul>

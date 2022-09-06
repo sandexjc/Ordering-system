@@ -40,13 +40,11 @@ $(".updateButtons").each(function() {
 				$(this).prop('disabled', false);
 				$(this).html("Update");
 				$(this).find('span').remove();
-
-				// $('.newCont').replaceWith(data);
+				console.log(data.updated_object);
 				
 
 			},
 			error: function(status) {
-				console.log(status.statusText);
 				$(".alertmsgdiv").append("<div>"+status.statusText+"</div>");
 				$(".ALERT-E").css("display","inline");
 				$(".ALERT-S").css("display","none");
@@ -65,14 +63,26 @@ $('.deleteButtons').each(function() {
 		$(this).prop('disabled', true);
 		$(this).html("Loading...");
 		$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+		var deleteButton = this
 
 		$.ajax({
 			method: "POST",
 			url: '/table/deleteOrder/' + this.getAttribute('id'),
 			data: $("#Delete"+this.getAttribute('id')+" .deleteForms").serialize(),
 			timeout: 10000,
-			success: function() {
+			context: deleteButton,
+			success: function(data) {
 				location.reload();
+				// console.log(data.status);
+			},
+
+			error: function(status) {
+				$(".ALERT-E-DEL-VIEW").css("display","inline");
+				$(".ALERT-S-DEL-VIEW").css("display","none");
+				$(this).prop('disabled', false);
+				$(this).html("Confirm");
+				$(this).find('span').remove();
+
 			}
 		})
 	})
@@ -88,7 +98,6 @@ $('#editButton').click(function() {
 // $('#editOrderForm').submit()
 
 $(".SuccessAlertBtn").click(function() {
-	console.log("SuccessAlertBtn clicked");
 	$(".ALERT-S").css("display","none");
 })
 

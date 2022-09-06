@@ -3,11 +3,13 @@ from django.shortcuts import redirect
 from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.http import JsonResponse
 
 from accounts.models import User
 from table.models import Order, Plate, Edge, Payment, Cutting, Edging, Other 
 from table import forms
 from SimpleTable.forms import PlateProgressFormSet, EdgeProgressFormSet, UpdateOrderProgressForm
+import json
 
 class CreateOrder(LoginRequiredMixin, CreateView):
 
@@ -244,7 +246,18 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 class DeleteOrder(LoginRequiredMixin, DeleteView):
 
     model = Order
-    success_url = '/'
+    
+    def post(self, request, pk, *args, **kwargs):
+
+        self.object = Order.objects.get(pk=pk)
+        print('DELETING OBJECT ->',self.object)
+
+        self.object.delete()
+
+        return JsonResponse({
+            'status':'OK'
+            })
+
 
 class UpdateOrder(LoginRequiredMixin, UpdateView):
 
@@ -265,6 +278,7 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
         if PLATES_PROG.is_valid() and EDGES_PROG.is_valid() and ORDER_PROG.is_valid():
             print('FORM VALID')
             return self.form_valid(PLATES_PROG, EDGES_PROG, ORDER_PROG, self.object)
+            # self.form_valid(PLATES_PROG, EDGES_PROG, ORDER_PROG, self.object)
         else:
             print('FORM INVALID _____________')
             print('PLATES ERRORS:')
@@ -293,7 +307,11 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
             order.order_taken = False
             order.save()
 
-        return redirect('/')
+        # return redirect('/')
+        
+        return JsonResponse({
+            'updated_object':order.ID,
+            })
 
     def check_if_ready(self, order, plates, edges):
 

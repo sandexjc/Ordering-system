@@ -40,7 +40,7 @@
 
 					<div class="ALERT-E alertmsg" style="display: none;">
 		      			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
-			  				<strong><div style="text-align: center;">ERROR</div></strong>
+			  				<strong><div class="alertmsgdiv" style="text-align: center;">ERROR</div></strong>
 			  				<button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
 						</div>
 					</div>
@@ -199,11 +199,15 @@
 
 		<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
 	  		<li class="nav-item" role="presentation">
-	    		<a class="nav-link" href="{% url 'internals' %}">Internals</a>
+	    		<a class="nav-link" href="{% url 'internals' %}">Вътрешни</a>
 	  		</li>
 
 			<li class="nav-item" role="presentation">
-			    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Externals</button>
+			    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Външни</button>
+			</li>
+			
+			<li class="nav-item" role="presentation">
+				<a class="nav-link" href="#">Магазин</a>
 			</li>
 
 		</ul>
