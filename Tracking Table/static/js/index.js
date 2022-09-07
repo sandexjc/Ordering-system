@@ -8,10 +8,12 @@ $(".visibleRows").each(function() {
 				if (this.style.display === 'none') {
 					this.style.display = 'block';
 					this.classList.add("orderClicked");
+					$("#"+row_id+".visibleRows").addClass("rowSelected");
 					$(this).focus();
 				}else{
 					this.style.display = 'none';
 					this.classList.remove("orderClicked");
+					$("#"+row_id+".visibleRows").removeClass("rowSelected");
 				}
 			}
 		})
@@ -35,8 +37,8 @@ $(".updateButtons").each(function() {
 			context: updateButton,
 
 			success: function(data) {
-				$(".ALERT-E").css("display","none");
-				$(".ALERT-S").css("display","inline");
+				$(".ALERT-E-UPD-VIEW").css("display","none");
+				$(".ALERT-S-UPD-VIEW").css("display","inline");
 				$(this).prop('disabled', false);
 				$(this).html("Update");
 				$(this).find('span').remove();
@@ -45,9 +47,10 @@ $(".updateButtons").each(function() {
 
 			},
 			error: function(status) {
+				$(".alertmsgdiv").find("div").remove();
 				$(".alertmsgdiv").append("<div>"+status.statusText+"</div>");
-				$(".ALERT-E").css("display","inline");
-				$(".ALERT-S").css("display","none");
+				$(".ALERT-E-UPD-VIEW").css("display","inline");
+				$(".ALERT-S-UPD-VIEW").css("display","none");
 				$(this).prop('disabled', false);
 				$(this).html("Update");
 				$(this).find('span').remove();
@@ -72,11 +75,15 @@ $('.deleteButtons').each(function() {
 			timeout: 10000,
 			context: deleteButton,
 			success: function(data) {
-				location.reload();
-				// console.log(data.status);
+				$("#Delete"+this.getAttribute('id')+".modal").modal('hide');
+				$("#"+this.getAttribute('id')+".visibleRows").remove();
+				$("#"+this.getAttribute('id')+".hiddenRows").remove();
+
 			},
 
 			error: function(status) {
+				$(".alertmsgdiv").find("div").remove();
+				$(".alertmsgdiv").append("<div>"+status.statusText+"</div>");
 				$(".ALERT-E-DEL-VIEW").css("display","inline");
 				$(".ALERT-S-DEL-VIEW").css("display","none");
 				$(this).prop('disabled', false);
@@ -95,14 +102,14 @@ $('#editButton').click(function() {
 	$(this).prop('disabled', true);
 })
 
-// $('#editOrderForm').submit()
-
 $(".SuccessAlertBtn").click(function() {
-	$(".ALERT-S").css("display","none");
+	$(".ALERT-S-UPD-VIEW").css("display","none");
+	$(".ALERT-S-DEL-VIEW").css("display","none");
 })
 
 $(".ErrorAlertBtn").click(function() {
-	$(".ALERT-E").css("display","none");
+	$(".ALERT-E-UPD-VIEW").css("display","none");
+	$(".ALERT-E-DEL-VIEW").css("display","none");
 })
 
 $(".alertmsg").focus();

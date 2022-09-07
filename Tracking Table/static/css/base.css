@@ -88,6 +88,10 @@
 .orderClicked{
 	background-color: #e5e5e5;
 }
+.rowSelected{
+	background-blend-mode: multiply;
+	background-color: #d2d2d2;
+}
 
 .container{
 	max-width: 1700px;
