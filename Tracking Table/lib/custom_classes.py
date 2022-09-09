@@ -33,35 +33,24 @@ class OrderDetails:
 		self.material_other = models.Plate.objects.filter(cutID=order, manufacturer='Other')
 		self.material_edge = models.Edge.objects.filter(cutID=order)
 
-	# def get_order(self):
+	def get_order(self):
 
-	# 	return json.loads(serializers.serialize('json', [self.order]))
+		return json.loads(serializers.serialize('json', [self.order]))
 
 	def get_plates(self):
-
-		# result = {}
-
-		# for item in self.material_eger:
-		# 	result["egger"] = json.loads(serializers.serialize('json', self.material_eger))
-
-		# for item in self.material_krono:
-		# 	result["krono"] = json.loads(serializers.serialize('json', self.material_krono))
-
-		# for item in self.material_other:
-		# 	result["other"] = json.loads(serializers.serialize('json', self.material_other))
-
-		# return result
 
 		return json.loads(serializers.serialize('json', self.order_plates))
 
 	def get_edges(self):
 
-		result = {}
+		# result = {}
 
-		for item in self.material_edge:
-			result['edge'] = json.loads(serializers.serialize('json', self.material_edge))
+		# for item in self.material_edge:
+		# 	result['edge'] = json.loads(serializers.serialize('json', self.material_edge))
 
-		return result
+		# return result
+
+		return json.loads(serializers.serialize('json', self.material_edge))
 
 	def __str__(self):
 		return str(self.result)

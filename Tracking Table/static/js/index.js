@@ -45,37 +45,57 @@ $(".updateButtons").each(function() {
 				$(data.plates).each(function() {
 
 					if ((this.fields.ordered == true) && (this.fields.delivered != true)) {
-						$("#"+this.pk+".Plate").css('color', 'red');
-
+						$("#plate"+this.pk).css('color', 'red');
 					}else if ((this.fields.ordered == true) && (this.fields.delivered == true)) {
-						$("#"+this.pk+".Plate").css('color', '#8ac926');
-
+						$("#plate"+this.pk).css('color', '#8ac926');
 					}else{
-						$("#"+this.pk+".Plate").css('color', 'black');
+						$("#plate"+this.pk).css('color', 'black');
 					}
 
 					if (this.fields.ordered == true) {
-						$("#"+this.pk+".ordered").addClass("active");
+						$("#plate_prog"+this.pk+".ordered").addClass("active");
 					}else{
-						$("#"+this.pk+".ordered").removeClass("active");
+						$("#plate_prog"+this.pk+".ordered").removeClass("active");
 					}
 
 					if (this.fields.delivered == true) {
-						$("#"+this.pk+".delivered").addClass("active");
+						$("#plate_prog"+this.pk+".delivered").addClass("active");
 					}else{
-						$("#"+this.pk+".delivered").removeClass("active");
+						$("#plate_prog"+this.pk+".delivered").removeClass("active");
 					}
 
 					if (this.fields.cutted == true) {
-						$("#"+this.pk+".cutted").addClass("active");
+						$("#plate_prog"+this.pk+".cutted").addClass("active");
 					}else{
-						$("#"+this.pk+".cutted").removeClass("active");
+						$("#plate_prog"+this.pk+".cutted").removeClass("active");
 					}
 
 					if (this.fields.edged == true) {
-						$("#"+this.pk+".edged").addClass("active");
+						$("#plate_prog"+this.pk+".edged").addClass("active");
 					}else{
-						$("#"+this.pk+".edged").removeClass("active");
+						$("#plate_prog"+this.pk+".edged").removeClass("active");
+					}
+				})
+
+				$(data.edges).each(function() {
+					if ((this.fields.ordered == true) && (this.fields.delivered != true)) {
+						$("#edge"+this.pk).css('color', 'red');
+					}else if ((this.fields.ordered == true) && (this.fields.delivered == true)) {
+						$("#edge"+this.pk).css('color', '#8ac926');
+					}else{
+						$("#edge"+this.pk).css('color', 'black');
+					}
+
+					if (this.fields.ordered == true) {
+						$("#edge_prog"+this.pk+".ordered").addClass("active");
+					}else{
+						$("#edge_prog"+this.pk+".ordered").removeClass("active");					
+					}
+
+					if (this.fields.delivered == true) {
+						$("#edge_prog"+this.pk+".delivered").addClass("active");
+					}else{
+						$("#edge_prog"+this.pk+".delivered").removeClass("active");	
 					}
 				})
 			},
