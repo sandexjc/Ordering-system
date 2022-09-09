@@ -4,7 +4,9 @@ from django.views.generic import CreateView, UpdateView, TemplateView, DeleteVie
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import JsonResponse
+from django.core import serializers
 
+from lib import custom_classes
 from accounts.models import User
 from table.models import Order, Plate, Edge, Payment, Cutting, Edging, Other 
 from table import forms
@@ -255,7 +257,7 @@ class DeleteOrder(LoginRequiredMixin, DeleteView):
         self.object.delete()
 
         return JsonResponse({
-            'status':'OK'
+            'status':'OK',
             })
 
 
@@ -265,10 +267,9 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
 
     def post(self, request, pk, *args, **kwargs):
 
-        print('UPDATE ORDER', type(pk) ,pk)
+        print('UPDATE ORDER ->', pk)
 
         self.object = Order.objects.get(pk=pk)
-        print(self.object)
         PLATES_PROG = PlateProgressFormSet(self.request.POST, instance=self.object)
         EDGES_PROG = EdgeProgressFormSet(self.request.POST, instance=self.object)
         ORDER_PROG = UpdateOrderProgressForm(self.request.POST, instance=self.object)
@@ -278,7 +279,6 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
         if PLATES_PROG.is_valid() and EDGES_PROG.is_valid() and ORDER_PROG.is_valid():
             print('FORM VALID')
             return self.form_valid(PLATES_PROG, EDGES_PROG, ORDER_PROG, self.object)
-            # self.form_valid(PLATES_PROG, EDGES_PROG, ORDER_PROG, self.object)
         else:
             print('FORM INVALID _____________')
             print('PLATES ERRORS:')
@@ -308,9 +308,15 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
             order.save()
 
         # return redirect('/')
+
+        customObj = custom_classes.OrderDetails(order)
+        # print('Custom SER -------> ',customObj.custom_json_ser())
+        # json_model = serializers.serialize('json', [order])
         
         return JsonResponse({
-            'updated_object':order.ID,
+            'order': order.ID,
+            'plates':customObj.get_plates(),
+            'edges':customObj.get_edges(),
             })
 
     def check_if_ready(self, order, plates, edges):

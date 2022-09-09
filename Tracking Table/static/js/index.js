@@ -33,7 +33,6 @@ $(".updateButtons").each(function() {
 			url: '/table/updateOrder/' + this.getAttribute('id'),
 			data: $("#Progress"+this.getAttribute('id')+" .updateForms").serialize(),
 			timeout: 10000,
-
 			context: updateButton,
 
 			success: function(data) {
@@ -42,9 +41,43 @@ $(".updateButtons").each(function() {
 				$(this).prop('disabled', false);
 				$(this).html("Update");
 				$(this).find('span').remove();
-				console.log(data.updated_object);
-				
 
+				$(data.plates).each(function() {
+
+					if ((this.fields.ordered == true) && (this.fields.delivered != true)) {
+						$("#"+this.pk+".Plate").css('color', 'red');
+
+					}else if ((this.fields.ordered == true) && (this.fields.delivered == true)) {
+						$("#"+this.pk+".Plate").css('color', '#8ac926');
+
+					}else{
+						$("#"+this.pk+".Plate").css('color', 'black');
+					}
+
+					if (this.fields.ordered == true) {
+						$("#"+this.pk+".ordered").addClass("active");
+					}else{
+						$("#"+this.pk+".ordered").removeClass("active");
+					}
+
+					if (this.fields.delivered == true) {
+						$("#"+this.pk+".delivered").addClass("active");
+					}else{
+						$("#"+this.pk+".delivered").removeClass("active");
+					}
+
+					if (this.fields.cutted == true) {
+						$("#"+this.pk+".cutted").addClass("active");
+					}else{
+						$("#"+this.pk+".cutted").removeClass("active");
+					}
+
+					if (this.fields.edged == true) {
+						$("#"+this.pk+".edged").addClass("active");
+					}else{
+						$("#"+this.pk+".edged").removeClass("active");
+					}
+				})
 			},
 			error: function(status) {
 				$(".alertmsgdiv").find("div").remove();
@@ -57,7 +90,6 @@ $(".updateButtons").each(function() {
 			}
 
 			})
-
 	})
 })
 
@@ -74,11 +106,11 @@ $('.deleteButtons').each(function() {
 			data: $("#Delete"+this.getAttribute('id')+" .deleteForms").serialize(),
 			timeout: 10000,
 			context: deleteButton,
+
 			success: function(data) {
 				$("#Delete"+this.getAttribute('id')+".modal").modal('hide');
 				$("#"+this.getAttribute('id')+".visibleRows").remove();
 				$("#"+this.getAttribute('id')+".hiddenRows").remove();
-
 			},
 
 			error: function(status) {
@@ -89,7 +121,6 @@ $('.deleteButtons').each(function() {
 				$(this).prop('disabled', false);
 				$(this).html("Confirm");
 				$(this).find('span').remove();
-
 			}
 		})
 	})
