@@ -177,7 +177,7 @@ class Payment(models.Model):
 
     cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
 
-    value = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(0.001)])
+    value = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(0.00)])
     payment_method = models.CharField(choices=payment_methods, default='Cash', max_length=10)
 
     def __str__(self):

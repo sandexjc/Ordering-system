@@ -26,7 +26,7 @@ class UpdateOrderForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['owner'].widget.attrs = {
         'placeholder': 'Client Name',
-        'readonly': True,
+        'readonly': False,
         }    
         self.fields['owner'].label = 'Client Name'
         self.fields['created_date'].widget.attrs['readonly'] = False

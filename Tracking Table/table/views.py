@@ -3,11 +3,15 @@ from django.shortcuts import redirect
 from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.http import JsonResponse
+from django.core import serializers
 
+from lib import custom_classes
 from accounts.models import User
 from table.models import Order, Plate, Edge, Payment, Cutting, Edging, Other 
 from table import forms
 from SimpleTable.forms import PlateProgressFormSet, EdgeProgressFormSet, UpdateOrderProgressForm
+import json
 
 class CreateOrder(LoginRequiredMixin, CreateView):
 
@@ -244,7 +248,18 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 class DeleteOrder(LoginRequiredMixin, DeleteView):
 
     model = Order
-    success_url = '/'
+    
+    def post(self, request, pk, *args, **kwargs):
+
+        self.object = Order.objects.get(pk=pk)
+        print('DELETING OBJECT ->',self.object)
+
+        self.object.delete()
+
+        return JsonResponse({
+            'status':'OK',
+            })
+
 
 class UpdateOrder(LoginRequiredMixin, UpdateView):
 
@@ -252,10 +267,9 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
 
     def post(self, request, pk, *args, **kwargs):
 
-        print('UPDATE ORDER', type(pk) ,pk)
+        print('UPDATE ORDER ->', pk)
 
         self.object = Order.objects.get(pk=pk)
-        print(self.object)
         PLATES_PROG = PlateProgressFormSet(self.request.POST, instance=self.object)
         EDGES_PROG = EdgeProgressFormSet(self.request.POST, instance=self.object)
         ORDER_PROG = UpdateOrderProgressForm(self.request.POST, instance=self.object)
@@ -293,7 +307,17 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
             order.order_taken = False
             order.save()
 
-        return redirect('/')
+        # return redirect('/')
+
+        customObj = custom_classes.OrderDetails(order)
+        # print('Custom SER -------> ',customObj.custom_json_ser())
+        # json_model = serializers.serialize('json', [order])
+        
+        return JsonResponse({
+            'order': customObj.get_order(),
+            'plates':customObj.get_plates(),
+            'edges':customObj.get_edges(),
+            })
 
     def check_if_ready(self, order, plates, edges):
 

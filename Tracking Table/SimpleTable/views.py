@@ -5,24 +5,7 @@ from table.models import Order, Plate, Edge, Payment, Note, Other
 from SimpleTable import forms
 import time
 import table
-
-class OrderObject:
-
-    def __init__(self, order):
-        self.order = order
-        self.material_eger = Plate.objects.filter(cutID=order, manufacturer='Egger')
-        self.material_krono = Plate.objects.filter(cutID=order, manufacturer='Kronospan')
-        self.material_other = Plate.objects.filter(cutID=order, manufacturer='Other')
-        self.material_edge = Edge.objects.filter(cutID=order)
-        self.other_services = Other.objects.filter(cutID=order)
-        self.notes = Note.objects.filter(cutID=order)
-        self.plate_forms = forms.PlateProgressFormSet(instance=order)
-        self.edge_forms = forms.EdgeProgressFormSet(instance=order)
-        self.order_progress = forms.UpdateOrderProgressForm(instance=order)
-        # self.order_invoice = forms.UpdateOrderInvoiceForm(instance=order)
-
-    def __str__(self):
-        return str(self.order)
+from lib import custom_classes
 
 class Internals(LoginRequiredMixin, TemplateView):
     template_name = 'internals.html'
@@ -84,7 +67,7 @@ class Internals(LoginRequiredMixin, TemplateView):
             context['badges'] = False
 
         for internal in all_internals:
-            context['internals'].append(OrderObject(internal))
+            context['internals'].append(custom_classes.OrderObject(internal))
 
         current_time = time.localtime(time.time())
 
@@ -150,7 +133,7 @@ class Externals(LoginRequiredMixin, TemplateView):
             context['badges'] = False
 
         for external in all_externals:
-            context['externals'].append(OrderObject(external))
+            context['externals'].append(custom_classes.OrderObject(external))
 
         current_time = time.localtime(time.time())
 
@@ -176,7 +159,7 @@ def search_id(client, ID):
 
     return Order.objects.filter(
             client=client, 
-            ID__contains=ID,
+            ID=ID,
             )
 
 def search_date(client, date):

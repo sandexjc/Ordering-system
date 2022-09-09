@@ -31,16 +31,16 @@
 
 	      		<div class="modal-body">
 
-		      		<div class="ALERT-S alertmsg" style="display: none;">
+		      		<div class="ALERT-S-UPD-VIEW alertmsg" style="display: none;">
 		      			<div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
 			  				<strong><div style="text-align: center;">SUCCESSFULLY SAVED</div></strong>
 			  				<button type="button" class="btn-close SuccessAlertBtn" aria-label="Close"></button>
 						</div>
 					</div>
 
-					<div class="ALERT-E alertmsg" style="display: none;">
+					<div class="ALERT-E-UPD-VIEW alertmsg" style="display: none;">
 		      			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
-			  				<strong><div style="text-align: center;">ERROR</div></strong>
+			  				<strong><div class="alertmsgdiv" style="text-align: center;">ERROR</div></strong>
 			  				<button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
 						</div>
 					</div>
@@ -121,18 +121,16 @@
 							{% endfor %}
 
 							<tr>
-								<th scope="row" colspan="8"></th>
+								<th scope="row" colspan="5"></th>
 							</tr>
 
-							{% if external.order.order_ready %}
-								<tr>
-									<td>ORDER_TAKEN</td>
-									<td>{{external.order_progress.order_taken}}</td>
-								</tr>
-							{% endif %}
+							<tr>
+								<td>Поръчката е взета</td>
+								<td>{{external.order_progress.order_taken}}</td>
+							</tr>
 
 							<tr>
-								<td>INVOICE</td>
+								<td>Издадена фактура</td>
 								<td>{{external.order_progress.invoice}}</td>
 							</tr>
 
@@ -168,6 +166,20 @@
 		    <form id="Delete{{external.order.ID}}" class="deleteForms">
 		    	{% csrf_token %}
 
+		    	<div class="ALERT-S-DEL-VIEW" style="display: none;">
+	      			<div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
+		  				<strong><div style="text-align: center;">SUCCESSFULLY DELETED</div></strong>
+		  				<button type="button" class="btn-close SuccessAlertBtn" aria-label="Close"></button>
+					</div>
+				</div>
+
+				<div class="ALERT-E-DEL-VIEW" style="display: none;">
+	      			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
+		  				<strong><div class="alertmsgdiv" style="text-align: center;">ERROR OCCURRED</div></strong>
+		  				<button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
+					</div>
+				</div>
+
 	      		<div class="modal-body" style="text-align: center;">
 		      		<h5>Are you sure you want to delete Order: 
 		      			<strong>#{{external.order.ID}}</strong>
@@ -199,11 +211,15 @@
 
 		<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
 	  		<li class="nav-item" role="presentation">
-	    		<a class="nav-link" href="{% url 'internals' %}">Internals</a>
+	    		<a class="nav-link" href="{% url 'internals' %}">Вътрешни</a>
 	  		</li>
 
 			<li class="nav-item" role="presentation">
-			    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Externals</button>
+			    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Външни</button>
+			</li>
+			
+			<li class="nav-item" role="presentation">
+				<a class="nav-link" href="#">Магазин</a>
 			</li>
 
 		</ul>
@@ -336,15 +352,15 @@
 							{% for external in externals %}
 
 					 			{% if external.order.order_taken %}
-						 			<tr class="visibleRows" id="{{external.order.ID}}" style="background-color: #eae2b7;">
+						 			<tr class="visibleRows orderTaken" id="{{external.order.ID}}">
 						 		{% else %}
-						 			<tr class="visibleRows" id="{{external.order.ID}}" style="background-color: white;">
+						 			<tr class="visibleRows normalOrder" id="{{external.order.ID}}">
 						 		{% endif %}
 
 							    {% if external.order.invoice %}
-							    	<th scope="row" style="color: black;">{{external.order.ID}}</th>
+							    	<th id="ID{{external.order.ID}}" scope="row" style="color: red;">{{external.order.ID}}</th>
 							    {% else %}
-							    	<th scope="row" style="color: red;">{{external.order.ID}}</th>
+							    	<th id="ID{{external.order.ID}}" scope="row" style="color: black;">{{external.order.ID}}</th>
 							    {% endif %}
 
 							    <td>{{external.order.created_date|date:"d.m.Y"}}</td>
@@ -353,11 +369,11 @@
 							    <td>
 							    	{% for item in external.material_eger %}
 							    		{% if item.ordered and not item.delivered %}
-							    			<div style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
-							    			<div style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    			<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% else %}
-							    			<div style="color: black;" >{{item.material}} - {{item.quantity}}</div>
+							    			<div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
 							    	{% endfor %}
 							    </td>
@@ -365,22 +381,22 @@
 							    <td>
 							    	{% for item in external.material_krono %}
 							    		{% if item.ordered and not item.delivered %}
-							    			<div style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
-							    			<div style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    			<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% else %}
-							    			<div style="color: black;" >{{item.material}} - {{item.quantity}}</div>
+							    			<div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
 							    	{% endfor %}
 							    </td>
 							    <td>
 							    	{% for item in external.material_other %}
 							    		{% if item.ordered and not item.delivered %}
-							    			<div style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
-							    			<div style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    			<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% else %}
-							    			<div style="color: black;" >{{item.material}} - {{item.quantity}}</div>
+							    			<div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
 							    	{% endfor %}
 							    </td>
@@ -388,15 +404,15 @@
 							    	{% for item in external.material_edge %}
 							    		{% if item.visible %}
 								    		{% if item.ordered and not item.delivered %}
-								    			<div style="color: red;">
+								    			<div class="Edge" id="edge{{item.pk}}" style="color: red;" >
 								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
 								    			</div>
 								    		{% elif item.delivered and item.ordered %}
-								    			<div style="color: #8ac926;">
+								    			<div class="Edge" id="edge{{item.pk}}" style="color: #8ac926;">
 								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
 								    			</div>
 								    		{% else %}
-								    			<div style="color: black;">
+								    			<div class="Edge" id="edge{{item.pk}}" style="color: black;">
 								    			{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
 								    			</div>
 								    		{% endif %}
@@ -445,26 +461,26 @@
 							    						<tr>
 							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
-								    							<ul class="progressbar">
+								    							<ul class="progressbar" id="bar{{item.pk}}">
 								    								{% if item.ordered %}
-								    									<li class="active"></li>
+								    									<li class="ordered active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="ordered" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    								{% if item.delivered %}
-								    									<li class="active"></li>
+								    									<li class="delivered active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="delivered" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    								{% if item.cutted %}
-								    									<li class="active"></li>
+								    									<li class="cutted active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="cutted" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    								{% if item.edged %}
-								    									<li class="active"></li>
+								    									<li class="edged active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="edged" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    							</ul>
 							    							</td>
@@ -477,26 +493,26 @@
 							    						<tr>
 							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
-								    							<ul class="progressbar">
+								    							<ul class="progressbar" id="bar{{item.pk}}">
 								    								{% if item.ordered %}
-								    									<li class="active"></li>
+								    									<li class="ordered active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="ordered" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    								{% if item.delivered %}
-								    									<li class="active"></li>
+								    									<li class="delivered active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="delivered" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    								{% if item.cutted %}
-								    									<li class="active"></li>
+								    									<li class="cutted active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="cutted" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    								{% if item.edged %}
-								    									<li class="active"></li>
+								    									<li class="edged active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="edged" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    							</ul>
 							    							</td>
@@ -509,26 +525,26 @@
 							    						<tr>
 							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
-								    							<ul class="progressbar">
+								    							<ul class="progressbar" id="bar{{item.pk}}">
 								    								{% if item.ordered %}
-								    									<li class="active"></li>
+								    									<li class="ordered active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="ordered" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    								{% if item.delivered %}
-								    									<li class="active"></li>
+								    									<li class="delivered active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="delivered" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    								{% if item.cutted %}
-								    									<li class="active"></li>
+								    									<li class="cutted active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="cutted" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    								{% if item.edged %}
-								    									<li class="active"></li>
+								    									<li class="edged active" id="plate_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="edged" id="plate_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    							</ul>
 							    							</td>
@@ -543,14 +559,14 @@
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}
-								    									<li class="active"></li>
+								    									<li class="ordered active" id="edge_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="ordered" id="edge_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    								{% if item.delivered %}
-								    									<li class="active"></li>
+								    									<li class="delivered active" id="edge_prog{{item.pk}}"></li>
 								    								{% else %}
-								    									<li></li>
+								    									<li class="delivered" id="edge_prog{{item.pk}}"></li>
 								    								{% endif %}
 								    							</ul>
 							    							</td>
@@ -561,7 +577,7 @@
 								 
 								    	</div>
 
-							    		<div class="hidden-buttons" style="margin-left: 41%">
+							    		<div class="hidden-buttons">
 							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=external.order.ID %}" role="button" title="Edit Order">
 							    				<img src="{% static 'images/edit.png' %}" class="tableIcons">
 							    			</a>
