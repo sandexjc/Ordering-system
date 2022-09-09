@@ -124,12 +124,10 @@
 								<th scope="row" colspan="5"></th>
 							</tr>
 
-							{% if internal.order.order_ready %}
-								<tr>
-									<td>Поръчката е взета</td>
-									<td>{{internal.order_progress.order_taken}}</td>
-								</tr>
-							{% endif %}
+							<tr>
+								<td>Поръчката е взета</td>
+								<td>{{internal.order_progress.order_taken}}</td>
+							</tr>
 
 							<tr>
 								<td>Издадена фактура</td>
@@ -363,9 +361,9 @@
 						 		{% endif %}
 
 						 		{% if internal.order.invoice %}
-							    	<th scope="row" style="color: red;">{{internal.order.ID}}</th>
+							    	<th scope="row" style="color: red;" id="ID{{internal.order.ID}}">{{internal.order.ID}}</th>
 							    {% else %}
-							    	<th scope="row" style="color: black;">{{internal.order.ID}}</th>
+							    	<th scope="row" style="color: black;" id="ID{{internal.order.ID}}">{{internal.order.ID}}</th>
 							    {% endif %}
 
 							    <td>{{internal.order.created_date|date:"d.m.Y"}}</td>

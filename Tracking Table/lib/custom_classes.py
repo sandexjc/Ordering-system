@@ -43,13 +43,6 @@ class OrderDetails:
 
 	def get_edges(self):
 
-		# result = {}
-
-		# for item in self.material_edge:
-		# 	result['edge'] = json.loads(serializers.serialize('json', self.material_edge))
-
-		# return result
-
 		return json.loads(serializers.serialize('json', self.material_edge))
 
 	def __str__(self):

@@ -42,6 +42,22 @@ $(".updateButtons").each(function() {
 				$(this).html("Update");
 				$(this).find('span').remove();
 
+				$(data.order).each(function() {
+					if (this.fields.order_taken == true) {
+						$("#"+this.pk+".visibleRows").removeClass('normalOrder');
+						$("#"+this.pk+".visibleRows").addClass('orderTaken');
+					}else{
+						$("#"+this.pk+".visibleRows").removeClass('orderTaken');
+						$("#"+this.pk+".visibleRows").addClass('normalOrder');
+					}
+
+					if (this.fields.invoice == true) {
+						$("#ID"+this.pk).css('color', 'red');
+					}else{
+						$("#ID"+this.pk).css('color', 'black');
+					}
+				})
+
 				$(data.plates).each(function() {
 
 					if ((this.fields.ordered == true) && (this.fields.delivered != true)) {

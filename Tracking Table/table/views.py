@@ -314,7 +314,7 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
         # json_model = serializers.serialize('json', [order])
         
         return JsonResponse({
-            'order': order.ID,
+            'order': customObj.get_order(),
             'plates':customObj.get_plates(),
             'edges':customObj.get_edges(),
             })
