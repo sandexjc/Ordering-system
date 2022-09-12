@@ -58,7 +58,7 @@ class AddPlateForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['material'].widget.attrs = {
-        'style': 'width: 170px;', 
+        'style': 'width: 150px;', 
         'class': 'form-control form-control-sm',
         }
         self.fields['manufacturer'].widget.attrs = {
@@ -66,7 +66,7 @@ class AddPlateForm(ModelForm):
         'class': 'form-select form-select-sm'
         }
         self.fields['quantity'].widget.attrs = {
-        'style': 'width: 75px', 
+        'style': 'width: 100px', 
         'class': 'form-control form-control-sm'
         }
         self.fields['price'].widget.attrs = {
