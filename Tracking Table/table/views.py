@@ -8,7 +8,7 @@ from django.core import serializers
 
 from lib import custom_classes
 from accounts.models import User
-from table.models import Order, Plate, Edge, Payment, Cutting, Edging, Other 
+from table.models import Order, Plate, Edge, Payment, Cutting, Edging, Other, Change 
 from table import forms
 from SimpleTable.forms import PlateProgressFormSet, EdgeProgressFormSet, UpdateOrderProgressForm
 import json
@@ -39,6 +39,14 @@ class CreateOrder(LoginRequiredMixin, CreateView):
         self.object = form.save(commit=False)
         self.object.save()
 
+        Change.objects.create(
+            cutID=self.object,
+            user=user.first_name, 
+            operation='created', 
+            what='Order',
+            new_state=self.object.ID,
+            ).save()
+
         add_note = forms.AddNoteForm(self.request.POST).save(commit=False)
         add_note.cutID = self.object
         add_note.user = user
@@ -46,6 +54,15 @@ class CreateOrder(LoginRequiredMixin, CreateView):
 
         if note != '':
             add_note.save()
+
+            Change.objects.create(
+            cutID=self.object,
+            user=user.first_name, 
+            operation='created', 
+            what='Note',
+            new_state=note,
+            ).save()
+
 
         return redirect('table:editOrder', self.object.pk)
 
@@ -173,12 +190,31 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         if note != '':
             notes.save()
 
+            Change.objects.create(
+            cutID=self.object,
+            user=user, 
+            operation='created', 
+            what='Note',
+            new_state=note,
+            ).save()
+
         plate = PLATES.save(commit=False)
 
         for item in plate:
             item.cutID = self.object
             item.value = round((item.quantity * item.price), 2)
             item.save()
+
+            print(dir(item))
+            print(item.__getstate__())
+
+            # Change.objects.create(
+            # cutID=self.object,
+            # user=user, 
+            # operation='Chnaged', 
+            # what='Plate',
+            # new_state=,
+            # ).save()
 
         for item in PLATES.deleted_objects:
             print(f'DELETING {item}')
@@ -307,11 +343,7 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
             order.order_taken = False
             order.save()
 
-        # return redirect('/')
-
         customObj = custom_classes.OrderDetails(order)
-        # print('Custom SER -------> ',customObj.custom_json_ser())
-        # json_model = serializers.serialize('json', [order])
         
         return JsonResponse({
             'order': customObj.get_order(),
