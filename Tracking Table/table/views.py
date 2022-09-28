@@ -201,24 +201,59 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         plate = PLATES.save(commit=False)
 
         for item in plate:
+
+            if item.pk:
+
+                old_object = Plate.objects.get(pk=item.pk)
+                changed_fields = {}
+
+                if old_object.material != item.material:
+                    changed_fields['material'] = f'{old_object.material} -> {item.material}'
+
+                if old_object.manufacturer != item.manufacturer:
+                    changed_fields['manufacturer'] = f'{old_object.manufacturer} -> {item.manufacturer}'
+
+                if old_object.quantity != item.quantity:
+                    changed_fields['quantity'] = f'{old_object.quantity} -> {item.quantity}'
+
+                if old_object.price != item.price:
+                    changed_fields['price'] = f'{old_object.price} -> {item.price}'
+
+                print(changed_fields)
+
+                for changed_field in changed_fields.keys():
+                    Change.objects.create(
+                    cutID=self.object,
+                    user=user, 
+                    operation='Changed', 
+                    what=changed_field,
+                    current_state=item.material,
+                    new_state=changed_fields[changed_field],
+                    ).save()
+            else:
+                Change.objects.create(
+                cutID=self.object,
+                user=user, 
+                operation='Added', 
+                what='Plate',
+                new_state=item.material,
+                ).save()
+
             item.cutID = self.object
             item.value = round((item.quantity * item.price), 2)
             item.save()
 
-            print(dir(item))
-            print(item.__getstate__())
-
-            # Change.objects.create(
-            # cutID=self.object,
-            # user=user, 
-            # operation='Chnaged', 
-            # what='Plate',
-            # new_state=,
-            # ).save()
-
         for item in PLATES.deleted_objects:
             print(f'DELETING {item}')
             item.delete()
+
+            Change.objects.create(
+            cutID=self.object,
+            user=user, 
+            operation='Deleted', 
+            what='Plate',
+            new_state=item.material,
+            ).save()
 
         cutting = CUTTING.save(commit=False)
 
