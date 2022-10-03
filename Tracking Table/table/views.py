@@ -219,6 +219,11 @@ class EditOrder(LoginRequiredMixin, UpdateView):
                 if old_object.price != item.price:
                     changed_fields['price'] = f'{old_object.price} -> {item.price}'
 
+                if old_object.from_client != item.from_client:
+                    changed_fields['from_client'] = f'{old_object.from_client} -> {item.from_client}'
+
+
+
                 print(changed_fields)
 
                 for changed_field in changed_fields.keys():
@@ -244,7 +249,6 @@ class EditOrder(LoginRequiredMixin, UpdateView):
             item.save()
 
         for item in PLATES.deleted_objects:
-            print(f'DELETING {item}')
             item.delete()
 
             Change.objects.create(
@@ -258,12 +262,55 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         cutting = CUTTING.save(commit=False)
 
         for item in cutting:
+
+            if item.pk:
+
+                old_object = Cutting.objects.get(pk=item.pk)
+                changed_fields = {}
+
+                if old_object.cutting_type != item.cutting_type:
+                    changed_fields['cutting_type'] = f'{old_object.cutting_type} -> {item.cutting_type}'
+
+                if old_object.quantity != item.quantity:
+                    changed_fields['quantity'] = f'{old_object.quantity} -> {item.quantity}'
+
+                if old_object.price != item.price:
+                    changed_fields['price'] = f'{old_object.price} -> {item.price}'
+
+                print(changed_fields)
+
+                for changed_field in changed_fields.keys():
+                    Change.objects.create(
+                    cutID=self.object,
+                    user=user, 
+                    operation='Changed', 
+                    what=changed_field,
+                    current_state=item.cutting_type,
+                    new_state=changed_fields[changed_field],
+                    ).save()
+            else:
+                Change.objects.create(
+                cutID=self.object,
+                user=user, 
+                operation='Added', 
+                what='Cutting',
+                new_state=item.cutting_type,
+                ).save()
+
             item.cutID = self.object
             item.value = round((item.quantity * item.price), 2)
             item.save()
 
         for item in CUTTING.deleted_objects:
-            print(f'DELETING {item}')
+
+            Change.objects.create(
+            cutID=self.object,
+            user=user, 
+            operation='Deleted', 
+            what='Cutting',
+            new_state=item.cutting_type,
+            ).save()
+
             item.delete()
 
         edge = EDGES.save(commit=False)

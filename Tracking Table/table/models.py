@@ -99,6 +99,7 @@ class Plate(models.Model):
     quantity = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.49)])
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    from_client = models.BooleanField(default=False)
 
     ordered = models.BooleanField(default=False)
     delivered = models.BooleanField(default=False)

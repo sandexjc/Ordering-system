@@ -51,7 +51,7 @@ class AddPlateForm(ModelForm):
     class Meta:
         model = models.Plate
         fields = (
-            'material', 'manufacturer',
+            'material', 'manufacturer', 'from_client',
             'quantity', 'price', 'value',
             )
 
@@ -62,11 +62,16 @@ class AddPlateForm(ModelForm):
         'class': 'form-control form-control-sm',
         }
         self.fields['manufacturer'].widget.attrs = {
-        'style': 'width: 120px', 
+        'style': 'width: 120px',  
         'class': 'form-select form-select-sm'
         }
+        self.fields['from_client'].widget.attrs = {
+        'style':'width: 30px; height: 15px;',
+        'class': 'form-check-input',
+        'role': 'switch',
+        }
         self.fields['quantity'].widget.attrs = {
-        'style': 'width: 100px', 
+        'style': 'width: 90px', 
         'class': 'form-control form-control-sm'
         }
         self.fields['price'].widget.attrs = {
