@@ -375,12 +375,10 @@
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% elif item.from_client %}
+						    				<div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% else %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
-							    		{% endif %}
-
-							    		{% if item.from_client %}
-						    				<div class="Plate" id="plate{{item.pk}}" style="color: #cdb4db;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
 							    	{% endfor %}
 							    </td>
@@ -391,12 +389,10 @@
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% elif item.from_client %}
+						    				<div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% else %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
-							    		{% endif %}
-
-							    		{% if item.from_client %}
-						    				<div class="Plate" id="plate{{item.pk}}" style="color: #cdb4db;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
 							    	{% endfor %}
 							    </td>
@@ -406,12 +402,10 @@
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% elif item.from_client %}
+						    				<div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% else %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
-							    		{% endif %}
-
-							    		{% if item.from_client %}
-						    				<div class="Plate" id="plate{{item.pk}}" style="color: #cdb4db;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
 							    	{% endfor %}
 							    </td>
