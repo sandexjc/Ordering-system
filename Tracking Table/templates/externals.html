@@ -199,6 +199,21 @@
 </div> 
 <!-- MODAL DELETE WINDOW END -->
 
+<!-- OFFCANVAS HISTORY TAB -->
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight{{external.order.ID}}" aria-labelledby="offcanvasRightLabel">
+  	<div class="offcanvas-header">
+    	<h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{external.order.ID}}</h5>
+    	<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  	</div>
+  	<div class="offcanvas-body">
+    	HISTORY TAB
+  	</div>
+</div>
+
+
+<!-- OFFCANVAS HISTORY TAB END-->
+
 {% endfor %}
 
 	<div class="WelcomeText">
@@ -599,6 +614,10 @@
 							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=external.order.ID %}" role="button" target="_blank" title="Print View">
 							    				<img src="{% static 'images/printer.png' %}" class="tableIcons">
 							    			</a>
+
+							    			<button class="btn btn-outline-warning" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight{{external.order.ID}}" aria-controls="offcanvasRight">
+							    				<img src="{% static 'images/deadline.png' %}" class="tableIcons">
+							    			</button>
 							    		</div>
 
 						    		</div>

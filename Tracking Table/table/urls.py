@@ -9,4 +9,5 @@ urlpatterns = [
     path('deleteOrder/<int:pk>', views.DeleteOrder.as_view(), name='deleteOrder'),
     path('updateOrder/<int:pk>', views.UpdateOrder.as_view(), name='updateOrder'),
     path('printOrder/<int:pk>', views.PrintOrder.as_view(), name='printOrder'),
+    path('getOrderHistory/<int:pk>', views.GetOrderHistory.as_view(), name='orderHistory'),
 ]

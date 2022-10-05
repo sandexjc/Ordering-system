@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
+from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import JsonResponse
@@ -63,9 +63,7 @@ class CreateOrder(LoginRequiredMixin, CreateView):
             new_state=note,
             ).save()
 
-
         return redirect('table:editOrder', self.object.pk)
-
 
 class EditOrder(LoginRequiredMixin, UpdateView):
 
@@ -440,6 +438,27 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
                 return False
 
         return True
+
+class GetOrderHistory(LoginRequiredMixin, ListView):
+
+    model = Order
+
+    def get(self, request, pk, *args, **kwargs):
+
+        print("GET ORDER HISTORY", pk)
+
+        order_chnages = Change.objects.filter(cutID=pk)
+
+        if not order_chnages:
+            return JsonResponse({
+            'changes': 'NO DATA',
+            }) 
+            
+        return JsonResponse({
+            'changes': json.loads(serializers.serialize('json', Change.objects.filter(cutID=pk))),
+            })
+
+
 
 class PrintOrder(LoginRequiredMixin, TemplateView):
 

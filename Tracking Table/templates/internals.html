@@ -199,6 +199,30 @@
 </div> 
 <!-- MODAL DELETE WINDOW END -->
 
+<!-- OFFCANVAS HISTORY TAB -->
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight{{internal.order.ID}}" aria-labelledby="offcanvasRightLabel">
+  	<div class="offcanvas-header">
+    	<h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{internal.order.ID}}</h5>
+    	<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  	</div>
+  	<div class="offcanvas-body" id="{{internal.order.ID}}" pulled="False">
+
+  		<button class="btn btn-outline-secondary" id="historyRefresh{{internal.order.ID}}" type="button">
+			<img src="{% static 'images/refresh-arrow.png' %}" class="tableIcons">
+		</button>
+  			
+  		<div class="d-flex justify-content-center" style="margin-top: 100%;">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+  	</div>
+</div>
+
+
+<!-- OFFCANVAS HISTORY TAB END-->
+
 {% endfor %}
 
 <!-- ##############################################
@@ -608,6 +632,10 @@
 							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=internal %}" role="button" target="_blank" title="Print View">
 							    				<img src="{% static 'images/printer.png' %}" class="tableIcons">
 							    			</a>
+
+							    			<button class="btn btn-outline-warning Historybtns" id="{{internal.order.ID}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight{{internal.order.ID}}" aria-controls="offcanvasRight">
+							    				<img src="{% static 'images/deadline.png' %}" class="tableIcons">
+							    			</button>
 							    		</div>
 
 						    		</div>
