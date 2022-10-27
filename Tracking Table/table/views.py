@@ -220,10 +220,6 @@ class EditOrder(LoginRequiredMixin, UpdateView):
                 if old_object.from_client != item.from_client:
                     changed_fields['from_client'] = f'{old_object.from_client} -> {item.from_client}'
 
-
-
-                print(changed_fields)
-
                 for changed_field in changed_fields.keys():
                     Change.objects.create(
                     cutID=self.object,
@@ -274,8 +270,6 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
                 if old_object.price != item.price:
                     changed_fields['price'] = f'{old_object.price} -> {item.price}'
-
-                print(changed_fields)
 
                 for changed_field in changed_fields.keys():
                     Change.objects.create(

@@ -11,20 +11,26 @@ $('.Historybtns').each(function() {
 			context: historyBtn,
 
 			success: function(data) {
+				historyBtn_body.empty();
 				historyBtn_body.find('div').remove();
 				historyBtn_body.find('span').remove();
-				// console.log(data);
-
+				historyBtn_body.css({
+					'font-size':'10px',
+					'font-weight':'bold',
+					});
+				historyBtn_body.append("<br>");
+			
 				$.each(data, function() {
 					$.each(this, function() {
-						historyBtn_body.append('<div class="historyEntry" style="font-size: 10px;"></div');
-						$('.historyEntry').append('<br>');
-						$.each(this.fields, function() {
 
-							$('.historyEntry').append(this + ' ');
-							console.log(this);
-							
-						})
+							historyBtn_body.append(this.fields.date + " ");
+							historyBtn_body.append(this.fields.user + " ");
+							historyBtn_body.append(this.fields.operation + " ");
+							historyBtn_body.append(this.fields.what + " ");
+							historyBtn_body.append(this.fields.current_state + " ");
+							historyBtn_body.append(this.fields.new_state + " ");
+							historyBtn_body.append("<br>");
+
 					})
 				})
 
@@ -33,7 +39,11 @@ $('.Historybtns').each(function() {
 			error: function(status) {
 				$('#'+this.getAttribute("id")+'.offcanvas-body').find('div').remove();
 				$('#'+this.getAttribute("id")+'.offcanvas-body').find('span').remove();
-				console.log(status.statusText);
+				historyBtn_body.append("<br>");
+				historyBtn_body.append(status.statusText);
+				historyBtn_body.css({
+					'margin-top': '100%',
+					});
 			}
 		})
 	})

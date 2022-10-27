@@ -206,8 +206,17 @@
     	<h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{external.order.ID}}</h5>
     	<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   	</div>
-  	<div class="offcanvas-body">
-    	HISTORY TAB
+  	<div class="offcanvas-body" id="{{external.order.ID}}" pulled="False">
+
+  		<button class="btn btn-outline-secondary" id="historyRefresh{{external.order.ID}}" type="button">
+			<img src="{% static 'images/refresh-arrow.png' %}" class="tableIcons">
+		</button>
+  			
+  		<div class="d-flex justify-content-center" style="margin-top: 100%;">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
   	</div>
 </div>
 
@@ -615,7 +624,7 @@
 							    				<img src="{% static 'images/printer.png' %}" class="tableIcons">
 							    			</a>
 
-							    			<button class="btn btn-outline-warning" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight{{external.order.ID}}" aria-controls="offcanvasRight">
+							    			<button class="btn btn-outline-warning Historybtns" id="{{external.order.ID}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight{{external.order.ID}}" aria-controls="offcanvasRight">
 							    				<img src="{% static 'images/deadline.png' %}" class="tableIcons">
 							    			</button>
 							    		</div>
