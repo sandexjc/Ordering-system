@@ -199,6 +199,30 @@
 </div> 
 <!-- MODAL DELETE WINDOW END -->
 
+<!-- OFFCANVAS HISTORY TAB -->
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight{{external.order.ID}}" aria-labelledby="offcanvasRightLabel">
+  	<div class="offcanvas-header">
+    	<h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{external.order.ID}}</h5>
+    	<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  	</div>
+  	<div class="offcanvas-body" id="{{external.order.ID}}" pulled="False">
+
+  		<button class="btn btn-outline-secondary" id="historyRefresh{{external.order.ID}}" type="button">
+			<img src="{% static 'images/refresh-arrow.png' %}" class="tableIcons">
+		</button>
+  			
+  		<div class="d-flex justify-content-center" style="margin-top: 100%;">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+  	</div>
+</div>
+
+
+<!-- OFFCANVAS HISTORY TAB END-->
+
 {% endfor %}
 
 	<div class="WelcomeText">
@@ -207,7 +231,7 @@
 
 	<!-- NAVIGATION PANEL -->
 
-	<div class="container shadow-lg">
+	<div class="container shadow-lg tableContent">
 
 		<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
 	  		<li class="nav-item" role="presentation">
@@ -372,6 +396,8 @@
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% elif item.from_client %}
+						    				<div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% else %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
@@ -384,6 +410,8 @@
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% elif item.from_client %}
+						    				<div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% else %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
@@ -395,6 +423,8 @@
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+							    		{% elif item.from_client %}
+						    				<div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% else %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% endif %}
@@ -593,6 +623,10 @@
 							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=external.order.ID %}" role="button" target="_blank" title="Print View">
 							    				<img src="{% static 'images/printer.png' %}" class="tableIcons">
 							    			</a>
+
+							    			<button class="btn btn-outline-warning Historybtns" id="{{external.order.ID}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight{{external.order.ID}}" aria-controls="offcanvasRight">
+							    				<img src="{% static 'images/deadline.png' %}" class="tableIcons">
+							    			</button>
 							    		</div>
 
 						    		</div>

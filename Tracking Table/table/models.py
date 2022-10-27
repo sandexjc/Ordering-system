@@ -96,9 +96,10 @@ class Plate(models.Model):
     manufacturer = models.CharField(choices=manufacturers, default='Egger', max_length=10)
 
     material = models.CharField(max_length=50)
-    quantity = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.49)])
+    quantity = models.DecimalField(max_digits=10, decimal_places=1, validators=[MinValueValidator(0.49)])
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    from_client = models.BooleanField(default=False)
 
     ordered = models.BooleanField(default=False)
     delivered = models.BooleanField(default=False)
@@ -114,7 +115,7 @@ class Cutting(models.Model):
     cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     cutting_type = models.CharField(max_length=50)
-    quantity = models.PositiveSmallIntegerField()
+    quantity = models.DecimalField(max_digits=10, decimal_places=1, validators=[MinValueValidator(0.49)])
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -128,7 +129,7 @@ class Edge(models.Model):
 
     edge_type = models.CharField(max_length=50)
     color_code = models.CharField(max_length=50, default='')
-    quantity = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.49)])
+    quantity = models.DecimalField(max_digits=10, decimal_places=1, validators=[MinValueValidator(0.49)])
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -146,7 +147,7 @@ class Edging(models.Model):
     cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     edging_type = models.CharField(max_length=50)
-    quantity = models.PositiveSmallIntegerField()
+    quantity = models.DecimalField(max_digits=10, decimal_places=1, validators=[MinValueValidator(0.49)])
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -159,7 +160,7 @@ class Other(models.Model):
     cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     description = models.CharField(max_length=50)
-    quantity = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.49)])
+    quantity = models.DecimalField(max_digits=10, decimal_places=1, validators=[MinValueValidator(0.49)])
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)])
     value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -182,3 +183,17 @@ class Payment(models.Model):
 
     def __str__(self):
         return f'Payment for {self.cutID}'
+
+class Change(models.Model):
+
+    cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
+
+    date = models.DateTimeField(default=timezone.now)
+    user = models.CharField(max_length=100, default='N/A')
+    operation = models.CharField(max_length=100, default='N/A')
+    what = models.CharField(max_length=100, default='N/A')
+    current_state = models.CharField(max_length=100, default='')
+    new_state = models.CharField(max_length=100, default='')
+
+    def __str__(self):
+        return f'{self.cutID} - {self.user} {self.operation} {self.what} {self.current_state} {self.new_state}'

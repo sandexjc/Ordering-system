@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView
+from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import JsonResponse
@@ -8,7 +8,7 @@ from django.core import serializers
 
 from lib import custom_classes
 from accounts.models import User
-from table.models import Order, Plate, Edge, Payment, Cutting, Edging, Other 
+from table.models import Order, Plate, Edge, Payment, Cutting, Edging, Other, Change 
 from table import forms
 from SimpleTable.forms import PlateProgressFormSet, EdgeProgressFormSet, UpdateOrderProgressForm
 import json
@@ -39,6 +39,14 @@ class CreateOrder(LoginRequiredMixin, CreateView):
         self.object = form.save(commit=False)
         self.object.save()
 
+        Change.objects.create(
+            cutID=self.object,
+            user=user.first_name, 
+            operation='created', 
+            what='Order',
+            new_state=self.object.ID,
+            ).save()
+
         add_note = forms.AddNoteForm(self.request.POST).save(commit=False)
         add_note.cutID = self.object
         add_note.user = user
@@ -47,8 +55,15 @@ class CreateOrder(LoginRequiredMixin, CreateView):
         if note != '':
             add_note.save()
 
-        return redirect('table:editOrder', self.object.pk)
+            Change.objects.create(
+            cutID=self.object,
+            user=user.first_name, 
+            operation='created', 
+            what='Note',
+            new_state=note,
+            ).save()
 
+        return redirect('table:editOrder', self.object.pk)
 
 class EditOrder(LoginRequiredMixin, UpdateView):
 
@@ -173,26 +188,121 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         if note != '':
             notes.save()
 
+            Change.objects.create(
+            cutID=self.object,
+            user=user, 
+            operation='created', 
+            what='Note',
+            new_state=note,
+            ).save()
+
         plate = PLATES.save(commit=False)
 
         for item in plate:
+
+            if item.pk:
+
+                old_object = Plate.objects.get(pk=item.pk)
+                changed_fields = {}
+
+                if old_object.material != item.material:
+                    changed_fields['material'] = f'{old_object.material} -> {item.material}'
+
+                if old_object.manufacturer != item.manufacturer:
+                    changed_fields['manufacturer'] = f'{old_object.manufacturer} -> {item.manufacturer}'
+
+                if old_object.quantity != item.quantity:
+                    changed_fields['quantity'] = f'{old_object.quantity} -> {item.quantity}'
+
+                if old_object.price != item.price:
+                    changed_fields['price'] = f'{old_object.price} -> {item.price}'
+
+                if old_object.from_client != item.from_client:
+                    changed_fields['from_client'] = f'{old_object.from_client} -> {item.from_client}'
+
+                for changed_field in changed_fields.keys():
+                    Change.objects.create(
+                    cutID=self.object,
+                    user=user, 
+                    operation='Changed', 
+                    what=changed_field,
+                    current_state=item.material,
+                    new_state=changed_fields[changed_field],
+                    ).save()
+            else:
+                Change.objects.create(
+                cutID=self.object,
+                user=user, 
+                operation='Added', 
+                what='Plate',
+                new_state=item.material,
+                ).save()
+
             item.cutID = self.object
             item.value = round((item.quantity * item.price), 2)
             item.save()
 
         for item in PLATES.deleted_objects:
-            print(f'DELETING {item}')
             item.delete()
+
+            Change.objects.create(
+            cutID=self.object,
+            user=user, 
+            operation='Deleted', 
+            what='Plate',
+            new_state=item.material,
+            ).save()
 
         cutting = CUTTING.save(commit=False)
 
         for item in cutting:
+
+            if item.pk:
+
+                old_object = Cutting.objects.get(pk=item.pk)
+                changed_fields = {}
+
+                if old_object.cutting_type != item.cutting_type:
+                    changed_fields['cutting_type'] = f'{old_object.cutting_type} -> {item.cutting_type}'
+
+                if old_object.quantity != item.quantity:
+                    changed_fields['quantity'] = f'{old_object.quantity} -> {item.quantity}'
+
+                if old_object.price != item.price:
+                    changed_fields['price'] = f'{old_object.price} -> {item.price}'
+
+                for changed_field in changed_fields.keys():
+                    Change.objects.create(
+                    cutID=self.object,
+                    user=user, 
+                    operation='Changed', 
+                    what=changed_field,
+                    current_state=item.cutting_type,
+                    new_state=changed_fields[changed_field],
+                    ).save()
+            else:
+                Change.objects.create(
+                cutID=self.object,
+                user=user, 
+                operation='Added', 
+                what='Cutting',
+                new_state=item.cutting_type,
+                ).save()
+
             item.cutID = self.object
             item.value = round((item.quantity * item.price), 2)
             item.save()
 
         for item in CUTTING.deleted_objects:
-            print(f'DELETING {item}')
+
+            Change.objects.create(
+            cutID=self.object,
+            user=user, 
+            operation='Deleted', 
+            what='Cutting',
+            new_state=item.cutting_type,
+            ).save()
+
             item.delete()
 
         edge = EDGES.save(commit=False)
@@ -307,11 +417,7 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
             order.order_taken = False
             order.save()
 
-        # return redirect('/')
-
         customObj = custom_classes.OrderDetails(order)
-        # print('Custom SER -------> ',customObj.custom_json_ser())
-        # json_model = serializers.serialize('json', [order])
         
         return JsonResponse({
             'order': customObj.get_order(),
@@ -326,6 +432,27 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
                 return False
 
         return True
+
+class GetOrderHistory(LoginRequiredMixin, ListView):
+
+    model = Order
+
+    def get(self, request, pk, *args, **kwargs):
+
+        print("GET ORDER HISTORY", pk)
+
+        order_chnages = Change.objects.filter(cutID=pk)
+
+        if not order_chnages:
+            return JsonResponse({
+            'changes': 'NO DATA',
+            }) 
+            
+        return JsonResponse({
+            'changes': json.loads(serializers.serialize('json', Change.objects.filter(cutID=pk))),
+            })
+
+
 
 class PrintOrder(LoginRequiredMixin, TemplateView):
 

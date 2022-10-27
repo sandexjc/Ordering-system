@@ -51,32 +51,33 @@ class AddPlateForm(ModelForm):
     class Meta:
         model = models.Plate
         fields = (
-            'material', 'manufacturer',
+            'material', 'manufacturer', 'from_client',
             'quantity', 'price', 'value',
             )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['material'].widget.attrs = {
-        'style': 'width: 170px;', 
+        self.fields['material'].widget.attrs = { 
         'class': 'form-control form-control-sm',
         }
         self.fields['manufacturer'].widget.attrs = {
-        'style': 'width: 120px', 
-        'class': 'form-select form-select-sm'
+        'style':'background-color: #faf9f9',  
+        'class': 'form-select form-select-sm',
         }
-        self.fields['quantity'].widget.attrs = {
-        'style': 'width: 75px', 
-        'class': 'form-control form-control-sm'
+        self.fields['from_client'].widget.attrs = {
+        'class': 'form-check-input',
+        'role': 'switch'
         }
-        self.fields['price'].widget.attrs = {
-        'style': 'width: 90px', 
+        self.fields['quantity'].widget.attrs = { 
+        'class': 'form-control form-control-sm',
+        }
+        self.fields['price'].widget.attrs = { 
         'step': '0.01', 
-        'class': 'form-control form-control-sm'
+        'class': 'form-control form-control-sm',
         }
         self.fields['value'].widget.attrs = {
         'readonly': 'True', 
-        'style': 'background-color: #e9ecef; width: 110px; font-weight: bold;', 
+        'style': 'background-color: #e9ecef; font-weight: bold;', 
         'class': 'form-control form-control-sm'
         }
 
@@ -91,21 +92,18 @@ class AddCuttingForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['cutting_type'].widget.attrs = {
-        'style': 'width: 200px', 
+        self.fields['cutting_type'].widget.attrs = { 
         'class': 'form-control form-control-sm'
         }
-        self.fields['quantity'].widget.attrs = {
-        'style': 'width: 75px', 
+        self.fields['quantity'].widget.attrs = { 
         'class': 'form-control form-control-sm'
         }
-        self.fields['price'].widget.attrs = {
-        'style': 'width: 100px', 
+        self.fields['price'].widget.attrs = { 
         'step': '0.01', 
         'class': 'form-control form-control-sm'}
         self.fields['value'].widget.attrs = {
         'readonly': 'True', 
-        'style': 'background-color: #e9ecef; width: 190px; font-weight: bold;', 
+        'style': 'background-color: #e9ecef; font-weight: bold;', 
         'class': 'form-control form-control-sm'}
 
 
@@ -122,29 +120,24 @@ class AddEdgeForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['edge_type'].widget.attrs = {
-        'style': 'width: 100px', 
         'class': 'form-control form-control-sm'
         }
-        self.fields['color_code'].widget.attrs = {
-        'style': 'width: 80px', 
+        self.fields['color_code'].widget.attrs = { 
         'class': 'form-control form-control-sm'
         }
-        self.fields['quantity'].widget.attrs = {
-        'style': 'width: 80px', 
+        self.fields['quantity'].widget.attrs = { 
         'class': 'form-control form-control-sm'
         }
-        self.fields['price'].widget.attrs = {
-        'style': 'width: 100px', 
+        self.fields['price'].widget.attrs = { 
         'step': '0.01', 
         'class': 'form-control form-control-sm'
         }
         self.fields['value'].widget.attrs = {
         'readonly': 'True', 
-        'style': 'background-color: #e9ecef; font-weight: bold; width: 150px;', 
+        'style': 'background-color: #e9ecef; font-weight: bold;', 
         'class': 'form-control form-control-sm',
         }
         self.fields['visible'].widget.attrs = {
-        'style':'width: 30px; height: 15px;',
         'class': 'form-check-input',
         'role': 'switch'
         }
@@ -161,22 +154,19 @@ class AddEdgingForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['edging_type'].widget.attrs = {
-        'style': 'width: 200px', 
+        self.fields['edging_type'].widget.attrs = { 
         'class': 'form-control form-control-sm'
         }
-        self.fields['quantity'].widget.attrs = {
-        'style': 'width: 75px', 
+        self.fields['quantity'].widget.attrs = { 
         'class': 'form-control form-control-sm'
         }
-        self.fields['price'].widget.attrs = {
-        'style': 'width: 100px', 
+        self.fields['price'].widget.attrs = { 
         'step': '0.01', 
         'class': 'form-control form-control-sm'
         }
         self.fields['value'].widget.attrs = {
         'readonly': 'True', 
-        'style': 'background-color: #e9ecef; width: 190px; font-weight: bold;', 
+        'style': 'background-color: #e9ecef; font-weight: bold;', 
         'class': 'form-control form-control-sm'
         }
 
@@ -191,22 +181,19 @@ class AddOtherForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['description'].widget.attrs = {
-        'style': 'width: 200px', 
+        self.fields['description'].widget.attrs = { 
         'class': 'form-control form-control-sm'
         }
-        self.fields['quantity'].widget.attrs = {
-        'style': 'width: 75px', 
+        self.fields['quantity'].widget.attrs = { 
         'class': 'form-control form-control-sm'
         }
-        self.fields['price'].widget.attrs = {
-        'style': 'width: 100px', 
+        self.fields['price'].widget.attrs = { 
         'step': '0.01', 
         'class': 'form-control form-control-sm'
         }
         self.fields['value'].widget.attrs = {
         'readonly': 'True', 
-        'style': 'background-color: #e9ecef; font-weight: bold; width: 190px;', 
+        'style': 'background-color: #e9ecef; font-weight: bold;', 
         'class': 'form-control form-control-sm',
         }
 
