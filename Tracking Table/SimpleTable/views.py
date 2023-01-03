@@ -15,44 +15,38 @@ class Internals(LoginRequiredMixin, TemplateView):
         context['internals'] = []
         
         if self.request.POST:
-
-            print(kwargs['search_field'])
     
             context['search_form'] = forms.SearchForm(self.request.POST)
             context['category'] = kwargs['category']
             context['search_string'] = kwargs['search_field']
+            context['search_error'] = False
 
             results = []
             all_internals = []
 
             if kwargs['category'] == 'ID':
-                all_internals = search_id('Internal', kwargs['search_field']).order_by('-ID')
-                # all_internals.extend(search_id('Internal', kwargs['search_field']))
+                if kwargs['search_field'].isnumeric():
+                    all_internals = search_id('Internal', kwargs['search_field']).order_by('-ID')
+                else:
+                    context['search_error'] = True
 
             elif kwargs['category'] == 'Date':
                 all_internals = search_date('Internal', kwargs['search_field']).order_by('-ID')
-                # all_internals.extend(search_date('Internal', kwargs['search_field']))
 
             elif kwargs['category'] == 'Telephone':
                 all_internals = search_telephone('Internal', kwargs['search_field']).order_by('-ID')
-                # all_internals.extend(search_telephone('Internal', kwargs['search_field']))
 
             elif kwargs['category'] == 'Client Name':
                 all_internals = search_name('Internal', kwargs['search_field']).order_by('-ID')
-                # all_internals.extend(search_name('Internal', kwargs['search_field']))
 
             else:
-                all_internals.extend(search_id('Internal', kwargs['search_field']))
-                all_internals.extend(search_date('Internal', kwargs['search_field']))
-                all_internals.extend(search_telephone('Internal', kwargs['search_field']))
-                all_internals.extend(search_name('Internal', kwargs['search_field']))
-                # id_filter = search_id('Internal', kwargs['search_field']).order_by('-ID')
-                # date_filter = search_date('Internal', kwargs['search_field']).order_by('-ID')
-                # telephone_filter = search_telephone('Internal', kwargs['search_field']).order_by('-ID')
-                # name_filter = search_name('Internal', kwargs['search_field']).order_by('-ID')
+                if len(kwargs['search_field']) != 0:
+                    all_internals.extend(search_date('Internal', kwargs['search_field']))
+                    all_internals.extend(search_telephone('Internal', kwargs['search_field']))
+                    all_internals.extend(search_name('Internal', kwargs['search_field']))
 
-                # id_filter.union(date_filter, telephone_filter, name_filter)
-                # all_internals = id_filter
+                    if kwargs['search_field'].isnumeric():
+                        all_internals.extend(search_id('Internal', kwargs['search_field']))
 
             all_internals = list(set(all_internals))
 
@@ -62,7 +56,7 @@ class Internals(LoginRequiredMixin, TemplateView):
                 context['badges'] = True
 
         else:
-            all_internals = Order.objects.filter(client='Internal').order_by('-created_date')
+            all_internals = Order.objects.filter(client='Internal').order_by('-created_date')[:0]
             context['search_form'] = forms.SearchForm
             context['badges'] = False
 
@@ -99,27 +93,34 @@ class Externals(LoginRequiredMixin, TemplateView):
             context['search_form'] = forms.SearchForm(self.request.POST)
             context['category'] = kwargs['category']
             context['search_string'] = kwargs['search_field']
+            context['search_error'] = False
 
             results = []
             all_externals = []
 
             if kwargs['category'] == 'ID':
-                all_externals.extend(search_id('External', kwargs['search_field']))
+                if kwargs['search_field'].isnumeric():
+                    all_externals = search_id('External', kwargs['search_field']).order_by('-ID')
+                else:
+                    context['search_error'] = True
 
             elif kwargs['category'] == 'Date':
-                all_externals.extend(search_date('External', kwargs['search_field']))
+                all_externals = search_date('External', kwargs['search_field']).order_by('-ID')
 
             elif kwargs['category'] == 'Telephone':
-                all_externals.extend(search_telephone('External', kwargs['search_field']))
+                all_externals = search_telephone('External', kwargs['search_field']).order_by('-ID')
 
             elif kwargs['category'] == 'Client Name':
-                all_externals.extend(search_name('External', kwargs['search_field']))
+                all_externals = search_name('External', kwargs['search_field']).order_by('-ID')
 
             else:
-                all_externals.extend(search_id('External', kwargs['search_field']))
-                all_externals.extend(search_date('External', kwargs['search_field']))
-                all_externals.extend(search_telephone('External', kwargs['search_field']))
-                all_externals.extend(search_name('External', kwargs['search_field']))
+                if len(kwargs['search_field']) != 0:
+                    all_externals.extend(search_date('External', kwargs['search_field']))
+                    all_externals.extend(search_telephone('External', kwargs['search_field']))
+                    all_externals.extend(search_name('External', kwargs['search_field']))
+
+                    if kwargs['search_field'].isnumeric():
+                        all_externals.extend(search_id('External', kwargs['search_field']))
 
             all_externals = list(set(all_externals))
 

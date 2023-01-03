@@ -295,11 +295,15 @@
 						</div>
 					</div>
 
-<!-- 					<div class="collapse" id="collapseExample">
+					<!-- FILTER CARD -->
+
+					<div class="collapse" id="collapseExample">
 					  <div class="card card-body">
 					    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
 					  </div>
-					</div> -->
+					</div>
+
+					<!-- FILTER CARD END -->
 
 					<!-- MODAL SEARCH WINDOW -->
 					<div class="modal fade" id="Search" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -343,8 +347,17 @@
 								Search results for "{{category}}"="{{search_string}}"
 							</span>
 							<span class="badge text-bg-primary">
-								<a href="{% url 'home' %}">Clear</a>
+								<a href="{% url 'home' %}">Clear results</a>
 							</span>
+						</h5>
+					</div>
+				{% endif %}
+
+				{% if search_error %}
+					<div style="text-align: center; display: block;">
+						<h5>
+							<p style="color: red;">Wrong query!</p>
+							<p style="color: red;">Please check if the search string aligns with the category!</p>
 						</h5>
 					</div>
 				{% endif %}
