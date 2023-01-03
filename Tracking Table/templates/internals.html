@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load bootstrap5 %}
+{% load django_bootstrap5 %}
 {% block content %}
 
 <!-- ##############################################
@@ -269,8 +269,13 @@
 								</a>
 
 							  	<!-- BUTTON FILTER -->
-							  	<button class="btn btn-outline-primary" style="margin-right: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+							  	<button class="btn btn-outline-primary position-relative" style="margin-right: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
 							    	<img src="{% static 'images/filter.png' %}" class="tableIcons">
+							    	{% if filter_badge %}
+								  		<span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" style="display: inline;"></span>
+								  	{% else %}
+								   		<span class="badge bg-danger" style="display: none;"></span>
+								  	{% endif %}
 							  	</button>
 
 						 	</nav>
@@ -297,9 +302,22 @@
 
 					<!-- FILTER CARD -->
 
-					<div class="collapse" id="collapseExample">
+					<div class="collapse" id="collapseExample" style="margin-top: 20px;">
 					  <div class="card card-body">
-					    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+					    
+					    <form method="POST">
+				      		{% csrf_token %}
+
+				      		<div style="font-size: 90%; margin-top: 20px;">
+					      		{% bootstrap_form filter_form bound_css_class='' %}
+				      		</div>
+
+				      		<div style="text-align: center;">
+				      			<input type="submit" class="btn btn-primary" value="Filter" name="action">
+				      		</div>
+						      		
+						</form>
+
 					  </div>
 					</div>
 
@@ -325,7 +343,7 @@
 
 						      		<div class="modal-footer">
 						      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-						      			<input type="submit" class="btn btn-primary" value="Search">
+						      			<input type="submit" class="btn btn-primary" value="Search" name="action">
 						      		</div>
 						      		
 						      	</form>
@@ -363,6 +381,34 @@
 				{% endif %}
 
 				<div class="container">
+
+					{% if visible_items == 1 %}
+
+						<p style="
+							font-size: 70%; 
+							font-style: italic; 
+							color: gray; 
+							text-align: center;
+							font-weight: bold;
+							">
+
+							{{visible_items}} видим елемент
+						</p>
+
+					{% else %}
+
+						<p style="
+							font-size: 70%; 
+							font-style: italic; 
+							color: gray; 
+							text-align: center;
+							font-weight: bold;
+							">
+
+							{{visible_items}} видими елементa
+						</p>
+
+					{% endif %}
 
 					<table class="table table-hover table-bordered table-responsive">
 
@@ -476,10 +522,9 @@
 							    	{% for item in internal.notes %}
 							    		<div>
 							    			{{item.user}} -> 
-							    			<div style="color: red;">
+							    			<span style="color: red;">
 							    				{{item.content}}
-							    			</div>
-							    			
+							    			</span>
 							    		</div>
 							    	{% endfor %}
 							    </td>

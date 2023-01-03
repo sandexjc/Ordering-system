@@ -22,6 +22,24 @@ class SearchForm(forms.Form):
         'class': 'form-select',
         }
 
+class FilterForm(forms.Form):
+
+    fast_select_choice = [
+        (50, 'последни 50'),
+        (100, 'последни 100'),
+        (150, 'последни 150'),
+        ('all', 'всички'),
+    ]
+
+    fast_select = forms.ChoiceField(widget=forms.RadioSelect, choices=fast_select_choice, initial='50')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['fast_select'].label = "Покажи"
+        self.fields['fast_select'].widget.attrs = {
+        'class': 'form-check',
+        }
+
 class UpdateOrderProgressForm(forms.ModelForm):
 
     class Meta:
