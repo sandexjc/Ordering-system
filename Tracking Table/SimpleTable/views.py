@@ -1,5 +1,9 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.core import serializers
+import json
 
 from table.models import Order, Plate, Edge, Payment, Note, Other
 from SimpleTable import forms
@@ -221,3 +225,10 @@ def search_telephone(client, telephone):
             client=client, 
             telephone__contains=telephone,
             )
+
+def react_response(request):
+
+    return JsonResponse({
+        # 'models':json.loads(serializers.serialize('json', Order.objects.all())),
+        'models':json.loads(serializers.serialize('json', Order.objects.order_by('-created_date'))),
+        })
