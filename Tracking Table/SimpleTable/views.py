@@ -35,18 +35,18 @@ class Internals(LoginRequiredMixin, TemplateView):
 
                 if self.request.POST['category'] == 'ID':
                     if self.request.POST['search_field'].isnumeric():
-                        all_internals = search_id('Internal', self.request.POST['search_field']).order_by('-ID')
+                        all_internals = search_id('Internal', self.request.POST['search_field'])
                     else:
                         context['search_error'] = True
 
                 elif self.request.POST['category'] == 'Date':
-                    all_internals = search_date('Internal', self.request.POST['search_field']).order_by('-ID')
+                    all_internals = search_date('Internal', self.request.POST['search_field'])
 
                 elif self.request.POST['category'] == 'Telephone':
-                    all_internals = search_telephone('Internal', self.request.POST['search_field']).order_by('-ID')
+                    all_internals = search_telephone('Internal', self.request.POST['search_field'])
 
                 elif self.request.POST['category'] == 'Client Name':
-                    all_internals = search_name('Internal', self.request.POST['search_field']).order_by('-ID')
+                    all_internals = search_name('Internal', self.request.POST['search_field'])
 
                 else:
                     if len(self.request.POST['search_field']) != 0:
@@ -78,7 +78,7 @@ class Internals(LoginRequiredMixin, TemplateView):
                 context['filter_form'] = forms.FilterForm(self.request.POST)
 
         else:
-            all_internals = Order.objects.filter(client='Internal').order_by('-created_date')[:50]
+            all_internals = Order.objects.filter(client='Internal').order_by('-created_date')[:80]
             context['search_form'] = forms.SearchForm
             context['filter_form'] = forms.FilterForm
             context['badges'] = False
@@ -90,11 +90,11 @@ class Internals(LoginRequiredMixin, TemplateView):
 
         current_time = time.localtime(time.time())
 
-        if current_time.tm_hour in range(7, 9):
+        if current_time.tm_hour in range(7, 10):
             context['current_time'] = 'Morning'
-        elif current_time.tm_hour in range(10, 13):
+        elif current_time.tm_hour in range(11, 15):
             context['current_time'] = 'Day'
-        elif current_time.tm_hour in range(14, 19):
+        elif current_time.tm_hour in range(16, 19):
             context['current_time'] = 'Afternoon'
         else:
             context['current_time'] = 'Night'
@@ -128,18 +128,18 @@ class Externals(LoginRequiredMixin, TemplateView):
 
                 if self.request.POST['category'] == 'ID':
                     if self.request.POST['search_field'].isnumeric():
-                        all_externals = search_id('External', self.request.POST['search_field']).order_by('-ID')
+                        all_externals = search_id('External', self.request.POST['search_field'])
                     else:
                         context['search_error'] = True
 
                 elif self.request.POST['category'] == 'Date':
-                    all_externals = search_date('External', self.request.POST['search_field']).order_by('-ID')
+                    all_externals = search_date('External', self.request.POST['search_field'])
 
                 elif self.request.POST['category'] == 'Telephone':
-                    all_externals = search_telephone('External', self.request.POST['search_field']).order_by('-ID')
+                    all_externals = search_telephone('External', self.request.POST['search_field'])
 
                 elif self.request.POST['category'] == 'Client Name':
-                    all_externals = search_name('External', self.request.POST['search_field']).order_by('-ID')
+                    all_externals = search_name('External', self.request.POST['search_field'])
 
                 else:
                     if len(self.request.POST['search_field']) != 0:
@@ -171,7 +171,7 @@ class Externals(LoginRequiredMixin, TemplateView):
                 context['filter_form'] = forms.FilterForm(self.request.POST)
 
         else:
-            all_externals = Order.objects.filter(client='External').order_by('-created_date')[:50]
+            all_externals = Order.objects.filter(client='External').order_by('-created_date')[:80]
             context['search_form'] = forms.SearchForm
             context['filter_form'] = forms.FilterForm
             context['badges'] = False
@@ -184,11 +184,11 @@ class Externals(LoginRequiredMixin, TemplateView):
 
         current_time = time.localtime(time.time())
 
-        if current_time.tm_hour in range(7, 9):
+        if current_time.tm_hour in range(7, 10):
             context['current_time'] = 'Morning'
-        elif current_time.tm_hour in range(10, 13):
+        elif current_time.tm_hour in range(11, 15):
             context['current_time'] = 'Day'
-        elif current_time.tm_hour in range(14, 19):
+        elif current_time.tm_hour in range(16, 19):
             context['current_time'] = 'Afternoon'
         else:
             context['current_time'] = 'Night'
@@ -200,31 +200,21 @@ class Externals(LoginRequiredMixin, TemplateView):
 
 def search_id(client, ID):
 
-    return Order.objects.filter(
-            client=client, 
-            ID=ID,
-            )
+    return Order.objects.filter(client=client, ID=ID).order_by('-ID')
 
 def search_date(client, date):
 
-    return Order.objects.filter(
-            client=client, 
-            created_date__contains=date,
-            )
+    return Order.objects.filter(client=client, created_date__contains=date).order_by('-ID')
 
 def search_name(client, name):
 
-    return Order.objects.filter(
-            client=client, 
-            owner__contains=name,
-            )
+    return Order.objects.filter(client=client, owner__icontains=name).order_by('-ID')
 
 def search_telephone(client, telephone):
 
-    return Order.objects.filter(
-            client=client, 
-            telephone__contains=telephone,
-            )
+    return Order.objects.filter(client=client, telephone__icontains=telephone).order_by('-ID')
+
+
 
 def react_response(request):
 

@@ -33,11 +33,11 @@ class FilterForm(forms.Form):
         ('all', 'всички'),
     ]
 
-    fast_select = forms.ChoiceField(widget=forms.RadioSelect, choices=fast_select_choice, initial='50')
+    fast_select = forms.ChoiceField(widget=forms.RadioSelect, choices=fast_select_choice, initial='80')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['fast_select'].label = "Покажи"
+        self.fields['fast_select'].label = "Виж"
         self.fields['fast_select'].widget.attrs = {
         'class': 'form-check',
         }
