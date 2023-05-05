@@ -26,4 +26,5 @@ urlpatterns = [
     path('externals/', views.Externals.as_view(), name='externals'),
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('table/', include('table.urls', namespace='table')),
+    path('internals/react/', views.react_response, name='react'),
 ]
