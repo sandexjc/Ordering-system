@@ -12,3 +12,9 @@ Once logged in you will land on the home page where you will be able to find the
 Orders in the system are devided by internals and externals based on the client.
 (The feture is requested by the client).
 <img width="1414" alt="Screenshot 2023-06-14 at 23 54 02" src="https://github.com/sandexjc/Ordering-system/assets/84847008/155c2b3c-d0e9-4cfe-8e30-091c1f5c002b">
+
+Create new order button is right above the orders.
+Once clicked it will load new page where you will be able to fill the order form.
+<img width="1414" alt="Screenshot 2023-06-15 at 0 10 59" src="https://github.com/sandexjc/Ordering-system/assets/84847008/07d71646-83bd-422a-a7f6-18dfa86cbeec">
+<img width="1414" alt="Screenshot 2023-06-15 at 0 18 59" src="https://github.com/sandexjc/Ordering-system/assets/84847008/65279ad2-4d1c-4067-92f7-3b1acc41750b">
+
