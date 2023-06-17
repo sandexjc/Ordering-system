@@ -7,6 +7,7 @@ Login && Home
 - First account should be created by the terminal as superuser/admin in order to be able to login into the web interface and create additional accounts.
 - Once logged in you will land on the home page where you will be able to find the nav bar with account settings, user management and home page button.
 <img width="1400" alt="Login page" src="https://github.com/sandexjc/Ordering-system/assets/84847008/bf73fb52-2e78-4911-a59d-76b3b349d1b5">
+
 <br><br>
 
 Order management
@@ -23,7 +24,24 @@ Order management
 
 <br><br>
 
-- Orders state can be easily managed by clicking on the update button. Modal window with predefined states will be opened and updating the state will not trigger window closure due to usage of AJAX requests.
+- Orders state can be easily managed by clicking on the update button. Modal window with predefined states will be opened and updating the state will not trigger page closure or reload due to usage of AJAX requests.
+- One or more order items and states can be updated simultaneously.
 <img width="1414" alt="Create_order" src="https://github.com/sandexjc/Ordering-system/assets/84847008/d6999e3b-4792-4810-8026-5b32b4f0d8de">
 
+<br><br>
+
+- Orders can be deleted by clicking the delete button for the selected order.
+- Modal window will be loaded to confirm the action.
+<img width="1414" alt="Create_order" src="https://github.com/sandexjc/Ordering-system/assets/84847008/b7b8598b-8f65-44a8-9d61-524a08ab96c3">
+
+<br><br>
+
+- Order history can be viewed by clicking on the history button.
+- Offcanvas tab will pop-up on the right of the screen with information about the latest changes for the selected order.
+<img width="1414" alt="Create_order" src="https://github.com/sandexjc/Ordering-system/assets/84847008/188ece8f-9e34-46c3-873e-a7e34fd948ed">
+
+<br><br>
+
+- Orders have quick print view by selecting the print button. (requested by the client)
+<img width="1414" alt="Create_order" src="https://github.com/sandexjc/Ordering-system/assets/84847008/fb490a42-411d-462b-b923-73a8772908a5">
 
