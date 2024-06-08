@@ -78,7 +78,7 @@ class Internals(LoginRequiredMixin, TemplateView):
                 context['filter_form'] = forms.FilterForm(self.request.POST)
 
         else:
-            all_internals = Order.objects.filter(client='Internal').order_by('-created_date')[:80]
+            all_internals = Order.objects.filter(client='Internal').order_by('-created_date')[:100]
             context['search_form'] = forms.SearchForm
             context['filter_form'] = forms.FilterForm
             context['badges'] = False
@@ -200,19 +200,19 @@ class Externals(LoginRequiredMixin, TemplateView):
 
 def search_id(client, ID):
 
-    return Order.objects.filter(client=client, ID=ID).order_by('-ID')
+    return Order.objects.filter(client=client, ID=ID).order_by('-created_date')
 
 def search_date(client, date):
 
-    return Order.objects.filter(client=client, created_date__contains=date).order_by('-ID')
+    return Order.objects.filter(client=client, created_date__contains=date).order_by('-created_date')
 
 def search_name(client, name):
 
-    return Order.objects.filter(client=client, owner__icontains=name).order_by('-ID')
+    return Order.objects.filter(client=client, owner__icontains=name).order_by('-created_date')
 
 def search_telephone(client, telephone):
 
-    return Order.objects.filter(client=client, telephone__icontains=telephone).order_by('-ID')
+    return Order.objects.filter(client=client, telephone__icontains=telephone).order_by('-created_date')
 
 
 

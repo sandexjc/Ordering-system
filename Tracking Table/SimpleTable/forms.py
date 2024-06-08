@@ -25,15 +25,14 @@ class SearchForm(forms.Form):
 class FilterForm(forms.Form):
 
     fast_select_choice = [
-        (80, 'последни 80'),
         (100, 'последни 100'),
-        (150, 'последни 150'),
+        (200, 'последни 200'),
         (300, 'последни 300'),
         (500, 'последни 500'),
         ('all', 'всички'),
     ]
 
-    fast_select = forms.ChoiceField(widget=forms.RadioSelect, choices=fast_select_choice, initial='80')
+    fast_select = forms.ChoiceField(widget=forms.RadioSelect, choices=fast_select_choice, initial='100')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
