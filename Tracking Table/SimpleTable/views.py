@@ -34,30 +34,21 @@ class Internals(LoginRequiredMixin, TemplateView):
                 all_internals = []
 
                 if self.request.POST['category'] == 'ID':
+                    context['search_error'] = True
                     if self.request.POST['search_field'].isnumeric():
                         all_internals = search_id('Internal', self.request.POST['search_field'])
-                    else:
-                        context['search_error'] = True
+                        context['search_error'] = False
 
                 elif self.request.POST['category'] == 'Date':
                     all_internals = search_date('Internal', self.request.POST['search_field'])
-
                 elif self.request.POST['category'] == 'Telephone':
                     all_internals = search_telephone('Internal', self.request.POST['search_field'])
-
                 elif self.request.POST['category'] == 'Client Name':
                     all_internals = search_name('Internal', self.request.POST['search_field'])
+                elif self.request.POST['category'] == 'All':
+                    all_internals = search_all('Internal', self.request.POST['search_field'])
 
-                else:
-                    if len(self.request.POST['search_field']) != 0:
-                        all_internals.extend(search_date('Internal', self.request.POST['search_field']))
-                        all_internals.extend(search_telephone('Internal', self.request.POST['search_field']))
-                        all_internals.extend(search_name('Internal', self.request.POST['search_field']))
-
-                        if self.request.POST['search_field'].isnumeric():
-                            all_internals.extend(search_id('Internal', self.request.POST['search_field']))
-
-                all_internals = list(set(all_internals))
+                # all_internals = list(set(all_internals))
 
                 if len(self.request.POST['search_field']) == 0:
                     context['badges'] = False
@@ -127,30 +118,21 @@ class Externals(LoginRequiredMixin, TemplateView):
                 all_externals = []
 
                 if self.request.POST['category'] == 'ID':
+                    context['search_error'] = True
                     if self.request.POST['search_field'].isnumeric():
                         all_externals = search_id('External', self.request.POST['search_field'])
-                    else:
-                        context['search_error'] = True
+                        context['search_error'] = False
 
                 elif self.request.POST['category'] == 'Date':
                     all_externals = search_date('External', self.request.POST['search_field'])
-
                 elif self.request.POST['category'] == 'Telephone':
                     all_externals = search_telephone('External', self.request.POST['search_field'])
-
                 elif self.request.POST['category'] == 'Client Name':
                     all_externals = search_name('External', self.request.POST['search_field'])
+                elif self.request.POST['category'] == 'All':
+                    all_externals = search_all('External', self.request.POST['search_field'])
 
-                else:
-                    if len(self.request.POST['search_field']) != 0:
-                        all_externals.extend(search_date('External', self.request.POST['search_field']))
-                        all_externals.extend(search_telephone('External', self.request.POST['search_field']))
-                        all_externals.extend(search_name('External', self.request.POST['search_field']))
-
-                        if self.request.POST['search_field'].isnumeric():
-                            all_externals.extend(search_id('External', self.request.POST['search_field']))
-
-                all_externals = list(set(all_externals))
+                # all_internals = list(set(all_internals))
 
                 if len(self.request.POST['search_field']) == 0:
                     context['badges'] = False
@@ -199,21 +181,24 @@ class Externals(LoginRequiredMixin, TemplateView):
         return self.render_to_response(self.get_context_data())
 
 def search_id(client, ID):
-
     return Order.objects.filter(client=client, ID=ID).order_by('-created_date')
 
 def search_date(client, date):
-
     return Order.objects.filter(client=client, created_date__contains=date).order_by('-created_date')
 
 def search_name(client, name):
-
     return Order.objects.filter(client=client, owner__icontains=name).order_by('-created_date')
 
 def search_telephone(client, telephone):
-
     return Order.objects.filter(client=client, telephone__icontains=telephone).order_by('-created_date')
 
+def search_all(client, search_kwd):
+    return ( 
+        # Order.objects.filter(client=client, ID=search_kwd).order_by('-created_date') |
+        Order.objects.filter(client=client, created_date__contains=search_kwd).order_by('-created_date') |
+        Order.objects.filter(client=client, owner__icontains=search_kwd).order_by('-created_date') |
+        Order.objects.filter(client=client, telephone__icontains=search_kwd).order_by('-created_date')
+    )
 
 
 def react_response(request):
