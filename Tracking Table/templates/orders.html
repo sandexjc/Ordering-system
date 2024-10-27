@@ -6,12 +6,12 @@
 <!-- ##############################################
 ############################################## -->
 
-{% for external in externals %}
+{% for order in orders %}
 
 <!-- MODAL PROGRESS WINDOW -->
-<div class="modal fade" id="Progress{{external.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="Progress{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 
-  	<div class="modal-dialog">
+  	<div class="modal-dialog modal-lg">
 	    <div class="modal-content">
 
 	      	<div class="modal-header">
@@ -20,14 +20,14 @@
 		        		UPDATE PROGRESS
 		        	</div>
 		        	<div>
-		        		ORDER {{external.order.ID}}
+		        		ORDER {{order.order.ID}}
 		        	</div>
 		        </h5>
 
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form id="{{external.order.ID}}" class="updateForms">
+		    <form id="{{order.order.ID}}" class="updateForms">
 
 	      		<div class="modal-body">
 
@@ -40,7 +40,7 @@
 
 					<div class="ALERT-E-UPD-VIEW alertmsg" style="display: none;">
 		      			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
-			  				<strong><div class="alertmsgdiv" style="text-align: center;">ERROR</div></strong>
+			  				<strong><div class="alertmsgdiv" style="text-align: center;">ERROR OCCURRED</div></strong>
 			  				<button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
 						</div>
 					</div>
@@ -57,11 +57,11 @@
 						</thead>
 						<tbody>
 							<tr>
-								<th scope="row" colspan="8">EGGER</th>
+								<th scope="row" colspan="5">EGGER</th>
 							</tr>
-							{{external.plate_forms.management_form}}
+							{{order.plate_forms.management_form}}
 							
-							{% for item in external.plate_forms %}
+							{% for item in order.plate_forms %}
 								{% if item.manufacturer.value == 'Egger' %}
 									{{item.id}}
 									<tr>
@@ -75,9 +75,9 @@
 							{% endfor %}
 
 							<tr>
-								<th scope="row" colspan="8">KRONO</th>
+								<th scope="row" colspan="5">KRONO</th>
 							</tr>
-							{% for item in external.plate_forms %}
+							{% for item in order.plate_forms %}
 								{% if item.manufacturer.value == 'Kronospan' %}
 									{{item.id}}
 									<tr>
@@ -91,9 +91,9 @@
 							{% endfor %}
 
 							<tr>
-								<th scope="row" colspan="8">Други</th>
+								<th scope="row" colspan="5">Други</th>
 							</tr>
-							{% for item in external.plate_forms %}
+							{% for item in order.plate_forms %}
 								{% if item.manufacturer.value == 'Other' %}
 									{{item.id}}
 									<tr>
@@ -107,11 +107,11 @@
 							{% endfor %}
 							
 							<tr>
-								<th scope="row" colspan="8">Кант</th>
+								<th scope="row" colspan="5">Кант</th>
 							</tr>
-							{{external.edge_forms.management_form}}
+							{{order.edge_forms.management_form}}
 
-							{% for item in external.edge_forms %}
+							{% for item in order.edge_forms %}
 								{{item.id}}
 								<tr>
 									<td>{{item.color_code}}{{item.edge_type}}</td>
@@ -126,12 +126,12 @@
 
 							<tr>
 								<td>Поръчката е взета</td>
-								<td>{{external.order_progress.order_taken}}</td>
+								<td>{{order.order_progress.order_taken}}</td>
 							</tr>
 
 							<tr>
 								<td>Издадена фактура</td>
-								<td>{{external.order_progress.invoice}}</td>
+								<td>{{order.order_progress.invoice}}</td>
 							</tr>
 
 						</tbody>
@@ -141,7 +141,7 @@
 
 	      		<div class="modal-footer">
 	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<button type="button" class="btn btn-primary updateButtons" id="{{external.order.ID}}">Update</button>
+	      			<button type="button" class="btn btn-primary updateButtons" id="{{order.order.ID}}">Update</button>
 	      		</div>
 
       		</form>
@@ -153,7 +153,7 @@
 <!-- MODAL PROGRESS WINDOW END -->
 
 <!-- MODAL DELETE WINDOW -->
-<div class="modal fade" id="Delete{{external.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="Delete{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 
   	<div class="modal-dialog">
 	    <div class="modal-content">
@@ -163,7 +163,7 @@
 		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		    </div>
 
-		    <form id="Delete{{external.order.ID}}" class="deleteForms">
+		    <form id="Delete{{order.order.ID}}" class="deleteForms">
 		    	{% csrf_token %}
 
 		    	<div class="ALERT-S-DEL-VIEW" style="display: none;">
@@ -182,13 +182,13 @@
 
 	      		<div class="modal-body" style="text-align: center;">
 		      		<h5>Are you sure you want to delete Order: 
-		      			<strong>#{{external.order.ID}}</strong>
+		      			<strong>#{{order.order.ID}}</strong>
 		      		</h5>
 	      		</div>
 
 	      		<div class="modal-footer">
 	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<button type="submit" class="btn btn-danger deleteButtons" id="{{external.order.ID}}">Confirm</button>
+	      			<button type="submit" class="btn btn-danger deleteButtons" id="{{order.order.ID}}">Confirm</button>
 	      		</div>
 
 	      	</form>
@@ -201,14 +201,14 @@
 
 <!-- OFFCANVAS HISTORY TAB -->
 
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight{{external.order.ID}}" aria-labelledby="offcanvasRightLabel">
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight{{order.order.ID}}" aria-labelledby="offcanvasRightLabel">
   	<div class="offcanvas-header">
-    	<h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{external.order.ID}}</h5>
+    	<h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{order.order.ID}}</h5>
     	<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   	</div>
-  	<div class="offcanvas-body" id="{{external.order.ID}}" pulled="False">
+  	<div class="offcanvas-body" id="{{order.order.ID}}" pulled="False">
 
-  		<button class="btn btn-outline-secondary" id="historyRefresh{{external.order.ID}}" type="button">
+  		<button class="btn btn-outline-secondary" id="historyRefresh{{order.order.ID}}" type="button">
 			<img src="{% static 'images/refresh-arrow.png' %}" class="tableIcons">
 		</button>
   			
@@ -225,46 +225,50 @@
 
 {% endfor %}
 
+<!-- ##############################################
+############################################## -->
+
 	<div class="WelcomeText">
 		<h2>Good {{current_time}}</h2>
 	</div>
 
 	<!-- NAVIGATION PANEL -->
+	<div class="container-xxl shadow-lg" style="margin-top: 20px;">
 
-	<div class="container shadow-lg tableContent">
-
-		<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
-	  		<li class="nav-item" role="presentation">
-	    		<a class="nav-link" href="{% url 'internals' %}">Вътрешни</a>
-	  		</li>
-
-			<li class="nav-item" role="presentation">
-			    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Външни</button>
-			</li>
-			
-			<li class="nav-item" role="presentation">
-				<a class="nav-link" href="#">Магазин</a>
-			</li>
-
-		</ul>
+			<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
+                {% if nav_select == 'internals' %}
+                <!-- INTERNALS TAB SELECTED -->
+		  		<li class="nav-item" role="presentation">
+		    		<button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Вътрешни</button>
+		  		</li>
+				<li class="nav-item" role="presentation">
+				    <a class="nav-link" href="{% url 'externals' %}">Външни</a>
+				</li>
+                {% elif nav_select == 'externals' %}
+                <!-- EXTERNALS TAB SELECTED -->
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" href="{% url 'internals' %}">Вътрешни</a>
+                  </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Външни</button>
+                </li>
+                {% endif %}
+				<li class="nav-item" role="presentation">
+					<a class="nav-link" href="#">Магазин</a>
+				</li>
+			</ul>
 
 		<div class="tab-content" id="myTabContent">
 			<div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-
-				<!-- EXTERNALS BUTTON TAB -->
-
+				<!-- ORDERS BUTTON TAB -->
 				<div class="container FilterNav">
-
 					<div class="row">
 						<div class="col">
-
 							<nav class="nav">
-
 								<!-- BUTTON ORDER CREATION -->
 								<a class="btn btn-outline-primary" style="margin-right: 2px;" href="{% url 'table:newOrder' %}" role="button" aria-expanded="false" aria-controls="collapseExample">
 								    <img src="{% static 'images/add.png' %}" class="tableIcons">
 								</a>
-
 							  	<!-- BUTTON FILTER -->
 							  	<button class="btn btn-outline-primary position-relative" style="margin-right: 2px;" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
 							    	<img src="{% static 'images/filter.png' %}" class="tableIcons">
@@ -274,37 +278,28 @@
 								   		<span class="badge bg-danger" style="display: none;"></span>
 								  	{% endif %}
 							  	</button>
-
 						 	</nav>
-							
 						</div>
 						<div class="col">
-
 							<nav class="nav justify-content-end">
-
 							  	<!-- BUTTTON SEARCH --> 
 							  	<button type="button" class="btn btn-outline-primary position-relative" data-bs-toggle="modal" data-bs-target="#Search">
 								  <img src="{% static 'images/search.png' %}" class="tableIcons">
 								  {% if badges %}
 								  	<span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" style="display: inline;"></span>
 								  {% else %}
-								  	<span class="badge bg-danger" style="display: none;"></span>
+								   	<span class="badge bg-danger" style="display: none;"></span>
 								  {% endif %}
 								</button>
-
 							</nav>
-							
 						</div>
 					</div>
 
 					<!-- FILTER CARD -->
-
 					<div class="collapse" id="collapseExample" style="margin-top: 20px;">
 					  <div class="card card-body">
-					    
 					    <form method="POST">
 				      		{% csrf_token %}
-
 				      		<div style="font-size: 90%; margin-top: 20px;">
 					      		{% bootstrap_form filter_form bound_css_class='' %}
 				      		</div>
@@ -312,12 +307,9 @@
 				      		<div style="text-align: center;">
 				      			<input type="submit" class="btn btn-primary" value="Filter" name="action">
 				      		</div>
-						      		
 						</form>
-
 					  </div>
 					</div>
-
 					<!-- FILTER CARD END -->
 
 					<!-- MODAL SEARCH WINDOW -->
@@ -353,16 +345,16 @@
 					
 				</div>
 
-				<!-- EXTERNALS BUTTONS TAB END -->
+				<!-- ORDERS BUTTONS TAB END -->
 
-				{% if badges %}
+				{% if badges %} 
 					<div style="text-align: center; display: block;">
 						<h5>
 							<span class="badge rounded-pill bg-warning text-dark">
 								Search results for "{{category}}"="{{search_string}}"
 							</span>
 							<span class="badge text-bg-primary">
-								<a href="{% url 'externals' %}">Clear</a>
+								<a href="{% url 'home' %}">Clear results</a>
 							</span>
 						</h5>
 					</div>
@@ -370,10 +362,10 @@
 
 				{% if search_error %}
 					<div style="text-align: center; display: block;">
-						<h5>
+						<h7>
 							<p style="color: red;">Wrong query!</p>
 							<p style="color: red;">Please check if the search string aligns with the category!</p>
-						</h5>
+						</h7>
 					</div>
 				{% endif %}
 
@@ -407,7 +399,7 @@
 
 					{% endif %}
 
-					<table class="table table-hover">
+					<table class="table table-hover table-bordered table-responsive">
 
 						<thead>
 							<tr>
@@ -432,25 +424,25 @@
 
 						<tbody>
 
-							{% for external in externals %}
+							{% for order in orders %}
 
-					 			{% if external.order.order_taken %}
-						 			<tr class="visibleRows orderTaken" id="{{external.order.ID}}">
+								{% if order.order.order_taken %}
+						 			<tr class="visibleRows orderTaken" id="{{order.order.ID}}">
 						 		{% else %}
-						 			<tr class="visibleRows normalOrder" id="{{external.order.ID}}">
+						 			<tr class="visibleRows normalOrder" id="{{order.order.ID}}">
 						 		{% endif %}
 
-							    {% if external.order.invoice %}
-							    	<th id="ID{{external.order.ID}}" scope="row" style="color: red;">{{external.order.ID}}</th>
+						 		{% if order.order.invoice %}
+							    	<th scope="row" style="color: red;" id="ID{{order.order.ID}}">{{order.order.ID}}</th>
 							    {% else %}
-							    	<th id="ID{{external.order.ID}}" scope="row" style="color: black;">{{external.order.ID}}</th>
+							    	<th scope="row" style="color: black;" id="ID{{order.order.ID}}">{{order.order.ID}}</th>
 							    {% endif %}
 
-							    <td>{{external.order.created_date|date:"d.m.Y"}}</td>
-							    <td>{{external.order.owner}}<br>{{external.order.telephone}}</td>
+							    <td>{{order.order.created_date|date:"d.m.Y"}}</td>
+							    <td>{{order.order.owner}}<br>{{order.order.telephone}}</td>
 
 							    <td>
-							    	{% for item in external.material_eger %}
+							    	{% for item in order.material_eger %}
 							    		{% if item.ordered and not item.delivered %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
@@ -464,7 +456,7 @@
 							    </td>
 
 							    <td>
-							    	{% for item in external.material_krono %}
+							    	{% for item in order.material_krono %}
 							    		{% if item.ordered and not item.delivered %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
@@ -477,7 +469,7 @@
 							    	{% endfor %}
 							    </td>
 							    <td>
-							    	{% for item in external.material_other %}
+							    	{% for item in order.material_other %}
 							    		{% if item.ordered and not item.delivered %}
 							    			<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
 							    		{% elif item.delivered and item.ordered %}
@@ -490,7 +482,7 @@
 							    	{% endfor %}
 							    </td>
 							    <td>
-							    	{% for item in external.material_edge %}
+							    	{% for item in order.material_edge %}
 							    		{% if item.visible %}
 								    		{% if item.ordered and not item.delivered %}
 								    			<div class="Edge" id="edge{{item.pk}}" style="color: red;" >
@@ -509,25 +501,28 @@
 							    	{% endfor %}
 							    </td>
 							    <td>
-							    	{% for item in external.other_services %}
+							    	{% for item in order.other_services %}
 							    		<div>
-							    			{{item.description}} - {{item.quantity}}
+							    			{{item.description}} - {{item.quantity}} 
 							    		</div>
 							    	{% endfor %}
 							    </td>
 							    <td>
-							    	{% for item in external.notes %}
+							    	{% for item in order.notes %}
 							    		<div>
-							    			{{item.user}} -> <span style="color: red;">{{item.content}}</span>
+							    			{{item.user}} -> 
+							    			<span style="color: red;">
+							    				{{item.content}}
+							    			</span>
 							    		</div>
 							    	{% endfor %}
 							    </td>
-							    <td>{{external.order.balance}}</td>
+							    <td>{{order.order.balance}}</td>
 						    </tr>
 
 						    <tr>
 						    	<td colspan="10">
-						    		<div class="hiddenRows" id="{{external.order.ID}}" style="display: none">
+						    		<div class="hiddenRows" id="{{order}}" style="display: none">
 
 						    			<div class="hidden-table">
 
@@ -544,11 +539,12 @@
 
 							    				<tbody>
 							    					<tr>
-							    						<th scope="row" colspan="5">ЕГЕР</th>
+							    						<th scope="row" colspan="8">ЕГЕР</th>
 							    					</tr>
-							    					{% for item in external.material_eger %}
+							    					{% for item in order.material_eger %}
 							    						<tr>
 							    							<td>{{item.material}} - {{item.quantity}}</td>
+
 							    							<td colspan="4">
 								    							<ul class="progressbar" id="bar{{item.pk}}">
 								    								{% if item.ordered %}
@@ -573,12 +569,13 @@
 								    								{% endif %}
 								    							</ul>
 							    							</td>
+
 							    						</tr>
 							    					{% endfor %}
 							    					<tr>
 							    						<th scope="row" colspan="8">КРОНО</th>
 							    					</tr>
-							    					{% for item in external.material_krono %}
+							    					{% for item in order.material_krono %}
 							    						<tr>
 							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
@@ -610,7 +607,7 @@
 							    					<tr>
 							    						<th scope="row" colspan="8">ДРУГИ</th>
 							    					</tr>
-							    					{% for item in external.material_other %}
+							    					{% for item in order.material_other %}
 							    						<tr>
 							    							<td>{{item.material}} - {{item.quantity}}</td>
 							    							<td colspan="4">
@@ -642,9 +639,9 @@
 							    					<tr>
 							    						<th scope="row" colspan="8">КАНТ</th>
 							    					</tr>
-							    					{% for item in external.material_edge %}
+							    					{% for item in order.material_edge %}
 							    						<tr>
-							    							<td>{{item.color_code}} - {{item.edge_type}} - {{item.quantity}}</td>
+							    							<td>{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}</td>
 							    							<td colspan="4">
 								    							<ul class="progressbar">
 								    								{% if item.ordered %}
@@ -667,23 +664,23 @@
 								    	</div>
 
 							    		<div class="hidden-buttons">
-							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=external.order.ID %}" role="button" title="Edit Order">
+							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=order.order %}" role="button" title="Edit Order">
 							    				<img src="{% static 'images/edit.png' %}" class="tableIcons">
 							    			</a>
-
-							    			<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Delete{{external}}" title="Delete Order">
+ 
+							    			<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Delete{{order}}" title="Delete Order">
 							    				<img src="{% static 'images/delete-can.png' %}" class="tableIcons">
 							    			</button>
 
-							    			<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#Progress{{external}}" title="Update Order">
+							    			<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#Progress{{order}}" title="Update Order">
 							    				<img src="{% static 'images/check-list.png' %}" class="tableIcons">
 							    			</button>
 
-							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=external.order.ID %}" role="button" target="_blank" title="Print View">
+							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=order %}" role="button" target="_blank" title="Print View">
 							    				<img src="{% static 'images/printer.png' %}" class="tableIcons">
 							    			</a>
 
-							    			<button class="btn btn-outline-warning Historybtns" id="{{external.order.ID}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight{{external.order.ID}}" aria-controls="offcanvasRight">
+							    			<button class="btn btn-outline-warning Historybtns" id="{{order.order.ID}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight{{order.order.ID}}" aria-controls="offcanvasRight">
 							    				<img src="{% static 'images/deadline.png' %}" class="tableIcons">
 							    			</button>
 							    		</div>
@@ -695,11 +692,10 @@
 						    {% endfor %}
 							
 						</tbody>
-
 					</table>
-					
 				</div>
 			</div>
 		</div>
+
 	</div>
 {% endblock %}

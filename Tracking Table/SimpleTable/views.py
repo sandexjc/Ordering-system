@@ -12,12 +12,13 @@ import table
 from lib import custom_classes
 
 class Internals(LoginRequiredMixin, TemplateView):
-    template_name = 'internals.html'
+    template_name = 'orders.html'
 
     def get_context_data(self, **kwargs):
         context = super(Internals, self).get_context_data(**kwargs)
-        context['internals'] = []
+        context['orders'] = []
         context['filter_badge'] = True
+        context['nav_select'] = 'internals'
         
         if self.request.POST:
 
@@ -48,8 +49,6 @@ class Internals(LoginRequiredMixin, TemplateView):
                 elif self.request.POST['category'] == 'All':
                     all_internals = search_all('Internal', self.request.POST['search_field'])
 
-                # all_internals = list(set(all_internals))
-
                 if len(self.request.POST['search_field']) == 0:
                     context['badges'] = False
                 else:
@@ -77,7 +76,7 @@ class Internals(LoginRequiredMixin, TemplateView):
         context['visible_items'] = len(all_internals)
 
         for internal in all_internals:
-            context['internals'].append(custom_classes.OrderObject(internal))
+            context['orders'].append(custom_classes.OrderObject(internal))
 
         current_time = time.localtime(time.time())
 
@@ -96,12 +95,13 @@ class Internals(LoginRequiredMixin, TemplateView):
         return self.render_to_response(self.get_context_data())
 
 class Externals(LoginRequiredMixin, TemplateView):
-    template_name = 'externals.html'
+    template_name = 'orders.html'
 
     def get_context_data(self, **kwargs):
         context = super(Externals, self).get_context_data(**kwargs)
-        context['externals'] = []
+        context['orders'] = []
         context['filter_badge'] = True
+        context['nav_select'] = 'externals'
         
         if self.request.POST:
 
@@ -132,8 +132,6 @@ class Externals(LoginRequiredMixin, TemplateView):
                 elif self.request.POST['category'] == 'All':
                     all_externals = search_all('External', self.request.POST['search_field'])
 
-                # all_internals = list(set(all_internals))
-
                 if len(self.request.POST['search_field']) == 0:
                     context['badges'] = False
                 else:
@@ -162,7 +160,7 @@ class Externals(LoginRequiredMixin, TemplateView):
         context['visible_items'] = len(all_externals)
 
         for external in all_externals:
-            context['externals'].append(custom_classes.OrderObject(external))
+            context['orders'].append(custom_classes.OrderObject(external))
 
         current_time = time.localtime(time.time())
 
