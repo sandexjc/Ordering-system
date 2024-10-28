@@ -8,16 +8,16 @@ class OrderObject:
 
 	def __init__(self, order):
 
-	    self.order = order
-	    self.material_eger = models.Plate.objects.filter(cutID=order, manufacturer='Egger')
-	    self.material_krono = models.Plate.objects.filter(cutID=order, manufacturer='Kronospan')
-	    self.material_other = models.Plate.objects.filter(cutID=order, manufacturer='Other')
-	    self.material_edge = models.Edge.objects.filter(cutID=order)
-	    self.other_services = models.Other.objects.filter(cutID=order)
-	    self.notes = models.Note.objects.filter(cutID=order)
-	    self.plate_forms = forms.PlateProgressFormSet(instance=order)
-	    self.edge_forms = forms.EdgeProgressFormSet(instance=order)
-	    self.order_progress = forms.UpdateOrderProgressForm(instance=order)
+		self.order = order
+		self.material_eger = models.Plate.objects.filter(cutID=order, manufacturer='Egger')
+		self.material_krono = models.Plate.objects.filter(cutID=order, manufacturer='Kronospan')
+		self.material_other = models.Plate.objects.filter(cutID=order, manufacturer='Other')
+		self.material_edge = models.Edge.objects.filter(cutID=order)
+		self.other_services = models.Other.objects.filter(cutID=order)
+		self.notes = models.Note.objects.filter(cutID=order)
+		self.plate_forms = forms.PlateProgressFormSet(instance=order)
+		self.edge_forms = forms.EdgeProgressFormSet(instance=order)
+		self.order_progress = forms.UpdateOrderProgressForm(instance=order)
 
 	def __str__(self):
 	    return str(self.order)
