@@ -11,6 +11,18 @@ import time
 import table
 from lib import custom_classes
 
+class OrderView(LoginRequiredMixin, TemplateView):
+    template_name = 'order.html'
+
+    def get_context_data(self, pk, **kwargs):
+        context = super(OrderView, self).get_context_data(**kwargs)
+        context['order'] = custom_classes.OrderObject(search_id(pk).first())
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        return self.render_to_response(self.get_context_data())
+
+
 class Internals(LoginRequiredMixin, TemplateView):
     template_name = 'orders.html'
 
@@ -37,7 +49,7 @@ class Internals(LoginRequiredMixin, TemplateView):
                 if self.request.POST['category'] == 'ID':
                     context['search_error'] = True
                     if self.request.POST['search_field'].isnumeric():
-                        all_internals = search_id('Internal', self.request.POST['search_field'])
+                        all_internals = search_id(self.request.POST['search_field'])
                         context['search_error'] = False
 
                 elif self.request.POST['category'] == 'Date':
@@ -120,7 +132,7 @@ class Externals(LoginRequiredMixin, TemplateView):
                 if self.request.POST['category'] == 'ID':
                     context['search_error'] = True
                     if self.request.POST['search_field'].isnumeric():
-                        all_externals = search_id('External', self.request.POST['search_field'])
+                        all_externals = search_id(self.request.POST['search_field'])
                         context['search_error'] = False
 
                 elif self.request.POST['category'] == 'Date':
@@ -178,8 +190,8 @@ class Externals(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         return self.render_to_response(self.get_context_data())
 
-def search_id(client, ID):
-    return Order.objects.filter(client=client, ID=ID).order_by('-created_date')
+def search_id(ID):
+    return Order.objects.filter(ID=ID)
 
 def search_date(client, date):
     return Order.objects.filter(client=client, created_date__contains=date).order_by('-created_date')

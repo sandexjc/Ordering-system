@@ -3,238 +3,12 @@
 {% load django_bootstrap5 %}
 {% block content %}
 
-<!-- ##############################################
-############################################## -->
-
-{% for order in orders %}
-
-<!-- MODAL PROGRESS WINDOW -->
-<div class="modal fade" id="Progress{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-
-  	<div class="modal-dialog modal-lg">
-	    <div class="modal-content">
-
-	      	<div class="modal-header">
-		        <h5 class="modal-title" id="staticBackdropLabel">
-		        	<div style="text-align: center; color: red;">
-		        		UPDATE PROGRESS
-		        	</div>
-		        	<div>
-		        		ORDER {{order.order.ID}}
-		        	</div>
-		        </h5>
-
-		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-		    </div>
-
-		    <form id="{{order.order.ID}}" class="updateForms">
-
-	      		<div class="modal-body">
-
-		      		<div class="ALERT-S-UPD-VIEW alertmsg" style="display: none;">
-		      			<div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
-			  				<strong><div style="text-align: center;">SUCCESSFULLY SAVED</div></strong>
-			  				<button type="button" class="btn-close SuccessAlertBtn" aria-label="Close"></button>
-						</div>
-					</div>
-
-					<div class="ALERT-E-UPD-VIEW alertmsg" style="display: none;">
-		      			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
-			  				<strong><div class="alertmsgdiv" style="text-align: center;">ERROR OCCURRED</div></strong>
-			  				<button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
-						</div>
-					</div>
-
-					{% csrf_token %}
-
-					<table class="table">
-						<thead>
-							<th scope="col">Материал</th>
-							<th scope="col">Поръчано</th>
-							<th scope="col">Доставено</th>
-							<th scope="col">Нарязано</th>
-							<th scope="col">Кантирано</th>
-						</thead>
-						<tbody>
-							<tr>
-								<th scope="row" colspan="5">EGGER</th>
-							</tr>
-							{{order.plate_forms.management_form}}
-							
-							{% for item in order.plate_forms %}
-								{% if item.manufacturer.value == 'Egger' %}
-									{{item.id}}
-									<tr>
-										<td>{{item.material}}</td>
-										<td>{{item.ordered}}</td>
-										<td>{{item.delivered}}</td>
-										<td>{{item.cutted}}</td>
-										<td>{{item.edged}}</td>
-									</tr>
-								{% endif %}
-							{% endfor %}
-
-							<tr>
-								<th scope="row" colspan="5">KRONO</th>
-							</tr>
-							{% for item in order.plate_forms %}
-								{% if item.manufacturer.value == 'Kronospan' %}
-									{{item.id}}
-									<tr>
-										<td>{{item.material}}</td>
-										<td>{{item.ordered}}</td>
-										<td>{{item.delivered}}</td>
-										<td>{{item.cutted}}</td>
-										<td>{{item.edged}}</td>
-									</tr>
-								{% endif %}
-							{% endfor %}
-
-							<tr>
-								<th scope="row" colspan="5">Други</th>
-							</tr>
-							{% for item in order.plate_forms %}
-								{% if item.manufacturer.value == 'Other' %}
-									{{item.id}}
-									<tr>
-										<td>{{item.material}}</td>
-										<td>{{item.ordered}}</td>
-										<td>{{item.delivered}}</td>
-										<td>{{item.cutted}}</td>
-										<td>{{item.edged}}</td>
-									</tr>
-								{% endif %}
-							{% endfor %}
-							
-							<tr>
-								<th scope="row" colspan="5">Кант</th>
-							</tr>
-							{{order.edge_forms.management_form}}
-
-							{% for item in order.edge_forms %}
-								{{item.id}}
-								<tr>
-									<td>{{item.color_code}}{{item.edge_type}}</td>
-									<td style="margin-right: auto; margin-top: auto;">{{item.ordered}}</td>
-									<td>{{item.delivered}}</td>
-								</tr>
-							{% endfor %}
-
-							<tr>
-								<th scope="row" colspan="5"></th>
-							</tr>
-
-							<tr>
-								<td>Поръчката е взета</td>
-								<td>{{order.order_progress.order_taken}}</td>
-							</tr>
-
-							<tr>
-								<td>Издадена фактура</td>
-								<td>{{order.order_progress.invoice}}</td>
-							</tr>
-
-						</tbody>
-					</table>
-	      			
-	      		</div>
-
-	      		<div class="modal-footer">
-	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<button type="button" class="btn btn-primary updateButtons" id="{{order.order.ID}}">Update</button>
-	      		</div>
-
-      		</form>
-
-	    </div>
-  	</div>
-
-</div> 
-<!-- MODAL PROGRESS WINDOW END -->
-
-<!-- MODAL DELETE WINDOW -->
-<div class="modal fade" id="Delete{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-
-  	<div class="modal-dialog">
-	    <div class="modal-content">
-
-	      	<div class="modal-header">
-		        <h5 class="modal-title" id="staticBackdropLabel">DELETE ORDER</h5>
-		        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-		    </div>
-
-		    <form id="Delete{{order.order.ID}}" class="deleteForms">
-		    	{% csrf_token %}
-
-		    	<div class="ALERT-S-DEL-VIEW" style="display: none;">
-	      			<div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
-		  				<strong><div style="text-align: center;">SUCCESSFULLY DELETED</div></strong>
-		  				<button type="button" class="btn-close SuccessAlertBtn" aria-label="Close"></button>
-					</div>
-				</div>
-
-				<div class="ALERT-E-DEL-VIEW" style="display: none;">
-	      			<div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
-		  				<strong><div class="alertmsgdiv" style="text-align: center;">ERROR OCCURRED</div></strong>
-		  				<button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
-					</div>
-				</div>
-
-	      		<div class="modal-body" style="text-align: center;">
-		      		<h5>Are you sure you want to delete Order: 
-		      			<strong>#{{order.order.ID}}</strong>
-		      		</h5>
-	      		</div>
-
-	      		<div class="modal-footer">
-	      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-	      			<button type="submit" class="btn btn-danger deleteButtons" id="{{order.order.ID}}">Confirm</button>
-	      		</div>
-
-	      	</form>
-	      		
-	    </div>
-  	</div>
-
-</div> 
-<!-- MODAL DELETE WINDOW END -->
-
-<!-- OFFCANVAS HISTORY TAB -->
-
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight{{order.order.ID}}" aria-labelledby="offcanvasRightLabel">
-  	<div class="offcanvas-header">
-    	<h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{order.order.ID}}</h5>
-    	<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  	</div>
-  	<div class="offcanvas-body" id="{{order.order.ID}}" pulled="False">
-
-  		<button class="btn btn-outline-secondary" id="historyRefresh{{order.order.ID}}" type="button">
-			<img src="{% static 'images/refresh-arrow.png' %}" class="tableIcons">
-		</button>
-  			
-  		<div class="d-flex justify-content-center" style="margin-top: 100%;">
-			<div class="spinner-border text-primary" role="status">
-				<span class="visually-hidden">Loading...</span>
-			</div>
-		</div>
-  	</div>
-</div>
-
-
-<!-- OFFCANVAS HISTORY TAB END-->
-
-{% endfor %}
-
-<!-- ##############################################
-############################################## -->
-
 	<div class="WelcomeText">
 		<h2>Good {{current_time}}</h2>
 	</div>
 
 	<!-- NAVIGATION PANEL -->
 	<div class="container-xxl shadow-lg" style="margin-top: 20px;">
-
 			<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
                 {% if nav_select == 'internals' %}
                 <!-- INTERNALS TAB SELECTED -->
@@ -257,7 +31,6 @@
 					<a class="nav-link" href="#">Магазин</a>
 				</li>
 			</ul>
-
 		<div class="tab-content" id="myTabContent">
 			<div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 				<!-- ORDERS BUTTON TAB -->
@@ -294,7 +67,6 @@
 							</nav>
 						</div>
 					</div>
-
 					<!-- FILTER CARD -->
 					<div class="collapse" id="collapseExample" style="margin-top: 20px;">
 					  <div class="card card-body">
@@ -311,42 +83,31 @@
 					  </div>
 					</div>
 					<!-- FILTER CARD END -->
-
 					<!-- MODAL SEARCH WINDOW -->
 					<div class="modal fade" id="Search" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 
 					  	<div class="modal-dialog">
 						    <div class="modal-content">
-
 						      	<div class="modal-header">
 							        <h5 class="modal-title" id="staticBackdropLabel">Search</h5>
 							        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 							    </div>
-
 						      	<form method="POST">
 						      		{% csrf_token %}
-
 						      		<div class="modal-body">
 							      		{% bootstrap_form search_form bound_css_class='' %}
 						      		</div>
-
 						      		<div class="modal-footer">
 						      			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 						      			<input type="submit" class="btn btn-primary" value="Search" name="action">
 						      		</div>
-						      		
 						      	</form>
-						      		
 						    </div>
 					  	</div>
-
 					</div> 
 					<!-- MODAL SEARCH WINDOW END -->
-					
 				</div>
-
 				<!-- ORDERS BUTTONS TAB END -->
-
 				{% if badges %} 
 					<div style="text-align: center; display: block;">
 						<h5>
@@ -359,7 +120,6 @@
 						</h5>
 					</div>
 				{% endif %}
-
 				{% if search_error %}
 					<div style="text-align: center; display: block;">
 						<h7>
@@ -368,11 +128,8 @@
 						</h7>
 					</div>
 				{% endif %}
-
 				<div class="container">
-
 					{% if visible_items == 1 %}
-
 						<p style="
 							font-size: 70%; 
 							font-style: italic; 
@@ -380,12 +137,9 @@
 							text-align: center;
 							font-weight: bold;
 							">
-
 							{{visible_items}} видим елемент
 						</p>
-
 					{% else %}
-
 						<p style="
 							font-size: 70%; 
 							font-style: italic; 
@@ -393,14 +147,10 @@
 							text-align: center;
 							font-weight: bold;
 							">
-
 							{{visible_items}} видими елементa
 						</p>
-
 					{% endif %}
-
 					<table class="table table-hover table-bordered table-responsive">
-
 						<thead>
 							<tr>
 								<th scope="col" colspan="3">Основна Информация</th>
@@ -423,8 +173,8 @@
 						</thead>
 
 						<tbody>
-
 							{% for order in orders %}
+							<tr>
 
 								{% if order.order.order_taken %}
 						 			<tr class="visibleRows orderTaken" id="{{order.order.ID}}">
@@ -519,177 +269,15 @@
 							    </td>
 							    <td>{{order.order.balance}}</td>
 						    </tr>
-
-						    <tr>
-						    	<td colspan="10">
+							<tr>
+								<td colspan="10">
 						    		<div class="hiddenRows" id="{{order}}" style="display: none">
-
-						    			<div class="hidden-table">
-
-							    			<table class="table">
-							    				<thead>
-							    					<tr>
-							    						<th scope="col">Материал</th>
-												      	<th scope="col">Поръчано</th>
-												      	<th scope="col">Доставено</th>
-												      	<th scope="col">Нарязано</th>
-												      	<th scope="col">Кантирано</th>
-							    					</tr>
-							    				</thead>
-
-							    				<tbody>
-							    					<tr>
-							    						<th scope="row" colspan="8">ЕГЕР</th>
-							    					</tr>
-							    					{% for item in order.material_eger %}
-							    						<tr>
-							    							<td>{{item.material}} - {{item.quantity}}</td>
-
-							    							<td colspan="4">
-								    							<ul class="progressbar" id="bar{{item.pk}}">
-								    								{% if item.ordered %}
-								    									<li class="ordered active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="ordered" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    								{% if item.delivered %}
-								    									<li class="delivered active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="delivered" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    								{% if item.cutted %}
-								    									<li class="cutted active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="cutted" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    								{% if item.edged %}
-								    									<li class="edged active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="edged" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    							</ul>
-							    							</td>
-
-							    						</tr>
-							    					{% endfor %}
-							    					<tr>
-							    						<th scope="row" colspan="8">КРОНО</th>
-							    					</tr>
-							    					{% for item in order.material_krono %}
-							    						<tr>
-							    							<td>{{item.material}} - {{item.quantity}}</td>
-							    							<td colspan="4">
-								    							<ul class="progressbar" id="bar{{item.pk}}">
-								    								{% if item.ordered %}
-								    									<li class="ordered active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="ordered" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    								{% if item.delivered %}
-								    									<li class="delivered active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="delivered" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    								{% if item.cutted %}
-								    									<li class="cutted active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="cutted" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    								{% if item.edged %}
-								    									<li class="edged active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="edged" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    							</ul>
-							    							</td>
-							    						</tr>
-							    					{% endfor %}
-							    					<tr>
-							    						<th scope="row" colspan="8">ДРУГИ</th>
-							    					</tr>
-							    					{% for item in order.material_other %}
-							    						<tr>
-							    							<td>{{item.material}} - {{item.quantity}}</td>
-							    							<td colspan="4">
-								    							<ul class="progressbar" id="bar{{item.pk}}">
-								    								{% if item.ordered %}
-								    									<li class="ordered active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="ordered" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    								{% if item.delivered %}
-								    									<li class="delivered active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="delivered" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    								{% if item.cutted %}
-								    									<li class="cutted active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="cutted" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    								{% if item.edged %}
-								    									<li class="edged active" id="plate_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="edged" id="plate_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    							</ul>
-							    							</td>
-							    						</tr>
-							    					{% endfor %}
-							    					<tr>
-							    						<th scope="row" colspan="8">КАНТ</th>
-							    					</tr>
-							    					{% for item in order.material_edge %}
-							    						<tr>
-							    							<td>{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}</td>
-							    							<td colspan="4">
-								    							<ul class="progressbar">
-								    								{% if item.ordered %}
-								    									<li class="ordered active" id="edge_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="ordered" id="edge_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    								{% if item.delivered %}
-								    									<li class="delivered active" id="edge_prog{{item.pk}}"></li>
-								    								{% else %}
-								    									<li class="delivered" id="edge_prog{{item.pk}}"></li>
-								    								{% endif %}
-								    							</ul>
-							    							</td>
-							    						</tr>
-							    					{% endfor %}
-							    				</tbody>
-							    			</table>
-								 
-								    	</div>
-
-							    		<div class="hidden-buttons">
-							    			<a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=order.order %}" role="button" title="Edit Order">
-							    				<img src="{% static 'images/edit.png' %}" class="tableIcons">
-							    			</a>
- 
-							    			<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Delete{{order}}" title="Delete Order">
-							    				<img src="{% static 'images/delete-can.png' %}" class="tableIcons">
-							    			</button>
-
-							    			<button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#Progress{{order}}" title="Update Order">
-							    				<img src="{% static 'images/check-list.png' %}" class="tableIcons">
-							    			</button>
-
-							    			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=order %}" role="button" target="_blank" title="Print View">
-							    				<img src="{% static 'images/printer.png' %}" class="tableIcons">
-							    			</a>
-
-							    			<button class="btn btn-outline-warning Historybtns" id="{{order.order.ID}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight{{order.order.ID}}" aria-controls="offcanvasRight">
-							    				<img src="{% static 'images/deadline.png' %}" class="tableIcons">
-							    			</button>
-							    		</div>
-
-						    		</div>
-						    	</td>
-						    </tr>
-
-						    {% endfor %}
+										<div class="hidden-table" id="hidden-table-{{order}}">
+										</div>
+									</div>
+								</td>
+							</tr>
+							{% endfor %}
 							
 						</tbody>
 					</table>

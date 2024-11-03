@@ -27,4 +27,5 @@ urlpatterns = [
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('table/', include('table.urls', namespace='table')),
     path('internals/react/', views.react_response, name='react'),
+    path('viewOrder/<int:pk>', views.OrderView.as_view(), name='order_view'),
 ]
