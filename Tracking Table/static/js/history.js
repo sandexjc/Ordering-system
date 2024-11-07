@@ -1,4 +1,10 @@
-function addHistoryBtnHandlers() {
+/**
+ * Add history button event handler
+ * On Click -> load history for selected order 
+ */
+
+function handle_orders_history() 
+{
 	$('.Historybtns').each(function() {
 		$(this).click(function() {
 			var historyBtn = this;

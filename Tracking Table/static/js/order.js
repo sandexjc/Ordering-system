@@ -1,4 +1,9 @@
-function addOrderBtnHandlers() {
+/**
+ * All order properties and events handling
+ */
+
+function handle_orders_properties() 
+{
 	$(".updateButtons").each(function() {
 		$(this).click(function() {
 
@@ -10,7 +15,7 @@ function addOrderBtnHandlers() {
 			$.ajax({
 				method: "POST",
 				url: '/table/updateOrder/' + this.getAttribute('id'),
-				data: $("#Progress"+this.getAttribute('id')+" .updateForms").serialize(),
+				data: $("#modal-progress-"+this.getAttribute('id')+" .updateForms").serialize(),
 				timeout: 10000,
 				context: updateButton,
 
@@ -115,19 +120,23 @@ function addOrderBtnHandlers() {
 			$(this).prop('disabled', true);
 			$(this).html("Loading...");
 			$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-			var deleteButton = this
+			var deleteButton = this;
+			var order_id = this.getAttribute('id');
 
 			$.ajax({
 				method: "POST",
 				url: '/table/deleteOrder/' + this.getAttribute('id'),
-				data: $("#Delete"+this.getAttribute('id')+" .deleteForms").serialize(),
+				data: $("#modal-delete-"+this.getAttribute('id')+" .deleteForms").serialize(),
 				timeout: 10000,
 				context: deleteButton,
 
 				success: function(data) {
-					$("#Delete"+this.getAttribute('id')+".modal").modal('hide');
+					$("#modal-delete-"+this.getAttribute('id')+".modal").modal('hide');
 					$("#"+this.getAttribute('id')+".visibleRows").remove();
-					$("#"+this.getAttribute('id')+".hiddenRows").remove();
+					document.getElementById("modal-progress-" + order_id).remove();
+					document.getElementById("history-tab-" + order_id).remove();
+					document.getElementById("hidden-row-" + order_id).remove();
+					document.getElementById("modal-delete-" + order_id).remove();
 				},
 
 				error: function(status) {

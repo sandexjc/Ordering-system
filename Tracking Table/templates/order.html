@@ -3,7 +3,7 @@
 <!-- ######################################################## MODALS ################################################################# -->
 <!-- MODAL PROGRESS WINDOW -->
 <div id="progress-window-{{order.order.ID}}">
-    <div class="modal fade" id="Progress{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="modal-progress-{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -139,7 +139,7 @@
 
 <!-- MODAL DELETE WINDOW -->
 <div id="delete-window-{{order.order.ID}}">
-    <div class="modal fade" id="Delete{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="modal-delete-{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -178,7 +178,7 @@
 
 <!-- OFFCANVAS HISTORY TAB -->
 <div id="offcanvas-history-tab-{{order.order.ID}}">
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight{{order.order.ID}}" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="history-tab-{{order.order.ID}}" aria-labelledby="offcanvasRightLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{order.order.ID}}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -196,6 +196,7 @@
     </div>
 </div>
 <!-- OFFCANVAS HISTORY TAB END-->
+<!-- ######################################################## MODALS ################################################################# -->
 
 <div class="order-view">
     <table class="table">
@@ -337,16 +338,16 @@
         <a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=order.order %}" role="button" title="Edit Order">
             <img src="{% static 'images/edit.png' %}" class="tableIcons">
         </a>
-        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#Delete{{order}}" title="Delete Order">
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modal-delete-{{order}}" title="Delete Order">
             <img src="{% static 'images/delete-can.png' %}" class="tableIcons">
         </button>
-        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#Progress{{order}}" title="Update Order">
+        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modal-progress-{{order}}" title="Update Order">
             <img src="{% static 'images/check-list.png' %}" class="tableIcons">
         </button>
         <a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=order %}" role="button" target="_blank" title="Print View">
             <img src="{% static 'images/printer.png' %}" class="tableIcons">
         </a>
-        <button class="btn btn-outline-warning Historybtns" id="{{order.order.ID}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight{{order.order.ID}}" aria-controls="offcanvasRight">
+        <button class="btn btn-outline-warning Historybtns" id="{{order.order.ID}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#history-tab-{{order.order.ID}}" aria-controls="offcanvasRight">
             <img src="{% static 'images/deadline.png' %}" class="tableIcons">
         </button>
     </div>
