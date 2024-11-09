@@ -26,8 +26,6 @@ function get_order(order_id)
             /** Load order table */
             document.getElementById("hidden-table-" + order_id)
                 .innerHTML = newHtml.getElementsByClassName("order-view")[0].innerHTML;
-            /** Prevent auto fetch  */
-            document.getElementById("hidden-row-" + order_id).classList.add("fetch-prevent");
             /** Add orders handlers */
             handle_orders_properties();
             handle_orders_history();
