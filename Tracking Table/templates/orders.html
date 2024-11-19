@@ -3,12 +3,12 @@
 {% load django_bootstrap5 %}
 {% block content %}
 
-	<div class="WelcomeText">
+	<div class="container-fluid WelcomeText fixed-min-width">
 		<h2>Good {{current_time}}</h2>
 	</div>
 
 	<!-- NAVIGATION PANEL -->
-	<div class="container-xxl shadow-lg" style="margin-top: 20px;">
+	<div class="container-fluid shadow-lg fixed-min-width" style="margin-top: 20px;">
 			<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
                 {% if nav_select == 'internals' %}
                 <!-- INTERNALS TAB SELECTED -->
@@ -34,7 +34,7 @@
 		<div class="tab-content" id="myTabContent">
 			<div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 				<!-- ORDERS BUTTON TAB -->
-				<div class="container FilterNav">
+				<div class="container-fluid FilterNav">
 					<div class="row">
 						<div class="col">
 							<nav class="nav">
@@ -128,7 +128,7 @@
 						</h7>
 					</div>
 				{% endif %}
-				<div class="container">
+				<div class="container-fluid">
 					{% if visible_items == 1 %}
 						<p style="
 							font-size: 70%; 
@@ -150,6 +150,8 @@
 							{{visible_items}} видими елементa
 						</p>
 					{% endif %}
+
+					<!-- ######################################################## TABLE ######################################################## -->
 					<table class="table table-hover table-bordered table-responsive">
 						<thead>
 							<tr>
@@ -177,15 +179,14 @@
 							<tr>
 
 								{% if order.order.order_taken %}
-						 			<tr class="visibleRows orderTaken" id="{{order.order.ID}}">
+						 			<tr class="visibleRows orderTaken fixed-min-width" id="{{order.order.ID}}">
 						 		{% else %}
-						 			<tr class="visibleRows normalOrder" id="{{order.order.ID}}">
+						 			<tr class="visibleRows normalOrder fixed-min-width" id="{{order.order.ID}}">
 						 		{% endif %}
-
-						 		{% if order.order.invoice %}
-							    	<th scope="row" style="color: red;" id="ID{{order.order.ID}}">{{order.order.ID}}</th>
+								{% if order.order.invoice %}
+							    	<td style="color: red;"   id="ID{{order.order.ID}}">{{order.order.ID}}</th>
 							    {% else %}
-							    	<th scope="row" style="color: black;" id="ID{{order.order.ID}}">{{order.order.ID}}</th>
+							    	<td style="color: black;" id="ID{{order.order.ID}}">{{order.order.ID}}</th>
 							    {% endif %}
 
 							    <td>{{order.order.created_date|date:"d.m.Y"}}</td>
@@ -271,8 +272,8 @@
 						    </tr>
 							<tr>
 								<td colspan="10">
-						    		<div class="hiddenRows" id="hidden-row-{{order}}" style="display: none">
-										<div class="hidden-table" id="hidden-table-{{order}}">
+						    		<div class="container-fluid hiddenRows fixed-min-width" id="hidden-row-{{order}}" style="display: none">
+										<div class="container-fluid hidden-table fixed-min-width" id="hidden-table-{{order}}">
 										</div>
 									</div>
 								</td>
@@ -281,6 +282,8 @@
 							
 						</tbody>
 					</table>
+					<!-- ######################################################## TABLE ######################################################## -->
+
 				</div>
 			</div>
 		</div>

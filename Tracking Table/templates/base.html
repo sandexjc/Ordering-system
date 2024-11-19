@@ -16,7 +16,7 @@
 		<link rel="stylesheet" type="text/css" href="{% static 'css/progressbar.css' %}">
 	</head>
 	<body>
-		<nav class="navbar navbar-expand-sm navbar-light" style="background-color: #e6e6e9; --bs-bg-opacity: .5;">
+		<nav class="navbar navbar-light fixed-min-width" style="background-color: #e6e6e9; --bs-bg-opacity: .5;">
 			<div class="container-fluid">
 				<a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'images/favico.png' %}" style="width: 30px; height: 30px; margin-bottom: 2px;"></a>
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -59,7 +59,7 @@
 
 		<br>
 			<div class="sticky-bottom">
-				<div class="container WebFooter" style="text-align: center;">
+				<div class="container-fluid WebFooter fixed-min-width" style="text-align: center;">
 					<p>Megatrading Ltd© 2022</p>
 				</div>
 			</div>

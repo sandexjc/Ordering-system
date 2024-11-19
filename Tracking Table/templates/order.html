@@ -4,7 +4,7 @@
 <!-- MODAL PROGRESS WINDOW -->
 <div id="progress-window-{{order.order.ID}}">
     <div class="modal fade" id="modal-progress-{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">
@@ -82,6 +82,7 @@
                                 <tr>
                                     <th scope="row" colspan="5">Други</th>
                                 </tr>
+
                                 {% for item in order.plate_forms %}
                                     {% if item.manufacturer.value == 'Other' %}
                                         {{item.id}}
@@ -98,6 +99,7 @@
                                 <tr>
                                     <th scope="row" colspan="5">Кант</th>
                                 </tr>
+                                
                                 {{order.edge_forms.management_form}}
 
                                 {% for item in order.edge_forms %}
@@ -198,8 +200,8 @@
 <!-- OFFCANVAS HISTORY TAB END-->
 <!-- ######################################################## MODALS ################################################################# -->
 
-<div class="order-view">
-    <table class="table">
+<div class="container-fluid order-view fixed-min-width">
+    <table class="table fixed-min-width">
         <thead>
             <tr>
                 <th scope="col">Материал</th>
