@@ -4,7 +4,7 @@
 <!-- MODAL PROGRESS WINDOW -->
 <div id="progress-window-{{order.order.ID}}">
     <div class="modal fade" id="modal-progress-{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog fixed-min-width">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">
@@ -142,7 +142,7 @@
 <!-- MODAL DELETE WINDOW -->
 <div id="delete-window-{{order.order.ID}}">
     <div class="modal fade" id="modal-delete-{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-sm fixed-min-width">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">DELETE ORDER</h5>
@@ -200,8 +200,8 @@
 <!-- OFFCANVAS HISTORY TAB END-->
 <!-- ######################################################## MODALS ################################################################# -->
 
-<div class="container-fluid order-view fixed-min-width">
-    <table class="table fixed-min-width">
+<div class="container-fluid order-view">
+    <table class="table">
         <thead>
             <tr>
                 <th scope="col">Материал</th>

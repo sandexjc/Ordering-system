@@ -1,4 +1,5 @@
-.WelcomeText{
+.WelcomeText
+{
 	text-align: center;
 	margin-bottom: 50px;
 	margin-top: 50px;
@@ -6,28 +7,33 @@
 	margin-right: auto;
 }
 
-.UserForm{
+.UserForm
+{
 	margin-bottom: 70px;
 }
 
-.FilterNav{
+.FilterNav
+{
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
 
-.WebFooter{
+.WebFooter
+{
 	font-family: 'Source Serif Pro', serif;
 	color: black;
 	margin: auto;
 }
 
-.hiddenRows{
+.hiddenRows
+{
 	background-color: #e9ecef;
 	margin-left: auto;
 	margin-right: auto;
 }
 
-.hidden-table{
+.hidden-table
+{
 	width: 700px;
 	margin-left: auto;
 	margin-right: auto;
@@ -35,7 +41,8 @@
 	padding-top: 20px;
 }
 
-.hidden-buttons{
+.hidden-buttons
+{
 	position: relative;
 	width: 700px;
 	margin-left: auto;
@@ -44,63 +51,84 @@
 	text-align: center;
 }
 
-.table td{
+.table td
+{
 	padding: 0px;
 	font-weight: bold;
 	text-align: left;
 }
 
-.tableIcons{
+.tableIcons
+{
 	width: 25px;
 	height: 25px;
 }
 
-.EditOrderIcons{
+.EditOrderIcons
+{
 	width: 22px;
 	height: 20px;
 }
 
-.navbarIcons{
+.navbarIcons
+{
 	width: 40px;
 	height: 40px;
 }
 
-.NewOrderClientDetails{
+.NewOrderClientDetails
+{
 	width: 800px;
 	margin: auto;
 }
 
-.TableValue{
+.TableValue
+{
 	background-color: red;
 }
 
-.table th{
+.table th
+{
 	font-size: 16px;
 	text-align: left;
 }
 
-.orderTaken{
+.orderTaken
+{
 	background-color: #eae2b7;
 }
 
-.normalOrder{
+.normalOrder
+{
 	background-color: white;
 }
 
-.orderClicked{
+.orderClicked
+{
 	background-color: #e5e5e5;
 }
-.rowSelected{
+.rowSelected
+{
 	background-blend-mode: multiply;
 	background-color: #d2d2d2;
 }
 
-.fixed-min-width{
+.fixed-min-width
+{
 	min-width: 800px;
 }
 
-/*.editcontent{
-	max-width: 1700px;
-	min-width: 100px;
-}*/
+.modal-backdrop
+{
+    opacity:0.3 !important;
+	width: 99.99%;
+	height: 99.99%;
+	min-width: 800px;
+}
+
+.table-div 
+{
+	margin-top: 20px; 
+	width: 90%;
+}
 

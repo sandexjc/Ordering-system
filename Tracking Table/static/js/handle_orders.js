@@ -11,7 +11,7 @@ function handle_orders()
 			$(".hiddenRows").each(function() {
 				if (this.getAttribute('id') === "hidden-row-" + row_id) {
 					if (this.style.display === 'none') {
-						this.style.display = 'block';
+						this.style.display = 'inline-table';
 						this.classList.add("orderClicked");
 						$("#"+row_id+".visibleRows").addClass("rowSelected");
 						$(this).focus();

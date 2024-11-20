@@ -8,7 +8,7 @@
 	</div>
 
 	<!-- NAVIGATION PANEL -->
-	<div class="container-fluid shadow-lg fixed-min-width" style="margin-top: 20px;">
+	<div class="container-fluid shadow-lg fixed-min-width table-div">
 			<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
                 {% if nav_select == 'internals' %}
                 <!-- INTERNALS TAB SELECTED -->
@@ -84,9 +84,9 @@
 					</div>
 					<!-- FILTER CARD END -->
 					<!-- MODAL SEARCH WINDOW -->
-					<div class="modal fade" id="Search" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+					<div class="modal fade fixed-min-width" id="Search" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 
-					  	<div class="modal-dialog">
+					  	<div class="modal-dialog fixed-min-width">
 						    <div class="modal-content">
 						      	<div class="modal-header">
 							        <h5 class="modal-title" id="staticBackdropLabel">Search</h5>
@@ -152,7 +152,7 @@
 					{% endif %}
 
 					<!-- ######################################################## TABLE ######################################################## -->
-					<table class="table table-hover table-bordered table-responsive">
+					<table class="table table-hover table-bordered">
 						<thead>
 							<tr>
 								<th scope="col" colspan="3">Основна Информация</th>
@@ -272,8 +272,8 @@
 						    </tr>
 							<tr>
 								<td colspan="10">
-						    		<div class="container-fluid hiddenRows fixed-min-width" id="hidden-row-{{order}}" style="display: none">
-										<div class="container-fluid hidden-table fixed-min-width" id="hidden-table-{{order}}">
+						    		<div class="container-fluid hiddenRows" id="hidden-row-{{order}}" style="display: none">
+										<div class="container-fluid hidden-table" id="hidden-table-{{order}}">
 										</div>
 									</div>
 								</td>
