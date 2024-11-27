@@ -52,6 +52,6 @@
 	content: "✔️";
 }
 
-.progressbar li.active + li:after {
+.progressbar li.active + li.active:after {
 	background-color: #16c60c;
 }
