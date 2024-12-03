@@ -452,17 +452,12 @@ class GetOrderHistory(LoginRequiredMixin, ListView):
             'changes': json.loads(serializers.serialize('json', Change.objects.filter(cutID=pk))),
             })
 
-
-
 class PrintOrder(LoginRequiredMixin, TemplateView):
-
     model = Order
     template_name = 'table/printOrder.html'
     
     def get_context_data(self, pk, **kwargs):
-
         context = super(PrintOrder, self).get_context_data(**kwargs)
-
         context['order'] = Order.objects.get(pk=pk)
         context['order_plates'] = Plate.objects.filter(cutID=pk)
         context['order_edges'] = Edge.objects.filter(cutID=pk)

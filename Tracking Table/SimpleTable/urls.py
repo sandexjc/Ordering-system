@@ -1,31 +1,21 @@
-"""SimpleTable URL Configuration
+""" SimpleTable URL Configuration """
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
-
 from SimpleTable import views
 
 urlpatterns = [
+    # Site resources
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='internals/'), name='home'),
     path('internals/', views.Internals.as_view(), name='internals'),
     path('externals/', views.Externals.as_view(), name='externals'),
-    path('accounts/', include('accounts.urls', namespace='accounts')),
-    path('table/', include('table.urls', namespace='table')),
-    path('internals/react/', views.react_response, name='react'),
     path('viewOrder/<int:pk>', views.OrderView.as_view(), name='order_view'),
+
+    # Accounts app resources
+    path('accounts/', include('accounts.urls', namespace='accounts')),
+
+    # Table app resources
+    path('table/', include('table.urls', namespace='table')),
 ]

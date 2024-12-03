@@ -1,5 +1,4 @@
 from django.core import serializers
-
 from table import models
 from SimpleTable import forms
 import json
@@ -7,7 +6,6 @@ import json
 class OrderObject:
 
 	def __init__(self, order):
-
 		self.order = order
 		self.material_eger = models.Plate.objects.filter(cutID=order, manufacturer='Egger')
 		self.material_krono = models.Plate.objects.filter(cutID=order, manufacturer='Kronospan')
@@ -25,7 +23,6 @@ class OrderObject:
 class OrderDetails:
 
 	def __init__(self, order):
-
 		self.order = order
 		self.order_plates = models.Plate.objects.filter(cutID=order)
 		self.material_eger = models.Plate.objects.filter(cutID=order, manufacturer='Egger')
@@ -34,15 +31,12 @@ class OrderDetails:
 		self.material_edge = models.Edge.objects.filter(cutID=order)
 
 	def get_order(self):
-
 		return json.loads(serializers.serialize('json', [self.order]))
 
 	def get_plates(self):
-
 		return json.loads(serializers.serialize('json', self.order_plates))
 
 	def get_edges(self):
-
 		return json.loads(serializers.serialize('json', self.material_edge))
 
 	def __str__(self):

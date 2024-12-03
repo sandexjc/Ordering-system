@@ -1,15 +1,9 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.core import serializers
-import json
-
-from table.models import Order, Plate, Edge, Payment, Note, Other
+from table.models import Order
 from SimpleTable import forms
-import time
-import table
 from lib import custom_classes
+import time
 
 class OrderView(LoginRequiredMixin, TemplateView):
     template_name = 'order.html'
@@ -203,17 +197,8 @@ def search_telephone(client, telephone):
     return Order.objects.filter(client=client, telephone__icontains=telephone).order_by('-created_date')
 
 def search_all(client, search_kwd):
-    return ( 
-        # Order.objects.filter(client=client, ID=search_kwd).order_by('-created_date') |
+    return (
         Order.objects.filter(client=client, created_date__contains=search_kwd).order_by('-created_date') |
         Order.objects.filter(client=client, owner__icontains=search_kwd).order_by('-created_date') |
         Order.objects.filter(client=client, telephone__icontains=search_kwd).order_by('-created_date')
     )
-
-
-def react_response(request):
-
-    return JsonResponse({
-        # 'models':json.loads(serializers.serialize('json', Order.objects.all())),
-        'models':json.loads(serializers.serialize('json', Order.objects.order_by('-created_date'))),
-        })
