@@ -10,4 +10,5 @@ urlpatterns = [
     path('updateOrder/<int:pk>', views.UpdateOrder.as_view(), name='updateOrder'),
     path('printOrder/<int:pk>', views.PrintOrder.as_view(), name='printOrder'),
     path('getOrderHistory/<int:pk>', views.GetOrderHistory.as_view(), name='orderHistory'),
+    path('viewOrder/<int:pk>', views.ViewOrder.as_view(), name='order_view'),
 ]

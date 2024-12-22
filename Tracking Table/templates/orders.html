@@ -10,7 +10,7 @@
 	<!-- NAVIGATION PANEL -->
 	<div class="container-fluid shadow-lg fixed-min-width table-div custom-round bottom-space">
 			<ul class="nav justify-content-center nav-tabs" id="myTab" role="tablist">
-                {% if nav_select == 'internals' %}
+                {% if nav_select == 'Internal' %}
                 <!-- INTERNALS TAB SELECTED -->
 		  		<li class="nav-item" role="presentation">
 		    		<button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Вътрешни</button>
@@ -18,7 +18,7 @@
 				<li class="nav-item" role="presentation">
 				    <a class="nav-link" href="{% url 'externals' %}">Външни</a>
 				</li>
-                {% elif nav_select == 'externals' %}
+                {% elif nav_select == 'External' %}
                 <!-- EXTERNALS TAB SELECTED -->
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" href="{% url 'internals' %}">Вътрешни</a>

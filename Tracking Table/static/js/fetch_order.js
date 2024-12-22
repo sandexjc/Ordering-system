@@ -8,7 +8,7 @@
 
 function get_order(order_id)
 {
-    fetch('/viewOrder/' + order_id)
+    fetch('/table/viewOrder/' + order_id)
         .then((response) => {
             return response.text()
         })
