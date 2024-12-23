@@ -110,12 +110,20 @@
 				{% if badges %} 
 					<div style="text-align: center; display: block;">
 						<h5>
-							<span class="badge rounded-pill bg-warning text-dark">
-								Search results for "{{category}}"="{{search_string}}"
-							</span>
-							<span class="badge text-bg-primary">
-								<a href="{% url 'home' %}">Clear results</a>
-							</span>
+							<div class="container-fluid" style="display: flex; justify-content: center;">
+								<span class="badge rounded-pill bg-warning text-dark">
+									Резултати за: "{{category}}"="{{search_string}}"
+								</span>
+							</div>
+							<div class="container-fluid" style="display: flex; justify-content: center;"></div>
+								<span class="badge text-bg-primary">
+									{% if nav_select == 'Internal' %}
+										<a href="{% url 'internals' %}">изчисти търсенето</a>
+									{% elif nav_select == 'External' %}
+										<a href="{% url 'externals' %}">изчисти търсенето</a>
+									{% endif %}
+								</span>
+							</div>
 						</h5>
 					</div>
 				{% endif %}
