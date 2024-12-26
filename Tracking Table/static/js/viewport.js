@@ -1,16 +1,18 @@
 /** 
- * Dynamically set content scale based on viewport size 
+ * Dynamically set content scale based on viewport size and minimum required viewport width
  */
-function set_viewport_scale()
+
+function set_viewport_scale(viewport_width, min_viewport_width)
 {
-    const viewport_width = window.innerWidth;
     var meta_scale = document.getElementById("viewport-scale-meta");
 
-    if (viewport_width < 1000)
+    if (viewport_width < min_viewport_width)
     {
-        meta_scale.setAttribute("content", "width=device-width, initial-scale=" + viewport_width/1000);
+        meta_scale.setAttribute("content", "width=device-width, initial-scale=" + viewport_width/min_viewport_width);
     }
 
-}
+    console.log("MIN WIDTH", min_viewport_width);
+    console.log("VIEWPORT WIDTH", viewport_width);
+    console.log("SCALE", viewport_width/min_viewport_width);
 
-set_viewport_scale();
+}

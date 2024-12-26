@@ -1,3 +1,16 @@
+html
+{
+	height: 100%;
+	width: 100%;
+}
+
+body 
+{
+	background-image: url("/static/images/city-background.png");
+	background-color: rgba(255, 255, 255, 0.7);
+	background-blend-mode: lighten;
+}
+
 .WelcomeText
 {
 	text-align: center;
@@ -130,6 +143,7 @@
 
 .table-div 
 {
+	background-color: white;
 	margin-top: 20px; 
 	width: 90%;
 }

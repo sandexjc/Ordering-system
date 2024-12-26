@@ -1,0 +1,44 @@
+html
+{
+	height: 100%;
+	width: 100%;
+}
+
+body 
+{
+	background-image: url("../../../static/images/city-background.png");
+	background-color: rgba(255, 255, 255, 0.7);
+	background-blend-mode: lighten;
+}
+
+.login-page 
+{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding-top: 12rem;
+	padding-left: 4rem;
+	padding-right: 4rem;
+}
+
+.login-card
+{
+	padding-left: 2rem;
+	padding-right: 2rem;
+	border-radius: 1rem;
+	min-width: 300px;
+	max-width: 500px;
+	background-color: white;
+}
+
+.login-header
+{
+	padding-top: 2rem;
+	padding-bottom: 2rem;
+	text-align: center;
+}
+
+.login-form
+{
+	padding-bottom: 3rem;
+}
