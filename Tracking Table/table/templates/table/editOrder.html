@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
-{% block content %}
 {% load static %}
+
+{% block links %}
+<link rel="stylesheet" type="text/css" href="{% static 'table/css/order-form.css' %}?v=1.1">
+{% endblock %}
+
+{% block content %}
 
 <div class="container-fluid fixed-min-width" style="width: 90%;">
 
@@ -25,7 +30,7 @@
 		<h1>Edit Order</h1>
 	</div>
 
-	<form method="POST" id="editOrderForm">
+	<form method="POST" id="editOrderForm" class="shadow-lg order-form">
 		{% csrf_token %}
 		<label class="form-label" for="OrderID">ID</label>
 		<input type="text" id="OrderID" class="form-control" readonly value="{{current_order.ID}}">

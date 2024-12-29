@@ -7,8 +7,10 @@
 		<title>TTable</title>
 		<link rel="icon" type="image/x-icon" href="{% static 'images/favico.png' %}">
 		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.1.3/css/bootstrap.css' %}?v=1.1">
-		<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}?v=1.1">
+		<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}?v=1.2">
 		<link rel="stylesheet" type="text/css" href="{% static 'css/progressbar.css' %}?v=1.1">
+		{% block links %}
+		{% endblock %}
 	</head>
 	<body>
 		<nav class="navbar navbar-light fixed-min-width" style="background-color: #e6e6e9; --bs-bg-opacity: .5;">
@@ -54,6 +56,8 @@
 		<script type="text/javascript" src="{% static 'js/handle_orders.js' %}?v=1.1"></script>
 		<script type="text/javascript" src="{% static 'js/base.js' %}?v=1.2"></script>
 		<script type="text/javascript" src="{% static 'js/spinner.js' %}?v=1.1"></script>
+		{% block scripts %}
+		{% endblock %}
 
 		<br>
 			<div class="sticky-bottom">
