@@ -10,7 +10,7 @@ body
 	background-repeat: no-repeat;
   	background-attachment: fixed;
 	background-size: 100% 100%;
-	background-color: rgba(255, 255, 255, 0.7);
+	background-color: rgba(255, 255, 255, 0.35);
 	background-blend-mode: lighten;
 }
 
@@ -29,8 +29,8 @@ body
 	padding-left: 2rem;
 	padding-right: 2rem;
 	border-radius: 1rem;
-	min-width: 300px;
-	max-width: 500px;
+	min-width: 18rem;
+	max-width: 32rem;
 	background-color: white;
 }
 
@@ -39,9 +39,24 @@ body
 	padding-top: 2rem;
 	padding-bottom: 2rem;
 	text-align: center;
+	font-size: 2rem;
+	font-weight: bold;
 }
 
 .login-form
 {
 	padding-bottom: 3rem;
+}
+
+.login-button-div
+{
+	display: flex;
+	justify-content: center;
+	padding-top: 2rem;
+}
+
+.login-button
+{
+	width: 10rem;
+	min-width: 4rem;
 }

@@ -18,10 +18,12 @@
 				</h2>
 				<form method="post" class="login-form">
 					{% csrf_token %}
-					{% bootstrap_form form bound_css_class='' %}
-					<button type="submit" class="btn btn-primary form-button">
-						Login
-					</button>
+					{% bootstrap_form form %}
+					<div class="login-button-div">
+						<button type="submit" class="btn btn-primary login-button">
+							Login
+						</button>
+					</div>
 				</form>
 			</div>
 		</div>

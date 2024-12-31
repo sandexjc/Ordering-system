@@ -1,7 +1,4 @@
-# from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.core.exceptions import ValidationError
-
 from accounts.models import User
 
 class UserCreateForm(UserCreationForm):
@@ -35,7 +32,7 @@ class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
-        self.fields['password'].label = ""
-        self.fields['username'].label = ""
-        self.fields['password'].widget.attrs['placeholder'] = 'Password'
-        self.fields['username'].widget.attrs['placeholder'] = 'Username'
+        self.fields['username'].label = "Username"
+        self.fields['password'].label = "Password"
+        self.fields['username'].widget.attrs['placeholder'] = 'Type your username'
+        self.fields['password'].widget.attrs['placeholder'] = 'Type your password'

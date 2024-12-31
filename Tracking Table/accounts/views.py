@@ -9,8 +9,8 @@ from accounts.models import User
 
 class CreateUser(LoginRequiredMixin, CreateView):
     form_class = forms.UserCreateForm
-    template_name = 'accounts/createUser.html'
-    success_url = reverse_lazy('accounts:viewUsers')
+    template_name = 'accounts/create-user.html'
+    success_url = reverse_lazy('accounts:view-users')
 
 class Login(LoginView):
     form_class = forms.LoginForm

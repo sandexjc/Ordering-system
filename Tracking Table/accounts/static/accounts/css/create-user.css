@@ -1,0 +1,16 @@
+.create-user-page
+{
+    width: 90%;
+    min-width: 32rem;
+    margin-top: 3rem;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 1rem;
+}
+
+.create-user-header
+{
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+}

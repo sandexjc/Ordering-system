@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title %}
+<title>TTable Create User</title>
+{% endblock %}
+
+{% block links %}
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/create-user.css' %}?v=1.1">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid shadow-lg create-user-page">
+	<h1 class="create-user-header">
+		Create User
+	</h1>
+	<div class="create-user-form">
+		<form method="post">
+			{% csrf_token %}
+			{% bootstrap_form form %}
+			<input type="submit" class="btn btn-primary" value="Create">
+		</form>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{% static 'accounts/js/create-user.js' %}?v=1.1"></script>
+{% endblock %}

@@ -4,12 +4,14 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1" id="viewport-scale-meta">
+		{% block title %}
 		<title>TTable</title>
+		{% endblock %}
 		<link rel="icon" type="image/x-icon" href="{% static 'images/favico.png' %}">
 		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.1.3/css/bootstrap.css' %}?v=1.1">
 		<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}?v=1.2">
-		<link rel="stylesheet" type="text/css" href="{% static 'css/progressbar.css' %}?v=1.1">
 		{% block links %}
+		<link rel="stylesheet" type="text/css" href="{% static 'css/progressbar.css' %}?v=1.1">
 		{% endblock %}
 	</head>
 	<body>
@@ -19,9 +21,9 @@
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 					<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><img src="{% static 'images/user-group.png' %}" style="width: 28px; height: 28px;"></a>
 						<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-							<li><a class="dropdown-item" href="{% url 'accounts:viewUsers' %}">Manage Users</a></li>
+							<li><a class="dropdown-item" href="{% url 'accounts:view-users' %}">View Users</a></li>
 							<li><hr class="dropdown-divider"></li>
-							<li><a class="dropdown-item" href="{% url 'accounts:createUser' %}">Create User</a></li>
+							<li><a class="dropdown-item" href="{% url 'accounts:create-user' %}">Create User</a></li>
 							<li><a class="dropdown-item" href="#">Delete User</a></li>
 						</ul>
 					</li>
@@ -47,8 +49,8 @@
 		
 		<script type="text/javascript" src="{% static 'jquery/jquery-3.7.1.min.js' %}?v=1.1"></script>
 		<script type="text/javascript" src="{% static 'bootstrap/5.1.3/js/bootstrap.bundle.js' %}?v=1.1"></script>
-
 		<script type="text/javascript" src="{% static 'js/viewport.js' %}?v=1.2"></script>
+		{% block scripts %}
 		<script type="text/javascript" src="{% static 'js/handle_orders.js' %}?v=1.1"></script>
 		<script type="text/javascript" src="{% static 'js/order.js' %}?v=1.1"></script>
 		<script type="text/javascript" src="{% static 'js/history.js' %}?v=1.1"></script>
@@ -56,7 +58,6 @@
 		<script type="text/javascript" src="{% static 'js/handle_orders.js' %}?v=1.1"></script>
 		<script type="text/javascript" src="{% static 'js/base.js' %}?v=1.2"></script>
 		<script type="text/javascript" src="{% static 'js/spinner.js' %}?v=1.1"></script>
-		{% block scripts %}
 		{% endblock %}
 
 		<br>
