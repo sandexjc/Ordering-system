@@ -17,10 +17,15 @@
 	<body>
 		<nav class="navbar navbar-light fixed-min-width" style="background-color: #e6e6e9; --bs-bg-opacity: .5;">
 			<div class="container-fluid">
-				<a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'images/favico.png' %}" style="width: 30px; height: 30px; margin-bottom: 2px;"></a>
+				<a class="navbar-brand" href="{% url 'home' %}">
+					<img src="{% static 'images/favico.png' %}" style="width: 30px; height: 30px; margin-bottom: 2px;">
+				</a>
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-					<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><img src="{% static 'images/user-group.png' %}" style="width: 28px; height: 28px;"></a>
-						<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<img src="{% static 'images/user-group.png' %}" style="width: 28px; height: 28px;">
+						</a>
+						<ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="position: absolute;">
 							<li><a class="dropdown-item" href="{% url 'accounts:view-users' %}">View Users</a></li>
 							<li><hr class="dropdown-divider"></li>
 							<li><a class="dropdown-item" href="{% url 'accounts:create-user' %}">Create User</a></li>
@@ -30,10 +35,12 @@
 				</ul>
 				<span class="navbar-text">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
 						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome <strong>{{user.first_name}}</strong> <img src="{% static 'images/user.png' %}" class="navbarIcons"></a>
-							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								Welcome <strong>{{user.first_name}}</strong> 
+								<img src="{% static 'images/user.png' %}" class="navbarIcons">
+							</a>
+							<ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="position: absolute;">
 								<li><a class="dropdown-item" href="#">View Profile</a></li>
 								<li><hr class="dropdown-divider"></li>
 								<li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Logout</a></li>
