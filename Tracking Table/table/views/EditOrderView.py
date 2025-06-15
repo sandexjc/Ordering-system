@@ -1,73 +1,15 @@
-from django.urls import reverse_lazy
-from django.shortcuts import redirect
-from django.views.generic import CreateView, UpdateView, TemplateView, DeleteView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import UpdateView
 from django.contrib import messages
-from django.http import JsonResponse
-from django.core import serializers
 
-from lib import custom_classes
-from accounts.models import User
-from table.models import Order, Plate, Edge, Payment, Cutting, Edging, Other, Change 
+from table import models
 from table import forms
-from SimpleTable.forms import PlateProgressFormSet, EdgeProgressFormSet, UpdateOrderProgressForm
-import json
 
-class CreateOrder(LoginRequiredMixin, CreateView):
-
-    form_class = forms.CreateOrderForm
-    template_name = 'table/newOrder.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(CreateOrder, self).get_context_data(**kwargs)
-        context['add_note'] = forms.AddNoteForm
-
-        return context
-
-    def post(self, request):
-
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-
-        note = self.request.POST['content']
-        user = self.request.user
-
-        return self.form_valid(form, note, user)
-
-    def form_valid(self, form, note, user):
-
-        self.object = form.save(commit=False)
-        self.object.save()
-
-        Change.objects.create(
-            cutID=self.object,
-            user=user.first_name, 
-            operation='created', 
-            what='Order',
-            new_state=self.object.ID,
-            ).save()
-
-        add_note = forms.AddNoteForm(self.request.POST).save(commit=False)
-        add_note.cutID = self.object
-        add_note.user = user
-        add_note.content = note
-
-        if note != '':
-            add_note.save()
-
-            Change.objects.create(
-            cutID=self.object,
-            user=user.first_name, 
-            operation='created', 
-            what='Note',
-            new_state=note,
-            ).save()
-
-        return redirect('table:editOrder', self.object.pk)
+from django.shortcuts import redirect
 
 class EditOrder(LoginRequiredMixin, UpdateView):
 
-    model = Order
+    model = models.Order
     form_class = forms.UpdateOrderForm
     template_name = 'table/editOrder.html'
     
@@ -94,16 +36,16 @@ class EditOrder(LoginRequiredMixin, UpdateView):
             context['payment_forms'] = forms.PaymentFormSet(instance=self.object)
             context['add_note'] = forms.AddNoteForm
 
-        context['current_plates'] = Plate.objects.filter(cutID=self.object)
-        context['current_edges'] = Edge.objects.filter(cutID=self.object)
-        context['current_payments'] = Payment.objects.filter(cutID=self.object)
+        context['current_plates'] = models.Plate.objects.filter(cutID=self.object)
+        context['current_edges'] = models.Edge.objects.filter(cutID=self.object)
+        context['current_payments'] = models.Payment.objects.filter(cutID=self.object)
         context['current_order'] = self.object
 
         return context
 
     def post(self, request, pk, *args, **kwargs):
 
-        self.object = Order.objects.get(pk=pk)
+        self.object = models.Order.objects.get(pk=pk)
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
@@ -188,13 +130,8 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         if note != '':
             notes.save()
 
-            Change.objects.create(
-            cutID=self.object,
-            user=user, 
-            operation='created', 
-            what='Note',
-            new_state=note,
-            ).save()
+            models.Change.objects.create(cutID=self.object, user=user, operation='created', 
+                                            what='Note', new_state=note).save()
 
         plate = PLATES.save(commit=False)
 
@@ -202,7 +139,7 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
             if item.pk:
 
-                old_object = Plate.objects.get(pk=item.pk)
+                old_object = models.Plate.objects.get(pk=item.pk)
                 changed_fields = {}
 
                 if old_object.material != item.material:
@@ -221,22 +158,11 @@ class EditOrder(LoginRequiredMixin, UpdateView):
                     changed_fields['from_client'] = f'{old_object.from_client} -> {item.from_client}'
 
                 for changed_field in changed_fields.keys():
-                    Change.objects.create(
-                    cutID=self.object,
-                    user=user, 
-                    operation='Changed', 
-                    what=changed_field,
-                    current_state=item.material,
-                    new_state=changed_fields[changed_field],
-                    ).save()
+                    models.Change.objects.create(cutID=self.object, user=user, operation='Changed', what=changed_field,
+                                                    current_state=item.material, new_state=changed_fields[changed_field]).save()
             else:
-                Change.objects.create(
-                cutID=self.object,
-                user=user, 
-                operation='Added', 
-                what='Plate',
-                new_state=item.material,
-                ).save()
+                models.Change.objects.create(cutID=self.object, user=user, operation='Added', 
+                                                what='Plate', new_state=item.material).save()
 
             item.cutID = self.object
             item.value = round((item.quantity * item.price), 2)
@@ -245,13 +171,8 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         for item in PLATES.deleted_objects:
             item.delete()
 
-            Change.objects.create(
-            cutID=self.object,
-            user=user, 
-            operation='Deleted', 
-            what='Plate',
-            new_state=item.material,
-            ).save()
+            models.Change.objects.create(cutID=self.object, user=user, operation='Deleted', 
+                                            what='Plate', new_state=item.material).save()
 
         cutting = CUTTING.save(commit=False)
 
@@ -259,7 +180,7 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
             if item.pk:
 
-                old_object = Cutting.objects.get(pk=item.pk)
+                old_object = models.Cutting.objects.get(pk=item.pk)
                 changed_fields = {}
 
                 if old_object.cutting_type != item.cutting_type:
@@ -272,22 +193,11 @@ class EditOrder(LoginRequiredMixin, UpdateView):
                     changed_fields['price'] = f'{old_object.price} -> {item.price}'
 
                 for changed_field in changed_fields.keys():
-                    Change.objects.create(
-                    cutID=self.object,
-                    user=user, 
-                    operation='Changed', 
-                    what=changed_field,
-                    current_state=item.cutting_type,
-                    new_state=changed_fields[changed_field],
-                    ).save()
+                    models.Change.objects.create(cutID=self.object, user=user, operation='Changed', what=changed_field,
+                                                    current_state=item.cutting_type, new_state=changed_fields[changed_field]).save()
             else:
-                Change.objects.create(
-                cutID=self.object,
-                user=user, 
-                operation='Added', 
-                what='Cutting',
-                new_state=item.cutting_type,
-                ).save()
+                models.Change.objects.create(cutID=self.object, user=user, operation='Added', 
+                                                what='Cutting', new_state=item.cutting_type).save()
 
             item.cutID = self.object
             item.value = round((item.quantity * item.price), 2)
@@ -295,13 +205,8 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
         for item in CUTTING.deleted_objects:
 
-            Change.objects.create(
-            cutID=self.object,
-            user=user, 
-            operation='Deleted', 
-            what='Cutting',
-            new_state=item.cutting_type,
-            ).save()
+            models.Change.objects.create(cutID=self.object, user=user, operation='Deleted', 
+                                            what='Cutting', new_state=item.cutting_type).save()
 
             item.delete()
 
@@ -354,127 +259,3 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         return self.render_to_response(self.get_context_data(form=form, 
             PLATES=PLATES, EDGES=EDGES, PAYMENTS=PAYMENTS, 
             CUTTING=CUTTING, EDGING=EDGING, OTHER=OTHER, add_note=add_note))
-
-class DeleteOrder(LoginRequiredMixin, DeleteView):
-
-    model = Order
-    
-    def post(self, request, pk, *args, **kwargs):
-
-        self.object = Order.objects.get(pk=pk)
-        print('DELETING OBJECT ->',self.object)
-
-        self.object.delete()
-
-        return JsonResponse({
-            'status':'OK',
-            })
-
-
-class UpdateOrder(LoginRequiredMixin, UpdateView):
-
-    model = Order
-
-    def post(self, request, pk, *args, **kwargs):
-
-        print('UPDATE ORDER ->', pk)
-
-        self.object = Order.objects.get(pk=pk)
-        PLATES_PROG = PlateProgressFormSet(self.request.POST, instance=self.object)
-        EDGES_PROG = EdgeProgressFormSet(self.request.POST, instance=self.object)
-        ORDER_PROG = UpdateOrderProgressForm(self.request.POST, instance=self.object)
-
-        print('<<--------------------------------->>')
-
-        if PLATES_PROG.is_valid() and EDGES_PROG.is_valid() and ORDER_PROG.is_valid():
-            print('FORM VALID')
-            return self.form_valid(PLATES_PROG, EDGES_PROG, ORDER_PROG, self.object)
-        else:
-            print('FORM INVALID _____________')
-            print('PLATES ERRORS:')
-            print(PLATES_PROG.errors)
-            print('EDGES ERRORS:')
-            print(EDGES_PROG.errors)
-            return redirect('/')
-
-    def form_valid(self, PLATES_PROG, EDGES_PROG, ORDER_PROG, order):
-
-        plates_data = PLATES_PROG.save(commit=False)
-        edges_data = EDGES_PROG.save(commit=False)
-
-        for item in plates_data:
-            item.save()
-
-        for item in edges_data:
-            item.save()
-
-        if self.check_if_ready(order, plates_data, edges_data):
-            order.order_ready = True
-            order.save()
-            ORDER_PROG.save()
-        else:
-            order.order_ready = False
-            order.order_taken = False
-            order.save()
-
-        customObj = custom_classes.OrderDetails(order)
-        
-        return JsonResponse({
-            'order': customObj.get_order(),
-            'plates':customObj.get_plates(),
-            'edges':customObj.get_edges(),
-            })
-
-    def check_if_ready(self, order, plates, edges):
-
-        for item in plates:
-            if not item.ordered or not item.delivered or not item.cutted or not item.edged:
-                return False
-
-        return True
-
-class GetOrderHistory(LoginRequiredMixin, ListView):
-
-    model = Order
-
-    def get(self, request, pk, *args, **kwargs):
-
-        print("GET ORDER HISTORY", pk)
-
-        order_chnages = Change.objects.filter(cutID=pk)
-
-        if not order_chnages:
-            return JsonResponse({
-            'changes': 'NO DATA',
-            }) 
-            
-        return JsonResponse({
-            'changes': json.loads(serializers.serialize('json', Change.objects.filter(cutID=pk))),
-            })
-
-class PrintOrder(LoginRequiredMixin, TemplateView):
-    model = Order
-    template_name = 'table/printOrder.html'
-    
-    def get_context_data(self, pk, **kwargs):
-        context = super(PrintOrder, self).get_context_data(**kwargs)
-        context['order'] = Order.objects.get(pk=pk)
-        context['order_plates'] = Plate.objects.filter(cutID=pk)
-        context['order_edges'] = Edge.objects.filter(cutID=pk)
-        context['order_cutting'] = Cutting.objects.filter(cutID=pk)
-        context['order_edging'] = Edging.objects.filter(cutID=pk)
-        context['order_others'] = Other.objects.filter(cutID=pk)
-        context['order_payments'] = Payment.objects.filter(cutID=pk)
-
-        return context
-
-class ViewOrder(LoginRequiredMixin, TemplateView):
-    template_name = 'order.html'
-
-    def get_context_data(self, pk, **kwargs):
-        context = super(ViewOrder, self).get_context_data(**kwargs)
-        context['order'] = custom_classes.OrderObject(Order.objects.filter(ID=pk).first())
-        return context
-    
-    def post(self, request, *args, **kwargs):
-        return self.render_to_response(self.get_context_data())
