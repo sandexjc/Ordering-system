@@ -17,7 +17,38 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
         context = super(EditOrder, self).get_context_data(**kwargs)
 
-        self.object.update()
+        # FIXME
+        # Temporary move order object and total price calculation upon
+        # creation of common managers and querysets for models.
+        
+        # self.object.update()
+
+        self.object.clear()
+
+        for item in models.Plate.objects.filter(cutID=self.object.ID):
+            self.object.plates_total += item.value
+            self.object.total_price += item.value
+
+        for item in models.Edge.objects.filter(cutID=self.object.ID):
+            self.object.edge_total += item.value
+            self.object.total_price += item.value
+
+        for item in models.Cutting.objects.filter(cutID=self.object.ID):
+            self.object.cutting_total += item.value
+            self.object.total_price += item.value
+
+        for item in models.Edging.objects.filter(cutID=self.object.ID):
+            self.object.edging_total += item.value
+            self.object.total_price += item.value
+
+        for item in models.Other.objects.filter(cutID=self.object.ID):
+            self.object.others_total += item.value
+            self.object.total_price += item.value
+
+        for item in models.Payment.objects.filter(cutID=self.object.ID):
+            self.object.paid += item.value
+
+        self.object.balance = round((self.object.paid - self.object.total_price), 2)
 
         if self.request.POST:
             context['plate_forms'] = kwargs['PLATES']
@@ -250,7 +281,40 @@ class EditOrder(LoginRequiredMixin, UpdateView):
             item.save()
 
 
-        self.object.update()
+
+        # FIXME
+        # Temporary move order object and total price calculation upon
+        # creation of common managers and querysets for models.
+
+        # self.object.update()
+
+        self.object.clear()
+
+        for item in models.Plate.objects.filter(cutID=self.object.ID):
+            self.object.plates_total += item.value
+            self.object.total_price += item.value
+
+        for item in models.Edge.objects.filter(cutID=self.object.ID):
+            self.object.edge_total += item.value
+            self.object.total_price += item.value
+
+        for item in models.Cutting.objects.filter(cutID=self.object.ID):
+            self.object.cutting_total += item.value
+            self.object.total_price += item.value
+
+        for item in models.Edging.objects.filter(cutID=self.object.ID):
+            self.object.edging_total += item.value
+            self.object.total_price += item.value
+
+        for item in models.Other.objects.filter(cutID=self.object.ID):
+            self.object.others_total += item.value
+            self.object.total_price += item.value
+
+        for item in models.Payment.objects.filter(cutID=self.object.ID):
+            self.object.paid += item.value
+
+        self.object.balance = round((self.object.paid - self.object.total_price), 2)
+
         self.object.save()
 
         return redirect('table:editOrder', self.object.pk)
