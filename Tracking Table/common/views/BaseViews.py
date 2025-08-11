@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from table.models import Order
-from SimpleTable import forms
+from common import forms
 from lib import custom_classes
 import time
 
@@ -77,7 +77,7 @@ class OrdersView(LoginRequiredMixin, TemplateView):
                 context['filter_form'] = forms.FilterForm(self.request.POST)
 
         else:
-            orders = Order.objects.filter(client=self.clients_type).order_by('-created_date')[:100]
+            orders = Order.objects.filter(client=self.clients_type).order_by('created_date')[:100]
             context['search_form'] = forms.SearchForm
             context['filter_form'] = forms.FilterForm
             context['badges'] = False

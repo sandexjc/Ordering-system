@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.http import JsonResponse
 
 from table.models import Order
-from SimpleTable.forms import PlateProgressFormSet, EdgeProgressFormSet, UpdateOrderProgressForm
+from common.forms import PlateProgressFormSet, EdgeProgressFormSet, UpdateOrderProgressForm
 from lib import custom_classes
 
 class UpdateOrder(LoginRequiredMixin, UpdateView):

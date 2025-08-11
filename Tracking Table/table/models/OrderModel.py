@@ -1,13 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-# from .PlateModel import Plate
-# from .EdgeModel import Edge
-# from .CuttingModel import Cutting
-# from .EdgingModel import Edging
-# from .OtherModel import Other
-# from .PaymentModel import Payment
-
 class Order(models.Model):
 
     client_statuses = [
@@ -35,35 +28,6 @@ class Order(models.Model):
     order_taken = models.BooleanField(default=False)
 
     invoice = models.BooleanField(default=False)
-
-    # def update(self):
-
-    #     self.clear()
-
-    #     for item in Plate.objects.filter(cutID=self.ID):
-    #         self.plates_total += item.value
-    #         self.total_price += item.value
-
-    #     for item in Edge.objects.filter(cutID=self.ID):
-    #         self.edge_total += item.value
-    #         self.total_price += item.value
-
-    #     for item in Cutting.objects.filter(cutID=self.ID):
-    #         self.cutting_total += item.value
-    #         self.total_price += item.value
-
-    #     for item in Edging.objects.filter(cutID=self.ID):
-    #         self.edging_total += item.value
-    #         self.total_price += item.value
-
-    #     for item in Other.objects.filter(cutID=self.ID):
-    #         self.others_total += item.value
-    #         self.total_price += item.value
-
-    #     for item in Payment.objects.filter(cutID=self.ID):
-    #         self.paid += item.value
-
-    #     self.balance = round((self.paid - self.total_price), 2)
 
     def clear(self):
 

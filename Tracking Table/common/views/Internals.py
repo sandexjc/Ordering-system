@@ -1,4 +1,4 @@
-from SimpleTable.views.BaseViews import OrdersView
+from common.views import OrdersView
 
 class InternalsView(OrdersView):
     def __init__(self):

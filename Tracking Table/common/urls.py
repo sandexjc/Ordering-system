@@ -1,9 +1,9 @@
-""" SimpleTable URL Configuration """
+""" Ordering system URL Configuration """
 
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
-from SimpleTable.views import Internals, Externals
+from common.views import Internals, Externals
 
 urlpatterns = [
     # Site resources
