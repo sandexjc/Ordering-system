@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
-from common.views import Internals, Externals
+from main.views import Internals, Externals
 
 urlpatterns = [
     # Site resources

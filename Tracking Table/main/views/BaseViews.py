@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from table.models import Order
-from common import forms
+from main import forms
 from lib import custom_classes
 import time
 

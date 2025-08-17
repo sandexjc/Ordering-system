@@ -1,4 +1,4 @@
-from common.views import OrdersView
+from main.views import OrdersView
 
 class InternalsView(OrdersView):
     def __init__(self):

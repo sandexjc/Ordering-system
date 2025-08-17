@@ -1,6 +1,6 @@
 from django.core import serializers
 from table import models
-from common import forms
+from main import forms
 import json
 
 class OrderObject:
