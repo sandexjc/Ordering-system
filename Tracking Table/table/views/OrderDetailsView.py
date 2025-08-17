@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
-from lib import custom_classes
+from common import custom_classes
 from table.models import Order
 
 class ViewOrder(LoginRequiredMixin, TemplateView):

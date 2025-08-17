@@ -5,7 +5,7 @@ from django.http import JsonResponse
 
 from table.models import Order
 from main.forms import PlateProgressFormSet, EdgeProgressFormSet, UpdateOrderProgressForm
-from lib import custom_classes
+from common import custom_classes
 
 class UpdateOrder(LoginRequiredMixin, UpdateView):
 
