@@ -33,7 +33,7 @@ class CreateOrder(LoginRequiredMixin, CreateView):
         self.object.save()
 
         Change.objects.create(cutID=self.object, user=user.first_name, operation='created', 
-                                what='Order',new_state=self.object.ID).save()
+                                what='Order',new_state=self.object.id).save()
 
         add_note = AddNoteForm(self.request.POST).save(commit=False)
         add_note.cutID = self.object

@@ -9,7 +9,7 @@ class ViewOrder(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, pk, **kwargs):
         context = super(ViewOrder, self).get_context_data(**kwargs)
-        context['order'] = custom_classes.OrderObject(Order.objects.filter(ID=pk).first())
+        context['order'] = custom_classes.OrderObject(Order.objects.filter(id=pk).first())
         return context
     
     def post(self, request, *args, **kwargs):

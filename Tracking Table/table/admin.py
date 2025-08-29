@@ -1,13 +1,13 @@
 from django.contrib import admin
 from import_export import resources
 from import_export.fields import Field
-from import_export.widgets import ForeignKeyWidget, DateWidget
+from import_export.widgets import DateWidget
 from import_export.admin import ExportActionMixin
 from table import models
 
 class OrderResource(resources.ModelResource):
 
-	ID = Field(attribute='ID', column_name='ID')
+	id = Field(attribute='id', column_name='id')
 	date = Field(attribute='created_date', column_name='Дата на създаване', widget=DateWidget(format='%d.%m.%Y %H:%m'))
 	client = Field(attribute='owner', column_name='Име на клиент')
 	telephone = Field(attribute='telephone', column_name='Телефон')
@@ -23,7 +23,7 @@ class OrderResource(resources.ModelResource):
 	class Meta:
 		model = models.Order
 		fields = (
-			'ID', 
+			'id', 
 			'date', 
 			'client', 
 			'telephone', 

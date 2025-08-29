@@ -1,10 +1,9 @@
 from django.db import models
 from django.utils import timezone
+from .TableItemModel import TableItem
 from .OrderModel import Order
 
-class Change(models.Model):
-
-    cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
+class Change(TableItem):
 
     date = models.DateTimeField(default=timezone.now)
     user = models.CharField(max_length=100, default='N/A')

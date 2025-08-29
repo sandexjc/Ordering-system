@@ -25,27 +25,27 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
         self.object.clear()
 
-        for item in models.Plate.objects.filter(cutID=self.object.ID):
+        for item in models.Plate.objects.filter(cutID=self.object.id):
             self.object.plates_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Edge.objects.filter(cutID=self.object.ID):
+        for item in models.Edge.objects.filter(cutID=self.object.id):
             self.object.edge_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Cutting.objects.filter(cutID=self.object.ID):
+        for item in models.Cutting.objects.filter(cutID=self.object.id):
             self.object.cutting_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Edging.objects.filter(cutID=self.object.ID):
+        for item in models.Edging.objects.filter(cutID=self.object.id):
             self.object.edging_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Other.objects.filter(cutID=self.object.ID):
+        for item in models.Other.objects.filter(cutID=self.object.id):
             self.object.others_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Payment.objects.filter(cutID=self.object.ID):
+        for item in models.Payment.objects.filter(cutID=self.object.id):
             self.object.paid += item.value
 
         self.object.balance = round((self.object.paid - self.object.total_price), 2)
@@ -290,27 +290,27 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
         self.object.clear()
 
-        for item in models.Plate.objects.filter(cutID=self.object.ID):
+        for item in models.Plate.objects.filter(cutID=self.object.id):
             self.object.plates_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Edge.objects.filter(cutID=self.object.ID):
+        for item in models.Edge.objects.filter(cutID=self.object.id):
             self.object.edge_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Cutting.objects.filter(cutID=self.object.ID):
+        for item in models.Cutting.objects.filter(cutID=self.object.id):
             self.object.cutting_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Edging.objects.filter(cutID=self.object.ID):
+        for item in models.Edging.objects.filter(cutID=self.object.id):
             self.object.edging_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Other.objects.filter(cutID=self.object.ID):
+        for item in models.Other.objects.filter(cutID=self.object.id):
             self.object.others_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Payment.objects.filter(cutID=self.object.ID):
+        for item in models.Payment.objects.filter(cutID=self.object.id):
             self.object.paid += item.value
 
         self.object.balance = round((self.object.paid - self.object.total_price), 2)

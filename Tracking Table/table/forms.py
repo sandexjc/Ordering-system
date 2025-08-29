@@ -18,7 +18,7 @@ class UpdateOrderForm(ModelForm):
     class Meta:
         model = models.Order
         fields = (
-            'ID', 'created_date', 'owner',
+            'id', 'created_date', 'owner',
             'client', 'telephone'
             )
 

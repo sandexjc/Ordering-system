@@ -186,14 +186,14 @@
 							<tr>
 
 								{% if order.order.order_taken %}
-						 			<tr class="visibleRows orderTaken fixed-min-width" id="{{order.order.ID}}">
+						 			<tr class="visibleRows orderTaken fixed-min-width" id="{{order.order.id}}">
 						 		{% else %}
-						 			<tr class="visibleRows normalOrder fixed-min-width" id="{{order.order.ID}}">
+						 			<tr class="visibleRows normalOrder fixed-min-width" id="{{order.order.id}}">
 						 		{% endif %}
 								{% if order.order.invoice %}
-							    	<td style="color: red;"   id="ID{{order.order.ID}}">{{order.order.ID}}</th>
+							    	<td style="color: red;"   id="ID{{order.order.id}}">{{order.order.id}}</th>
 							    {% else %}
-							    	<td style="color: black;" id="ID{{order.order.ID}}">{{order.order.ID}}</th>
+							    	<td style="color: black;" id="ID{{order.order.id}}">{{order.order.id}}</th>
 							    {% endif %}
 
 							    <td>{{order.order.created_date|date:"d.m.Y"}}</td>

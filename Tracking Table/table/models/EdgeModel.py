@@ -1,10 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from .TableItemModel import TableItem
 from .OrderModel import Order
 
-class Edge(models.Model):
-
-    cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
+class Edge(TableItem):
 
     edge_type = models.CharField(max_length=50)
     color_code = models.CharField(max_length=50, default='')
@@ -18,4 +17,4 @@ class Edge(models.Model):
     visible = models.BooleanField(default=True)
 
     def __str__(self):
-        return str(self.cutID) + ' / ' + self.color_code
+        return f'{self.edge_type} / Order ID: {self.cutID}'

@@ -2,8 +2,8 @@
 {% load django_bootstrap5 %}
 <!-- ######################################################## MODALS ################################################################# -->
 <!-- MODAL PROGRESS WINDOW -->
-<div id="progress-window-{{order.order.ID}}">
-    <div class="modal fade" id="modal-progress-{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div id="progress-window-{{order.order.id}}">
+    <div class="modal fade" id="modal-progress-{{order.order.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog fixed-min-width">
             <div class="modal-content">
                 <div class="modal-header">
@@ -12,13 +12,13 @@
                             UPDATE PROGRESS
                         </div>
                         <div>
-                            ORDER {{order.order.ID}}
+                            ORDER {{order.order.id}}
                         </div>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form id="{{order.order.ID}}" class="updateForms">
+                <form id="{{order.order.id}}" class="updateForms">
                     <div class="modal-body">
                         <div class="ALERT-S-UPD-VIEW alertmsg" style="display: none;">
                             <div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
@@ -130,7 +130,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary updateButtons" id="{{order.order.ID}}">Update</button>
+                        <button type="button" class="btn btn-primary updateButtons" id="{{order.order.id}}">Update</button>
                     </div>
                 </form>
             </div>
@@ -140,15 +140,15 @@
 <!-- MODAL PROGRESS WINDOW END -->
 
 <!-- MODAL DELETE WINDOW -->
-<div id="delete-window-{{order.order.ID}}">
-    <div class="modal fade" id="modal-delete-{{order.order.ID}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div id="delete-window-{{order.order.id}}">
+    <div class="modal fade" id="modal-delete-{{order.order.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm fixed-min-width">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">DELETE ORDER</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="Delete{{order.order.ID}}" class="deleteForms">
+                <form id="Delete{{order.order.id}}" class="deleteForms">
                     {% csrf_token %}
                     <div class="ALERT-S-DEL-VIEW" style="display: none;">
                         <div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
@@ -164,12 +164,12 @@
                     </div>
                     <div class="modal-body" style="text-align: center;">
                         <h5>Are you sure you want to delete Order: 
-                            <strong>#{{order.order.ID}}</strong>
+                            <strong>#{{order.order.id}}</strong>
                         </h5>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-danger deleteButtons" id="{{order.order.ID}}">Delete</button>
+                        <button type="submit" class="btn btn-danger deleteButtons" id="{{order.order.id}}">Delete</button>
                     </div>
                 </form>
             </div>
@@ -179,14 +179,14 @@
 <!-- MODAL DELETE WINDOW END -->
 
 <!-- OFFCANVAS HISTORY TAB -->
-<div id="offcanvas-history-tab-{{order.order.ID}}">
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="history-tab-{{order.order.ID}}" aria-labelledby="offcanvasRightLabel">
+<div id="offcanvas-history-tab-{{order.order.id}}">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="history-tab-{{order.order.id}}" aria-labelledby="offcanvasRightLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{order.order.ID}}</h5>
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{order.order.id}}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body" id="{{order.order.ID}}" pulled="False">
-            <button class="btn btn-outline-secondary" id="historyRefresh{{order.order.ID}}" type="button">
+        <div class="offcanvas-body" id="{{order.order.id}}" pulled="False">
+            <button class="btn btn-outline-secondary" id="historyRefresh{{order.order.id}}" type="button">
                 <img src="{% static 'images/refresh-arrow.png' %}" class="tableIcons">
             </button>
             <div class="d-flex justify-content-center" style="margin-top: 100%;">
@@ -349,7 +349,7 @@
         <a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=order %}" role="button" target="_blank" title="Print View">
             <img src="{% static 'images/printer.png' %}" class="tableIcons">
         </a>
-        <button class="btn btn-outline-warning Historybtns" id="{{order.order.ID}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#history-tab-{{order.order.ID}}" aria-controls="offcanvasRight">
+        <button class="btn btn-outline-warning Historybtns" id="{{order.order.id}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#history-tab-{{order.order.id}}" aria-controls="offcanvasRight">
             <img src="{% static 'images/deadline.png' %}" class="tableIcons">
         </button>
     </div>

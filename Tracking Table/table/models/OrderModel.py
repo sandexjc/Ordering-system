@@ -1,14 +1,15 @@
 from django.db import models
 from django.utils import timezone
+from .TableOrderModel import TableOrder
 
-class Order(models.Model):
+class Order(TableOrder):
 
     client_statuses = [
         ('Internal', 'Internal'),
         ('External', 'External'),
     ]
 
-    ID = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     created_date = models.DateTimeField(default=timezone.now)
     owner = models.CharField(max_length=50)
     client = models.CharField(choices=client_statuses, default='Internal', max_length=50)
@@ -40,4 +41,4 @@ class Order(models.Model):
         self.total_price = 0
 
     def __str__(self):
-        return str(self.ID)
+        return str(self.id)
