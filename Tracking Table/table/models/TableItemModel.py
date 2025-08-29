@@ -4,7 +4,7 @@ from table.models import Order
 
 class TableItem(BaseModel):
 
-    cutID = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order_id = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True

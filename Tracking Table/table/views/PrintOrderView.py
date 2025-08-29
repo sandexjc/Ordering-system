@@ -10,11 +10,11 @@ class PrintOrder(LoginRequiredMixin, TemplateView):
     def get_context_data(self, pk, **kwargs):
         context = super(PrintOrder, self).get_context_data(**kwargs)
         context['order'] = models.Order.objects.get(pk=pk)
-        context['order_plates'] = models.Plate.objects.filter(cutID=pk)
-        context['order_edges'] = models.Edge.objects.filter(cutID=pk)
-        context['order_cutting'] = models.Cutting.objects.filter(cutID=pk)
-        context['order_edging'] = models.Edging.objects.filter(cutID=pk)
-        context['order_others'] = models.Other.objects.filter(cutID=pk)
-        context['order_payments'] = models.Payment.objects.filter(cutID=pk)
+        context['order_plates'] = models.Plate.objects.filter(order_id=pk)
+        context['order_edges'] = models.Edge.objects.filter(order_id=pk)
+        context['order_cutting'] = models.Cutting.objects.filter(order_id=pk)
+        context['order_edging'] = models.Edging.objects.filter(order_id=pk)
+        context['order_others'] = models.Other.objects.filter(order_id=pk)
+        context['order_payments'] = models.Payment.objects.filter(order_id=pk)
 
         return context

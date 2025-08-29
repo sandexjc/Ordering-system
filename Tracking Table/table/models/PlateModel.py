@@ -24,4 +24,4 @@ class Plate(TableItem):
     edged = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.material} / Order ID: {self.cutID}'
+        return f'{self.material} / Order ID: {self.order_id}'

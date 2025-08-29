@@ -33,7 +33,7 @@
 	<form method="POST" id="editOrderForm" class="shadow-lg order-form">
 		{% csrf_token %}
 		<label class="form-label" for="OrderID">ID</label>
-		<input type="text" id="OrderID" class="form-control" readonly value="{{current_order.ID}}">
+		<input type="text" id="OrderID" class="form-control" readonly value="{{current_order.id}}">
 		<br>
 
 		{% bootstrap_form form bound_css_class='' %}

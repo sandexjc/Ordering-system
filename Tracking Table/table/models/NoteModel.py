@@ -10,4 +10,4 @@ class Note(TableItem):
     content = models.TextField(max_length=500, blank=True)
 
     def __str__(self):
-        return f'{self.user} / Order ID: {self.cutID}'
+        return f'{self.user} / Order ID: {self.order_id}'

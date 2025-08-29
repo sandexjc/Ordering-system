@@ -15,4 +15,4 @@ class Payment(TableItem):
     payment_method = models.CharField(choices=payment_methods, default='Cash', max_length=10)
 
     def __str__(self):
-        return f'Payment for Order ID: {self.cutID}'
+        return f'Payment for Order ID: {self.order_id}'

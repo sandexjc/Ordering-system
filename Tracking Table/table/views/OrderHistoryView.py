@@ -15,7 +15,7 @@ class OrderHistory(LoginRequiredMixin, ListView):
 
         print("GET ORDER HISTORY", pk)
 
-        order_chnages = Change.objects.filter(cutID=pk)
+        order_chnages = Change.objects.filter(order_id=pk)
 
         if not order_chnages:
             return JsonResponse({
@@ -23,5 +23,5 @@ class OrderHistory(LoginRequiredMixin, ListView):
             }) 
             
         return JsonResponse({
-            'changes': json.loads(serializers.serialize('json', Change.objects.filter(cutID=pk))),
+            'changes': json.loads(serializers.serialize('json', Change.objects.filter(order_id=pk))),
             })

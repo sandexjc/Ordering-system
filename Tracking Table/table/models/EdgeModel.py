@@ -17,4 +17,4 @@ class Edge(TableItem):
     visible = models.BooleanField(default=True)
 
     def __str__(self):
-        return f'{self.edge_type} / Order ID: {self.cutID}'
+        return f'{self.edge_type} / Order ID: {self.order_id}'

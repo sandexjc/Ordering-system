@@ -25,27 +25,27 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
         self.object.clear()
 
-        for item in models.Plate.objects.filter(cutID=self.object.id):
+        for item in models.Plate.objects.filter(order_id=self.object.id):
             self.object.plates_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Edge.objects.filter(cutID=self.object.id):
+        for item in models.Edge.objects.filter(order_id=self.object.id):
             self.object.edge_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Cutting.objects.filter(cutID=self.object.id):
+        for item in models.Cutting.objects.filter(order_id=self.object.id):
             self.object.cutting_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Edging.objects.filter(cutID=self.object.id):
+        for item in models.Edging.objects.filter(order_id=self.object.id):
             self.object.edging_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Other.objects.filter(cutID=self.object.id):
+        for item in models.Other.objects.filter(order_id=self.object.id):
             self.object.others_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Payment.objects.filter(cutID=self.object.id):
+        for item in models.Payment.objects.filter(order_id=self.object.id):
             self.object.paid += item.value
 
         self.object.balance = round((self.object.paid - self.object.total_price), 2)
@@ -67,9 +67,9 @@ class EditOrder(LoginRequiredMixin, UpdateView):
             context['payment_forms'] = forms.PaymentFormSet(instance=self.object)
             context['add_note'] = forms.AddNoteForm
 
-        context['current_plates'] = models.Plate.objects.filter(cutID=self.object)
-        context['current_edges'] = models.Edge.objects.filter(cutID=self.object)
-        context['current_payments'] = models.Payment.objects.filter(cutID=self.object)
+        context['current_plates'] = models.Plate.objects.filter(order_id=self.object)
+        context['current_edges'] = models.Edge.objects.filter(order_id=self.object)
+        context['current_payments'] = models.Payment.objects.filter(order_id=self.object)
         context['current_order'] = self.object
 
         return context
@@ -155,13 +155,13 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
         notes = add_note.save(commit=False)
         notes.user = user
-        notes.cutID = self.object
+        notes.order_id = self.object
         notes.content = note
 
         if note != '':
             notes.save()
 
-            models.Change.objects.create(cutID=self.object, user=user, operation='created', 
+            models.Change.objects.create(order_id=self.object, user=user, operation='created', 
                                             what='Note', new_state=note).save()
 
         plate = PLATES.save(commit=False)
@@ -189,20 +189,20 @@ class EditOrder(LoginRequiredMixin, UpdateView):
                     changed_fields['from_client'] = f'{old_object.from_client} -> {item.from_client}'
 
                 for changed_field in changed_fields.keys():
-                    models.Change.objects.create(cutID=self.object, user=user, operation='Changed', what=changed_field,
+                    models.Change.objects.create(order_id=self.object, user=user, operation='Changed', what=changed_field,
                                                     current_state=item.material, new_state=changed_fields[changed_field]).save()
             else:
-                models.Change.objects.create(cutID=self.object, user=user, operation='Added', 
+                models.Change.objects.create(order_id=self.object, user=user, operation='Added', 
                                                 what='Plate', new_state=item.material).save()
 
-            item.cutID = self.object
+            item.order_id = self.object
             item.value = round((item.quantity * item.price), 2)
             item.save()
 
         for item in PLATES.deleted_objects:
             item.delete()
 
-            models.Change.objects.create(cutID=self.object, user=user, operation='Deleted', 
+            models.Change.objects.create(order_id=self.object, user=user, operation='Deleted', 
                                             what='Plate', new_state=item.material).save()
 
         cutting = CUTTING.save(commit=False)
@@ -224,19 +224,19 @@ class EditOrder(LoginRequiredMixin, UpdateView):
                     changed_fields['price'] = f'{old_object.price} -> {item.price}'
 
                 for changed_field in changed_fields.keys():
-                    models.Change.objects.create(cutID=self.object, user=user, operation='Changed', what=changed_field,
+                    models.Change.objects.create(order_id=self.object, user=user, operation='Changed', what=changed_field,
                                                     current_state=item.cutting_type, new_state=changed_fields[changed_field]).save()
             else:
-                models.Change.objects.create(cutID=self.object, user=user, operation='Added', 
+                models.Change.objects.create(order_id=self.object, user=user, operation='Added', 
                                                 what='Cutting', new_state=item.cutting_type).save()
 
-            item.cutID = self.object
+            item.order_id = self.object
             item.value = round((item.quantity * item.price), 2)
             item.save()
 
         for item in CUTTING.deleted_objects:
 
-            models.Change.objects.create(cutID=self.object, user=user, operation='Deleted', 
+            models.Change.objects.create(order_id=self.object, user=user, operation='Deleted', 
                                             what='Cutting', new_state=item.cutting_type).save()
 
             item.delete()
@@ -244,7 +244,7 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         edge = EDGES.save(commit=False)
 
         for item in edge:
-            item.cutID = self.object
+            item.order_id = self.object
             item.value = round((item.quantity * item.price), 2)
             item.save()
 
@@ -255,7 +255,7 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         edging = EDGING.save(commit=False)
 
         for item in edging:
-            item.cutID = self.object
+            item.order_id = self.object
             item.value = round((item.quantity * item.price), 2)
             item.save()
 
@@ -266,7 +266,7 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         other = OTHER.save(commit=False)
 
         for item in other:
-            item.cutID = self.object
+            item.order_id = self.object
             item.value = round((item.quantity * item.price), 2)
             item.save()
 
@@ -277,7 +277,7 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         payment = PAYMENTS.save(commit=False)
 
         for item in payment:
-            item.cutID = self.object
+            item.order_id = self.object
             item.save()
 
 
@@ -290,27 +290,27 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
         self.object.clear()
 
-        for item in models.Plate.objects.filter(cutID=self.object.id):
+        for item in models.Plate.objects.filter(order_id=self.object.id):
             self.object.plates_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Edge.objects.filter(cutID=self.object.id):
+        for item in models.Edge.objects.filter(order_id=self.object.id):
             self.object.edge_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Cutting.objects.filter(cutID=self.object.id):
+        for item in models.Cutting.objects.filter(order_id=self.object.id):
             self.object.cutting_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Edging.objects.filter(cutID=self.object.id):
+        for item in models.Edging.objects.filter(order_id=self.object.id):
             self.object.edging_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Other.objects.filter(cutID=self.object.id):
+        for item in models.Other.objects.filter(order_id=self.object.id):
             self.object.others_total += item.value
             self.object.total_price += item.value
 
-        for item in models.Payment.objects.filter(cutID=self.object.id):
+        for item in models.Payment.objects.filter(order_id=self.object.id):
             self.object.paid += item.value
 
         self.object.balance = round((self.object.paid - self.object.total_price), 2)
