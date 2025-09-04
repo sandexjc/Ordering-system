@@ -1,8 +1,8 @@
 from django import forms
 
-class BaseForm(forms.ModelForm):
+class BaseModelForm(forms.ModelForm):
     
-    # Top level form for the whole project.
+    # Top level model form for the whole project.
     # Defines common widget styling and helper logic.
 
     def __init__(self, *args, **kwargs):

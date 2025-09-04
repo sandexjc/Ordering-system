@@ -1,9 +1,21 @@
-from .CreateOrderForm import CreateOrderForm
-from .UpdateOrderForm import UpdateOrderForm
-from .AddNoteForm import AddNoteForm
-from .AddPlateForm import AddPlateForm, PlateFormSet
-from .AddCuttingForm import AddCuttingForm, CuttingFormSet
-from .AddEdgeForm import AddEdgeForm, EdgeFormSet
-from .AddEdgingForm import AddEdgingForm, EdgingFormSet
-from .AddOtherForm import AddOtherForm, OthersFormSet
-from .AddPaymentForm import AddPaymentForm, PaymentFormSet
+from .BaseForms import (
+    TableForm, TableFormSet,
+)
+
+from .OrderForms import (
+    CreateOrderForm, EditOrderForm,
+)
+
+from .ItemsForms import (
+    AddNoteForm, AddPlateForm, AddCuttingForm,
+    AddEdgeForm, AddEdgingForm, AddOtherForm, 
+    AddPaymentForm,
+    PlateFormSet, EdgeFormSet, EdgingFormSet,
+    PaymentFormSet, OthersFormSet, CuttingFormSet,
+)
+
+from .ProgressForms import (
+    OrderProgressForm, EdgeProgressForm, PlateProgressForm,
+    EdgeProgressFormSet, PlateProgressFormSet,
+)
+

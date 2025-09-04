@@ -1,5 +1,4 @@
-from .TableBaseForm import TableForm
-from .TableBaseFormSet import CustomTableInlineFormSet
+from table.forms import TableForm, TableFormSet
 from table.models import Other, Order
 from django.forms import inlineformset_factory
 
@@ -20,7 +19,7 @@ class AddOtherForm(TableForm):
 OthersFormSet = inlineformset_factory(
     parent_model=Order,
     model=Other,
-    formset=CustomTableInlineFormSet,
+    formset=TableFormSet,
     form=AddOtherForm,
     extra=3,
     can_delete_extra=False,

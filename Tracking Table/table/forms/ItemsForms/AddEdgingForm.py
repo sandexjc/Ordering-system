@@ -1,5 +1,4 @@
-from .TableBaseForm import TableForm
-from .TableBaseFormSet import CustomTableInlineFormSet
+from table.forms import TableForm, TableFormSet
 from table.models import Edging, Order
 from django.forms import inlineformset_factory
 
@@ -20,7 +19,7 @@ class AddEdgingForm(TableForm):
 EdgingFormSet = inlineformset_factory(
     parent_model=Order,
     model=Edging,
-    formset=CustomTableInlineFormSet,
+    formset=TableFormSet,
     form=AddEdgingForm,
     extra=3,
     can_delete_extra=False,

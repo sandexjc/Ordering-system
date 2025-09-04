@@ -1,7 +1,7 @@
-from .TableBaseForm import TableForm
+from table.forms import TableForm
 from table.models import Order
 
-class UpdateOrderForm(TableForm):
+class EditOrderForm(TableForm):
     
     class Meta:
         model = Order

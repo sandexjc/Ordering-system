@@ -1,5 +1,4 @@
-from .TableBaseForm import TableForm
-from .TableBaseFormSet import CustomTableInlineFormSet
+from table.forms import TableForm, TableFormSet
 from table.models import Payment, Order
 from django.forms import inlineformset_factory
 
@@ -20,7 +19,7 @@ class AddPaymentForm(TableForm):
 PaymentFormSet = inlineformset_factory(
     parent_model=Order,
     model=Payment,
-    formset=CustomTableInlineFormSet,
+    formset=TableFormSet,
     form=AddPaymentForm,
     extra=1,
     can_delete_extra=False,

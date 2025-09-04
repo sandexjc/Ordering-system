@@ -1,5 +1,4 @@
-from .TableBaseForm import TableForm
-from .TableBaseFormSet import CustomTableInlineFormSet
+from table.forms import TableForm, TableFormSet
 from table.models import Edge, Order
 from django.forms import inlineformset_factory
 
@@ -21,7 +20,7 @@ class AddEdgeForm(TableForm):
 EdgeFormSet = inlineformset_factory(
     parent_model=Order,
     model=Edge,
-    formset=CustomTableInlineFormSet,
+    formset=TableFormSet,
     form=AddEdgeForm,
     extra=3,
     can_delete_extra=False,

@@ -10,7 +10,7 @@ from django.shortcuts import redirect
 class EditOrder(LoginRequiredMixin, UpdateView):
 
     model = models.Order
-    form_class = forms.UpdateOrderForm
+    form_class = forms.EditOrderForm
     template_name = 'table/editOrder.html'
     
     def get_context_data(self, **kwargs):

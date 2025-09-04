@@ -1,8 +1,8 @@
-from common.forms import BaseForm
+from common.forms import BaseModelForm
 
-class TableForm(BaseForm):
+class TableForm(BaseModelForm):
     
-    # Intermediate base form for all table app forms.
+    # Intermediate level base model form for all table app forms.
     # Adds reusable behavior specific to the table app.
 
     def set_readonly(self, field_name):

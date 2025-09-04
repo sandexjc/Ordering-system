@@ -1,5 +1,5 @@
 from table.models import Order
-from .TableBaseForm import TableForm
+from table.forms import TableForm
 
 class CreateOrderForm(TableForm):
 

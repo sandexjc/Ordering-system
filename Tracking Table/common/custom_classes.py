@@ -1,6 +1,6 @@
 from django.core import serializers
 from table import models
-from main import forms
+from table import forms
 import json
 
 class OrderObject:
@@ -15,7 +15,7 @@ class OrderObject:
 		self.notes = models.Note.objects.filter(order_id=order)
 		self.plate_forms = forms.PlateProgressFormSet(instance=order)
 		self.edge_forms = forms.EdgeProgressFormSet(instance=order)
-		self.order_progress = forms.UpdateOrderProgressForm(instance=order)
+		self.order_progress = forms.OrderProgressForm(instance=order)
 
 	def __str__(self):
 	    return str(self.order)

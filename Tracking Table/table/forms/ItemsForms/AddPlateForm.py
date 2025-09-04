@@ -1,5 +1,4 @@
-from .TableBaseForm import TableForm
-from .TableBaseFormSet import CustomTableInlineFormSet
+from table.forms import TableForm, TableFormSet
 from table.models import Plate, Order
 from django.forms import inlineformset_factory
 
@@ -25,7 +24,7 @@ class AddPlateForm(TableForm):
 PlateFormSet = inlineformset_factory(
     parent_model=Order,
     model=Plate,
-    formset=CustomTableInlineFormSet,
+    formset=TableFormSet,
     form=AddPlateForm,
     extra=3,
     can_delete_extra=False,
