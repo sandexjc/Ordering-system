@@ -1,7 +1,7 @@
-from common.forms import BaseForm
+from common.forms import BaseModelForm
 from table.models import Note
 
-class AddNoteForm(BaseForm):
+class AddNoteForm(BaseModelForm):
     
     class Meta:
         model = Note

@@ -9,7 +9,7 @@ class OrdersView(LoginRequiredMixin, TemplateView):
     template_name = 'orders.html'
 
     def search_id(self, ID):
-        return Order.objects.filter(ID=ID)
+        return Order.objects.filter(id=ID)
 
     def search_date(self, date):
         return Order.objects.filter(client=self.clients_type, created_date__contains=date).order_by('-created_date')
