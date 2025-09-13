@@ -1,10 +1,12 @@
 from django.db import models
 from common.models import BaseModel
 from table.models import Order
+from table.managers import TableItemManager
 
 class TableItem(BaseModel):
 
-    order_id = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order_id = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="%(class)ss")
+    objects = TableItemManager()
 
     class Meta:
         abstract = True

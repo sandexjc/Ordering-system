@@ -1,11 +1,13 @@
 from django.db import models
 from django.utils import timezone
+from common.managers import BaseManager
 
 class BaseModel(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
+    objects = BaseManager()
 
     class Meta:
         abstract = True

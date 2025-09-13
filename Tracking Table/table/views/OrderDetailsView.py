@@ -1,15 +1,20 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
-
-from common import custom_classes
 from table.models import Order
+from table.forms import PlateProgressFormSet, EdgeProgressFormSet, OrderProgressForm
 
 class ViewOrder(LoginRequiredMixin, TemplateView):
     template_name = 'order.html'
 
     def get_context_data(self, pk, **kwargs):
         context = super(ViewOrder, self).get_context_data(**kwargs)
-        context['order'] = custom_classes.OrderObject(Order.objects.filter(id=pk).first())
+        context['order'] = Order.objects.get_by_id(pk)
+        
+        # FIXME formsets by request
+        context['plate_forms'] = PlateProgressFormSet(instance=context['order'])
+        context['edge_forms'] = EdgeProgressFormSet(instance=context['order'])
+        context['order_progress'] = OrderProgressForm(instance=context['order'])
+
         return context
     
     def post(self, request, *args, **kwargs):

@@ -2,8 +2,8 @@
 {% load django_bootstrap5 %}
 <!-- ######################################################## MODALS ################################################################# -->
 <!-- MODAL PROGRESS WINDOW -->
-<div id="progress-window-{{order.order.id}}">
-    <div class="modal fade" id="modal-progress-{{order.order.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div id="progress-window-{{order.id}}">
+    <div class="modal fade" id="modal-progress-{{order.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog fixed-min-width">
             <div class="modal-content">
                 <div class="modal-header">
@@ -12,13 +12,13 @@
                             UPDATE PROGRESS
                         </div>
                         <div>
-                            ORDER {{order.order.id}}
+                            ORDER {{order.id}}
                         </div>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form id="{{order.order.id}}" class="updateForms">
+                <form id="{{order.id}}" class="updateForms">
                     <div class="modal-body">
                         <div class="ALERT-S-UPD-VIEW alertmsg" style="display: none;">
                             <div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
@@ -47,9 +47,9 @@
                                 <tr>
                                     <th scope="row" colspan="5">EGGER</th>
                                 </tr>
-                                {{order.plate_forms.management_form}}
+                                {{plate_forms.management_form}}
                             
-                                {% for item in order.plate_forms %}
+                                {% for item in plate_forms %}
                                     {% if item.manufacturer.value == 'Egger' %}
                                         {{item.id}}
                                         <tr>
@@ -66,7 +66,7 @@
                                     <th scope="row" colspan="5">KRONO</th>
                                 </tr>
 
-                                {% for item in order.plate_forms %}
+                                {% for item in plate_forms %}
                                     {% if item.manufacturer.value == 'Kronospan' %}
                                         {{item.id}}
                                         <tr>
@@ -83,7 +83,7 @@
                                     <th scope="row" colspan="5">Други</th>
                                 </tr>
 
-                                {% for item in order.plate_forms %}
+                                {% for item in plate_forms %}
                                     {% if item.manufacturer.value == 'Other' %}
                                         {{item.id}}
                                         <tr>
@@ -100,9 +100,9 @@
                                     <th scope="row" colspan="5">Кант</th>
                                 </tr>
                                 
-                                {{order.edge_forms.management_form}}
+                                {{edge_forms.management_form}}
 
-                                {% for item in order.edge_forms %}
+                                {% for item in edge_forms %}
                                     {{item.id}}
                                     <tr>
                                         <td>{{item.color_code}}{{item.edge_type}}</td>
@@ -117,12 +117,12 @@
 
                                 <tr>
                                     <td>Поръчката е взета</td>
-                                    <td>{{order.order_progress.order_taken}}</td>
+                                    <td>{{order_progress.order_taken}}</td>
                                 </tr>
 
                                 <tr>
                                     <td>Издадена фактура</td>
-                                    <td>{{order.order_progress.invoice}}</td>
+                                    <td>{{order_progress.invoice}}</td>
                                 </tr>
 
                             </tbody>
@@ -130,7 +130,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary updateButtons" id="{{order.order.id}}">Update</button>
+                        <button type="button" class="btn btn-primary updateButtons" id="{{order.id}}">Update</button>
                     </div>
                 </form>
             </div>
@@ -140,15 +140,15 @@
 <!-- MODAL PROGRESS WINDOW END -->
 
 <!-- MODAL DELETE WINDOW -->
-<div id="delete-window-{{order.order.id}}">
-    <div class="modal fade" id="modal-delete-{{order.order.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div id="delete-window-{{order.id}}">
+    <div class="modal fade" id="modal-delete-{{order.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-sm fixed-min-width">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">DELETE ORDER</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="Delete{{order.order.id}}" class="deleteForms">
+                <form id="Delete{{order.id}}" class="deleteForms">
                     {% csrf_token %}
                     <div class="ALERT-S-DEL-VIEW" style="display: none;">
                         <div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
@@ -164,12 +164,12 @@
                     </div>
                     <div class="modal-body" style="text-align: center;">
                         <h5>Are you sure you want to delete Order: 
-                            <strong>#{{order.order.id}}</strong>
+                            <strong>#{{order.id}}</strong>
                         </h5>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-danger deleteButtons" id="{{order.order.id}}">Delete</button>
+                        <button type="submit" class="btn btn-danger deleteButtons" id="{{order.id}}">Delete</button>
                     </div>
                 </form>
             </div>
@@ -179,14 +179,14 @@
 <!-- MODAL DELETE WINDOW END -->
 
 <!-- OFFCANVAS HISTORY TAB -->
-<div id="offcanvas-history-tab-{{order.order.id}}">
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="history-tab-{{order.order.id}}" aria-labelledby="offcanvasRightLabel">
+<div id="offcanvas-history-tab-{{order.id}}">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="history-tab-{{order.id}}" aria-labelledby="offcanvasRightLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{order.order.id}}</h5>
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">История за поръчка №{{order.id}}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body" id="{{order.order.id}}" pulled="False">
-            <button class="btn btn-outline-secondary" id="historyRefresh{{order.order.id}}" type="button">
+        <div class="offcanvas-body" id="{{order.id}}" pulled="False">
+            <button class="btn btn-outline-secondary" id="historyRefresh{{order.id}}" type="button">
                 <img src="{% static 'images/refresh-arrow.png' %}" class="tableIcons">
             </button>
             <div class="d-flex justify-content-center" style="margin-top: 100%;">
@@ -216,105 +216,111 @@
             <tr>
                 <th scope="row" colspan="8">ЕГЕР</th>
             </tr>
-            {% for item in order.material_eger %}
-                <tr>
-                    <td>{{item.material}} - {{item.quantity}}</td>
+            {% for item in order.plates.all %}
+                {% if item.manufacturer == "Egger" %}
+                    <tr>
+                        <td>{{item.material}} - {{item.quantity}}</td>
 
-                    <td colspan="4">
-                        <ul class="progressbar" id="bar{{item.pk}}">
-                            {% if item.ordered %}
-                                <li class="ordered active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="ordered" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                            {% if item.delivered %}
-                                <li class="delivered active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="delivered" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                            {% if item.cutted %}
-                                <li class="cutted active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="cutted" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                            {% if item.edged %}
-                                <li class="edged active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="edged" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                        </ul>
-                    </td>
+                        <td colspan="4">
+                            <ul class="progressbar" id="bar{{item.pk}}">
+                                {% if item.ordered %}
+                                    <li class="ordered active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="ordered" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                                {% if item.delivered %}
+                                    <li class="delivered active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="delivered" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                                {% if item.cutted %}
+                                    <li class="cutted active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="cutted" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                                {% if item.edged %}
+                                    <li class="edged active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="edged" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                            </ul>
+                        </td>
 
-                </tr>
+                    </tr>
+                {% endif %}
             {% endfor %}
             <tr>
                 <th scope="row" colspan="8">КРОНО</th>
             </tr>
-            {% for item in order.material_krono %}
-                <tr>
-                    <td>{{item.material}} - {{item.quantity}}</td>
-                    <td colspan="4">
-                        <ul class="progressbar" id="bar{{item.pk}}">
-                            {% if item.ordered %}
-                                <li class="ordered active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="ordered" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                            {% if item.delivered %}
-                                <li class="delivered active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="delivered" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                            {% if item.cutted %}
-                                <li class="cutted active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="cutted" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                            {% if item.edged %}
-                                <li class="edged active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="edged" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                        </ul>
-                    </td>
-                </tr>
+            {% for item in order.plates.all %}
+                {% if item.manufacturer == "Kronospan" %}
+                    <tr>
+                        <td>{{item.material}} - {{item.quantity}}</td>
+                        <td colspan="4">
+                            <ul class="progressbar" id="bar{{item.pk}}">
+                                {% if item.ordered %}
+                                    <li class="ordered active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="ordered" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                                {% if item.delivered %}
+                                    <li class="delivered active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="delivered" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                                {% if item.cutted %}
+                                    <li class="cutted active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="cutted" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                                {% if item.edged %}
+                                    <li class="edged active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="edged" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
             <tr>
                 <th scope="row" colspan="8">ДРУГИ</th>
             </tr>
-            {% for item in order.material_other %}
-                <tr>
-                    <td>{{item.material}} - {{item.quantity}}</td>
-                    <td colspan="4">
-                        <ul class="progressbar" id="bar{{item.pk}}">
-                            {% if item.ordered %}
-                                <li class="ordered active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="ordered" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                            {% if item.delivered %}
-                                <li class="delivered active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="delivered" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                            {% if item.cutted %}
-                                <li class="cutted active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="cutted" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                            {% if item.edged %}
-                                <li class="edged active" id="plate_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="edged" id="plate_prog{{item.pk}}"></li>
-                            {% endif %}
-                        </ul>
-                    </td>
-                </tr>
+            {% for item in order.plates.all %}
+                {% if item.manufacturer == "Other" %}
+                    <tr>
+                        <td>{{item.material}} - {{item.quantity}}</td>
+                        <td colspan="4">
+                            <ul class="progressbar" id="bar{{item.pk}}">
+                                {% if item.ordered %}
+                                    <li class="ordered active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="ordered" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                                {% if item.delivered %}
+                                    <li class="delivered active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="delivered" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                                {% if item.cutted %}
+                                    <li class="cutted active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="cutted" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                                {% if item.edged %}
+                                    <li class="edged active" id="plate_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="edged" id="plate_prog{{item.pk}}"></li>
+                                {% endif %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
             <tr>
                 <th scope="row" colspan="8">КАНТ</th>
             </tr>
-            {% for item in order.material_edge %}
+            {% for item in order.edges.all %}
                 <tr>
                     <td>{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}</td>
                     <td colspan="4">
@@ -337,19 +343,19 @@
     </table>
 
     <div class="hidden-buttons">
-        <a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=order.order %}" role="button" title="Edit Order">
+        <a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=order.id %}" role="button" title="Edit Order">
             <img src="{% static 'images/edit.png' %}" class="tableIcons">
         </a>
-        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modal-delete-{{order}}" title="Delete Order">
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modal-delete-{{order.id}}" title="Delete Order">
             <img src="{% static 'images/delete-can.png' %}" class="tableIcons">
         </button>
-        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modal-progress-{{order}}" title="Update Order">
+        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modal-progress-{{order.id}}" title="Update Order">
             <img src="{% static 'images/check-list.png' %}" class="tableIcons">
         </button>
-        <a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=order %}" role="button" target="_blank" title="Print View">
+        <a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=order.id %}" role="button" target="_blank" title="Print View">
             <img src="{% static 'images/printer.png' %}" class="tableIcons">
         </a>
-        <button class="btn btn-outline-warning Historybtns" id="{{order.order.id}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#history-tab-{{order.order.id}}" aria-controls="offcanvasRight">
+        <button class="btn btn-outline-warning Historybtns" id="{{order.id}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#history-tab-{{order.id}}" aria-controls="offcanvasRight">
             <img src="{% static 'images/deadline.png' %}" class="tableIcons">
         </button>
     </div>

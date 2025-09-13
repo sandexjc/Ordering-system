@@ -9,9 +9,7 @@ class DeleteOrder(LoginRequiredMixin, DeleteView):
     
     def post(self, request, pk, *args, **kwargs):
 
-        self.object = Order.objects.get(pk=pk)
-        print('DELETING OBJECT ->',self.object)
-
+        self.object = Order.objects.get_by_id(pk)
         self.object.delete()
 
         return JsonResponse({

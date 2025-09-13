@@ -76,7 +76,7 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
     def post(self, request, pk, *args, **kwargs):
 
-        self.object = models.Order.objects.get(pk=pk)
+        self.object = models.Order.objects.get_by_id(pk)
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 

@@ -8,7 +8,6 @@ class SearchForm(BaseForm):
         ('ID', 'ID'),
         ('Client Name', 'Client Name'),
         ('Telephone', 'Telephone'),
-        ('Date', 'Date')
     ]
 
     category = forms.ChoiceField(choices=category_choices)
