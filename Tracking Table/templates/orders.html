@@ -13,22 +13,22 @@
                 {% if nav_select == 'Internal' %}
                 <!-- INTERNALS TAB SELECTED -->
 		  		<li class="nav-item" role="presentation">
-		    		<button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Вътрешни</button>
+		    		<button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Поръчки</button>
 		  		</li>
 				<li class="nav-item" role="presentation">
-				    <a class="nav-link" href="{% url 'externals' %}">Външни</a>
+				    <a class="nav-link" href="{% url 'externals' %}">Оферти</a>
 				</li>
                 {% elif nav_select == 'External' %}
                 <!-- EXTERNALS TAB SELECTED -->
                 <li class="nav-item" role="presentation">
-                    <a class="nav-link" href="{% url 'internals' %}">Вътрешни</a>
+                    <a class="nav-link" href="{% url 'internals' %}">Поръчки</a>
                   </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Външни</button>
+                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Оферти</button>
                 </li>
                 {% endif %}
 				<li class="nav-item" role="presentation">
-					<a class="nav-link" href="#">Магазин</a>
+					<a class="nav-link" href="#">Витрини</a>
 				</li>
 			</ul>
 		<div class="tab-content" id="myTabContent">

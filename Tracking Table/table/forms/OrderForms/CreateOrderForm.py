@@ -9,5 +9,8 @@ class CreateOrderForm(TableForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owner"].widget.attrs["placeholder"] = "Name"
-        self.fields["owner"].label = "Client Name"
+        self.fields["owner"].widget.attrs["placeholder"] = "Име на клиент"
+        self.fields["owner"].label = "Име на клиент"
+        self.fields["telephone"].widget.attrs["placeholder"] = "Телефон"
+        self.fields["telephone"].label = "Телефон"
+        self.fields["client"].label = "Поръчка/Оферта"

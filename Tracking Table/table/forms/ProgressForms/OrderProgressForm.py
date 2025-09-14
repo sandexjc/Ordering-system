@@ -12,8 +12,4 @@ class OrderProgressForm(TableForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name in ['order_taken', 'invoice']:
-            self.fields[field_name].widget.attrs.update({
-                'style': 'width: 90px; height: 30px; margin-left: auto; margin-right: auto;',
-                'class': 'form-check-input',
-                'role': 'checkbox',
-            })
+            self.set_sm_checkbox(field_name)

@@ -27,7 +27,11 @@
 	{% endif %}	
 
 	<div style="text-align: center; margin: 20px;">
-		<h1>Edit Order</h1>
+		{% if current_order.client == "External" %}
+			<h1>Редактиране на оферта</h1>
+		{% else %}
+			<h1>Редактиране на поръчка</h1>
+		{% endif %}
 	</div>
 
 	<form method="POST" id="editOrderForm" class="shadow-lg order-form">

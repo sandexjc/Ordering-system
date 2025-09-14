@@ -5,8 +5,8 @@ from .TableOrderModel import TableOrder
 class Order(TableOrder):
 
     client_statuses = [
-        ('Internal', 'Internal'),
-        ('External', 'External'),
+        ('Internal', 'Поръчка'),
+        ('External', 'Оферта'),
     ]
 
     id = models.BigAutoField(primary_key=True)

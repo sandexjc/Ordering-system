@@ -13,11 +13,7 @@ class PlateProgressForm(TableForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name in ['ordered', 'delivered', 'cutted', 'edged']:
-            self.fields[field_name].widget.attrs.update({
-                'style': 'width: 90px; height: 30px; margin-left: auto; margin-right: auto;',
-                'class': 'form-check-input',
-                'role': 'checkbox',
-            })
+            self.set_lg_checkbox(field_name)
         self.set_readonly('material')
         self.fields['material'].required = False
         self.fields['manufacturer'].required = False

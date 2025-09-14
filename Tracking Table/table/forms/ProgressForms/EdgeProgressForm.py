@@ -13,11 +13,7 @@ class EdgeProgressForm(TableForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name in ['ordered', 'delivered']:
-            self.fields[field_name].widget.attrs.update({
-                'style': 'width: 40px; height: 40px;',
-                'class': 'form-check-input',
-                'role': 'checkbox',
-            })
+            self.set_sm_checkbox(field_name)
         for field_name in ['color_code', 'edge_type']:
             self.set_readonly(field_name)
 

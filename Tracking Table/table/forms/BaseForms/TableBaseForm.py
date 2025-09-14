@@ -23,6 +23,26 @@ class TableForm(BaseModelForm):
                 "role": "switch",
             })
     
+    def set_lg_checkbox(self, field_name):
+
+        # Turn a boolean field into large Bootstrap checkbox
+        if field_name in self.fields:
+            self.fields[field_name].widget.attrs.update({
+                'style': 'width: 6rem; height: 2rem;',
+                'class': 'form-check-input mx-auto d-block',
+                'role': 'checkbox',
+            })
+    
+    def set_sm_checkbox(self, field_name):
+
+        # Turn a boolean field into small Bootstrap checkbox
+        if field_name in self.fields:
+            self.fields[field_name].widget.attrs.update({
+                'style': 'width: 2.5rem; height: 2.5rem;',
+                'class': 'form-check-input mx-auto d-block',
+                'role': 'checkbox',
+            })
+    
     def set_number(self, field_name):
 
         # Utility method to apply a consistent style to numeric form fields.

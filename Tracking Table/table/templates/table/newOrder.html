@@ -1,18 +1,24 @@
 {% extends 'base.html' %}
 {% load django_bootstrap5 %}
+{% load static %}
+
+{% block links %}
+<link rel="stylesheet" type="text/css" href="{% static 'table/css/order-form.css' %}?v=1.1">
+{% endblock %}
+
 {% block content %}
 
-<div class="container">
+<div class="container-fluid fixed-min-width" style="width: 90%;">
 
 	<div style="text-align: center; margin: 20px;">
-		<h1>Create Order</h1>
+		<h1>Нова заявка</h1>
 	</div>
 
-	<form method="POST">
+	<form method="POST" class="shadow-lg order-form">
 		{% csrf_token %}
-		{% bootstrap_form form %}
-		{% bootstrap_form add_note %}
-		<input type="submit" class="btn btn-primary" value="Create">
+		{% bootstrap_form form bound_css_class='' %}
+		{% bootstrap_form add_note bound_css_class='' %}
+		<input type="submit" class="btn btn-primary" value="Създай">
 	</form>
 	
 </div>

@@ -10,5 +10,5 @@ class EditOrderForm(TableForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["owner"].widget.attrs["placeholder"] = "Client Name"
-        self.fields["owner"].label = "Client Name"
-        self.set_readonly("created_date")
+        self.fields["owner"].label = "Име на клиент"
+        self.fields["client"].label = "Поръчка/Оферта"

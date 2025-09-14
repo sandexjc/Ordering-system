@@ -2,141 +2,143 @@
 {% load django_bootstrap5 %}
 <!-- ######################################################## MODALS ################################################################# -->
 <!-- MODAL PROGRESS WINDOW -->
-<div id="progress-window-{{order.id}}">
-    <div class="modal fade" id="modal-progress-{{order.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog fixed-min-width">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">
-                        <div style="text-align: center; color: red;">
-                            UPDATE PROGRESS
-                        </div>
-                        <div>
-                            ORDER {{order.id}}
-                        </div>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <form id="{{order.id}}" class="updateForms">
-                    <div class="modal-body">
-                        <div class="ALERT-S-UPD-VIEW alertmsg" style="display: none;">
-                            <div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
-                                <strong><div style="text-align: center;">SUCCESSFULLY SAVED</div></strong>
-                                <button type="button" class="btn-close SuccessAlertBtn" aria-label="Close"></button>
+{% if order.client == "Internal" %}
+    <div id="progress-window-{{order.id}}">
+        <div class="modal fade" id="modal-progress-{{order.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog fixed-min-width">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">
+                            <div style="text-align: center; color: red;">
+                                UPDATE PROGRESS
                             </div>
-                        </div>
-                        <div class="ALERT-E-UPD-VIEW alertmsg" style="display: none;">
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
-                                <strong><div class="alertmsgdiv" style="text-align: center;">ERROR OCCURRED</div></strong>
-                                <button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
+                            <div>
+                                Поръчка №{{order.id}}
                             </div>
-                        </div>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
 
-                        {% csrf_token %}
+                    <form id="{{order.id}}" class="updateForms">
+                        <div class="modal-body">
+                            <div class="ALERT-S-UPD-VIEW alertmsg" style="display: none;">
+                                <div class="alert alert-success alert-dismissible fade show" role="alert" id="SuccessAlert">
+                                    <strong><div style="text-align: center;">SUCCESSFULLY SAVED</div></strong>
+                                    <button type="button" class="btn-close SuccessAlertBtn" aria-label="Close"></button>
+                                </div>
+                            </div>
+                            <div class="ALERT-E-UPD-VIEW alertmsg" style="display: none;">
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert" id="ErrorAlert">
+                                    <strong><div class="alertmsgdiv" style="text-align: center;">ERROR OCCURRED</div></strong>
+                                    <button type="button" class="btn-close ErrorAlertBtn" aria-label="Close"></button>
+                                </div>
+                            </div>
 
-                        <table class="table">
-                            <thead>
-                                <th scope="col">Материал</th>
-                                <th scope="col">Поръчано</th>
-                                <th scope="col">Доставено</th>
-                                <th scope="col">Нарязано</th>
-                                <th scope="col">Кантирано</th>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row" colspan="5">EGGER</th>
-                                </tr>
-                                {{plate_forms.management_form}}
-                            
-                                {% for item in plate_forms %}
-                                    {% if item.manufacturer.value == 'Egger' %}
-                                        {{item.id}}
-                                        <tr>
-                                            <td>{{item.material}}</td>
-                                            <td>{{item.ordered}}</td>
-                                            <td>{{item.delivered}}</td>
-                                            <td>{{item.cutted}}</td>
-                                            <td>{{item.edged}}</td>
-                                        </tr>
-                                    {% endif %}
-                                {% endfor %}
+                            {% csrf_token %}
 
-                                <tr>
-                                    <th scope="row" colspan="5">KRONO</th>
-                                </tr>
-
-                                {% for item in plate_forms %}
-                                    {% if item.manufacturer.value == 'Kronospan' %}
-                                        {{item.id}}
-                                        <tr>
-                                            <td>{{item.material}}</td>
-                                            <td>{{item.ordered}}</td>
-                                            <td>{{item.delivered}}</td>
-                                            <td>{{item.cutted}}</td>
-                                            <td>{{item.edged}}</td>
-                                        </tr>
-                                    {% endif %}
-                                {% endfor %}
-
-                                <tr>
-                                    <th scope="row" colspan="5">Други</th>
-                                </tr>
-
-                                {% for item in plate_forms %}
-                                    {% if item.manufacturer.value == 'Other' %}
-                                        {{item.id}}
-                                        <tr>
-                                            <td>{{item.material}}</td>
-                                            <td>{{item.ordered}}</td>
-                                            <td>{{item.delivered}}</td>
-                                            <td>{{item.cutted}}</td>
-                                            <td>{{item.edged}}</td>
-                                        </tr>
-                                    {% endif %}
-                                {% endfor %}
-                            
-                                <tr>
-                                    <th scope="row" colspan="5">Кант</th>
-                                </tr>
-                                
-                                {{edge_forms.management_form}}
-
-                                {% for item in edge_forms %}
-                                    {{item.id}}
+                            <table class="table">
+                                <thead>
+                                    <th scope="col">Материал</th>
+                                    <th scope="col">Поръчано</th>
+                                    <th scope="col">Доставено</th>
+                                    <th scope="col">Нарязано</th>
+                                    <th scope="col">Кантирано</th>
+                                </thead>
+                                <tbody>
                                     <tr>
-                                        <td>{{item.color_code}}{{item.edge_type}}</td>
-                                        <td style="margin-right: auto; margin-top: auto;">{{item.ordered}}</td>
-                                        <td>{{item.delivered}}</td>
+                                        <th scope="row" colspan="5">EGGER</th>
                                     </tr>
-                                {% endfor %}
+                                    {{plate_forms.management_form}}
+                                
+                                    {% for item in plate_forms %}
+                                        {% if item.manufacturer.value == 'Egger' %}
+                                            {{item.id}}
+                                            <tr>
+                                                <td>{{item.material}}</td>
+                                                <td>{{item.ordered}}</td>
+                                                <td>{{item.delivered}}</td>
+                                                <td>{{item.cutted}}</td>
+                                                <td>{{item.edged}}</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
 
-                                <tr>
-                                    <th scope="row" colspan="5"></th>
-                                </tr>
+                                    <tr>
+                                        <th scope="row" colspan="5">KRONO</th>
+                                    </tr>
 
-                                <tr>
-                                    <td>Поръчката е взета</td>
-                                    <td>{{order_progress.order_taken}}</td>
-                                </tr>
+                                    {% for item in plate_forms %}
+                                        {% if item.manufacturer.value == 'Kronospan' %}
+                                            {{item.id}}
+                                            <tr>
+                                                <td>{{item.material}}</td>
+                                                <td>{{item.ordered}}</td>
+                                                <td>{{item.delivered}}</td>
+                                                <td>{{item.cutted}}</td>
+                                                <td>{{item.edged}}</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
 
-                                <tr>
-                                    <td>Издадена фактура</td>
-                                    <td>{{order_progress.invoice}}</td>
-                                </tr>
+                                    <tr>
+                                        <th scope="row" colspan="5">Други</th>
+                                    </tr>
 
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary updateButtons" id="{{order.id}}">Update</button>
-                    </div>
-                </form>
+                                    {% for item in plate_forms %}
+                                        {% if item.manufacturer.value == 'Other' %}
+                                            {{item.id}}
+                                            <tr>
+                                                <td>{{item.material}}</td>
+                                                <td>{{item.ordered}}</td>
+                                                <td>{{item.delivered}}</td>
+                                                <td>{{item.cutted}}</td>
+                                                <td>{{item.edged}}</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                
+                                    <tr>
+                                        <th scope="row" colspan="5">Кант</th>
+                                    </tr>
+                                    
+                                    {{edge_forms.management_form}}
+
+                                    {% for item in edge_forms %}
+                                        {{item.id}}
+                                        <tr>
+                                            <td>{{item.color_code}}{{item.edge_type}}</td>
+                                            <td style="margin-right: auto; margin-top: auto;">{{item.ordered}}</td>
+                                            <td>{{item.delivered}}</td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    <tr>
+                                        <th scope="row" colspan="5"></th>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Поръчката е взета</td>
+                                        <td>{{order_progress.order_taken}}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Издадена фактура</td>
+                                        <td>{{order_progress.invoice}}</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary updateButtons" id="{{order.id}}">Update</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+{% endif %}
 <!-- MODAL PROGRESS WINDOW END -->
 
 <!-- MODAL DELETE WINDOW -->
@@ -201,146 +203,148 @@
 <!-- ######################################################## MODALS ################################################################# -->
 
 <div class="container-fluid order-view">
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Материал</th>
-                    <th scope="col">Поръчано</th>
-                    <th scope="col">Доставено</th>
-                    <th scope="col">Нарязано</th>
-                    <th scope="col">Кантирано</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr>
-                <th scope="row" colspan="8">ЕГЕР</th>
-            </tr>
-            {% for item in order.plates.all %}
-                {% if item.manufacturer == "Egger" %}
-                    <tr>
-                        <td>{{item.material}} - {{item.quantity}}</td>
-
-                        <td colspan="4">
-                            <ul class="progressbar" id="bar{{item.pk}}">
-                                {% if item.ordered %}
-                                    <li class="ordered active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="ordered" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                                {% if item.delivered %}
-                                    <li class="delivered active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="delivered" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                                {% if item.cutted %}
-                                    <li class="cutted active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="cutted" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                                {% if item.edged %}
-                                    <li class="edged active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="edged" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                            </ul>
-                        </td>
-
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            <tr>
-                <th scope="row" colspan="8">КРОНО</th>
-            </tr>
-            {% for item in order.plates.all %}
-                {% if item.manufacturer == "Kronospan" %}
-                    <tr>
-                        <td>{{item.material}} - {{item.quantity}}</td>
-                        <td colspan="4">
-                            <ul class="progressbar" id="bar{{item.pk}}">
-                                {% if item.ordered %}
-                                    <li class="ordered active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="ordered" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                                {% if item.delivered %}
-                                    <li class="delivered active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="delivered" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                                {% if item.cutted %}
-                                    <li class="cutted active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="cutted" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                                {% if item.edged %}
-                                    <li class="edged active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="edged" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                            </ul>
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            <tr>
-                <th scope="row" colspan="8">ДРУГИ</th>
-            </tr>
-            {% for item in order.plates.all %}
-                {% if item.manufacturer == "Other" %}
-                    <tr>
-                        <td>{{item.material}} - {{item.quantity}}</td>
-                        <td colspan="4">
-                            <ul class="progressbar" id="bar{{item.pk}}">
-                                {% if item.ordered %}
-                                    <li class="ordered active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="ordered" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                                {% if item.delivered %}
-                                    <li class="delivered active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="delivered" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                                {% if item.cutted %}
-                                    <li class="cutted active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="cutted" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                                {% if item.edged %}
-                                    <li class="edged active" id="plate_prog{{item.pk}}"></li>
-                                {% else %}
-                                    <li class="edged" id="plate_prog{{item.pk}}"></li>
-                                {% endif %}
-                            </ul>
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            <tr>
-                <th scope="row" colspan="8">КАНТ</th>
-            </tr>
-            {% for item in order.edges.all %}
+    {% if order.client == "Internal" %}
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}</td>
-                    <td colspan="4">
-                        <ul class="progressbar">
-                            {% if item.ordered %}
-                                <li class="ordered active" id="edge_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="ordered" id="edge_prog{{item.pk}}"></li>
-                            {% endif %}
-                            {% if item.delivered %}
-                                <li class="delivered active" id="edge_prog{{item.pk}}"></li>
-                            {% else %}
-                                <li class="delivered" id="edge_prog{{item.pk}}"></li>
-                            {% endif %}
-                        </ul>
-                    </td>
+                    <th scope="col">Материал</th>
+                        <th scope="col">Поръчано</th>
+                        <th scope="col">Доставено</th>
+                        <th scope="col">Нарязано</th>
+                        <th scope="col">Кантирано</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <th scope="row" colspan="8">ЕГЕР</th>
+                </tr>
+                {% for item in order.plates.all %}
+                    {% if item.manufacturer == "Egger" %}
+                        <tr>
+                            <td>{{item.material}} - {{item.quantity}}</td>
+
+                            <td colspan="4">
+                                <ul class="progressbar" id="bar{{item.pk}}">
+                                    {% if item.ordered %}
+                                        <li class="ordered active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="ordered" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                    {% if item.delivered %}
+                                        <li class="delivered active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="delivered" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                    {% if item.cutted %}
+                                        <li class="cutted active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="cutted" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                    {% if item.edged %}
+                                        <li class="edged active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="edged" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                </ul>
+                            </td>
+
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                <tr>
+                    <th scope="row" colspan="8">КРОНО</th>
+                </tr>
+                {% for item in order.plates.all %}
+                    {% if item.manufacturer == "Kronospan" %}
+                        <tr>
+                            <td>{{item.material}} - {{item.quantity}}</td>
+                            <td colspan="4">
+                                <ul class="progressbar" id="bar{{item.pk}}">
+                                    {% if item.ordered %}
+                                        <li class="ordered active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="ordered" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                    {% if item.delivered %}
+                                        <li class="delivered active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="delivered" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                    {% if item.cutted %}
+                                        <li class="cutted active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="cutted" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                    {% if item.edged %}
+                                        <li class="edged active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="edged" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                </ul>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                <tr>
+                    <th scope="row" colspan="8">ДРУГИ</th>
+                </tr>
+                {% for item in order.plates.all %}
+                    {% if item.manufacturer == "Other" %}
+                        <tr>
+                            <td>{{item.material}} - {{item.quantity}}</td>
+                            <td colspan="4">
+                                <ul class="progressbar" id="bar{{item.pk}}">
+                                    {% if item.ordered %}
+                                        <li class="ordered active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="ordered" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                    {% if item.delivered %}
+                                        <li class="delivered active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="delivered" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                    {% if item.cutted %}
+                                        <li class="cutted active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="cutted" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                    {% if item.edged %}
+                                        <li class="edged active" id="plate_prog{{item.pk}}"></li>
+                                    {% else %}
+                                        <li class="edged" id="plate_prog{{item.pk}}"></li>
+                                    {% endif %}
+                                </ul>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                <tr>
+                    <th scope="row" colspan="8">КАНТ</th>
+                </tr>
+                {% for item in order.edges.all %}
+                    <tr>
+                        <td>{{item.edge_type}}-{{item.color_code}} - {{item.quantity}}</td>
+                        <td colspan="4">
+                            <ul class="progressbar">
+                                {% if item.ordered %}
+                                    <li class="ordered active" id="edge_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="ordered" id="edge_prog{{item.pk}}"></li>
+                                {% endif %}
+                                {% if item.delivered %}
+                                    <li class="delivered active" id="edge_prog{{item.pk}}"></li>
+                                {% else %}
+                                    <li class="delivered" id="edge_prog{{item.pk}}"></li>
+                                {% endif %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 
     <div class="hidden-buttons">
         <a class="btn btn-outline-primary" href="{% url 'table:editOrder' pk=order.id %}" role="button" title="Edit Order">
@@ -349,9 +353,11 @@
         <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modal-delete-{{order.id}}" title="Delete Order">
             <img src="{% static 'images/delete-can.png' %}" class="tableIcons">
         </button>
-        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modal-progress-{{order.id}}" title="Update Order">
-            <img src="{% static 'images/check-list.png' %}" class="tableIcons">
-        </button>
+        {% if order.client == "Internal" %}
+            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#modal-progress-{{order.id}}" title="Update Order">
+                <img src="{% static 'images/check-list.png' %}" class="tableIcons">
+            </button>
+        {% endif %}
         <a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=order.id %}" role="button" target="_blank" title="Print View">
             <img src="{% static 'images/printer.png' %}" class="tableIcons">
         </a>
