@@ -364,5 +364,8 @@
         <button class="btn btn-outline-warning Historybtns" id="{{order.id}}" type="button" data-bs-toggle="offcanvas" data-bs-target="#history-tab-{{order.id}}" aria-controls="offcanvasRight">
             <img src="{% static 'images/deadline.png' %}" class="tableIcons">
         </button>
+        <button class="btn btn-outline-light" id="{{order.id}}" type="button" onclick="retry_order('{{order.id}}')">
+            <img src="{% static 'images/refresh.png' %}" class="tableIcons">
+        </button>
     </div>
 </div>
