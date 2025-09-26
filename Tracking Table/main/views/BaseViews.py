@@ -28,7 +28,7 @@ class OrdersView(LoginRequiredMixin, TemplateView):
                 if self.request.POST['category'] == 'ID':
                     context['search_error'] = True
                     if self.request.POST['search_field'].isnumeric():
-                        context['orders'] = Order.objects.get_by_id(self.request.POST['search_field'])
+                        context['orders'] = [Order.objects.get_by_id(self.request.POST['search_field'])]
                         context['search_error'] = False
 
                 elif self.request.POST['category'] == 'Telephone':
