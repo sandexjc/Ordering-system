@@ -17,11 +17,9 @@ function handle_orders()
 						$(this).focus();
                         if (!this.classList.contains("fetch-prevent"))
                         {
-							/** add loading indication */
-                            document.getElementById("hidden-row-" + row_id).appendChild(spinner(row_id));
 							/** prevent duplicate requests on click event */
 							document.getElementById("hidden-row-" + row_id).classList.add("fetch-prevent");
-							/** get order information and actions */
+							/** get order information */
                             get_order(row_id);
                         }
 					}else{
