@@ -1,7 +1,7 @@
 from django.db import models
 from common.models import BaseModel
-from table.models import Order
 from table.managers import TableItemManager
+from table.models.order import Order
 
 class TableItem(BaseModel):
 

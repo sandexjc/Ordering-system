@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from .TableItemModel import TableItem
-from .OrderModel import Order
+from table.models.base import TableItem
 
 class Note(TableItem):
 

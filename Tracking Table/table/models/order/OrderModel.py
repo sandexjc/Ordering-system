@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from .TableOrderModel import TableOrder
+from table.models.base import TableOrder
 
 class Order(TableOrder):
 
