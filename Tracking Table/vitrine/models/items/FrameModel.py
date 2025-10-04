@@ -1,0 +1,20 @@
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from common.models import BaseItem
+from vitrine.models.base import VitrineItem
+
+
+class Frame(VitrineItem, BaseItem):
+
+    profile_colors = [
+        ('Black', 'Черен'),
+        ('Matte', 'Мат'),
+        ('Inox', 'Инокс'),
+    ] 
+
+    profile_color = models.CharField(choices=profile_colors, default='Black', max_length=10)
+    length = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20000)], default=0)
+    width = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20000)], default=0)
+
+    def __str__(self):
+        return f"Frame color: {self.profile_color} / Vitrine ID: {self.vitrine_id}"

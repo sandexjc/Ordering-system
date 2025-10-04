@@ -12,4 +12,4 @@ class Change(TableItem):
     new_state = models.CharField(max_length=100, default='')
 
     def __str__(self):
-        return f'Order ID: {self.order_id} - {self.user} {self.operation} {self.what} {self.current_state} {self.new_state}'
+        return f'User: {self.user} / Order ID: {self.order_id}'

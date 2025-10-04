@@ -1,0 +1,1 @@
+from .VitrineModel import Vitrine
