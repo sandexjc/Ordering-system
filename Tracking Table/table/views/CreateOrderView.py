@@ -11,6 +11,11 @@ class CreateOrder(LoginRequiredMixin, CreateView):
     form_class = CreateOrderForm
     template_name = 'table/newOrder.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['order_type'] = self.kwargs.get('type')  # comes from <str:type> in URL
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super(CreateOrder, self).get_context_data(**kwargs)
         context['add_note'] = AddNoteForm
