@@ -56,7 +56,7 @@ class UpdateOrder(LoginRequiredMixin, UpdateView):
     def check_if_ready(self, order, plates, edges):
 
         for item in plates:
-            if not item.ordered or not item.delivered or not item.cutted or not item.edged:
+            if not item.delivered or not item.cutted or not item.edged:
                 return False
 
         return True
