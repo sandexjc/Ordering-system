@@ -10,7 +10,7 @@ class Order(TableOrder, BaseOrder):
     ]
 
     id = models.BigAutoField(primary_key=True)
-    client = models.CharField(choices=client_statuses, default='Internal', max_length=50)
+    client = models.CharField(choices=client_statuses, default='External', max_length=50)
 
     plates_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     edge_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
