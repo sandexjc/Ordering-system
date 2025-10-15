@@ -1,3 +1,4 @@
+/* === Base Progressbar Container === */
 .progressbar {
 	position: relative;
 	width: 100%;
@@ -5,13 +6,16 @@
 	margin-left: 0%;
 }
 
-.progressbar li{
+/* === Each Step Item === */
+.progressbar li {
 	list-style-type: none;
 	float: left;
 	width: 25%;
 	position: relative;
 	text-align: left;
 }
+
+/* === Step Circle (default) === */
 .progressbar li:before {
 	content: '';
 	position: relative;
@@ -27,6 +31,7 @@
 	z-index: 2;
 }
 
+/* === Connector Line Between Steps (default) === */
 .progressbar li:after {
 	content: '';
 	position: absolute;
@@ -38,20 +43,91 @@
 	z-index: 1;
 }
 
+/* === Remove Connector Before the First Step === */
 .progressbar li:first-child:after {
 	content: none;
 }
 
+/* === Active Step Styles === */
 .progressbar li.active {
 	color: #16c60c;
 	font-weight: bold;
 }
 
+/* === Active Step Circle === */
 .progressbar li.active:before {
 	border-color: #16c60c;
 	content: "✔️";
 }
 
+/* === Active → Active Connector Line (green) === */
 .progressbar li.active + li.active:after {
 	background-color: #16c60c;
+}
+
+/* === Active → None Connector Line (white) === */
+.progressbar li.active + li:not(.active):not(.disabled):after {
+	background-color: #fff;
+}
+
+/* === Active → Disabled Connector Line (gray) === */
+.progressbar li.active + li.disabled:after {
+	background-color: #ddd;
+}
+
+/* === None → Disabled Connector Line (gray) === */
+.progressbar li:not(.active):not(.disabled) + li.disabled:after {
+	background-color: #ddd;
+}
+
+/* === None → None Connector Line (white) === */
+.progressbar li:not(.active):not(.disabled) + li:not(.active):not(.disabled):after {
+	background-color: #fff;
+}
+
+/* === None → Active Connector Line (white) === */
+.progressbar li:not(.active):not(.disabled) + li.active:after {
+	background-color: #fff;
+}
+
+/* === Disabled → Active Connector Line (gray) === */
+.progressbar li.disabled + li.active:after {
+	background-color: #ddd;
+}
+
+/* === If a Step Comes After a Disabled One (gray connector) === */
+.progressbar li.disabled + li:after {
+	background-color: #ddd;
+}
+
+/* === If the Next Step is Disabled (gray connector) === */
+.progressbar li.disabled:after {
+	background-color: #ddd;
+}
+
+/* === Disabled Step (text + color) === */
+.progressbar li.disabled {
+	color: #aaa;
+	font-weight: normal;
+}
+
+/* === Disabled Step Circle === */
+.progressbar li.disabled:before {
+	border-color: #aaa;
+	background-color: #f5f5f5;
+	content: "✖️";
+	color: #aaa;
+}
+
+/* === Disabled Step Connector (light gray) === */
+.progressbar li.disabled:after {
+	background-color: #eee;
+}
+
+/* === Override Case: Active + Disabled (force disabled look) === */
+.progressbar li.active.disabled:before {
+	border-color: #aaa;
+	background-color: #f5f5f5;
+	content: "✖️";
+	color: #aaa;
 }

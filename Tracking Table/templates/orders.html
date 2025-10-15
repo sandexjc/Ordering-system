@@ -202,9 +202,9 @@
 							    <td>
 							    	{% for item in order.plates.all %}
 										{% if item.manufacturer == "Egger" %}
-											{% if item.ordered and not item.delivered %}
+											{% if item.ordered and not item.from_client and not item.delivered %}
 												<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
-											{% elif item.delivered and item.ordered %}
+											{% elif item.delivered %}
 												<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
 											{% elif item.from_client %}
 												<div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
@@ -218,9 +218,9 @@
 							    <td>
 							    	{% for item in order.plates.all %}
 										{% if item.manufacturer == "Kronospan" %}
-											{% if item.ordered and not item.delivered %}
+											{% if item.ordered and not item.from_client and not item.delivered %}
 												<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
-											{% elif item.delivered and item.ordered %}
+											{% elif item.delivered %}
 												<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
 											{% elif item.from_client %}
 												<div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
@@ -233,9 +233,9 @@
 							    <td>
 							    	{% for item in order.plates.all %}
 										{% if item.manufacturer == "Other" %}
-											{% if item.ordered and not item.delivered %}
+											{% if item.ordered and not item.from_client and not item.delivered %}
 												<div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
-											{% elif item.delivered and item.ordered %}
+											{% elif item.delivered %}
 												<div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
 											{% elif item.from_client %}
 												<div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>

@@ -44,9 +44,9 @@ function handle_orders_properties()
 
 					$(data.plates).each(function() {
 
-						if ((this.fields.ordered == true) && (this.fields.delivered != true)) {
+						if ((this.fields.ordered == true) && (this.fields.from_client != true) && (this.fields.delivered != true)) {
 							$("#plate"+this.pk).css('color', 'red');
-						}else if ((this.fields.ordered == true) && (this.fields.delivered == true)) {
+						}else if (this.fields.delivered == true) {
 							$("#plate"+this.pk).css('color', '#8ac926');
 						}else if (this.fields.from_client == true) {
 							$("#plate"+this.pk).css('color', '#7b2cbf');

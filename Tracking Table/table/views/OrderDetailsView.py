@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
-from table.models import Order
+from table.models import Order, Plate
 from table.forms import PlateProgressFormSet, EdgeProgressFormSet, OrderProgressForm
 
 class ViewOrder(LoginRequiredMixin, TemplateView):
@@ -8,14 +8,14 @@ class ViewOrder(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, pk, **kwargs):
         context = super(ViewOrder, self).get_context_data(**kwargs)
-        context['order'] = Order.objects.get_by_id(pk)
+
+        order = Order.objects.get_by_id(pk)
+        plates = Plate.objects.for_order(order).select_related("order_id")
         
-        # Only placed orders ( not offers ) can be tracked
-        if context['order'].client == "Internal":
-            # FIXME create formsets on request
-            context['plate_forms'] = PlateProgressFormSet(instance=context['order'])
-            context['edge_forms'] = EdgeProgressFormSet(instance=context['order'])
-            context['order_progress'] = OrderProgressForm(instance=context['order'])
+        context['order'] = order
+        context['plate_forms'] = PlateProgressFormSet(instance=order, queryset=plates)
+        context['edge_forms'] = EdgeProgressFormSet(instance=order)
+        context['order_progress'] = OrderProgressForm(instance=order)
 
         return context
     
