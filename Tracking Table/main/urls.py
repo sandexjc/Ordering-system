@@ -3,14 +3,14 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
-from main.views import Internals, Externals
+from main.views import Orders, Offers
 
 urlpatterns = [
     # Site resources
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='internals/'), name='home'),
-    path('internals/', Internals.InternalsView.as_view(), name='internals'),
-    path('externals/', Externals.ExternalsView.as_view(), name='externals'),
+    path('internals/', Orders.as_view(), name='internals'),
+    path('externals/', Offers.as_view(), name='externals'),
 
     # Accounts app resources
     path('accounts/', include('accounts.urls', namespace='accounts')),
