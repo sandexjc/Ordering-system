@@ -8,7 +8,7 @@ class BaseTableView(BaseView):
     """ Table application specific base view """
 
     model = Order
-    template_name = 'orders.html'
+    template_name = 'table/orders.html'
 
     def get_queryset_by_search(self, category, search_value):
         if category == 'ID':

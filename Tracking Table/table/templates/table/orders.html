@@ -1,0 +1,140 @@
+{% extends "layout/content.html" %}
+
+{% block table_content %}
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th scope="col" colspan="3">Основна Информация</th>
+            <th scope="col" colspan="3">Плочи</th>
+            <th scope="col">Кант</th>
+            <th scope="col" colspan="3">Други</th>
+        </tr>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Дата</th>
+            <th scope="col">Клиент</th>
+            <th scope="col">Егер</th>
+            <th scope="col">Кроно</th>
+            <th scope="col">Други</th>
+            <th scope="col">Кант</th>
+            <th scope="col">Други услуги</th>
+            <th scope="col">Бележки</th>
+            <th scope="col">Баланс</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for order in orders %}
+        <tr>
+
+            {% if order.order_taken %}
+                <tr class="visibleRows orderTaken fixed-min-width" id="{{order.id}}">
+            {% else %}
+                <tr class="visibleRows normalOrder fixed-min-width" id="{{order.id}}">
+            {% endif %}
+            {% if order.invoice %}
+                <td style="color: red;"   id="ID{{order.id}}">{{order.id}}</th>
+            {% else %}
+                <td style="color: black;" id="ID{{order.id}}">{{order.id}}</th>
+            {% endif %}
+
+            <td>{{order.created_date|date:"d.m.Y"}}</td>
+            <td>{{order.owner}}<br>{{order.telephone}}</td>
+
+            <td>
+                {% for item in order.plates.all %}
+                    {% if item.manufacturer == "Egger" %}
+                        {% if item.ordered and not item.from_client and not item.delivered %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+                        {% elif item.delivered %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+                        {% elif item.from_client %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
+                        {% else %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </td>
+
+            <td>
+                {% for item in order.plates.all %}
+                    {% if item.manufacturer == "Kronospan" %}
+                        {% if item.ordered and not item.from_client and not item.delivered %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+                        {% elif item.delivered %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+                        {% elif item.from_client %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
+                        {% else %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in order.plates.all %}
+                    {% if item.manufacturer == "Other" %}
+                        {% if item.ordered and not item.from_client and not item.delivered %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: red;" >{{item.material}} - {{item.quantity}}</div>
+                        {% elif item.delivered %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: #8ac926;" >{{item.material}} - {{item.quantity}}</div>
+                        {% elif item.from_client %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
+                        {% else %}
+                            <div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in order.edges.all %}
+                    {% if item.visible %}
+                        {% if item.ordered and not item.delivered %}
+                            <div class="Edge" id="edge{{item.pk}}" style="color: red;" >
+                            {{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+                            </div>
+                        {% elif item.delivered and item.ordered %}
+                            <div class="Edge" id="edge{{item.pk}}" style="color: #8ac926;">
+                            {{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+                            </div>
+                        {% else %}
+                            <div class="Edge" id="edge{{item.pk}}" style="color: black;">
+                            {{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in order.others.all %}
+                    <div>
+                        {{item.description}} - {{item.quantity}} 
+                    </div>
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in order.notes.all %}
+                    <div>
+                        {{item.user}} -> 
+                        <span style="color: red;">
+                            {{item.content}}
+                        </span>
+                    </div>
+                {% endfor %}
+            </td>
+            <td>{{order.balance}}</td>
+        </tr>
+        <tr>
+            <td colspan="10">
+                <div class="container-fluid hiddenRows" id="hidden-row-{{order}}" style="display: none">
+                    <div class="container-fluid hidden-table" id="hidden-table-{{order}}">
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+        
+    </tbody>
+</table>
+{% endblock %}

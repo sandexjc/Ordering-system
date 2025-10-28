@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layout/base.html' %}
 {% load django_bootstrap5 %}
 {% load static %}
 
@@ -10,21 +10,7 @@
 
 <div class="container-fluid fixed-min-width" style="width: 90%;">
 
-	{% if messages %}
-		{% for message in messages %}
-			{% if message.tags == 'success' %}
-				<div class="alert alert-success alert-dismissible fade show alertmsg" role="alert">
-	  				<strong><div style="text-align: center;">{{ message }}</div></strong>
-	  				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>
-			{% else %}
-				<div class="alert alert-danger alert-dismissible fade show alertmsg" role="alert">
-	  				<strong><div style="text-align: center;">{{ message }}</div></strong>
-	  				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>
-			{% endif %}
-		{% endfor %}
-	{% endif %}	
+	{% include "common/components/alert.html" %}
 
 	<div style="text-align: center; margin: 20px;">
 		{% if current_order.client == "External" %}

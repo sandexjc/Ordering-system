@@ -1,0 +1,29 @@
+<div id="delete-window-{{ object.id }}">
+    <div class="modal fade" id="modal-delete-{{ object.id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog modal-sm fixed-min-width">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Изтриване на поръчка №{{ object.id }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="Delete{{ object.id }}" class="deleteForms">
+
+                    {% include "common/components/alert.html" with type="success" message="Поръчка: №{{ object.id }} е изтрита успешно!" dismiss_id="SuccessAlert" %}
+                    {% include "common/components/alert.html" with type="danger" message="Възникна грешка при изтриването на поръчка №{{ object.id }}!" dismiss_id="ErrorAlert" %}
+
+                    {% csrf_token %}
+
+                    <div class="modal-body" style="text-align: center;">
+                        <h5>
+                            Сигурни ли сте, че искате да изтриете поръчка: <strong>{{ object.id }}</strong>
+                        </h5>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+                        <button type="submit" class="btn btn-danger deleteButtons" id="{{order.id}}">Изтрий</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

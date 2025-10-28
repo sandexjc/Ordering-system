@@ -8,7 +8,7 @@ from table.models import (
 
 class PrintOrder(LoginRequiredMixin, TemplateView):
     model = Order
-    template_name = 'table/printOrder.html'
+    template_name = 'table/print_order.html'
     
     def get_context_data(self, pk, **kwargs):
         context = super(PrintOrder, self).get_context_data(**kwargs)

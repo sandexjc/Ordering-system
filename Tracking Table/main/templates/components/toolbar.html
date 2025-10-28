@@ -1,0 +1,41 @@
+{% load static %}
+{% load django_bootstrap5 %}
+
+<div class="container-fluid FilterNav">
+    <div class="row">
+        <div class="col">
+            <nav class="nav">
+                <!-- New order button -->
+                <a class="btn btn-outline-primary" href="{% url 'table:newOrder' type=nav_select %}">
+                    <img src="{% static 'images/add.png' %}" class="tableIcons">
+                </a>
+
+                <!-- Filter button -->
+                <button class="btn btn-outline-primary position-relative" data-bs-toggle="collapse" data-bs-target="#collapseExample">
+                    <img src="{% static 'images/filter.png' %}" class="tableIcons">
+                    {% if filter_badge %}
+                        <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
+                    {% endif %}
+                </button>
+            </nav>
+        </div>
+
+        <div class="col">
+            <nav class="nav justify-content-end">
+                <!-- Search button -->
+                <button type="button" class="btn btn-outline-primary position-relative" data-bs-toggle="modal" data-bs-target="#Search">
+                    <img src="{% static 'images/search.png' %}" class="tableIcons">
+                    {% if badges %}
+                        <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
+                    {% endif %}
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    {% include "components/filter_form.html" %}
+    
+    <!-- Search Form -->
+    {% include "modals/search_form.html" %}
+</div>

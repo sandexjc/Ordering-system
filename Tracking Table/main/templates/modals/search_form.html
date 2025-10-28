@@ -1,0 +1,22 @@
+{% load django_bootstrap5 %}
+
+<div class="modal fade fixed-min-width" id="Search" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog fixed-min-width">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Search</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {% bootstrap_form search_form bound_css_class='' %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" value="Search" name="action">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

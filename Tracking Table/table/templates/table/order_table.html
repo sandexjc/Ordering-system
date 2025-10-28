@@ -1,0 +1,61 @@
+{% load static %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Материал</th>
+            <th scope="col">Поръчано</th>
+            <th scope="col">Доставено</th>
+            <th scope="col">Нарязано</th>
+            <th scope="col">Кантирано</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr><th scope="row" colspan="8">ЕГЕР</th></tr>
+        {% for item in plates %}
+            {% if item.manufacturer == "Egger" %}
+                <tr>
+                    <td>{{ item.material }} - {{ item.quantity }}</td>
+                    <td colspan="4">
+                        {% include "common/components/progress_bar.html" with item=item steps=item.plate_steps %}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+
+        <tr><th scope="row" colspan="8">КРОНО</th></tr>
+        {% for item in plates %}
+            {% if item.manufacturer == "Kronospan" %}
+                <tr>
+                    <td>{{ item.material }} - {{ item.quantity }}</td>
+                    <td colspan="4">
+                        {% include "common/components/progress_bar.html" with item=item steps=item.plate_steps %}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+
+        <tr><th scope="row" colspan="8">ДРУГИ</th></tr>
+        {% for item in plates %}
+            {% if item.manufacturer == "Other" %}
+                <tr>
+                    <td>{{ item.material }} - {{ item.quantity }}</td>
+                    <td colspan="4">
+                        {% include "common/components/progress_bar.html" with item=item steps=item.plate_steps %}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+
+        <tr><th scope="row" colspan="8">КАНТ</th></tr>
+        {% for item in edges %}
+            <tr>
+                <td>{{ item.edge_type }}-{{ item.color_code }} - {{ item.quantity }}</td>
+                <td colspan="4">
+                    {% include "common/components/progress_bar.html" with item=item steps=item.edge_steps %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

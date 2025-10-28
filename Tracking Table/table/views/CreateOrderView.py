@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 class CreateOrder(LoginRequiredMixin, CreateView):
 
     form_class = CreateOrderForm
-    template_name = 'table/newOrder.html'
+    template_name = 'table/new_order.html'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

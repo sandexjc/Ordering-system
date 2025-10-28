@@ -11,7 +11,7 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
     model = models.Order
     form_class = forms.EditOrderForm
-    template_name = 'table/editOrder.html'
+    template_name = 'table/edit_order.html'
     
     def get_context_data(self, **kwargs):
 

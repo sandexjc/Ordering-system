@@ -1,0 +1,42 @@
+{% load static %}
+
+<div class="hidden-buttons">
+    {% if toolbar_edit_url %}
+        <a class="btn btn-outline-primary" href="{{ toolbar_edit_url }}" role="button" title="Edit">
+        <img src="{% static 'images/edit.png' %}" class="tableIcons">
+        </a>
+    {% endif %}
+
+    {% if toolbar_delete_target %}
+        <button type="button" class="btn btn-outline-danger"
+                data-bs-toggle="modal" data-bs-target="#{{ toolbar_delete_target }}" title="Delete">
+        <img src="{% static 'images/delete-can.png' %}" class="tableIcons">
+        </button>
+    {% endif %}
+
+    {% if toolbar_progress_target %}
+        <button type="button" class="btn btn-outline-success"
+                data-bs-toggle="modal" data-bs-target="#{{ toolbar_progress_target }}" title="Update">
+        <img src="{% static 'images/check-list.png' %}" class="tableIcons">
+        </button>
+    {% endif %}
+
+    {% if toolbar_print_url %}
+        <a class="btn btn-outline-info" href="{{ toolbar_print_url }}" role="button" target="_blank" title="Print">
+        <img src="{% static 'images/printer.png' %}" class="tableIcons">
+        </a>
+    {% endif %}
+
+    {% if toolbar_history_target %}
+        <button class="btn btn-outline-warning Historybtns" id="{{ order.id }}" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#{{ toolbar_history_target }}" aria-controls="offcanvasRight">
+        <img src="{% static 'images/deadline.png' %}" class="tableIcons">
+        </button>
+    {% endif %}
+
+    {% if toolbar_refresh_option %}
+        <button class="btn btn-outline-light" id="{{ order.id }}" type="button" onclick="retry_order('{{ order.id }}')">
+            <img src="{% static 'images/refresh.png' %}" class="tableIcons">
+        </button>
+    {% endif %}
+</div>

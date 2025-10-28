@@ -1,0 +1,16 @@
+{% load static %}
+{% load django_bootstrap5 %}
+
+{# MODALS & OFFCANVAS #}
+{% include "common/modals/progress_modal.html" with object=order progress_table_template="table/order_progress_form.html" %}
+{% include "common/modals/delete_modal.html" with object=order object_type="Order" %}
+{% include "common/components/offcanvas_history.html" with object=order object_type="Order" %}
+
+<div class="container-fluid order-view" id="order-view-{{ order.id }}">
+
+    {# ORDER ITEMS PROGRESS TABLE #}
+    {% include "table/order_table.html" with order=order %}
+    
+    {# ORDER TOOLBAR #}
+    {% include "common/components/order_toolbar.html" %}
+</div>

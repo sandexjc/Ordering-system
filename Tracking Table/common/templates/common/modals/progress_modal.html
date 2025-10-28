@@ -1,0 +1,34 @@
+
+<div id="progress-window-{{ object.id }}">
+    <div class="modal fade" id="modal-progress-{{ object.id }}" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog fixed-min-width">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger text-center fw-bold">
+                        Промени статус на поръчка №{{ object.id }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form id="{{ object.id }}" class="updateForms">
+                    <div class="modal-body">
+
+                        {% include "common/components/alert.html" with type="success" view="S-UPD" message="Променитe са запазени успешно!" handler="SuccessAlertBtn" %}
+                        {% include "common/components/alert.html" with type="danger" view="E-UPD" message="Възникна грешка при промяна на поръчката!" handler="ErrorAlertBtn" %}
+
+                        {% csrf_token %}
+                        {% include progress_table_template %}
+                        
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary updateButtons" id="{{ object.id }}">Update</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

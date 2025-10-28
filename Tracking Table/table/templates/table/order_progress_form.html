@@ -1,0 +1,75 @@
+<table class="table align-middle">
+    <thead>
+        <tr>
+            <th scope="col">Материал</th>
+            <th scope="col">Поръчано</th>
+            <th scope="col">Доставено</th>
+            <th scope="col">Нарязано</th>
+            <th scope="col">Кантирано</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {{ plate_forms.management_form }}
+        <tr><th scope="row" colspan="5">EGGER</th></tr>
+        {% for item in plate_forms %}
+            {% if item.manufacturer.value == 'Egger' %}
+                {{ item.id }}
+                <tr>
+                    <td>{{ item.material }}</td>
+                    <td>{{ item.ordered }}</td>
+                    <td>{{ item.delivered }}</td>
+                    <td>{{ item.cutted }}</td>
+                    <td>{{ item.edged }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        <tr><th scope="row" colspan="5">KRONO</th></tr>
+        {% for item in plate_forms %}
+            {% if item.manufacturer.value == 'Kronospan' %}
+                {{ item.id }}
+                <tr>
+                    <td>{{ item.material }}</td>
+                    <td>{{ item.ordered }}</td>
+                    <td>{{ item.delivered }}</td>
+                    <td>{{ item.cutted }}</td>
+                    <td>{{ item.edged }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        <tr><th scope="row" colspan="5">ДРУГИ</th></tr>
+        {% for item in plate_forms %}
+            {% if item.manufacturer.value == 'Other' %}
+                {{ item.id }}
+                <tr>
+                    <td>{{ item.material }}</td>
+                    <td>{{ item.ordered }}</td>
+                    <td>{{ item.delivered }}</td>
+                    <td>{{ item.cutted }}</td>
+                    <td>{{ item.edged }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+
+        <tr><th scope="row" colspan="5">КАНТ</th></tr>
+        {{ edge_forms.management_form }}
+        {% for item in edge_forms %}
+            {{ item.id }}
+            <tr>
+                <td>{{ item.color_code }} {{ item.edge_type }}</td>
+                <td>{{ item.ordered }}</td>
+                <td>{{ item.delivered }}</td>
+            </tr>
+        {% endfor %}
+
+        <tr><th colspan="5"></th></tr>
+        <tr>
+            <td>Поръчката е взета</td>
+            <td>{{ order_progress.order_taken }}</td>
+        </tr>
+        <tr>
+            <td>Издадена фактура</td>
+            <td>{{ order_progress.invoice }}</td>
+        </tr>
+    </tbody>
+</table>

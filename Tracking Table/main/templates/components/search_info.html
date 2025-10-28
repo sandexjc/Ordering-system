@@ -1,0 +1,23 @@
+{% if badges %}
+    <div class="text-center">
+        <h5>
+            <span class="badge rounded-pill bg-warning text-dark">
+                Резултати за: "{{category}}"="{{search_string}}"
+            </span>
+            <span class="badge text-bg-primary">
+                {% if nav_select == 'Internal' %}
+                    <a href="{% url 'internals' %}">изчисти търсенето</a>
+                {% elif nav_select == 'External' %}
+                    <a href="{% url 'externals' %}">изчисти търсенето</a>
+                {% endif %}
+            </span>
+        </h5>
+    </div>
+{% endif %}
+
+{% if search_error %}
+    <div class="text-center text-danger">
+        <p>Грешка в търсенето</p>
+        <p>Моля уверете се, че търсенето е в правилната категория!</p>
+    </div>
+{% endif %}
