@@ -1,12 +1,14 @@
 {% comment %}
+
     Expected context:
-    - item: the object this bar represents (used for ID binding)
-    - steps: a list of tuples (step_name, active, disabled)
+        - item: the object this bar represents (used for ID binding)
+        - steps: a list of tuples (step_name, active, disabled)
     Example: [("ordered", True, False), ("delivered", False, False)]
+
 {% endcomment %}
 
-<ul class="progressbar" id="bar{{ item.pk }}">
+<ul class="progressbar" id="{{ item.type }}-bar-{{ item.pk }}">
     {% for step, active, disabled in steps %}
-        <li class="{{ step }} {% if active %}active{% endif %} {% if disabled %}disabled{% endif %}" id="prog{{ item.pk }}_{{ step }}"></li>
+        <li class="{{ step }}{% if disabled %} disabled{% elif active %} active{% endif %}" id="{{ item.type }}-progress-{{ step }}-{{ item.pk }}"></li>
     {% endfor %}
 </ul>

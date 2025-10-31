@@ -15,10 +15,11 @@ class ViewOrder(LoginRequiredMixin, TemplateView):
         plates = Plate.objects.for_order(order).select_related("order_id")
         edges = Edge.objects.for_order(order).select_related("order_id")
 
+        # Attach type of the order related items
         # Attach progress steps dynamically to each item to represent with progress bar
         # (step_name, active, disabled)
-        # Plates
         for plate in plates:
+            plate.type = "plate"
             plate.plate_steps = [
                 ("ordered", plate.ordered, plate.from_client),
                 ("delivered", plate.delivered, False),
@@ -28,6 +29,7 @@ class ViewOrder(LoginRequiredMixin, TemplateView):
         
         # Edges
         for edge in edges:
+            edge.type = "edge"
             edge.edge_steps = [
                 ("ordered", edge.ordered, False),
                 ("delivered", edge.delivered, False),

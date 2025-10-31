@@ -54,28 +54,28 @@ function handle_orders_properties()
 							$("#plate"+this.pk).css('color', 'black');
 						}
 
-						if (this.fields.ordered == true) {
-							$("#plate_prog"+this.pk+".ordered").addClass("active");
+						if ((this.fields.ordered == true) && (this.fields.from_client != true)) {
+							$("#plate-progress-ordered-"+this.pk).addClass("active");
 						}else{
-							$("#plate_prog"+this.pk+".ordered").removeClass("active");
+							$("#plate-progress-ordered-"+this.pk).removeClass("active");
 						}
 
 						if (this.fields.delivered == true) {
-							$("#plate_prog"+this.pk+".delivered").addClass("active");
+							$("#plate-progress-delivered-"+this.pk).addClass("active");
 						}else{
-							$("#plate_prog"+this.pk+".delivered").removeClass("active");
+							$("#plate-progress-delivered-"+this.pk).removeClass("active");
 						}
 
 						if (this.fields.cutted == true) {
-							$("#plate_prog"+this.pk+".cutted").addClass("active");
+							$("#plate-progress-cutted-"+this.pk).addClass("active");
 						}else{
-							$("#plate_prog"+this.pk+".cutted").removeClass("active");
+							$("#plate-progress-cutted-"+this.pk).removeClass("active");
 						}
 
 						if (this.fields.edged == true) {
-							$("#plate_prog"+this.pk+".edged").addClass("active");
+							$("#plate-progress-edged-"+this.pk).addClass("active");
 						}else{
-							$("#plate_prog"+this.pk+".edged").removeClass("active");
+							$("#plate-progress-edged-"+this.pk).removeClass("active");
 						}
 					})
 
@@ -89,15 +89,15 @@ function handle_orders_properties()
 						}
 
 						if (this.fields.ordered == true) {
-							$("#edge_prog"+this.pk+".ordered").addClass("active");
+							$("#edge-progress-ordered-"+this.pk).addClass("active");
 						}else{
-							$("#edge_prog"+this.pk+".ordered").removeClass("active");					
+							$("#edge-progress-ordered-"+this.pk).removeClass("active");					
 						}
 
 						if (this.fields.delivered == true) {
-							$("#edge_prog"+this.pk+".delivered").addClass("active");
+							$("#edge-progress-delivered-"+this.pk).addClass("active");
 						}else{
-							$("#edge_prog"+this.pk+".delivered").removeClass("active");	
+							$("#edge-progress-delivered-"+this.pk).removeClass("active");	
 						}
 					})
 				},
