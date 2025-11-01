@@ -4,8 +4,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from main.forms import SearchForm, FilterForm
 import time
 
-DEFAULT_ITEMS_COUNT = 100
-
 class BaseView(LoginRequiredMixin, TemplateView):
 
     """ Base view logic for all apps sharing main site page """
@@ -19,6 +17,9 @@ class BaseView(LoginRequiredMixin, TemplateView):
     template_name = None
     clients_type = None
     navigation = None
+
+    # Default count of items to display
+    default_items_count = 100
 
     def get_context_data(self, **kwargs):
 

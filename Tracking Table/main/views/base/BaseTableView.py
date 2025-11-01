@@ -37,4 +37,4 @@ class BaseTableView(BaseView):
         return self.model.objects.all_by_client_type(self.clients_type)
 
     def get_default_queryset(self):
-        return self.model.objects.latest_by_count(self.clients_type, 100)
+        return self.model.objects.latest_by_count(self.clients_type, self.default_items_count)
