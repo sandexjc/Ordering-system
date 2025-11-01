@@ -3,7 +3,7 @@ from common.querysets import BaseQuerySet
 
 class BaseManager(models.Manager):
 
-    # Top level Manager designed to share common models logic
+    """ Top level Manager designed to share common models logic. """
 
     # Return active only objects
     def __get_queryset(self):

@@ -2,6 +2,8 @@ from common.managers import BaseManager
 from table.querysets import TableOrderQuerySet
 
 class TableOrderManager(BaseManager):
+
+    """ Table app domain level Orders manager. """
     
     def __get_queryset(self):
         return TableOrderQuerySet(self.model, using=self._db).active()
