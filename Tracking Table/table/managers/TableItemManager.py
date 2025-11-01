@@ -1,8 +1,8 @@
-from common.managers import BaseManager
+from common.managers import BaseItemManager
 from table.querysets import TableItemQuerySet
 
 
-class TableItemManager(BaseManager):
+class TableItemManager(BaseItemManager):
 
     """ Application specific (intermediate level) order related items queryset manager. """
 

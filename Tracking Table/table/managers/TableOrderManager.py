@@ -1,7 +1,7 @@
-from common.managers import BaseManager
+from common.managers import BaseOrderManager
 from table.querysets import TableOrderQuerySet
 
-class TableOrderManager(BaseManager):
+class TableOrderManager(BaseOrderManager):
 
     """ Table app domain level Orders manager. """
     
@@ -15,15 +15,7 @@ class TableOrderManager(BaseManager):
             .last_created()
             .with_items(*related_items)
         )
-
-    # Return signle order with related items by primary key
-    def get_by_id(self, id, *related_items):
-        return (
-            self.__get_queryset()
-            .with_items(*related_items)
-            .filter(pk=id)
-            .first()
-        )
+    
     
     #####################################################
     #                                                   #

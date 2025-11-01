@@ -1,0 +1,2 @@
+from .VitrineOrderManager import VitrineOrderManager
+from .VitrineItemManager import VitrineItemManager
