@@ -4,4 +4,4 @@ class Vitrines(BaseVitrineView):
 
     """ Main view for displaying vitrine orders. """
 
-    navigation = "vitrine"
+    navigation = "Vitrine"
