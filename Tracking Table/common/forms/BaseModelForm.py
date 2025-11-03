@@ -1,17 +1,13 @@
 from django import forms
+from common.mixins import FieldStyleMixin
 
-class BaseModelForm(forms.ModelForm):
+class BaseModelForm(FieldStyleMixin, forms.ModelForm):
     
-    # Top level model form for the whole project.
-    # Defines common widget styling and helper logic.
+    """ Top level model form for the whole project. """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Apply default bootstrap class to all fields
-        for field_name, field in self.fields.items():
-            css_class = field.widget.attrs.get("class", "")
-            field.widget.attrs["class"] = f"{css_class} form-control form-control-sm".strip()
+        self.apply_bootstrap_styling()
 
     class Meta:
         abstract = True

@@ -1,7 +1,8 @@
 from table.forms import TableForm
 from table.models import Order
+from common.mixins import ContactFieldsMixin
 
-class EditOrderForm(TableForm):
+class EditOrderForm(ContactFieldsMixin, TableForm):
     
     class Meta:
         model = Order
@@ -9,6 +10,7 @@ class EditOrderForm(TableForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["owner"].widget.attrs["placeholder"] = "Client Name"
-        self.fields["owner"].label = "Име на клиент"
         self.fields["client"].label = "Поръчка/Оферта"
+
+        # Shared client contact fields
+        self.setup_contact_fields()

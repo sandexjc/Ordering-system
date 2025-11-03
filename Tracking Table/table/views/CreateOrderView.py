@@ -22,7 +22,7 @@ class CreateOrder(LoginRequiredMixin, CreateView):
 
         return context
 
-    def post(self, request):
+    def post(self, request, **kwargs):
 
         form_class = self.get_form_class()
         form = self.get_form(form_class)

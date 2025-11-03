@@ -1,0 +1,1 @@
+from .VitrineBaseForm import VitrineForm
