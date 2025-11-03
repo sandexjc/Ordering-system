@@ -1,7 +1,7 @@
-# from .base import (
-#     TableItem, 
-#     TableOrder,
-# )
+from .base import (
+    TableItem, 
+    TableOrder,
+)
 
 from .items import (
     Change,

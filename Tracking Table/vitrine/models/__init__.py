@@ -10,6 +10,7 @@ from .items import (
     Hole,
     Glass,
     Seal,
+    Note,
 )
 
 from .vitrine import (
