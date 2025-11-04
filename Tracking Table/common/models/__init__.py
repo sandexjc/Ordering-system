@@ -1,5 +1,10 @@
-from .BaseModel import BaseModel
-from .BaseItemModel import BaseItem
-from .BaseOrderModel import BaseOrder
-from .BasePaymentModel import BasePayment
-from .BaseNoteModel import BaseNote
+from .base import (
+    BaseItem,
+    BaseModel,
+    BaseOrder,
+)
+
+from .items import (
+    BasePayment,
+    BaseNote,
+)
