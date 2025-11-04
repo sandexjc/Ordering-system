@@ -5,3 +5,7 @@ from .BaseForms import (
 from .VitrineForms import (
     CreateVitrineForm,
 )
+
+from .ItemsForms import (
+    AddNoteForm,
+)

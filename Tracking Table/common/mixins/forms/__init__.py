@@ -1,2 +1,2 @@
-from .FieldStyleMixin import FieldStyleMixin
-from .ContactFieldsMixin import ContactFieldsMixin
+from .FieldsStyleMixin import FieldsStyleMixin
+from .SetupFieldsMixin import SetupFieldsMixin

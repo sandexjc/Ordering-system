@@ -1,7 +1,7 @@
 from django import forms
-from common.mixins import FieldStyleMixin
+from common.mixins import FieldsStyleMixin
 
-class BaseForm(FieldStyleMixin, forms.Form):
+class BaseForm(FieldsStyleMixin, forms.Form):
 
     """ Top level base form for all non-model forms. """
     

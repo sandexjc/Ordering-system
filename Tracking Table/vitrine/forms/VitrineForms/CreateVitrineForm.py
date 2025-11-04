@@ -1,8 +1,8 @@
 from vitrine.models import Vitrine
 from vitrine.forms import VitrineForm
-from common.mixins import ContactFieldsMixin
+from common.mixins import SetupFieldsMixin
 
-class CreateVitrineForm(ContactFieldsMixin, VitrineForm):
+class CreateVitrineForm(SetupFieldsMixin, VitrineForm):
 
     class Meta:
         model = Vitrine
@@ -11,5 +11,5 @@ class CreateVitrineForm(ContactFieldsMixin, VitrineForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Shared client contact fields
+        # Customer contact information fields setup
         self.setup_contact_fields()

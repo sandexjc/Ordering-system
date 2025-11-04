@@ -1,4 +1,4 @@
 from .forms import (
-    FieldStyleMixin,
-    ContactFieldsMixin,
+    FieldsStyleMixin,
+    SetupFieldsMixin,
 )

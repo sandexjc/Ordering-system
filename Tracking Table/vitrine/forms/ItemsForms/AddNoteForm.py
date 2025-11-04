@@ -1,6 +1,6 @@
 from common.forms import BaseModelForm
 from common.mixins import SetupFieldsMixin
-from table.models import Note
+from vitrine.models import Note
 
 class AddNoteForm(SetupFieldsMixin, BaseModelForm):
     

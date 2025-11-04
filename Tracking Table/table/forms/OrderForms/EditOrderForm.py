@@ -1,8 +1,8 @@
 from table.forms import TableForm
 from table.models import Order
-from common.mixins import ContactFieldsMixin
+from common.mixins import SetupFieldsMixin
 
-class EditOrderForm(ContactFieldsMixin, TableForm):
+class EditOrderForm(SetupFieldsMixin, TableForm):
     
     class Meta:
         model = Order
@@ -12,5 +12,5 @@ class EditOrderForm(ContactFieldsMixin, TableForm):
         super().__init__(*args, **kwargs)
         self.fields["client"].label = "Поръчка/Оферта"
 
-        # Shared client contact fields
+        # Customer contact information fields setup
         self.setup_contact_fields()

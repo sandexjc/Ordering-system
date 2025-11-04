@@ -1,6 +1,6 @@
 
 
-class FieldStyleMixin:
+class FieldsStyleMixin:
 
     """ Mixin that provides helper methods for styling and controlling form fields. """
 
