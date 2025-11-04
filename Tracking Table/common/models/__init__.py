@@ -7,4 +7,5 @@ from .base import (
 from .items import (
     BasePayment,
     BaseNote,
+    BaseChange,
 )

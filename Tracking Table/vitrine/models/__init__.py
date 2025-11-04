@@ -11,6 +11,7 @@ from .items import (
     Glass,
     Seal,
     Note,
+    Change,
 )
 
 from .vitrine import (
