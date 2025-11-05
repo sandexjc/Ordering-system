@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block links %}
-<link rel="stylesheet" type="text/css" href="{% static 'table/css/order-form.css' %}?v=1.1">
+<link rel="stylesheet" type="text/css" href="{% static 'css/new_order_form.css' %}?v=1.6">
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@
 		<h1>Нова заявка</h1>
 	</div>
 
-	<form method="POST" class="shadow-lg order-form">
+	<form method="POST" class="shadow-lg new-order-form">
 		{% csrf_token %}
 		{% bootstrap_form form bound_css_class='' %}
 		{% bootstrap_form add_note bound_css_class='' %}

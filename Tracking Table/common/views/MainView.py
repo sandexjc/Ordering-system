@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from main.forms import SearchForm, FilterForm
 import time
 
-class BaseView(LoginRequiredMixin, TemplateView):
+class MainView(LoginRequiredMixin, TemplateView):
 
     """ Base view logic for all apps sharing main site page """
 

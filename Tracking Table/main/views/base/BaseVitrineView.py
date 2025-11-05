@@ -1,9 +1,9 @@
-from common.views import BaseView
+from common.views import MainView
 from vitrine.models import Vitrine
 from django.core.exceptions import ObjectDoesNotExist
 
 
-class BaseVitrineView(BaseView):
+class BaseVitrineView(MainView):
 
     """ Vitrine application domain base view """
 

@@ -6,9 +6,15 @@
         <div class="col">
             <nav class="nav">
                 <!-- New order button -->
-                <a class="btn btn-outline-primary" href="{% url 'table:newOrder' type=nav_select %}">
-                    <img src="{% static 'images/add.png' %}" class="tableIcons">
-                </a>
+                {% if nav_select == "Vitrine" %}
+                    <a class="btn btn-outline-primary" href="{% url 'vitrine:new_order' %}">
+                        <img src="{% static 'images/add.png' %}" class="tableIcons">
+                    </a>
+                {% else %}
+                    <a class="btn btn-outline-primary" href="{% url 'table:newOrder' type=nav_select %}">
+                        <img src="{% static 'images/add.png' %}" class="tableIcons">
+                    </a>
+                {% endif %}
 
                 <!-- Filter button -->
                 <button class="btn btn-outline-primary position-relative" data-bs-toggle="collapse" data-bs-target="#collapseExample">

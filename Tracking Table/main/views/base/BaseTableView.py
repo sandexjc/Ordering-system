@@ -1,9 +1,9 @@
-from common.views import BaseView
+from common.views import MainView
 from table.models import Order
 from django.core.exceptions import ObjectDoesNotExist
 
 
-class BaseTableView(BaseView):
+class BaseTableView(MainView):
 
     """ Table application specific base view """
 
