@@ -20,15 +20,5 @@ class Order(TableOrder, BaseOrder):
 
     invoice = models.BooleanField(default=False)
 
-    def clear(self):
-
-        self.plates_total = 0
-        self.edge_total = 0
-        self.cutting_total = 0
-        self.edging_total = 0
-        self.others_total = 0
-        self.paid = 0
-        self.total_price = 0
-
     def __str__(self):
         return str(self.id)

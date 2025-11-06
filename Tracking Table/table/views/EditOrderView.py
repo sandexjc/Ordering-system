@@ -17,39 +17,6 @@ class EditOrder(LoginRequiredMixin, UpdateView):
 
         context = super(EditOrder, self).get_context_data(**kwargs)
 
-        # FIXME
-        # Temporary move order object and total price calculation upon
-        # creation of common managers and querysets for models.
-        
-        # self.object.update()
-
-        self.object.clear()
-
-        for item in models.Plate.objects.filter(order_id=self.object.id):
-            self.object.plates_total += item.value
-            self.object.total_price += item.value
-
-        for item in models.Edge.objects.filter(order_id=self.object.id):
-            self.object.edge_total += item.value
-            self.object.total_price += item.value
-
-        for item in models.Cutting.objects.filter(order_id=self.object.id):
-            self.object.cutting_total += item.value
-            self.object.total_price += item.value
-
-        for item in models.Edging.objects.filter(order_id=self.object.id):
-            self.object.edging_total += item.value
-            self.object.total_price += item.value
-
-        for item in models.Other.objects.filter(order_id=self.object.id):
-            self.object.others_total += item.value
-            self.object.total_price += item.value
-
-        for item in models.Payment.objects.filter(order_id=self.object.id):
-            self.object.paid += item.value
-
-        self.object.balance = round((self.object.paid - self.object.total_price), 2)
-
         if self.request.POST:
             context['plate_forms'] = kwargs['PLATES']
             context['cutting_forms'] = kwargs['CUTTING']
@@ -196,7 +163,6 @@ class EditOrder(LoginRequiredMixin, UpdateView):
                                                 what='Plate', new_state=item.material).save()
 
             item.order_id = self.object
-            item.value = round((item.quantity * item.price), 2)
             item.save()
 
         for item in PLATES.deleted_objects:
@@ -279,41 +245,6 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         for item in payment:
             item.order_id = self.object
             item.save()
-
-
-
-        # FIXME
-        # Temporary move order object and total price calculation upon
-        # creation of common managers and querysets for models.
-
-        # self.object.update()
-
-        self.object.clear()
-
-        for item in models.Plate.objects.filter(order_id=self.object.id):
-            self.object.plates_total += item.value
-            self.object.total_price += item.value
-
-        for item in models.Edge.objects.filter(order_id=self.object.id):
-            self.object.edge_total += item.value
-            self.object.total_price += item.value
-
-        for item in models.Cutting.objects.filter(order_id=self.object.id):
-            self.object.cutting_total += item.value
-            self.object.total_price += item.value
-
-        for item in models.Edging.objects.filter(order_id=self.object.id):
-            self.object.edging_total += item.value
-            self.object.total_price += item.value
-
-        for item in models.Other.objects.filter(order_id=self.object.id):
-            self.object.others_total += item.value
-            self.object.total_price += item.value
-
-        for item in models.Payment.objects.filter(order_id=self.object.id):
-            self.object.paid += item.value
-
-        self.object.balance = round((self.object.paid - self.object.total_price), 2)
 
         self.object.save()
 
