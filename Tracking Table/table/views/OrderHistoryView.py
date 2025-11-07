@@ -13,9 +13,7 @@ class OrderHistory(LoginRequiredMixin, ListView):
 
     def get(self, request, pk, *args, **kwargs):
 
-        print("GET ORDER HISTORY", pk)
-
-        order_chnages = Change.objects.filter(order_id=pk)
+        order_chnages = Change.objects.for_order_id(pk)
 
         if not order_chnages:
             return JsonResponse({

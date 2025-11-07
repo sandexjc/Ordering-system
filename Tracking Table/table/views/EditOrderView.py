@@ -128,121 +128,65 @@ class EditOrder(LoginRequiredMixin, UpdateView):
         if note != '':
             notes.save()
 
-            models.Change.objects.create(order_id=self.object, user=user, operation='created', 
-                                            what='Note', new_state=note).save()
-
         plate = PLATES.save(commit=False)
 
         for item in plate:
-
-            if item.pk:
-
-                old_object = models.Plate.objects.get(pk=item.pk)
-                changed_fields = {}
-
-                if old_object.material != item.material:
-                    changed_fields['material'] = f'{old_object.material} -> {item.material}'
-
-                if old_object.manufacturer != item.manufacturer:
-                    changed_fields['manufacturer'] = f'{old_object.manufacturer} -> {item.manufacturer}'
-
-                if old_object.quantity != item.quantity:
-                    changed_fields['quantity'] = f'{old_object.quantity} -> {item.quantity}'
-
-                if old_object.price != item.price:
-                    changed_fields['price'] = f'{old_object.price} -> {item.price}'
-
-                if old_object.from_client != item.from_client:
-                    changed_fields['from_client'] = f'{old_object.from_client} -> {item.from_client}'
-
-                for changed_field in changed_fields.keys():
-                    models.Change.objects.create(order_id=self.object, user=user, operation='Changed', what=changed_field,
-                                                    current_state=item.material, new_state=changed_fields[changed_field]).save()
-            else:
-                models.Change.objects.create(order_id=self.object, user=user, operation='Added', 
-                                                what='Plate', new_state=item.material).save()
-
+            item.modified_by = user
             item.order_id = self.object
             item.save()
 
         for item in PLATES.deleted_objects:
+            item.modified_by = user
             item.delete()
-
-            models.Change.objects.create(order_id=self.object, user=user, operation='Deleted', 
-                                            what='Plate', new_state=item.material).save()
 
         cutting = CUTTING.save(commit=False)
 
         for item in cutting:
-
-            if item.pk:
-
-                old_object = models.Cutting.objects.get(pk=item.pk)
-                changed_fields = {}
-
-                if old_object.cutting_type != item.cutting_type:
-                    changed_fields['cutting_type'] = f'{old_object.cutting_type} -> {item.cutting_type}'
-
-                if old_object.quantity != item.quantity:
-                    changed_fields['quantity'] = f'{old_object.quantity} -> {item.quantity}'
-
-                if old_object.price != item.price:
-                    changed_fields['price'] = f'{old_object.price} -> {item.price}'
-
-                for changed_field in changed_fields.keys():
-                    models.Change.objects.create(order_id=self.object, user=user, operation='Changed', what=changed_field,
-                                                    current_state=item.cutting_type, new_state=changed_fields[changed_field]).save()
-            else:
-                models.Change.objects.create(order_id=self.object, user=user, operation='Added', 
-                                                what='Cutting', new_state=item.cutting_type).save()
-
+            item.modified_by = user
             item.order_id = self.object
-            item.value = round((item.quantity * item.price), 2)
             item.save()
 
         for item in CUTTING.deleted_objects:
-
-            models.Change.objects.create(order_id=self.object, user=user, operation='Deleted', 
-                                            what='Cutting', new_state=item.cutting_type).save()
-
+            item.modified_by = user
             item.delete()
 
         edge = EDGES.save(commit=False)
 
         for item in edge:
+            item.modified_by = user
             item.order_id = self.object
-            item.value = round((item.quantity * item.price), 2)
             item.save()
 
         for item in EDGES.deleted_objects:
-            print(f'DELETING {item}')
+            item.modified_by = user
             item.delete()
 
         edging = EDGING.save(commit=False)
 
         for item in edging:
+            item.modified_by = user
             item.order_id = self.object
-            item.value = round((item.quantity * item.price), 2)
             item.save()
 
         for item in EDGING.deleted_objects:
-            print(f'DELETING {item}')
+            item.modified_by = user
             item.delete()
 
         other = OTHER.save(commit=False)
 
         for item in other:
+            item.modified_by = user
             item.order_id = self.object
-            item.value = round((item.quantity * item.price), 2)
             item.save()
 
         for item in OTHER.deleted_objects:
-            print(f'DELETING {item}')
+            item.modified_by = user
             item.delete()
 
         payment = PAYMENTS.save(commit=False)
 
         for item in payment:
+            item.modified_by = user
             item.order_id = self.object
             item.save()
 

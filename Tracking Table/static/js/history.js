@@ -30,13 +30,25 @@ function handle_orders_history()
 					$.each(data, function() {
 						$.each(this, function() {
 
-								historyBtn_body.append(this.fields.date + " ");
-								historyBtn_body.append(this.fields.user + " ");
-								historyBtn_body.append(this.fields.operation + " ");
-								historyBtn_body.append(this.fields.what + " ");
-								historyBtn_body.append(this.fields.current_state + " ");
-								historyBtn_body.append(this.fields.new_state + " ");
-								historyBtn_body.append("<br>");
+							// Format the date string
+							const isoDate = this.fields.date;
+							const dateObj = new Date(isoDate);
+							const formattedDate = dateObj.toLocaleString('en-GB', {
+								year: 'numeric',
+								month: 'short',
+								day: '2-digit',
+								hour: '2-digit',
+								minute: '2-digit',
+								second: '2-digit'
+							});
+
+							historyBtn_body.append(formattedDate + " — ");
+							historyBtn_body.append(this.fields.user + " ");
+							historyBtn_body.append(this.fields.operation + " ");
+							historyBtn_body.append(this.fields.related_item + " ");
+							historyBtn_body.append(this.fields.current_state + " ");
+							historyBtn_body.append(this.fields.new_state + " ");
+							historyBtn_body.append("<br>");
 
 						})
 					})
