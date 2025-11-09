@@ -10,10 +10,7 @@ class AddPlateForm(TableForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["manufacturer"].widget.attrs.update({
-            "style": "background-color: #faf9f9",
-            "class": "form-select form-select-sm",
-        })
+        self.set_sm_dropdown("manufacturer")
         self.set_switch("from_client")
         self.set_number("price")
         self.set_readonly("value")

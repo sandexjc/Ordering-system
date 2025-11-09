@@ -59,6 +59,14 @@ class FieldsStyleMixin:
         if field_name in self.fields:
             self.fields[field_name].required = False
     
+    def set_sm_dropdown(self, field_name):
+        # Set small dropdown selective menu with notes of gray color
+        if field_name in self.fields:
+            self.fields[field_name].widget.attrs.update({
+                "style": "background-color: #faf9f9",
+                "class": "form-select form-select-sm",
+            })
+    
     def disable_if(self, condition: bool, field_name: str, reason: str | None = None):
         # Disable a field if a given condition is True.
         # Optionally adds a reason as help_text.

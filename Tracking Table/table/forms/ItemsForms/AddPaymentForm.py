@@ -10,7 +10,7 @@ class AddPaymentForm(TableForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["payment_method"].widget.attrs["class"] = "form-select form-select-sm"
+        self.set_sm_dropdown("payment_method")
         self.set_number("value")
 
 
