@@ -13,8 +13,6 @@ class BaseChangeSignalMixin:
     @classmethod
     def set_log_change(cls, related_instance, user, operation, old_state=None, new_state=None):
 
-        print(f"🟩 set_log_change(): new_state={new_state!r}")
-
         # Logs a change using the configured model and field name.
         if not cls.change_model or not cls.fk_field_name:
             raise AttributeError(

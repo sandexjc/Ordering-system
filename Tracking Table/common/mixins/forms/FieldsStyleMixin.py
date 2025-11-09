@@ -4,6 +4,13 @@ class FieldsStyleMixin:
 
     """ Mixin that provides helper methods for styling and controlling form fields. """
 
+    def is_valid(self):
+        # --- Lifecycle override to apply error styling automatically ---
+        valid = super().is_valid()
+        if not valid:
+            self.apply_error_styling()
+        return valid
+
     def apply_bootstrap_styling(self):
         # Apply default Bootstrap classes to all fields.
         for field_name, field in self.fields.items():
@@ -86,3 +93,11 @@ class FieldsStyleMixin:
                 "style": new_style.strip(),
                 "title": reason or "This field is disabled",
             })
+    
+    def apply_error_styling(self):
+        # Apply 'is-invalid' class and width-based adjustments to invalid fields.
+        for field_name, field in self.fields.items():
+            if self.errors.get(field_name):
+                field.widget.attrs.update({
+                    "class": "form-control form-control-sm is-invalid",
+                })

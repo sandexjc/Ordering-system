@@ -2,8 +2,6 @@
 def log_change(ChangeModel, fk_field_name, related_instance,
                user, operation, related_item, old_state=None, new_state=None):
     
-    print(f"🟦 log_change(): related_instance={related_instance!r}, new_state={new_state!r}")
-    
     """ 
     Generic change logger for any app.
         - Model should be explicitly set
