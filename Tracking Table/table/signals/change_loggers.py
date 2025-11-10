@@ -20,14 +20,14 @@ MODEL_TO_RELATED_ITEM = {
     models.Payment: "Payment",
 }
 
-# Map tracked fields from models
+# Map tracked fields from items models
 TRACKED_FIELDS = {
-    "Plate": ["material", "manufacturer", "quantity", "price", "from_client"],
-    "Edge": ["color_code", "length", "price"],
-    "Cutting": ["cutting_type", "price"],
-    "Edging": ["edging_type", "price"],
-    "Other": ["description", "price"],
-    "Payment": ["value", "payment_type"],
+    "Plate": ["material", "manufacturer", "quantity", "price", "from_client", "deleted_at", "ordered", "delivered", "cutted", "edged"],
+    "Edge": ["edge_type", "color_code", "quantity", "price", "deleted_at", "ordered", "delivered", "visible"],
+    "Cutting": ["cutting_type", "quantity", "price", "deleted_at"],
+    "Edging": ["edging_type", "quantity", "price", "deleted_at"],
+    "Other": ["description", "quantity", "price", "deleted_at"],
+    "Payment": ["value", "payment_method", "deleted_at"],
 }
 
 # --- DELETE HANDLERS ---- #
@@ -49,7 +49,9 @@ def log_item_deletion(sender, instance, **kwargs):
         or getattr(instance, "color_code", None)
         or getattr(instance, "cutting_type", None)
         or getattr(instance, "edging_type", None)
-        or str(instance) or "Delete",
+        or getattr(instance, "description", None)
+        or getattr(instance, "payment_method", None)
+        or str(instance) or "N/A",
     )
 
 
@@ -71,12 +73,14 @@ def log_item_creation(sender, instance, created, **kwargs):
         related_instance=getattr(instance, "order_id", None),
         user=getattr(instance, "modified_by", None)
         or getattr(instance, "created_by", None),
-        operation="Created",
+        operation="added",
         new_state=getattr(instance, "material", None)
         or getattr(instance, "color_code", None)
         or getattr(instance, "cutting_type", None)
         or getattr(instance, "edging_type", None)
-        or str(instance) or "Create",
+        or getattr(instance, "description", None)
+        or getattr(instance, "payment_method", None)
+        or str(instance) or "N/A",
     )
 
 
@@ -88,7 +92,8 @@ def log_item_creation(sender, instance, created, **kwargs):
 @receiver(pre_save, sender=models.Other)
 @receiver(pre_save, sender=models.Payment)
 def store_old_state(sender, instance, **kwargs):
-    # new object — exit
+
+    # if new object — exit
     if not instance.pk:
         return
 
@@ -111,8 +116,6 @@ def store_old_state(sender, instance, **kwargs):
 @receiver(post_save, sender=models.Payment)
 def log_item_update(sender, instance, created, **kwargs):
 
-    """Compare old vs new values and log changes."""
-
     # Skip new items
     if created:
         return
@@ -122,15 +125,33 @@ def log_item_update(sender, instance, created, **kwargs):
         return
 
     TableChangeSignal.related_item = sender.__name__
-    user = getattr(instance, "modified_by", None) or getattr(instance, "created_by", None)
+    user = getattr(instance, "modified_by", None) or "System Admin"
 
     for field, old_value in old_state.items():
+        new_state = None
         new_value = getattr(instance, field)
         if old_value != new_value:
+            if field == "deleted_at":
+                # Log a change if soft delete mechanism is used
+                operation = "deleted"
+                old_state = (
+                    getattr(instance, "material", None) 
+                    or getattr(instance, "color_code", None)
+                    or getattr(instance, "cutting_type", None)
+                    or getattr(instance, "edging_type", None)
+                    or getattr(instance, "description", None)
+                    or getattr(instance, "payment_method", None)
+                    or str(instance) or "N/A"
+                )
+            else:
+                operation = "modified"
+                old_state = f"{old_value}"
+                new_state = f" → {new_value}"
+            
             TableChangeSignal.set_log_change(
                 related_instance=getattr(instance, "order_id", None),
-                user=user,
-                operation="Changed",
-                old_state=f"{old_value}",
-                new_state=f" → {new_value}",
+                user = user,
+                operation = operation,
+                old_state = old_state,
+                new_state = new_state,
             )
