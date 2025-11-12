@@ -1,6 +1,7 @@
 from .forms import (
-    FieldsStyleMixin,
-    SetupFieldsMixin,
+    FormFieldsSetupMixin,
+    FormFieldsStyleMixin,
+    FormSetStyleMixin,
 )
 
 from .signals import (

@@ -1,2 +1,3 @@
-from .FieldsStyleMixin import FieldsStyleMixin
-from .SetupFieldsMixin import SetupFieldsMixin
+from .FormFieldsStyleMixin import FormFieldsStyleMixin
+from .FormFieldsSetupMixin import FormFieldsSetupMixin
+from .FormSetStyleMixin import FormSetStyleMixin

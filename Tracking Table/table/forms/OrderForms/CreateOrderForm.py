@@ -1,8 +1,8 @@
 from table.models import Order
 from table.forms import TableForm
-from common.mixins import SetupFieldsMixin
+from common.mixins import FormFieldsSetupMixin
 
-class CreateOrderForm(SetupFieldsMixin, TableForm):
+class CreateOrderForm(FormFieldsSetupMixin, TableForm):
 
     class Meta:
         model = Order

@@ -1,8 +1,8 @@
 from vitrine.models import Vitrine
 from vitrine.forms import VitrineForm
-from common.mixins import SetupFieldsMixin
+from common.mixins import FormFieldsSetupMixin
 
-class CreateVitrineForm(SetupFieldsMixin, VitrineForm):
+class CreateVitrineForm(FormFieldsSetupMixin, VitrineForm):
 
     class Meta:
         model = Vitrine

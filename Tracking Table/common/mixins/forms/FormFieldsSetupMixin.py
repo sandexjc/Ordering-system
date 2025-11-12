@@ -1,6 +1,6 @@
 
 
-class SetupFieldsMixin:
+class FormFieldsSetupMixin:
 
     """ Mixin that standardizes setup for fields in forms. """
 

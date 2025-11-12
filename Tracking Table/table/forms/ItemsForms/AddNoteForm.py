@@ -1,8 +1,8 @@
 from common.forms import BaseModelForm
-from common.mixins import SetupFieldsMixin
+from common.mixins import FormFieldsSetupMixin
 from table.models import Note
 
-class AddNoteForm(SetupFieldsMixin, BaseModelForm):
+class AddNoteForm(FormFieldsSetupMixin, BaseModelForm):
     
     class Meta:
         model = Note

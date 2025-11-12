@@ -1,11 +1,8 @@
 from django import forms
+from common.mixins import FormSetStyleMixin
 
-class TableFormSet(forms.BaseInlineFormSet):
+class TableFormSet(FormSetStyleMixin, forms.BaseInlineFormSet):
     
     """ Intermediate domain level base inline formset with styled deletion widget. """
     
-    deletion_widget = forms.CheckboxInput(attrs={
-        "style": "width: 30px; height: 15px;",
-        "class": "form-check-input",
-        "role": "switch",
-    })
+    pass
