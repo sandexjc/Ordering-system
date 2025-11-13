@@ -57,7 +57,6 @@ class FormFieldsStyleMixin:
         # Utility method to apply a consistent style to numeric form fields.
         if field_name in self.fields:
             self.fields[field_name].widget.attrs.update({
-                "step": "0.01",
                 "class": "form-control form-control-sm",
             })
     

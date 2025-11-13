@@ -1,5 +1,6 @@
 from .BaseForms import (
     VitrineForm,
+    VitrineFormSet,
 )
 
 from .VitrineForms import (
@@ -8,4 +9,7 @@ from .VitrineForms import (
 
 from .ItemsForms import (
     AddNoteForm,
+    AddOtherForm,
+    AddPaymentForm,
+    AddFrameForm,
 )
