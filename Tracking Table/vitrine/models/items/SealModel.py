@@ -1,8 +1,18 @@
+from django.db import models
 from common.models import BaseItem
 from vitrine.models.base import VitrineItem
+from .FrameModel import Frame
 
 
 class Seal(VitrineItem, BaseItem):
 
+    seal_types = [
+        ('Black', 'Черно'),
+        ('White', 'Бяло'),
+    ]
+
+    seal_type = models.CharField(choices=seal_types, default='Black', max_length=10)
+    frame_id = models.ForeignKey(Frame, on_delete=models.CASCADE, related_name="%(class)ss")
+
     def __str__(self):
-        return f'Seal: {self.quantity} / Vitrine ID: {self.vitrine_id}'
+        return f'Seal: {self.seal_type} / Vitrine ID: {self.vitrine_id}'

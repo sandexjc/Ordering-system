@@ -2,24 +2,18 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from common.models import BaseItem
 from vitrine.models.base import VitrineItem
+from .FrameModel import Frame
 
 
 class Hole(VitrineItem, BaseItem):
 
-    directions = [
-        ('down', 'отдолу'),
-        ('up', 'отгоре'),
+    holes_positions = [
+        ('length', 'дължина'),
+        ('width', 'широчина'),
     ]
 
-    positions = [
-        ('left', 'лява'),
-        ('right', 'дясна'),
-    ]
-
-    direction = models.CharField(choices=directions, default='down', max_length=10)
-    position_x = models.CharField(choices=positions, default='right', max_length=10)
-    position_y = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20000)], default=0)
-    quantity = models.IntegerField(default=1, editable=False, validators=[MinValueValidator(1), MaxValueValidator(1)])
+    holes_position = models.CharField(choices=holes_positions, default='length', max_length=10)
+    frame_id = models.ForeignKey(Frame, on_delete=models.CASCADE, related_name="%(class)ss")
 
     def __str__(self):
         return f"Hole: {self.id} / Vitrine ID: {self.vitrine_id}"
