@@ -1,1 +1,2 @@
 from .CreateVitrineForm import CreateVitrineForm
+from .EditVitrineForm import EditVitrineForm
