@@ -42,7 +42,7 @@ class BaseCreateView(LoginRequiredMixin, CreateView):
                     self.related_field_name: self.object,
                     "user": user.first_name,
                     "operation": "created",
-                    "what": self.change_what,
+                    "related_item": self.change_what,
                     "new_state": self.object.id,
                 }
             )
@@ -63,7 +63,7 @@ class BaseCreateView(LoginRequiredMixin, CreateView):
                         self.related_field_name: self.object,
                         "user": user.first_name,
                         "operation": "created",
-                        "what": "Note",
+                        "related_item": "Note",
                         "new_state": note,
                     }
                 )
