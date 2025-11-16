@@ -1,8 +1,9 @@
 from django.urls import path
-from vitrine.views import CreateOrder
+from vitrine import views
 
 app_name = 'vitrine'
 
 urlpatterns = [
-    path('create_order/', CreateOrder.as_view(), name='new_order'),
+    path('create_vitrine/', views.CreateVitrine.as_view(), name='new_vitrine'),
+    path('edit_vitrine/<int:pk>', views.EditVitrine.as_view(), name='edit_vitrine'),
 ]

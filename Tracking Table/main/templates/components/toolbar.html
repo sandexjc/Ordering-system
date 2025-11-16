@@ -7,7 +7,7 @@
             <nav class="nav">
                 <!-- New order button -->
                 {% if nav_select == "Vitrine" %}
-                    <a class="btn btn-outline-primary" href="{% url 'vitrine:new_order' %}">
+                    <a class="btn btn-outline-primary" href="{% url 'vitrine:new_vitrine' %}">
                         <img src="{% static 'images/add.png' %}" class="tableIcons">
                     </a>
                 {% else %}

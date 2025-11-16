@@ -51,7 +51,7 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
                         messages.error(request, error.as_text())
             return self.form_invalid(order_form, note_form, formsets)
 
-    # --- Validation --- #
+    # --- Validation and Save --- #
     def form_valid(self, order_form, note_form, formsets):
         user = self.request.user.first_name
         self.object = order_form.save()

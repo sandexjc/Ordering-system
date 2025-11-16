@@ -13,4 +13,7 @@ from .ItemsForms import (
     AddOtherForm,
     AddPaymentForm,
     AddFrameForm,
+    FrameFormSet,
+    OthersFormSet,
+    PaymentFormSet,
 )

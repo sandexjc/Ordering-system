@@ -1,4 +1,4 @@
 from .AddNoteForm import AddNoteForm
-from .AddOtherForm import AddOtherForm
-from .AddPaymentForm import AddPaymentForm
-from .AddFrameForm import AddFrameForm
+from .AddOtherForm import AddOtherForm, OthersFormSet
+from .AddPaymentForm import AddPaymentForm, PaymentFormSet
+from .AddFrameForm import AddFrameForm, FrameFormSet

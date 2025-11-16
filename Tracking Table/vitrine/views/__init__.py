@@ -1,1 +1,2 @@
-from .CreateVitrineView import CreateOrder
+from .CreateVitrineView import CreateVitrine
+from .EditVitrineView import EditVitrine
