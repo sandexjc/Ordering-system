@@ -21,6 +21,10 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
             for name, formset_class in self.related_formsets.items()
         }
 
+    def _handle_formsets(self, formsets):
+        raise NotImplementedError("Subclasses must implement _handle_formsets method.")
+    
+
     # --- GET --- #
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -32,6 +36,7 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
 
         context["current_order"] = self.object
         return context
+    
 
     # --- POST --- #
     def post(self, request, *args, **kwargs):
@@ -50,31 +55,23 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
                     if error:
                         messages.error(request, error.as_text())
             return self.form_invalid(order_form, note_form, formsets)
+        
 
-    # --- Validation and Save --- #
+    # --- Validation --- #
     def form_valid(self, order_form, note_form, formsets):
         user = self.request.user.first_name
         self.object = order_form.save()
 
         # Save note if not empty
-        if note_form:
+        if note_form and note.content:
             note = note_form.save(commit=False)
             note.user = user
-            setattr(note, self.fk_field_name, self.object)
+            setattr(note, self.fk_field_name, self.object.pk)
             if note.content:
                 note.save()
 
-        # Save all related formsets
-        for formset in formsets.values():
-            instances = formset.save(commit=False)
-            for item in instances:
-                item.modified_by = user
-                setattr(item, self.fk_field_name, self.object)
-                item.save()
-
-            for item in formset.deleted_objects:
-                item.modified_by = user
-                item.soft_delete()
+        # Handle realated formsets
+        self._handle_formsets(formsets, user)
 
         messages.success(self.request, "Промените са запазени успешно!")
         return redirect(self.redirect_url, self.object.pk)

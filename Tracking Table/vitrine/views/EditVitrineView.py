@@ -4,7 +4,7 @@ from vitrine import forms
 
 class EditVitrine(BaseEditView):
 
-    """ Main view for editing table app specific orders. """
+    """ Main view for editing vitrine app specific orders. """
 
     model = Vitrine
     form_class = forms.EditVitrineForm
@@ -19,3 +19,24 @@ class EditVitrine(BaseEditView):
 
     fk_field_name = "vitrine_id"
     redirect_url = "vitrine:edit_vitrine"
+
+    def _handle_formsets(self, formsets, user):
+
+        for formset in formsets.values():
+            instances = formset.save(commit=False)
+            for item in instances:
+                # create/update frame records
+                item.modified_by = user
+                setattr(item, self.fk_field_name, self.object)
+                item.save()
+
+                # create/update holes record
+
+                # create/update glass records
+
+                # create/update seal records
+
+
+            for item in formset.deleted_objects:
+                item.modified_by = user
+                item.soft_delete()
