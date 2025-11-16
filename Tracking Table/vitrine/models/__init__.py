@@ -1,8 +1,3 @@
-from .base import (
-    VitrineOrder,
-    VitrineItem,
-)
-
 from .items import (
     Other,
     Payment,

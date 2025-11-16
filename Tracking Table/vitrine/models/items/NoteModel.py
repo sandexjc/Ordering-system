@@ -1,5 +1,5 @@
 from common.models import BaseNote
-from vitrine.models import VitrineItem
+from vitrine.models.base import VitrineItem
 
 
 class Note(VitrineItem, BaseNote):

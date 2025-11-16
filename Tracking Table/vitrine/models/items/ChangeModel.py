@@ -1,5 +1,5 @@
 from common.models import BaseChange
-from vitrine.models import VitrineItem
+from vitrine.models.base import VitrineItem
 
 class Change(VitrineItem, BaseChange):
 
