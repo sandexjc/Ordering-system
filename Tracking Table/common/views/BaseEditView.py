@@ -60,15 +60,16 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
     # --- Validation --- #
     def form_valid(self, order_form, note_form, formsets):
         user = self.request.user.first_name
+
+        # handle order form
         self.object = order_form.save()
 
-        # Save note if not empty
-        if note_form and note.content:
-            note = note_form.save(commit=False)
-            note.user = user
-            setattr(note, self.fk_field_name, self.object.pk)
-            if note.content:
-                note.save()
+        # handle note form
+        note = note_form.save(commit=False)
+        note.user = user
+        setattr(note, self.fk_field_name, self.object)
+        if note.content:
+            note.save()
 
         # Handle realated formsets
         self._handle_formsets(formsets, user)

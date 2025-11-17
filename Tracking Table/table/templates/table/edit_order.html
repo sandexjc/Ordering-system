@@ -20,7 +20,7 @@
 		{% endif %}
 	</div>
 
-	<form method="POST" id="editOrderForm" class="shadow-lg new-order-form">
+	<form method="POST" id="edit-order-form" class="shadow-lg new-order-form">
 		{% csrf_token %}
 		<label class="form-label" for="OrderID">ID</label>
 		<input type="text" id="OrderID" class="form-control" readonly value="{{current_order.id}}">
@@ -310,7 +310,7 @@
 		</div>
 
 		<div class="d-grid gap-2 col-3 mx-auto">
-			<button type="submit" class="btn btn-primary" id="editButton">Update</button>
+			<button type="submit" class="btn btn-primary" id="edit-order-button">Update</button>
 		</div>
 	</form>
 	

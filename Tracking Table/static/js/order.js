@@ -152,8 +152,15 @@ function handle_orders_properties()
 		})
 	})
 
-	$('#editButton').click(function() {
-		$('#editOrderForm').submit();
+	$('#edit-order-button').click(function() {
+		$('#edit-order-form').submit();
+		$(this).html("Loading...");
+		$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
+		$(this).prop('disabled', true);
+	})
+
+	$('#edit-vitrine-button').click(function() {
+		$('#edit-vitrine-form').submit();
 		$(this).html("Loading...");
 		$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
 		$(this).prop('disabled', true);

@@ -16,7 +16,7 @@
 		<h1>Редактиране на витрина</h1>
 	</div>
 
-	<form method="POST" id="editVitrineForm" class="shadow-lg new-order-form">
+	<form method="POST" id="edit-vitrine-form" class="shadow-lg new-order-form">
 		{% csrf_token %}
 		<label class="form-label" for="vitrine_id">ID</label>
 		<input type="text" id="vitrine_id" class="form-control" readonly value="{{current_order.id}}">
@@ -148,11 +148,12 @@
 			</a>
 		</div>
 
+		{% endcomment %}
+
 		<div class="d-grid gap-2 col-3 mx-auto">
-			<button type="submit" class="btn btn-primary" id="editButton">Update</button>
+			<button type="submit" class="btn btn-primary" id="edit-vitrine-button">Update</button>
 		</div>
 
-        {% endcomment %}
 	</form>
 	
 </div>

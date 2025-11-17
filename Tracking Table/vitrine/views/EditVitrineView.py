@@ -1,12 +1,12 @@
 from common.views import BaseEditView
-from vitrine.models import Vitrine 
+from vitrine import models
 from vitrine import forms
 
 class EditVitrine(BaseEditView):
 
     """ Main view for editing vitrine app specific orders. """
 
-    model = Vitrine
+    model = models.Vitrine
     form_class = forms.EditVitrineForm
     note_form_class = forms.AddNoteForm
     template_name = 'vitrine/edit_vitrine.html'
@@ -24,19 +24,58 @@ class EditVitrine(BaseEditView):
 
         for formset in formsets.values():
             instances = formset.save(commit=False)
-            for item in instances:
-                # create/update frame records
+
+            for form, item in zip(formset.forms, instances):
+
+                # Save model formset items
                 item.modified_by = user
                 setattr(item, self.fk_field_name, self.object)
                 item.save()
 
-                # create/update holes record
+                # Handle extra (non-model) form fields
+                if isinstance(item, models.Frame):
+                    holes_count = form.cleaned_data.get("holes_count")
+                    holes_position = form.cleaned_data.get("holes_position")
+                    glass_type = form.cleaned_data.get("glass_type")
 
-                # create/update glass records
+                    # HOLES
+                    models.Hole.objects.update_or_create(
+                        vitrine_id = item.vitrine_id,
+                        frame_id=item,
+                        defaults={
+                            "holes_position": holes_position,
+                            "quantity": holes_count,
+                            "price": 0,
+                        }
+                    )
 
-                # create/update seal records
+                    # GLASS
+                    models.Glass.objects.update_or_create(
+                        vitrine_id = item.vitrine_id,
+                        frame_id=item,
+                        defaults={
+                            "glass_type": glass_type,
+                            "quantity": (item.length * item.width) / 1000000,
+                            "price": 0,
+                            }
+                    )
 
+                    # SEAL
+                    models.Seal.objects.update_or_create(
+                        vitrine_id = item.vitrine_id,
+                        frame_id=item,
+                        defaults={
+                            "seal_type": item.profile_type if item.profile_type == "Black" else "White",
+                            "quantity": (item.length * 2) + (item.width * 2),
+                            "price": 0,
+                            }
+                    )
 
+            # Handle deletes
             for item in formset.deleted_objects:
-                item.modified_by = user
+                if isinstance(item, models.Frame):
+                    models.Hole.frame_objects.for_frame(item).soft_delete()
+                    models.Glass.frame_objects.for_frame(item).soft_delete()
+                    models.Seal.frame_objects.for_frame(item).soft_delete()
                 item.soft_delete()
+
