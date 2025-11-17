@@ -2,7 +2,7 @@ from django.contrib import admin
 from import_export import resources
 from import_export.fields import Field
 from import_export.widgets import DateWidget
-from import_export.admin import ExportActionMixin
+# from import_export.admin import ExportActionMixin
 from table import models
 
 class OrderResource(resources.ModelResource):
@@ -36,10 +36,10 @@ class OrderResource(resources.ModelResource):
 			'balance_data',
 			)
 
-class ExportOrder(ExportActionMixin, admin.ModelAdmin):
-	resource_class = OrderResource
+class ExportOrder(admin.ModelAdmin):
+	pass
 
-class ExportOther(ExportActionMixin, admin.ModelAdmin):
+class ExportOther(admin.ModelAdmin):
 	# resource_class = PlateResource
 	pass
 
