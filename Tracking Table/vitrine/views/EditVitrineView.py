@@ -45,7 +45,7 @@ class EditVitrine(BaseEditView):
                         defaults={
                             "holes_position": holes_position,
                             "quantity": holes_count,
-                            "price": 0,
+                            "price": 2,
                         }
                     )
 
@@ -66,8 +66,8 @@ class EditVitrine(BaseEditView):
                         frame_id=item,
                         defaults={
                             "seal_type": item.profile_type if item.profile_type == "Black" else "White",
-                            "quantity": (item.length * 2) + (item.width * 2),
-                            "price": 0,
+                            "quantity": ((item.length * 2) + (item.width * 2)) / 1000,
+                            "price": 1,
                             }
                     )
 
