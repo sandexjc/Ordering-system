@@ -23,7 +23,7 @@ def create_or_update_items(sender, **kwargs):
         frame_id=frame,
         defaults={
             "seal_type": frame.profile_type if frame.profile_type == "Black" else "White",
-            "quantity": ((frame.length * 2) + (frame.width * 2)) / 1000,
+            "quantity": (((frame.length * 2) + (frame.width * 2)) / 1000) * frame.quantity,
             "price": 1,
             }
     )
@@ -34,7 +34,7 @@ def create_or_update_items(sender, **kwargs):
         frame_id=frame,
         defaults={
             "holes_position": frame.holes_position,
-            "quantity": frame.holes_count,
+            "quantity": (frame.holes_count - 2 if frame.holes_count > 2 else 0) * frame.quantity,
             "price": 2,
         }
     )
@@ -45,7 +45,7 @@ def create_or_update_items(sender, **kwargs):
         frame_id=frame,
         defaults={
             "glass_type": frame.glass_type,
-            "quantity": (frame.length * frame.width) / 1000000,
+            "quantity": ((frame.length * frame.width) / 1000000) * frame.quantity,
             "price": 0,
             }
     )

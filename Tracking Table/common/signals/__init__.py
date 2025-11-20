@@ -1,4 +1,4 @@
-from .common_signals import (
+from .custom_signals import (
     soft_deleted,
     restored,
 )
