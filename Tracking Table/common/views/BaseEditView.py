@@ -20,9 +20,6 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
             name: formset_class(data, instance=self.object) if data else formset_class(instance=self.object)
             for name, formset_class in self.related_formsets.items()
         }
-
-    def _handle_formsets(self, formsets):
-        raise NotImplementedError("Subclasses must implement _handle_formsets method.")
     
 
     # --- GET --- #
@@ -72,7 +69,16 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
             note.save()
 
         # Handle realated formsets
-        self._handle_formsets(formsets, user)
+        for formset in formsets.values():
+            instances = formset.save(commit=False)
+            for item in instances:
+                item.modified_by = user
+                setattr(item, self.fk_field_name, self.object)
+                item.save()
+            
+            for item in formset.deleted_objects:
+                item.modified_by = user
+                item.soft_delete()
 
         messages.success(self.request, "Промените са запазени успешно!")
         return redirect(self.redirect_url, self.object.pk)

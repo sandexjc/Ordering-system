@@ -5,7 +5,7 @@ from vitrine.models.base import VitrineItem, VitrineFrameItem
 
 class Glass(VitrineItem, VitrineFrameItem):
 
-    glass_type = models.CharField(max_length=50)
+    glass_type = models.CharField(max_length=50, blank=True, null=True)
 
     # Override BaseItem quantity field to align with model requirements
     quantity = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0.01)])

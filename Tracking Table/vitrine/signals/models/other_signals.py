@@ -5,5 +5,5 @@ from common.helpers import calculate_item_value
 
 
 @receiver(pre_save, sender=Other)
-def update_other_value(sender, instance, **kwargs):
-    instance.value = calculate_item_value(instance)
+def update_other_value(sender, other, **kwargs):
+    other.value = calculate_item_value(other)
