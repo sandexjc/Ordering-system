@@ -63,9 +63,11 @@ body
 	text-align: center;
 }
 
-.table td
-{
-	padding: 0px;
+.table > :not(caption) > * > td {
+    padding-left: 0.25rem;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
 	font-weight: bold;
 	text-align: left;
 }

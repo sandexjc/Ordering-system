@@ -1,0 +1,23 @@
+.frame-row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.holes-vertical {
+    --dot-size: 3px;
+    --tile-height: 6px;
+
+    width: var(--dot-size);
+    height: calc(var(--count) * var(--tile-height));
+
+    background:
+        radial-gradient(circle, black 60%, transparent 61%)
+        center top / var(--dot-size) var(--tile-height)
+        repeat-y;
+}
+
+/* empty placeholder so widths align */
+.empty {
+    width: 4px;
+}

@@ -33,9 +33,9 @@
             {% endif %}
 
                 {% if order.invoice %}
-                    <td style="color: red;"   id="ID{{order.id}}">{{order.id}}</th>
+                    <td style="color: red;"   id="ID{{order.id}}">{{ order.id }}</td>
                 {% else %}
-                    <td style="color: black;" id="ID{{order.id}}">{{order.id}}</th>
+                    <td style="color: black;" id="ID{{order.id}}">{{ order.id }}</td>
                 {% endif %}
 
                 <td>{{order.created_date|date:"d.m.Y"}}</td>
@@ -91,7 +91,7 @@
                     {% for item in order.edges.all %}
                         {% if item.visible %}
                             {% if item.ordered and not item.delivered %}
-                                <div class="Edge" id="edge{{item.pk}}" style="color: red;" >
+                                <div class="Edge" id="edge{{item.pk}}" style="color: red;">
                                 {{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
                                 </div>
                             {% elif item.delivered and item.ordered %}

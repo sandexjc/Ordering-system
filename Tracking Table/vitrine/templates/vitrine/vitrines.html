@@ -1,29 +1,88 @@
 {% extends "layout/content.html" %}
+{% load static %}
+
+{% block links %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/holes_dots.css' %}?v=1.0">
+{% endblock %}
 
 {% block table_content %}
 <table class="table table-hover table-bordered">
     <thead>
         <tr>
-            <th>#</th>
-            <th>Дата</th>
-            <th>Клиент</th>
-            <th>Тип витрина</th>
-            <th>Размери</th>
-            <th>Цвят</th>
-            <th>Цена</th>
+            <th scope="col" colspan="3">Основна Информация</th>
+            <th scope="col" colspan="2">Рамка</th>
+            <th scope="col" colspan="1">Стъкло</th>
+            <th scope="col" colspan="3">Други</th>
+        </tr>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Дата</th>
+            <th scope="col">Клиент</th>
+            <th scope="col">Профил</th>
+            <th scope="col">Размери</th>
+            <th scope="col">Стъкло</th>
+            <th scope="col">Други услуги</th>
+            <th scope="col">Бележки</th>
+            <th scope="col">Баланс</th>
         </tr>
     </thead>
-
     <tbody>
     {% for vitrine in orders %}
-        <tr>
+
+        {% if order.order_taken %}
+            <tr class="visibleRows orderTaken fixed-min-width" id="{{ vitrine.id }}">
+        {% else %}
+            <tr class="visibleRows normalOrder fixed-min-width" id="{{ vitrine.id }}">
+        {% endif %}
+
             <td>{{ vitrine.id }}</td>
             <td>{{ vitrine.created_date|date:"d.m.Y" }}</td>
-            <td>{{ vitrine.owner }}</td>
-            <td>{{ vitrine.type }}</td>
-            <td>{{ vitrine.size }}</td>
-            <td>{{ vitrine.color }}</td>
-            <td>{{ vitrine.total_price }}</td>
+            <td>{{ vitrine.owner }}<br>{{ vitrine.telephone }}</td>
+            <td>
+                {% for item in vitrine.frames.all %}
+                    <div class="frame-color" id="frame-color-{{ item.pk }}">{{ item.profile_type }}</div>
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in vitrine.frames.all %}
+                    <div class="frame-row" id="frame-size-{{ item.pk }}">
+                        {% if item.holes_position == "length" %}
+                            <div class="holes-vertical" style="--count: {{ item.holes_count }};"></div>
+                            <div>{{ item.length }}</div>
+                            <div>x</div>
+                            <div>{{ item.width }}</div>
+                        {% else %}
+                            <div class="empty"></div>
+                            <div>{{ item.length }}</div>
+                            <div>x</div>
+                            <div class="holes-vertical" style="--count: {{ item.holes_count }};"></div>
+                            <div>{{ item.width }}</div>
+                        {% endif %}
+                        <div> - {{ item.quantity }}</div>
+                    </div>
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in vitrine.frames.all %}
+                    <div class="frame-glass" id="frame-glass-{{ item.pk }}">{{ item.glass_type }}</div>
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in vitrine.others.all %}
+                    <div class="frame-others" id="vitrine-other-{{ item.pk }}">{{ item.description }} - {{ item.quantity }}</div>
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in vitrine.notes.all %}
+                    <div class="vitrine-notes" id="vitrine-note-{{ item.pk }}">
+                        {{ item.user }} -> <span style="color: red;">{{ item.content }}</span>
+                    </div>
+                {% endfor %}
+            </td>
+            <td>
+                <div class="vitrine-balance" id="vitrine-balance-{{ vitrine.id }}">{{ vitrine.balance }}</div>
+            </td>
+            
         </tr>
     {% endfor %}
     </tbody>
