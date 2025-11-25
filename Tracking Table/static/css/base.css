@@ -63,6 +63,7 @@ body
 	text-align: center;
 }
 
+/** Cells with padding to beautify the text */
 .table > :not(caption) > * > td {
     padding-left: 0.25rem;
     padding-right: 0;
@@ -71,6 +72,12 @@ body
 	font-weight: bold;
 	text-align: left;
 }
+
+/** Cells with no padding used for structure */
+.table > :not(caption) > * > td.no-padding-cell {
+    padding: 0 !important;
+}
+
 
 .tableIcons
 {
