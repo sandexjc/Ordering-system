@@ -1,9 +1,9 @@
-from common.managers import BaseManager
+from common.managers import BaseOrderManager
 from vitrine.querysets import VitrineOrderQuerySet
 
-class VitrineOrderManager(BaseManager):
+class VitrineOrderManager(BaseOrderManager):
 
-    """ Table app domain level Orders manager. """
+    """ Vitrine app domain level manager. """
     
     def __get_queryset(self):
         return VitrineOrderQuerySet(self.model, using=self._db).active()

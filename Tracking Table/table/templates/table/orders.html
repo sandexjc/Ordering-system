@@ -27,9 +27,9 @@
         {% for order in orders %}
 
             {% if order.order_taken %}
-                <tr class="visibleRows orderTaken fixed-min-width" id="{{order.id}}">
+                <tr class="visibleRows orderTaken fixed-min-width" id="{{ order.id }}" data-app-url="/table/viewOrder/">
             {% else %}
-                <tr class="visibleRows normalOrder fixed-min-width" id="{{order.id}}">
+                <tr class="visibleRows normalOrder fixed-min-width" id="{{ order.id }}" data-app-url="/table/viewOrder/">
             {% endif %}
 
                 {% if order.invoice %}

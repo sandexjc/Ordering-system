@@ -1,0 +1,13 @@
+{% load static %}
+{% load django_bootstrap5 %}
+
+
+{# MODALS & OFFCANVAS #}
+
+<div class="container-fluid order-view" id="order-view-{{ order.id }}">
+
+    {# ORDER ITEMS PROGRESS TABLE #}
+    
+    {# ORDER TOOLBAR #}
+    {% include "common/components/order_toolbar.html" %}
+</div>

@@ -6,9 +6,12 @@
 function get_order(order_id)
 {
     /** Add loading indication */
-    document.getElementById("hidden-row-" + order_id).appendChild(spinner(order_id));
+    document.getElementById("hidden-row-" + order_id).appendChild(add_spinner(order_id));
+    
+    /** Get app specific resource address from element */
+    let url_resource = document.getElementById(order_id).getAttribute("data-app-url");
 
-    fetch('/table/viewOrder/' + order_id)
+    fetch(url_resource + order_id)
         .then((response) => {
             /** Raise an error for a non network issues as well */
             if (!response.ok) {
@@ -22,15 +25,15 @@ function get_order(order_id)
             let newHtml = parser.parseFromString(html, 'text/html');
 
             /** Remove loading indication */
-            document.getElementById("order-spinner-" + order_id).remove();
+            remove_spinner(order_id);
 
             /*
              * Load progress tracking form
              * Offers does not have progress tracking, only orders does
              */
             let new_progress_form = newHtml.getElementById("progress-window-" + order_id);
+            let prev_progress_form = document.getElementById("progress-window-" + order_id);
             if (new_progress_form) {
-                let prev_progress_form = document.getElementById("progress-window-" + order_id);
                 if (prev_progress_form)
                 {
                     /** Replace previous progress window if any */
@@ -47,40 +50,46 @@ function get_order(order_id)
              * Load modal delete window
              */
             let modal_delete_form = document.getElementById("delete-window-" + order_id);
-            if (!modal_delete_form)
+            let new_modal_delete = newHtml.getElementById("delete-window-" + order_id);
+            if (!modal_delete_form && new_modal_delete)
             {
-                document.body.appendChild(newHtml.getElementById("delete-window-" + order_id).cloneNode(true));
+                document.body.appendChild(new_modal_delete.cloneNode(true));
             }
 
             /*
              * Load offcanvas history tab 
              */
             let history_tab = document.getElementById("offcanvas-history-tab-" + order_id);
-            if (!history_tab)
+            let new_history_tab = newHtml.getElementById("offcanvas-history-tab-" + order_id);
+            if (!history_tab && new_history_tab)
             {
-                document.body.appendChild(newHtml.getElementById("offcanvas-history-tab-" + order_id).cloneNode(true));
+                document.body.appendChild(new_history_tab.cloneNode(true));
             }
 
             /*
              * Load order progress view table 
              */
             let order_progress_view = document.getElementById("order-view-" + order_id);
-            if (order_progress_view)
+            let new_progress_view = newHtml.getElementById("order-view-" + order_id);
+            if (new_progress_view)
             {
-                order_progress_view.replaceWith(newHtml.getElementById("order-view-" + order_id).cloneNode(true));
-            }
-            else
-            {
-                document.getElementById("hidden-table-" + order_id).appendChild(newHtml.getElementById("order-view-" + order_id).cloneNode(true));
+                if (order_progress_view)
+                {
+                    order_progress_view.replaceWith(new_progress_view.cloneNode(true));
+                }
+                else
+                {
+                    document.getElementById("hidden-table-" + order_id).appendChild(new_progress_view.cloneNode(true));
+                }
             }
 
             handle_orders_properties();
             handle_orders_history();
-            // handle_orders();
         })
         .catch((error) => {
+
             /** Remove loading indication */
-            document.getElementById("order-spinner-" + order_id).remove();
+            remove_spinner(order_id);
 
             /** Show fallback message in placeholder */
             let hiddenTable = document.getElementById("hidden-table-" + order_id);
@@ -117,7 +126,6 @@ function retry_order(order_id) {
         {
             document.getElementById("order-view-" + order_id).remove();
         }
-
 
     }
     get_order(order_id);

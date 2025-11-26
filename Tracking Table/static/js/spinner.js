@@ -1,9 +1,9 @@
 /**
  * Function to create HTML spinner element and return it
  */
-
-function spinner(order_id)
+function add_spinner(order_id)
 {
+
     var main_div = document.createElement("div");
     var inner_div = document.createElement("div");
 
@@ -17,4 +17,17 @@ function spinner(order_id)
 
     return main_div;
 
+}
+
+/**
+ * Function to remove HTML spinner element from specified element
+ */
+function remove_spinner(order_id) {
+
+    let spinner = document.getElementById("order-spinner-" + order_id);
+    if (spinner)
+    {
+        spinner.remove();
+    }
+    
 }
