@@ -42,7 +42,15 @@ body
 	justify-content: center;
 	margin-left: auto;
 	margin-right: auto;
+
+	overflow: hidden;
+	height: 0;
+	transition: height 0.35s ease;
+	display: none; /* initial hidden state */
+	/* ensure consistent box sizing */
+	box-sizing: border-box;
 }
+
 
 .hidden-table
 {

@@ -85,6 +85,11 @@ function get_order(order_id)
 
             handle_orders_properties();
             handle_orders_history();
+
+            /** Recompute height after dynamic content is fully updated */
+            const hiddenRow = document.getElementById("hidden-row-" + order_id);
+            onHiddenRowContentUpdated(hiddenRow);
+
         })
         .catch((error) => {
 
