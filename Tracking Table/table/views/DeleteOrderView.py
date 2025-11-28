@@ -1,17 +1,9 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import DeleteView
+from common.views import BaseDeleteView
 from table.models import Order
-from django.http import JsonResponse
 
-class DeleteOrder(LoginRequiredMixin, DeleteView):
 
-    model = Order
+class DeleteOrder(BaseDeleteView):
+
+    """ Delete view dedicated to Table app. """
     
-    def post(self, request, pk, *args, **kwargs):
-
-        self.object = Order.objects.get_by_id(pk)
-        self.object.delete()
-
-        return JsonResponse({
-            'status':'OK',
-            })
+    model = Order

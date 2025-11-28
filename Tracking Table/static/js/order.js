@@ -115,42 +115,76 @@ function handle_orders_properties()
 		})
 	})
 
-	$('.deleteButtons').each(function() {
-		$(this).click(function() {
-			$(this).prop('disabled', true);
-			$(this).html("Loading...");
-			$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-			var deleteButton = this;
-			var order_id = this.getAttribute('id');
+	document.addEventListener("click", function(event) {
+		const btn = event.target.closest(".btn-delete");
+		if (!btn) return;
 
-			$.ajax({
-				method: "POST",
-				url: '/table/deleteOrder/' + this.getAttribute('id'),
-				data: $("#modal-delete-"+this.getAttribute('id')+" .deleteForms").serialize(),
-				timeout: 10000,
-				context: deleteButton,
+		event.preventDefault();
 
-				success: function(data) {
-					$("#modal-delete-"+this.getAttribute('id')+".modal").modal('hide');
-					$("#"+this.getAttribute('id')+".visibleRows").remove();
-					document.getElementById("modal-progress-" + order_id).remove();
-					document.getElementById("history-tab-" + order_id).remove();
-					document.getElementById("hidden-row-" + order_id).remove();
-					document.getElementById("modal-delete-" + order_id).remove();
-				},
+		const id = btn.dataset.id;
+		const url = btn.dataset.url;
+		const form = btn.closest("form");
 
-				error: function(status) {
-					$(".alertmsgdiv").find("div").remove();
-					$(".alertmsgdiv").append("<div>"+status.statusText+"</div>");
-					$(".ALERT-E-DEL-VIEW").css("display","inline");
-					$(".ALERT-S-DEL-VIEW").css("display","none");
-					$(this).prop('disabled', false);
-					$(this).html("Confirm");
-					$(this).find('span').remove();
-				}
-			})
+		// UI loading state
+		btn.disabled = true;
+		const oldHtml = btn.innerHTML;
+		btn.innerHTML = `
+			Loading...
+			<span class="spinner-border spinner-border-sm"></span>
+		`;
+
+		// CSRF token
+		const csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
+
+		// form data
+		const formData = new FormData(form);
+
+		fetch(url, {
+			method: "POST",
+			headers: {
+				"X-CSRFToken": csrfToken
+			},
+			body: formData
 		})
-	})
+		.then(function(response) {
+			// Convert response to JSON
+			return response.json().then(function(data) {
+				return { ok: response.ok, data: data };
+			});
+		})
+		.then(function(result) {
+			if (!result.ok || result.data.status !== "ok") {
+				throw new Error(result.data.message || "Deletion error");
+			}
+
+			// Close modal
+			const modal = document.getElementById(`modal-delete-${id}`);
+			if (modal) {
+				bootstrap.Modal.getInstance(modal).hide();
+			}
+
+			// Remove HTML elements
+			[
+				`#hidden-row-${id}`,			// remove hidden table row
+				`[data-row="${id}"]`,           // remove table row
+				`#delete-window-${id}`,         // remove delete modal wrapper
+				`#progress-window-${id}`,       // remove progress modal wrapper
+				`#offcanvas-history-tab-${id}`  // remove history offcanvas wrapper
+			].forEach(sel => {
+				const el = document.querySelector(sel);
+				if (el) el.remove();
+			});
+
+		})
+		.catch(function(error) {
+			console.error(error);
+			alert("Error deleting item. Please try again.");
+
+			btn.disabled = false;
+			btn.innerHTML = oldHtml;
+		});
+	});
+
 
 	$('#edit-order-button').click(function() {
 		$('#edit-order-form').submit();

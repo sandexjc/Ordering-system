@@ -15,12 +15,19 @@
 
                     <div class="modal-body" style="text-align: center;">
                         <h5>
-                            Сигурни ли сте, че искате да изтриете поръчка: <strong>{{ object.id }}</strong>
+                            Сигурни ли сте, че искате да изтриете поръчка: №<strong>{{ object.id }}</strong>
                         </h5>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
-                        <button type="submit" class="btn btn-danger deleteButtons" id="{{order.id}}">Изтрий</button>
+                        <button 
+                            type="submit" 
+                            class="btn btn-danger btn-delete" 
+                            id="delete-order-btn-{{ object.id }}"
+                            data-app="{{ app_name }}"
+                            data-url="{% url app_name|add:':delete_order' object.id %}"
+                            data-id="{{ object.id }}"
+                            >Изтрий</button>
                     </div>
                 </form>
             </div>
