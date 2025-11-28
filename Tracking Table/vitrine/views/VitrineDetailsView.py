@@ -16,17 +16,19 @@ class ViewVitrine(LoginRequiredMixin, TemplateView):
         # Order toolbar urls and targets
         edit_url = reverse("vitrine:edit_vitrine", kwargs={"pk": vitrine.id})
         # print_url = reverse("vitrine:print_order", kwargs={"pk": vitrine.id})
+        delete_target = f"modal-delete-{vitrine.id}"
         refresh_option = True
 
         # Prepare context
         context.update({
 
             # Order and related items
-            'order': vitrine,
+            'vitrine': vitrine,
 
             # Toolbar
             "toolbar_edit_url": edit_url,
             # "toolbar_print_url": print_url,
+            "toolbar_delete_target": delete_target,
             "toolbar_refresh_option": refresh_option,
         })
 

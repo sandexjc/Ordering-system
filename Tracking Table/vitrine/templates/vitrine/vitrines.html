@@ -30,9 +30,9 @@
     {% for vitrine in orders %}
 
         {% if order.order_taken %}
-            <tr class="visibleRows orderTaken fixed-min-width" id="{{ vitrine.id }}" data-app-url="/vitrine/view_vitrine/">
+            <tr class="visibleRows orderTaken fixed-min-width" id="{{ vitrine.id }}" data-app-url="/vitrine/view_vitrine/" data-row="{{ vitrine.id }}">
         {% else %}
-            <tr class="visibleRows normalOrder fixed-min-width" id="{{ vitrine.id }}" data-app-url="/vitrine/view_vitrine/">
+            <tr class="visibleRows normalOrder fixed-min-width" id="{{ vitrine.id }}" data-app-url="/vitrine/view_vitrine/" data-row="{{ vitrine.id }}">
         {% endif %}
 
             <td>{{ vitrine.id }}</td>
