@@ -8,4 +8,5 @@ urlpatterns = [
     path('edit_vitrine/<int:pk>', views.EditVitrine.as_view(), name='edit_vitrine'),
     path('view_vitrine/<int:pk>', views.ViewVitrine.as_view(), name='vitrine_view'),
     path('delete_vitrine/<int:pk>', views.DeleteVitrine.as_view(), name='delete_order'),
+    path('print_vitrine/<int:pk>', views.PrintVitrine.as_view(), name='print_vitrine'),
 ]

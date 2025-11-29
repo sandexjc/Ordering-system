@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>МЕГА ТРЕЙДИНГ ЕООД</title>
+	<link rel="icon" type="image/x-icon" href="{% static 'images/printer.png' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.1.3/css/bootstrap.css' %}?v=1.1">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/print_order.css' %}?v=1.0">
+</head>
+<body>
+	<div class="container" style="padding-top: 20px;">
+		<table class="table table-sm table-bordered border-dark">
+			<thead>
+				<tr>
+					<th scope="col" rowspan="3" class="text-top-left">
+						<pre class="pre_bold">МЕГА ТРЕЙДИНГ ЕООД</pre> <br> 
+						<pre class="pre_bold_small">Магазин</pre> <br> <pre>ПЗ Орион ул.3019, на ъгъла с ул. Адам Мицкевич  </pre>
+						<pre>&#128222; 0895750375</pre> <br>
+						<pre class="pre_bold_small">Производствена база</pre> <br> <pre>ул. Илиянско шосе 4. </pre>
+						<pre>&#128222; 0893457087</pre> <br>
+						<pre class="pre_bold_small">Условия за поръчка:</pre> <br>
+						<pre class="pre_bold_small">•</pre><br>
+						<pre class="pre_bold_small">•</pre><br>
+						<pre class="pre_bold_small">•</pre><br>
+						<pre class="pre_bold_small">•</pre><br>
+						<pre class="pre_bold_small">•</pre><br>
+						<pre class="pre_bold_small">•</pre><br>
+					</th>
+					<th scope="col" class="text-top-left">Поръчка № {{vitrine.id}} <br> Дата: {{vitrine.created_date|date:'d.m.Y'}}</th>
+				</tr>
+				<tr>
+					<th class="text-top-left">Клиент: {{vitrine.owner}}</th>
+				</tr>
+				<tr>
+					<th class="text-top-left">Тел: {{vitrine.telephone}}</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+
+	<div class="container" style="padding-top: 10px">
+		<div class="row">
+		</div>
+		<div class="row">
+		</div>
+		<div class="row">
+
+			<div class="col">
+				<table class="table table-sm table-bordered border-dark">
+					<thead>
+						<tr>
+							<th scope="col" colspan="2">Обща стойност</th>
+							<th scope="col"><strong>{{vitrine.total_price}}</strong></th>
+						</tr>
+						<tr>
+							<th scope="col">Разплащания</th>
+							<th scope="col">Метод</th>
+							<th scope="col">Сума</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for payment in vitrine.payments.all %}
+							<tr>
+								<td>Плащане-{{ forloop.counter }}</td>
+								{% if payment.payment_method == "Cash" %}
+									<td>в брой</td>
+								{% elif payment.payment_method == "Card" %}
+									<td>банкова карта</td>
+								{% elif payment.payment_method == "Bank" %}
+									<td>банков превод</td>
+								{% endif %}
+								<td>{{payment.value}}</td>
+							</tr>
+						{% endfor %}
+						<tr>
+							<th colspan="2">Остатък<br>за доплащане</th>
+							<th>{{vitrine.balance}}</th>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			
+		</div>
+	</div>
+	<script type="text/javascript" src="{% static 'bootstrap/5.1.3/js/bootstrap.bundle.js' %}?v=1.1"></script>
+</body>
+</html>
