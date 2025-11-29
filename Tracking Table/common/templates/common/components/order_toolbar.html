@@ -28,14 +28,14 @@
     {% endif %}
 
     {% if toolbar_history_target %}
-        <button class="btn btn-outline-warning Historybtns" id="{{ order.id }}" type="button"
+        <button class="btn btn-outline-warning Historybtns" id="btn-history-{{ object.id }}" type="button" data-id="{{ object.id }}"
                 data-bs-toggle="offcanvas" data-bs-target="#{{ toolbar_history_target }}" aria-controls="offcanvasRight">
         <img src="{% static 'images/deadline.png' %}" class="tableIcons">
         </button>
     {% endif %}
 
     {% if toolbar_refresh_option %}
-        <button class="btn btn-outline-light" id="{{ order.id }}" type="button" onclick="retry_order('{{ order.id }}')">
+        <button class="btn btn-outline-light" id="btn-refresh-{{ object.id }}" data-id="{{ object.id }}" type="button" onclick="retry_order('{{ object.id }}')">
             <img src="{% static 'images/refresh.png' %}" class="tableIcons">
         </button>
     {% endif %}

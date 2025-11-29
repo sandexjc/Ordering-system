@@ -8,12 +8,11 @@ function handle_orders_history()
 	$('.Historybtns').each(function() {
 		$(this).click(function() {
 			var historyBtn = this;
-			var historyBtn_id = this.getAttribute('id')
-			var historyBtn_body = $('#'+this.getAttribute("id")+'.offcanvas-body')
+			var historyBtn_body = $('#'+this.getAttribute("data-id")+'.offcanvas-body')
 			
 			$.ajax({
 				method: "GET",
-				url: '/table/getOrderHistory/' + this.getAttribute('id'),
+				url: '/table/getOrderHistory/' + this.getAttribute('data-id'),
 				timeout: 10000,
 				context: historyBtn,
 
@@ -56,8 +55,8 @@ function handle_orders_history()
 				},
 
 				error: function(status) {
-					$('#'+this.getAttribute("id")+'.offcanvas-body').find('div').remove();
-					$('#'+this.getAttribute("id")+'.offcanvas-body').find('span').remove();
+					$('#'+this.getAttribute("data-id")+'.offcanvas-body').find('div').remove();
+					$('#'+this.getAttribute("data-id")+'.offcanvas-body').find('span').remove();
 					historyBtn_body.append("<br>");
 					historyBtn_body.append(status.statusText);
 					historyBtn_body.css({
