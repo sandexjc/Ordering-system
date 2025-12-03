@@ -1,0 +1,24 @@
+
+body {
+    font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-size: 1rem;
+}
+pre {
+    display: inline;
+    font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-size: 0.8rem;
+    font-weight: lighter;
+}
+.pre_bold {
+    font-weight: bold;
+    font-size: 1.4rem;
+} 
+.pre_bold_small {
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.text-top-left {
+    vertical-align: top !important;
+    text-align: left !important;
+}

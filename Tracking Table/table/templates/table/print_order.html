@@ -6,40 +6,15 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>МЕГА ТРЕЙДИНГ ЕООД</title>
 	<link rel="icon" type="image/x-icon" href="{% static 'images/printer.png' %}">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-	<style type='text/css'> 
-	    body {
-            font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-            font-size: 1rem;
-        }
-		pre {
-			display: inline;
-			font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-			font-size: 0.8rem;
-			font-weight: lighter;
-		}
-		.pre_bold {
-            font-weight: bold;
-            font-size: 1.4rem;
-        } 
-		.pre_bold_small {
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-	</style>
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.1.3/css/bootstrap.css' %}?v=1.1">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/print_order.css' %}?v=1.0">
 </head>
 <body>
-
 	<div class="container" style="padding-top: 20px;">
-
 		<table class="table table-sm table-bordered border-dark">
-
 			<thead>
 				<tr>
-					<th scope="col"
-						rowspan="3"
-						style="text-align: left; ">
+					<th scope="col" rowspan="3" class="text-top-left">
 						<pre class="pre_bold">МЕГА ТРЕЙДИНГ ЕООД</pre> <br> 
 						<pre class="pre_bold_small">Магазин</pre> <br> <pre>ПЗ Орион ул.3019, на ъгъла с ул. Адам Мицкевич  </pre>
 						<pre>&#128222; 0895750375</pre> <br>
@@ -53,26 +28,21 @@
 						<pre class="pre_bold_small">•</pre><pre> Срокът за рекламации и съхранение на готови поръчки е до 3 работни дни, </pre> <br><pre>   считано от уведомителното съобщение.</pre> <br>
 						<pre class="pre_bold_small">•</pre><pre> Такса от 6лв. на пале се начислява за всеки ден престой, <br>   след третият работен ден.</pre>
 					</th>
-					<th scope="col">
-						Поръчка № {{order.id}} <br>   
-						Дата: {{order.created_date|date:'d.m.Y'}}
-					</th>
+					<th scope="col" class="text-top-left">Поръчка № {{order.id}} <br> Дата: {{order.created_date|date:'d.m.Y'}}</th>
 				</tr>
 				<tr>
-					<th>Клиент: {{order.owner}}</th>
+					<th class="text-top-left">Клиент: {{order.owner}}</th>
 				</tr>
 				<tr>
-					<th>Тел: {{order.telephone}}</th>
+					<th class="text-top-left">Тел: {{order.telephone}}</th>
 				</tr>
 			</thead>
-
 		</table>
-
 	</div>
+
 	<div class="container" style="padding-top: 10px">
 		<div class="row">
 			<div class="col">
-
 				<table class="table table-sm table-bordered border-dark">
 					<thead>
 						<tr>
@@ -83,7 +53,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for plate in order_plates %}
+						{% for plate in order.plates.all %}
 							<tr>
 								<td>{{plate.material}}</td>
 								<td>{{plate.quantity}}</td>
@@ -95,7 +65,6 @@
 						<th>{{order.plates_total}}</th>
 					</tbody>
 				</table>
-				
 			</div>
 
 			<div class="col">
@@ -109,7 +78,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for cut in order_cutting %}
+						{% for cut in order.cuttings.all %}
 							<tr>
 								<td>{{cut.cutting_type}}</td>
 								<td>{{cut.quantity}}</td>
@@ -121,11 +90,11 @@
 						<th>{{order.cutting_total}}</th>
 					</tbody>
 				</table>
-				
 			</div>
-			
+
 		</div>
 		<div class="row">
+
 			<div class="col">
 				<table class="table table-sm table-bordered border-dark">
 					<thead>
@@ -138,7 +107,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for edge in order_edges %}
+						{% for edge in order.edges.all %}
 							<tr>
 								<td>{{edge.edge_type}}</td>
 								<td>{{edge.color_code}}</td>
@@ -151,9 +120,8 @@
 						<th>{{order.edge_total}}</th>
 					</tbody>
 				</table>
-
-				
 			</div>
+
 			<div class="col">
 				<table class="table table-sm table-bordered border-dark">
 					<thead>
@@ -165,7 +133,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for edging in order_edging %}
+						{% for edging in order.edgings.all %}
 							<tr>
 								<td>{{edging.edging_type}}</td>
 								<td>{{edging.quantity}}</td>
@@ -177,13 +145,12 @@
 						<th>{{order.edging_total}}</th>
 					</tbody>
 				</table>
-				
 			</div>
 			
 		</div>
 		<div class="row">
-			<div class="col">
 
+			<div class="col">
 				<table class="table table-sm table-bordered border-dark">
 					<thead>
 						<tr>
@@ -194,7 +161,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for other in order_others %}
+						{% for other in order.others.all %}
 							<tr>
 								<td>{{other.description}}</td>
 								<td>{{other.quantity}}</td>
@@ -206,46 +173,45 @@
 						<th>{{order.others_total}}</th>
 					</tbody>
 				</table>
-
 			</div>
-			<div class="col">
 
+			<div class="col">
 				<table class="table table-sm table-bordered border-dark">
 					<thead>
 						<tr>
-							<th scope="col" colspan="2">
-								Обща стойност:
-							</th>
-								<th scope="col"><strong>{{order.total_price}}</strong></th>
+							<th scope="col" colspan="2">Обща стойност</th>
+							<th scope="col"><strong>{{order.total_price}}</strong></th>
+						</tr>
+						<tr>
+							<th scope="col">Разплащания</th>
+							<th scope="col">Метод</th>
+							<th scope="col">Сума</th>
 						</tr>
 					</thead>
 					<tbody>
-						{% for payment in order_payments %}
-						<tr>
-							<td>Авансово</td>
-							<td>{{payment.payment_method}}</td>
-							<td>{{payment.value}}</td>
-						</tr>
+						{% for payment in order.payments.all %}
+							<tr>
+								<td>Плащане-{{ forloop.counter }}</td>
+								{% if payment.payment_method == "Cash" %}
+									<td>в брой</td>
+								{% elif payment.payment_method == "Card" %}
+									<td>банкова карта</td>
+								{% elif payment.payment_method == "Bank" %}
+									<td>банков превод</td>
+								{% endif %}
+								<td>{{payment.value}}</td>
+							</tr>
 						{% endfor %}
-						<!-- <tr>
-							<th colspan="3">{{order.paid}}</th>
-							
-						</tr> -->
 						<tr>
-							<th colspan="2">
-								Остатък<br>
-								за доплащане
-							</th>
+							<th colspan="2">Остатък<br>за доплащане</th>
 							<th>{{order.balance}}</th>
 						</tr>
 					</tbody>
 				</table>
-				
 			</div>
 			
 		</div>
-		
 	</div>
-
+	<script type="text/javascript" src="{% static 'bootstrap/5.1.3/js/bootstrap.bundle.js' %}?v=1.1"></script>
 </body>
 </html>
