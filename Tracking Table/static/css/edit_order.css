@@ -1,0 +1,52 @@
+.edit-order-form
+{
+    padding: 2rem;
+    border-radius: 1rem;
+    background-color: white;
+}
+
+/*
+ * Vitrine app Frame table 
+ */
+
+/** Profile color */
+.frame-table th:nth-child(1),
+.frame-table td:nth-child(1) {
+    min-width: 6rem;
+}
+
+/** Length */
+.frame-table th:nth-child(2),
+.frame-table td:nth-child(2) {
+    min-width: 5rem;
+}
+
+/** Width */
+.frame-table th:nth-child(3),
+.frame-table td:nth-child(3) {
+    min-width: 5rem;
+}
+
+/** Quantity */
+.frame-table th:nth-child(4),
+.frame-table td:nth-child(4) {
+    min-width: 3rem;
+}
+
+/** Holes count */
+.frame-table th:nth-child(5),
+.frame-table td:nth-child(5) {
+    min-width: 4rem;
+}
+
+/** Holes position */
+.frame-table th:nth-child(6),
+.frame-table td:nth-child(6) {
+    min-width: 7.5rem;
+}
+
+/** Glass */
+.frame-table th:nth-child(7),
+.frame-table td:nth-child(7) {
+    min-width: 5rem;
+}

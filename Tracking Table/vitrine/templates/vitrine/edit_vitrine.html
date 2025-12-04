@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block links %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/new_order_form.css' %}?v=1.6">
+<link rel="stylesheet" type="text/css" href="{% static 'css/edit_order.css' %}?v=1.1">
 {% endblock %}
 
 {% block content %}
@@ -16,10 +16,10 @@
 		<h1>Редактиране на витрина</h1>
 	</div>
 
-	<form method="POST" id="edit-vitrine-form" class="shadow-lg new-order-form">
+	<form method="POST" id="edit-vitrine-form" class="shadow-lg edit-order-form">
 		{% csrf_token %}
 		<label class="form-label" for="vitrine_id">ID</label>
-		<input type="text" id="vitrine_id" class="form-control" readonly value="{{current_order.id}}">
+		<input type="text" id="vitrine_id" class="form-control" readonly value="{{ current_order.id }}">
 		<br>
 
 		{% bootstrap_form form bound_css_class='' %}
@@ -31,37 +31,48 @@
 
 		<div class="row">
             <h4>Витрини</h4>
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th>Профил</th>
-                        <th>Дължина</th>
-                        <th>Широчина</th>
-                        <th>Количество</th>
-                        <th>Цена за л.м.</th>
-                        <th>Брой отвори</th>
-                        <th>Позиция отвори</th>
-                        <th>Стъкло</th>
-                        <th>Изтрий</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in frame_forms %}
-                        {{ item.id }}
-                        <tr>
-                            <td>{{ item.profile_type }}</td>
-                            <td>{{ item.length }}</td>
-                            <td>{{ item.width }}</td>
-                            <td>{{ item.quantity }}</td>
-                            <td>{{ item.price }}</td>
-                            <td>{{ item.holes_count }}</td>
-                            <td>{{ item.holes_position }}</td>
-                            <td>{{ item.glass_type }}</td>
-                            <td>{{ item.DELETE }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+			<div class="row">
+
+				<div class="col">
+					<table class="table table-sm frame-table">
+						<thead>
+							<tr>
+								<th>Профил</th>
+								<th>Дължина</th>
+								<th>Широчина</th>
+								<th>Брой</th>
+								<th>Брой Отвори</th>
+								<th>Позиция отвори</th>
+								<th>Стъкло</th>
+								<th>Изтрий</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in frame_forms %}
+								{{ item.id }}
+								<tr>
+									<td>{{ item.profile_type }}</td>
+									<td>{{ item.length }}</td>
+									<td>{{ item.width }}</td>
+									<td>{{ item.quantity }}</td>
+									<td>{{ item.holes_count }}</td>
+									<td>{{ item.holes_position }}</td>
+									<td>{{ item.glass_type }}</td>
+									<td>
+										<div class="form-check form-switch" style="display: flex; justify-content: center;">
+											{{ item.DELETE }}
+										</div>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+
+				<div class="col">
+			
+				</div>
+			</div>
 		</div>
 
 		<div class="row">
@@ -83,13 +94,13 @@
 						{% for item in others_forms %}
 						{{ item.id }}
 							<tr>
-								<td>{{item.description}}</td>
-								<td>{{item.quantity}}</td>
-								<td>{{item.price}}</td>
-								<td>{{item.value}}</td>
+								<td>{{ item.description }}</td>
+								<td>{{ item.quantity }}</td>
+								<td>{{ item.price }}</td>
+								<td>{{ item.value }}</td>
 								<td>
-									<div class="form-check form-switch" style="margin-left: 10px; margin-top: 5px;">
-										{{item.DELETE}}
+									<div class="form-check form-switch" style="display: flex; justify-content: center;">
+										{{ item.DELETE }}
 									</div>
 								</td>
 							</tr>
@@ -98,7 +109,7 @@
 							<th colspan="3">Общо</th>
 							<th>
 								<div>
-									{{current_order.others_total}}
+									{{ current_order.others_total }}
 								</div>
 							</th>
 						</tr>
@@ -113,7 +124,7 @@
 					<tbody>
 						<tr>
 							<td><strong>ОБЩА СТОЙНОСТ</strong></td>
-							<td><strong>{{current_order.total_price}}</strong></td>
+							<td><strong>{{ current_order.total_price }}</strong></td>
 						</tr>
 						{% for item in payment_forms %}
 							{{ item.id }}
@@ -126,11 +137,11 @@
 						<tr>
 							<td scope="3"><strong>Всичко платено</strong></td>
 							<td></td>
-							<td><strong>{{current_order.paid}}</strong></td>
+							<td><strong>{{ current_order.paid }}</strong></td>
 						</tr>
 						<tr>
 							<td><strong>БАЛАНС</strong></td>
-							<td><strong>{{current_order.balance}}</strong></td>
+							<td><strong>{{ current_order.balance }}</strong></td>
 						</tr>
 					</tbody>
 					
@@ -140,16 +151,11 @@
 		</div>
 		<br><br><br>
 
-        {% comment %}
-
 		<div style="margin-left: 48%; margin-right: 50%; padding-bottom: 20px;">
-			<a class="btn btn-outline-info" href="{% url 'table:printOrder' pk=current_order %}" role="button" target="_blank" title="Print View">
+			<a class="btn btn-outline-info" href="{% url 'vitrine:print_vitrine' pk=current_order %}" role="button" target="_blank" title="Print View">
 				<img src="{% static 'images/printer.png' %}" class="tableIcons">
 			</a>
 		</div>
-
-		{% endcomment %}
-
 		<div class="d-grid gap-2 col-3 mx-auto">
 			<button type="submit" class="btn btn-primary" id="edit-vitrine-button">Update</button>
 		</div>
