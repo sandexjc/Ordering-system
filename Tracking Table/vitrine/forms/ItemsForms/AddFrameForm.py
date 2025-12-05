@@ -8,7 +8,7 @@ class AddFrameForm(VitrineForm):
         model = Frame
         fields = (
             # frame related fields
-            "profile_type", "length", "width", "quantity", "price",
+            "profile_type", "length", "width", "quantity",
             # helper fields
             "holes_count", "holes_position", "glass_type",
             )

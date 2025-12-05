@@ -6,9 +6,19 @@ from vitrine.models import Frame, Hole, Glass, Seal
 from common.signals import soft_deleted
 
 
+DEFAULT_PROFILE_PRICES = {
+    "Black": Decimal("15.60"),
+    "Matte": Decimal("16"),
+    "Inox": Decimal("17"),
+}
+
+
 @receiver(pre_save, sender=Frame)
 def update_frame_value(sender, **kwargs):
     frame = kwargs["instance"]
+    # Set price only once - when the frame is added
+    if frame.pk is None and not frame.price:
+        frame.price = DEFAULT_PROFILE_PRICES.get(frame.profile_type, Decimal("0"))
     frame_length = ((frame.length * 2) + (frame.width * 2)) / Decimal("1000")
     value = (frame_length * frame.quantity) * frame.price
     frame.value = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
@@ -17,6 +27,7 @@ def update_frame_value(sender, **kwargs):
 def create_or_update_items(sender, **kwargs):
     frame = kwargs["instance"]
 
+    # FIXME price - move prices into configurable model
     # Seal
     Seal.objects.update_or_create(
         vitrine_id = frame.vitrine_id,

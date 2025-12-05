@@ -50,3 +50,7 @@
 .frame-table td:nth-child(7) {
     min-width: 5rem;
 }
+
+.indent-cell {
+    padding-left: 1rem !important;
+}
