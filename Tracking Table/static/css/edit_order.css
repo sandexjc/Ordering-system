@@ -54,3 +54,7 @@
 .indent-cell {
     padding-left: 1rem !important;
 }
+
+.frame-info-table {
+    min-width: 35rem;
+}
