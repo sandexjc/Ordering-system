@@ -1,0 +1,1 @@
+from .VitrineInfoBuild import VitrineContextBuilder
