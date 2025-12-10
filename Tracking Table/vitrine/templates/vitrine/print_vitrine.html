@@ -8,6 +8,8 @@
 	<link rel="icon" type="image/x-icon" href="{% static 'images/printer.png' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.1.3/css/bootstrap.css' %}?v=1.1">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/print_order.css' %}?v=1.0">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/print_table.css' %}?v=1.0">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/holes_dots.css' %}?v=1.0">
 </head>
 <body>
 	<div class="container" style="padding-top: 20px;">
@@ -16,17 +18,12 @@
 				<tr>
 					<th scope="col" rowspan="3" class="text-top-left">
 						<pre class="pre_bold">МЕГА ТРЕЙДИНГ ЕООД</pre> <br> 
-						<pre class="pre_bold_small">Магазин</pre> <br> <pre>ПЗ Орион ул.3019, на ъгъла с ул. Адам Мицкевич  </pre>
-						<pre>&#128222; 0895750375</pre> <br>
-						<pre class="pre_bold_small">Производствена база</pre> <br> <pre>ул. Илиянско шосе 4. </pre>
-						<pre>&#128222; 0893457087</pre> <br>
+						<pre class="pre_bold_small">Магазин</pre> <br> <pre>ПЗ Орион ул.3019, на ъгъла с ул. Адам Мицкевич  </pre> <br>
+						<pre>&#128222; 0895795480</pre> <pre>&#128222; 0895795440</pre> <br>
 						<pre class="pre_bold_small">Условия за поръчка:</pre> <br>
-						<pre class="pre_bold_small">•</pre><br>
-						<pre class="pre_bold_small">•</pre><br>
-						<pre class="pre_bold_small">•</pre><br>
-						<pre class="pre_bold_small">•</pre><br>
-						<pre class="pre_bold_small">•</pre><br>
-						<pre class="pre_bold_small">•</pre><br>
+						<pre class="pre_bold_small">•</pre><pre> Срок за изработка: до 15 работни дни след <br>   капариране 50% от стойността на офертата.</pre> <br>
+						<pre class="pre_bold_small">•</pre><pre> Срокът се удължава при всяка промяна на размери.</pre> <br>
+						<pre class="pre_bold_small">•</pre><pre> Срокът за рекламации и съхранение на готови поръчки е до 3 работни дни, </pre> <br><pre>   считано от уведомителното съобщение.</pre> <br>
 					</th>
 					<th scope="col" class="text-top-left">Поръчка № {{vitrine.id}} <br> Дата: {{vitrine.created_date|date:'d.m.Y'}}</th>
 				</tr>
@@ -42,10 +39,80 @@
 
 	<div class="container" style="padding-top: 10px">
 		<div class="row">
+
+			<div class="col">
+				<h4>Витрини</h4>
+				<table class="table table-sm">
+					<thead>
+						<tr>
+							<th scope="col">Размери</th>
+							<th scope="col">Брой</th>
+							<th scope="col">Профил</th>
+							<th scope="col">Стъкло</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for item in vitrine.frames.all %}
+							<tr>
+								<td>
+									<div class="frame-row" id="frame-size-{{ item.pk }}">
+										{% if item.holes_position == "length" %}
+											<div class="holes-vertical" style="--count: {{ item.holes_count }};"></div>
+											<div>{{ item.length }}</div>
+											<div>x</div>
+											<div>{{ item.width }}</div>
+										{% else %}
+											<div class="empty"></div>
+											<div>{{ item.length }}</div>
+											<div>x</div>
+											<div class="holes-vertical" style="--count: {{ item.holes_count }};"></div>
+											<div>{{ item.width }}</div>
+										{% endif %}
+									</div>
+								</td>
+								<td>{{ item.quantity }}</td>
+								<td>{{ item.profile_type }}</td>
+								{% for glass in item.glasss.all %}
+									<td>{{ glass.glass_type }}</td>
+								{% endfor %}
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+
+			<div class="col">
+				<h4>Информация за поръчка</h4>
+				{% include "vitrine/tables/vitrine_order_info.html" with current_order=vitrine %}
+			</div>
+
 		</div>
 		<div class="row">
-		</div>
-		<div class="row">
+
+			<div class="col">
+				<table class="table table-sm table-bordered border-dark">
+					<thead>
+						<tr>
+							<th scope="col">Други услуги</th>
+							<th scope="col">Брой</th>
+							<th scope="col">Ед. цена</th>
+							<th scope="col">Ст-ст</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for other in vitrine.others.all %}
+							<tr>
+								<td>{{other.description}}</td>
+								<td>{{other.quantity}}</td>
+								<td>{{other.price}}</td>
+								<td>{{other.value}}</td>
+							</tr>
+						{% endfor %}
+						<th colspan="3">Обща стойност</th>
+						<th>{{vitrine.others_total}}</th>
+					</tbody>
+				</table>
+			</div>
 
 			<div class="col">
 				<table class="table table-sm table-bordered border-dark">
@@ -81,7 +148,9 @@
 					</tbody>
 				</table>
 			</div>
-			
+
+		</div>
+		<div class="row">
 		</div>
 	</div>
 	<script type="text/javascript" src="{% static 'bootstrap/5.1.3/js/bootstrap.bundle.js' %}?v=1.1"></script>

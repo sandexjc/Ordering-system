@@ -16,7 +16,7 @@
         {% endif %}
         {% if matte_profile_length != "0.00" %}
             <tr>
-                <td class="indent-cell">Мат</td>
+                <td class="indent-cell">Матов</td>
                 <td>{{ matte_profile_length }} л.м.</td>
                 <td>{{ matte_profile_price }} лв</td>
                 <td>{{ matte_profile_total }} лв</td>
@@ -70,7 +70,7 @@
         </tr>
         {% if total_frames_count != "0" %}
         <tr>
-            <td>Изработка</td>
+            <td class="indent-cell">Изработка</td>
             <td>{{ total_frames_count }}</td>
             <td>{{ frame_manufactoring_price }} лв</td>
             <td>{{ current_order.manufacturing_total }} лв</td>
@@ -78,7 +78,7 @@
         {% endif %}
         {% if additional_holes != "0" %}
             <tr>
-                <td>Допълнителни отвори</td>
+                <td class="indent-cell">д-ни отвори</td>
                 <td>{{ additional_holes }}</td>
                 <td>{{ additional_hole_price }} лв</td>
                 <td>{{ current_order.holes_total }} лв</td>

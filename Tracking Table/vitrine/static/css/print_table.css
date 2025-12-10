@@ -1,0 +1,7 @@
+.frame-info-table {
+    font-size: 0.80rem;
+}
+.frame-info-table td,
+.frame-info-table th {
+    white-space: nowrap;
+}
