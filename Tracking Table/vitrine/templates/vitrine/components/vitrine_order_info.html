@@ -1,0 +1,92 @@
+<table class="table table-sm frame-info-table">
+    <tbody>
+        <tr>
+            <td><strong>Профил</strong></td>
+            <td><strong>Количество</strong></td>
+            <td><strong>Цена за л.м</strong></td>
+            <td><strong>Стойност</strong></td>
+        </tr>
+        {% if black_profile_length != "0.00" %}
+            <tr>
+                <td class="indent-cell">Черeн</td>
+                <td>{{ black_profile_length }} л.м.</td>
+                <td>{{ black_profile_price }} лв</td>
+                <td>{{ black_profile_total }} лв</td>
+            </tr>
+        {% endif %}
+        {% if matte_profile_length != "0.00" %}
+            <tr>
+                <td class="indent-cell">Мат</td>
+                <td>{{ matte_profile_length }} л.м.</td>
+                <td>{{ matte_profile_price }} лв</td>
+                <td>{{ matte_profile_total }} лв</td>
+            </tr>
+        {% endif %}
+        {% if inox_profile_length != "0.00" %}
+            <tr>
+                <td class="indent-cell">Инокс</td>
+                <td>{{ inox_profile_length }} л.м.</td>
+                <td>{{ inox_profile_price }} лв</td>
+                <td>{{ inox_profile_total }} лв</td>
+            </tr>
+        {% endif %}
+        <tr>
+            <td colspan="3"><strong>Общо</strong></td>
+            <td><strong>{{ current_order.frames_total }} лв</strong></td>
+        </tr>
+        <tr><td><br></td></tr>
+        <tr>
+            <td><strong>Уплътнение</strong></td>
+            <td><strong>Количество</strong></td>
+            <td><strong>Цена за л.м</strong></td>
+            <td><strong>Стойност</strong></td>
+        </tr>
+        {% if white_seal != "0.00" %}
+        <tr>
+            <td class="indent-cell">Бяло</td>
+            <td>{{ white_seal }} л.м.</td>
+            <td>{{ seal_price }} лв</td>
+            <td>{{ white_seal_total }} лв</td>
+        </tr>
+        {% endif %}
+        {% if black_seal != "0.00" %}
+        <tr>
+            <td class="indent-cell">Черно</td>
+            <td>{{ black_seal }} л.м.</td>
+            <td>{{ seal_price }} лв</td>
+            <td>{{ black_seal_total }} лв</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td colspan="3"><strong>Общо</strong></td>
+            <td><strong>{{ current_order.seals_total }} лв</strong></td>
+        </tr>
+        <tr><td><br></td></tr>
+        <tr>
+            <td><strong>Други</strong></td>
+            <td><strong>Брой</strong></td>
+            <td><strong>Ед. цена</strong></td>
+            <td><strong>Стойност</strong></td>
+        </tr>
+        {% if total_frames_count != "0" %}
+        <tr>
+            <td>Изработка</td>
+            <td>{{ total_frames_count }}</td>
+            <td>{{ frame_manufactoring_price }} лв</td>
+            <td>{{ current_order.manufacturing_total }} лв</td>
+        </tr>
+        {% endif %}
+        {% if additional_holes != "0" %}
+            <tr>
+                <td>Допълнителни отвори</td>
+                <td>{{ additional_holes }}</td>
+                <td>{{ additional_hole_price }} лв</td>
+                <td>{{ current_order.holes_total }} лв</td>
+            </tr>
+        {% endif %}
+        <tr>
+            <td colspan="3"><strong>Общо</strong></td>
+            <td><strong>{{ additional_total }} лв</strong></td>
+        </tr>
+    </tbody>
+</table>
