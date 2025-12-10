@@ -1,8 +1,8 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
+from common.views import BasePrintView
 from table.models import Order
 
-class PrintOrder(LoginRequiredMixin, TemplateView):
+class PrintOrder(BasePrintView):
+    
     model = Order
     template_name = 'table/print_order.html'
     

@@ -1,8 +1,8 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
+from common.views import BasePrintView
 from vitrine.models import Vitrine
 
-class PrintVitrine(LoginRequiredMixin, TemplateView):
+class PrintVitrine(BasePrintView):
+    
     model = Vitrine
     template_name = 'vitrine/print_vitrine.html'
     
