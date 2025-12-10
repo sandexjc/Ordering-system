@@ -16,9 +16,8 @@ DEFAULT_PROFILE_PRICES = {
 @receiver(pre_save, sender=Frame)
 def update_frame_value(sender, **kwargs):
     frame = kwargs["instance"]
-    # Set price only once - when the frame is added
-    if frame.pk is None and not frame.price:
-        frame.price = DEFAULT_PROFILE_PRICES.get(frame.profile_type, Decimal("0"))
+    # FIXME - Set price only once - when the frame is added
+    frame.price = DEFAULT_PROFILE_PRICES.get(frame.profile_type, Decimal("0"))
     frame_length = ((frame.length * 2) + (frame.width * 2)) / Decimal("1000")
     value = (frame_length * frame.quantity) * frame.price
     frame.value = value.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
@@ -64,6 +63,6 @@ def create_or_update_items(sender, **kwargs):
 @receiver([soft_deleted, post_delete], sender=Frame)
 def delete_frame_items(sender, **kwargs):
     frame = kwargs["instance"]
-    Seal.frame_objects.for_frame(frame).update(deleted_at=timezone.now())
-    Hole.frame_objects.for_frame(frame).update(deleted_at=timezone.now())
-    Glass.frame_objects.for_frame(frame).update(deleted_at=timezone.now())
+    Seal.frame_objects.for_frame(frame).soft_delete()
+    Hole.frame_objects.for_frame(frame).soft_delete()
+    Glass.frame_objects.for_frame(frame).soft_delete()

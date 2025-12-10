@@ -24,26 +24,3 @@ def update_order_balance(order, included_fields):
         'total_price',
         'balance',
     ])
-
-    # # Compute all related totals
-    # for field, model in related.items():
-    #     total = (
-    #         model.objects.for_order(instance)
-    #         .aggregate(total=Sum('value'))['total']
-    #         or Decimal('0.00')
-    #     )
-    #     setattr(instance, field, total)
-
-    #     # Only add non-payment fields to total price
-    #     if field != 'paid':
-    #         instance.total_price += total
-
-    # # Compute balance
-    # instance.balance = instance.paid - instance.total_price
-
-    # # Save only affected fields
-    # instance.save(update_fields=[
-    #     *related.keys(),
-    #     'total_price',
-    #     'balance',
-    # ])
