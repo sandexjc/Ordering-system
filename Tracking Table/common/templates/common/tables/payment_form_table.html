@@ -1,0 +1,33 @@
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th scope="col">Разплащания</th>
+            <th scope="col">Метод</th>
+            <th scope="col">Сума</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in payment_forms %}
+            {{ item.id }}
+            <tr>
+                <td>плащане-{{ forloop.counter }}</td>
+                <td>{{ item.payment_method }}</td>
+                <td>{{ item.value }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td scope="3"><strong>Всичко платено</strong></td>
+            <td></td>
+            <td><strong>{{ current_order.paid }}</strong></td>
+        </tr>
+        <tr><td><br></td></tr>
+        <tr>
+            <td colspan="2"><strong>Обща стойност</strong></td>
+            <td><strong>{{ current_order.total_price }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>БАЛАНС</strong></td>
+            <td><strong>{{ current_order.balance }}</strong></td>
+        </tr>
+    </tbody>
+</table>

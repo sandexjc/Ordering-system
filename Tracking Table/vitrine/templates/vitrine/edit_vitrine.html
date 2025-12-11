@@ -30,7 +30,6 @@
 		{{payment_forms.management_form}}
 
 		<div class="row">
-
 			<div class="col">
 				<h4>Витрини</h4>
 				<table class="table table-sm frame-table">
@@ -82,35 +81,8 @@
 
 			<div class="col">
 				<h4>Плащания</h4>
-				<br>
-				<table class="table table-sm">
-					<tbody>
-						<tr>
-							<td><strong>ОБЩА СТОЙНОСТ</strong></td>
-							<td><strong>{{ current_order.total_price }}</strong></td>
-						</tr>
-						{% for item in payment_forms %}
-							{{ item.id }}
-							<tr>
-								<td>плащане</td>
-								<td>{{item.payment_method}}</td>
-								<td>{{item.value}}</td>
-							</tr>
-						{% endfor %}
-						<tr>
-							<td scope="3"><strong>Всичко платено</strong></td>
-							<td></td>
-							<td><strong>{{ current_order.paid }}</strong></td>
-						</tr>
-						<tr>
-							<td><strong>БАЛАНС</strong></td>
-							<td><strong>{{ current_order.balance }}</strong></td>
-						</tr>
-					</tbody>
-					
-				</table>
+				{% include "common/tables/payment_form_table.html" %}
 			</div>
-			
 		</div>
 		<br><br><br>
 
