@@ -1,0 +1,32 @@
+<table class="table table-sm table-bordered border-dark">
+    <thead>
+        <tr>
+            <th scope="col" colspan="2">Обща стойност</th>
+            <th scope="col"><strong>{{ order.total_price }}</strong></th>
+        </tr>
+        <tr>
+            <th scope="col">Разплащания</th>
+            <th scope="col">Метод</th>
+            <th scope="col">Сума</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for payment in order.payments.all %}
+            <tr>
+                <td>Плащане-{{ forloop.counter }}</td>
+                {% if payment.payment_method == "Cash" %}
+                    <td>в брой</td>
+                {% elif payment.payment_method == "Card" %}
+                    <td>банкова карта</td>
+                {% elif payment.payment_method == "Bank" %}
+                    <td>банков превод</td>
+                {% endif %}
+                <td>{{ payment.value }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <th colspan="2">Остатък<br>за доплащане</th>
+            <th>{{ order.balance }}</th>
+        </tr>
+    </tbody>
+</table>
