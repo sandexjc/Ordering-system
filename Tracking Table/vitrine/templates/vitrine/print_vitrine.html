@@ -8,7 +8,7 @@
 	<link rel="icon" type="image/x-icon" href="{% static 'images/printer.png' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.1.3/css/bootstrap.css' %}?v=1.1">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/print_order.css' %}?v=1.0">
-	<link rel="stylesheet" type="text/css" href="{% static 'css/print_table.css' %}?v=1.0">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/format_table.css' %}?v=1.0">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/holes_dots.css' %}?v=1.0">
 </head>
 <body>
@@ -41,7 +41,7 @@
 		<div class="row">
 			<div class="col">
 				<h4>Витрини</h4>
-				<table class="table table-sm">
+				<table class="table table-sm custom-table-sm table-no-wrap">
 					<thead>
 						<tr>
 							<th scope="col">Размери</th>
@@ -70,7 +70,13 @@
 									</div>
 								</td>
 								<td>{{ item.quantity }}</td>
-								<td>{{ item.profile_type }}</td>
+								{% if item.profile_type == "Black" %}
+									<td>Черен</td>
+								{% elif item.profile_type == "Matte" %}
+									<td>Матов</td>
+								{% else %}
+									<td>Инокс</td>
+								{% endif %}
 								{% for glass in item.glasss.all %}
 									<td>{{ glass.glass_type }}</td>
 								{% endfor %}
@@ -87,11 +93,13 @@
 		</div>
 		<div class="row">
 			<div class="col">
-				{% include "common/tables/others_print_table.html" with order=vitrine %}
+				<h4>Други услуги</h4>
+				{% include "common/tables/others_print_table.html" with order=vitrine props="custom-table-sm table-no-wrap" %}
 			</div>
 
 			<div class="col">
-				{% include "common/tables/payment_print_table.html" with order=vitrine %}
+				<h4>Плащания</h4>
+				{% include "common/tables/payment_print_table.html" with order=vitrine props="custom-table-sm table-no-wrap" %}
 			</div>
 		</div>
 		<div class="row">

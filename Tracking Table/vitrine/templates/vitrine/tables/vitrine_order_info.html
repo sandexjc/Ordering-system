@@ -1,10 +1,10 @@
-<table class="table table-sm frame-info-table">
+<table class="table table-sm custom-table-sm table-no-wrap">
     <tbody>
-        <tr>
-            <td><strong>Профил</strong></td>
-            <td><strong>Количество</strong></td>
-            <td><strong>Цена за л.м</strong></td>
-            <td><strong>Стойност</strong></td>
+        <tr class="section-header">
+            <th><strong>Профил</strong></th>
+            <th><strong>Количество</strong></th>
+            <th><strong>Цена за л.м</strong></th>
+            <th><strong>Стойност</strong></th>
         </tr>
         {% if black_profile_length != "0.00" %}
             <tr>
@@ -34,12 +34,12 @@
             <td colspan="3"><strong>Общо</strong></td>
             <td><strong>{{ current_order.frames_total }} лв</strong></td>
         </tr>
-        <tr><td><br></td></tr>
-        <tr>
-            <td><strong>Уплътнение</strong></td>
-            <td><strong>Количество</strong></td>
-            <td><strong>Цена за л.м</strong></td>
-            <td><strong>Стойност</strong></td>
+        <tr><td colspan="4"></td></tr>
+        <tr class="section-header">
+            <th><strong>Уплътнение</strong></th>
+            <th><strong>Количество</strong></th>
+            <th><strong>Цена за л.м</strong></th>
+            <th><strong>Стойност</strong></th>
         </tr>
         {% if white_seal != "0.00" %}
         <tr>
@@ -61,12 +61,12 @@
             <td colspan="3"><strong>Общо</strong></td>
             <td><strong>{{ current_order.seals_total }} лв</strong></td>
         </tr>
-        <tr><td><br></td></tr>
-        <tr>
-            <td><strong>Други</strong></td>
-            <td><strong>Брой</strong></td>
-            <td><strong>Ед. цена</strong></td>
-            <td><strong>Стойност</strong></td>
+        <tr><td colspan="4"></td></tr>
+        <tr class="section-header">
+            <th><strong>Други</strong></th>
+            <th><strong>Брой</strong></th>
+            <th><strong>Ед. цена</strong></th>
+            <th><strong>Стойност</strong></th>
         </tr>
         {% if total_frames_count != "0" %}
         <tr>
@@ -87,6 +87,11 @@
         <tr>
             <td colspan="3"><strong>Общо</strong></td>
             <td><strong>{{ additional_total }} лв</strong></td>
+        </tr>
+        <tr><td colspan="4"></td></tr>
+        <tr class="bordered-row">
+            <th colspan="3"><strong>Обща стойност</strong></th>
+            <th><strong>{{ current_order.total_price }} лв</strong></th>
         </tr>
     </tbody>
 </table>

@@ -1,9 +1,5 @@
-<table class="table table-sm table-bordered border-dark">
+<table class="table table-sm {{ props }}">
     <thead>
-        <tr>
-            <th scope="col" colspan="2">Обща стойност</th>
-            <th scope="col"><strong>{{ order.total_price }}</strong></th>
-        </tr>
         <tr>
             <th scope="col">Разплащания</th>
             <th scope="col">Метод</th>
@@ -21,12 +17,20 @@
                 {% elif payment.payment_method == "Bank" %}
                     <td>банков превод</td>
                 {% endif %}
-                <td>{{ payment.value }}</td>
+                <td>{{ payment.value }} лв</td>
             </tr>
         {% endfor %}
         <tr>
-            <th colspan="2">Остатък<br>за доплащане</th>
-            <th>{{ order.balance }}</th>
+            <td colspan="2"><strong>Всичко платено</strong></td>
+            <td><strong>{{ order.paid }} лв</strong></td>
+        </tr>
+        <tr>
+            <th scope="col" colspan="2">Обща стойност</th>
+            <th scope="col"><strong>{{ order.total_price }} лв</strong></th>
+        </tr>
+        <tr>
+            <th colspan="2">Остатък за доплащане</th>
+            <th>{{ order.balance }} лв</th>
         </tr>
     </tbody>
 </table>

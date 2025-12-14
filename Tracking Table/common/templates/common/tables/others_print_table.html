@@ -1,10 +1,10 @@
-<table class="table table-sm table-bordered border-dark">
+<table class="table table-sm {{ props }}">
     <thead>
         <tr>
             <th scope="col">Други услуги</th>
             <th scope="col">Брой</th>
             <th scope="col">Ед. цена</th>
-            <th scope="col">Ст-ст</th>
+            <th scope="col">Стойност</th>
         </tr>
     </thead>
     <tbody>
@@ -12,11 +12,11 @@
             <tr>
                 <td>{{other.description}}</td>
                 <td>{{other.quantity}}</td>
-                <td>{{other.price}}</td>
-                <td>{{other.value}}</td>
+                <td>{{other.price}} лв</td>
+                <td>{{other.value}} лв</td>
             </tr>
         {% endfor %}
         <th colspan="3">Обща стойност</th>
-        <th>{{order.others_total}}</th>
+        <th>{{order.others_total}} лв</th>
     </tbody>
 </table>

@@ -1,0 +1,20 @@
+.custom-table-sm {
+    font-size: 0.80rem;
+}
+
+.table-no-wrap td,
+.table-no-wrap th {
+    white-space: nowrap;
+}
+
+.table > tbody > tr.section-header > th {
+    font-weight: 700;
+    border-bottom: 2px solid currentColor;
+}
+
+.table > tbody > tr.bordered-row > th {
+    font-weight: 700;
+    border-bottom: 2px solid currentColor;
+    border-top: 2px solid currentColor;
+}
+

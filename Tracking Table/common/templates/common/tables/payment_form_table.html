@@ -18,16 +18,15 @@
         <tr>
             <td scope="3"><strong>Всичко платено</strong></td>
             <td></td>
-            <td><strong>{{ current_order.paid }}</strong></td>
+            <td><strong>{{ current_order.paid }} лв</strong></td>
         </tr>
-        <tr><td><br></td></tr>
         <tr>
-            <td colspan="2"><strong>Обща стойност</strong></td>
-            <td><strong>{{ current_order.total_price }}</strong></td>
+            <th colspan="2"><strong>Обща стойност</strong></th>
+            <th><strong>{{ current_order.total_price }} лв</strong></th>
         </tr>
         <tr>
             <td><strong>БАЛАНС</strong></td>
-            <td><strong>{{ current_order.balance }}</strong></td>
+            <td><strong>{{ current_order.balance }} лв</strong></td>
         </tr>
     </tbody>
 </table>
