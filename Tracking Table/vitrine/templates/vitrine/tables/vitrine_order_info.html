@@ -6,27 +6,27 @@
             <th><strong>Цена за л.м</strong></th>
             <th><strong>Стойност</strong></th>
         </tr>
-        {% if black_profile_length != "0.00" %}
+        {% if black_profile_len != "0.00" %}
             <tr>
                 <td class="indent-cell">Черeн</td>
-                <td>{{ black_profile_length }} л.м.</td>
-                <td>{{ black_profile_price }} лв</td>
+                <td>{{ black_profile_len }} л.м.</td>
+                <td>{{ current_order.black_profile_price }} лв</td>
                 <td>{{ black_profile_total }} лв</td>
             </tr>
         {% endif %}
-        {% if matte_profile_length != "0.00" %}
+        {% if matte_profile_len != "0.00" %}
             <tr>
                 <td class="indent-cell">Матов</td>
-                <td>{{ matte_profile_length }} л.м.</td>
-                <td>{{ matte_profile_price }} лв</td>
+                <td>{{ matte_profile_len }} л.м.</td>
+                <td>{{ current_order.matte_profile_price }} лв</td>
                 <td>{{ matte_profile_total }} лв</td>
             </tr>
         {% endif %}
-        {% if inox_profile_length != "0.00" %}
+        {% if inox_profile_len != "0.00" %}
             <tr>
                 <td class="indent-cell">Инокс</td>
-                <td>{{ inox_profile_length }} л.м.</td>
-                <td>{{ inox_profile_price }} лв</td>
+                <td>{{ inox_profile_len }} л.м.</td>
+                <td>{{ current_order.inox_profile_price }} лв</td>
                 <td>{{ inox_profile_total }} лв</td>
             </tr>
         {% endif %}
@@ -41,20 +41,20 @@
             <th><strong>Цена за л.м</strong></th>
             <th><strong>Стойност</strong></th>
         </tr>
-        {% if white_seal != "0.00" %}
-        <tr>
-            <td class="indent-cell">Бяло</td>
-            <td>{{ white_seal }} л.м.</td>
-            <td>{{ seal_price }} лв</td>
-            <td>{{ white_seal_total }} лв</td>
-        </tr>
-        {% endif %}
         {% if black_seal != "0.00" %}
         <tr>
             <td class="indent-cell">Черно</td>
             <td>{{ black_seal }} л.м.</td>
-            <td>{{ seal_price }} лв</td>
+            <td>{{ current_order.black_seal_price }} лв</td>
             <td>{{ black_seal_total }} лв</td>
+        </tr>
+        {% endif %}
+        {% if white_seal != "0.00" %}
+        <tr>
+            <td class="indent-cell">Бяло</td>
+            <td>{{ white_seal }} л.м.</td>
+            <td>{{ current_order.white_seal_price }} лв</td>
+            <td>{{ white_seal_total }} лв</td>
         </tr>
         {% endif %}
         <tr>
@@ -72,7 +72,7 @@
         <tr>
             <td class="indent-cell">Изработка</td>
             <td>{{ total_frames_count }}</td>
-            <td>{{ frame_manufactoring_price }} лв</td>
+            <td>{{ current_order.manufacturing_price }} лв</td>
             <td>{{ current_order.manufacturing_total }} лв</td>
         </tr>
         {% endif %}
@@ -80,7 +80,7 @@
             <tr>
                 <td class="indent-cell">д-ни отвори</td>
                 <td>{{ additional_holes }}</td>
-                <td>{{ additional_hole_price }} лв</td>
+                <td>{{ current_order.add_hole_price }} лв</td>
                 <td>{{ current_order.holes_total }} лв</td>
             </tr>
         {% endif %}

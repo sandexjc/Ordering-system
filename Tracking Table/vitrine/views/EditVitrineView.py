@@ -25,5 +25,5 @@ class EditVitrine(BaseEditView):
         context = super().get_context_data(**kwargs)
         vitrine = self.object
         
-        context.update(VitrineContextBuilder.build(vitrine))
+        context.update(VitrineContextBuilder.build_context(vitrine))
         return context

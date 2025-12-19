@@ -16,6 +16,15 @@ class Vitrine(VitrineOrder, BaseOrder):
 
     id = models.BigAutoField(primary_key=True)
 
+    # Vitrine order pricing
+    black_profile_price = models.DecimalField(max_digits=7, decimal_places=2, default=0)
+    matte_profile_price = models.DecimalField(max_digits=7, decimal_places=2, default=0)
+    inox_profile_price = models.DecimalField(max_digits=7, decimal_places=2, default=0)
+    white_seal_price = models.DecimalField(max_digits=7, decimal_places=2, default=0)
+    black_seal_price = models.DecimalField(max_digits=7, decimal_places=2, default=0)
+    add_hole_price = models.DecimalField(max_digits=7, decimal_places=2, default=0)
+    manufacturing_price = models.DecimalField(max_digits=7, decimal_places=2, default=0)
+
     # Vitrine related items total values
     frames_total = models.DecimalField(max_digits=7, decimal_places=2, default=0)
     holes_total = models.DecimalField(max_digits=7, decimal_places=2, default=0)

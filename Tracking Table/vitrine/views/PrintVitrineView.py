@@ -12,6 +12,6 @@ class PrintVitrine(BasePrintView):
         vitrine = Vitrine.objects.get_by_id(pk)
         
         context['vitrine'] = vitrine
-        context.update(VitrineContextBuilder.build(vitrine))
+        context.update(VitrineContextBuilder.build_context(vitrine))
 
         return context
