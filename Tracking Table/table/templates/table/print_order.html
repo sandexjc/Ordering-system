@@ -59,12 +59,12 @@
 							<tr>
 								<td>{{plate.material}}</td>
 								<td>{{plate.quantity}}</td>
-								<td>{{plate.price}} лв</td>
-								<td>{{plate.value}} лв</td>
+								<td>{{plate.price}} {{ currency }}</td>
+								<td>{{plate.value}} {{ currency }}</td>
 							</tr>
 						{% endfor %}
 						<th colspan="3">Обща стойност</th>
-						<th>{{order.plates_total}} лв</th>
+						<th>{{order.plates_total}} {{ currency }}</th>
 					</tbody>
 				</table>
 			</div>
@@ -85,12 +85,12 @@
 							<tr>
 								<td>{{cut.cutting_type}}</td>
 								<td>{{cut.quantity}}</td>
-								<td>{{cut.price}} лв</td>
-								<td>{{cut.value}} лв</td>
+								<td>{{cut.price}} {{ currency }}</td>
+								<td>{{cut.value}} {{ currency }}</td>
 							</tr>
 						{% endfor %}
 						<th colspan="3">Обща стойност</th>
-						<th>{{order.cutting_total}} лв</th>
+						<th>{{order.cutting_total}} {{ currency }}</th>
 					</tbody>
 				</table>
 			</div>
@@ -116,12 +116,12 @@
 								<td>{{edge.edge_type}}</td>
 								<td>{{edge.color_code}}</td>
 								<td>{{edge.quantity}}</td>
-								<td>{{edge.price}} лв</td>
-								<td>{{edge.value}} лв</td>
+								<td>{{edge.price}} {{ currency }}</td>
+								<td>{{edge.value}} {{ currency }}</td>
 							</tr>
 						{% endfor %}
 						<th colspan="4">Обща стойност</th>
-						<th>{{order.edge_total}} лв</th>
+						<th>{{order.edge_total}} {{ currency }}</th>
 					</tbody>
 				</table>
 			</div>
@@ -142,12 +142,12 @@
 							<tr>
 								<td>{{edging.edging_type}}</td>
 								<td>{{edging.quantity}}</td>
-								<td>{{edging.price}} лв</td>
-								<td>{{edging.value}} лв</td>
+								<td>{{edging.price}} {{ currency }}</td>
+								<td>{{edging.value}} {{ currency }}</td>
 							</tr>
 						{% endfor %}
 						<th colspan="3">Обща стойност</th>
-						<th>{{order.edging_total}} лв</th>
+						<th>{{order.edging_total}} {{ currency }}</th>
 					</tbody>
 				</table>
 			</div>

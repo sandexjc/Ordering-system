@@ -12,11 +12,11 @@
             <tr>
                 <td>{{other.description}}</td>
                 <td>{{other.quantity}}</td>
-                <td>{{other.price}} лв</td>
-                <td>{{other.value}} лв</td>
+                <td>{{other.price}} {{ currency }}</td>
+                <td>{{other.value}} {{ currency }}</td>
             </tr>
         {% endfor %}
         <th colspan="3">Обща стойност</th>
-        <th>{{order.others_total}} лв</th>
+        <th>{{order.others_total}} {{ currency }}</th>
     </tbody>
 </table>

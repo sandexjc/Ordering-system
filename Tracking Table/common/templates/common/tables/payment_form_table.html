@@ -12,21 +12,24 @@
             <tr>
                 <td>плащане-{{ forloop.counter }}</td>
                 <td>{{ item.payment_method }}</td>
-                <td>{{ item.value }}</td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        {{ item.value }}<span class="input-group-text">{{ currency }}</span>
+                    </div>
+                </td>
             </tr>
         {% endfor %}
         <tr>
-            <td scope="3"><strong>Всичко платено</strong></td>
-            <td></td>
-            <td><strong>{{ current_order.paid }} лв</strong></td>
+            <td colspan="2"><strong>Всичко платено</strong></td>
+            <td><strong>{{ current_order.paid }} {{ currency }}</strong></td>
         </tr>
         <tr>
             <th colspan="2"><strong>Обща стойност</strong></th>
-            <th><strong>{{ current_order.total_price }} лв</strong></th>
+            <th><strong>{{ current_order.total_price }} {{ currency }}</strong></th>
         </tr>
         <tr>
             <td><strong>БАЛАНС</strong></td>
-            <td><strong>{{ current_order.balance }} лв</strong></td>
+            <td><strong>{{ current_order.balance }} {{ currency }}</strong></td>
         </tr>
     </tbody>
 </table>

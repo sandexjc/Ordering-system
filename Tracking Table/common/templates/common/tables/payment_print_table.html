@@ -17,20 +17,20 @@
                 {% elif payment.payment_method == "Bank" %}
                     <td>банков превод</td>
                 {% endif %}
-                <td>{{ payment.value }} лв</td>
+                <td>{{ payment.value }} {{ currency }}</td>
             </tr>
         {% endfor %}
         <tr>
             <td colspan="2"><strong>Всичко платено</strong></td>
-            <td><strong>{{ order.paid }} лв</strong></td>
+            <td><strong>{{ order.paid }} {{ currency }}</strong></td>
         </tr>
         <tr>
             <th scope="col" colspan="2">Обща стойност</th>
-            <th scope="col"><strong>{{ order.total_price }} лв</strong></th>
+            <th scope="col"><strong>{{ order.total_price }} {{ currency }}</strong></th>
         </tr>
         <tr>
             <th colspan="2">Остатък за доплащане</th>
-            <th>{{ order.balance }} лв</th>
+            <th>{{ order.balance }} {{ currency }}</th>
         </tr>
     </tbody>
 </table>

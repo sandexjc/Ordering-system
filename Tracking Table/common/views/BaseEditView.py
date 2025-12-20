@@ -2,6 +2,7 @@ from django.views.generic import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
+from common.service import CurrencyOperations
 
 class BaseEditView(LoginRequiredMixin, UpdateView):
 
@@ -32,6 +33,7 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
             context["add_note"] = kwargs.get("add_note") or self.note_form_class()
 
         context["current_order"] = self.object
+        context["currency"] = CurrencyOperations.get_currency(self.object.created_at.date())
         return context
     
 
