@@ -5,5 +5,8 @@ from vitrine.models import Hole
 
 @receiver(pre_save, sender=Hole)
 def update_hole_value(sender, **kwargs):
+
+    """ Calculate hole total for related frame. """
+    
     hole = kwargs["instance"]
     hole.value = hole.quantity * hole.price
