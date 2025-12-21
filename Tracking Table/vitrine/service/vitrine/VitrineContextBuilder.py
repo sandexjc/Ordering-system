@@ -1,4 +1,3 @@
-from vitrine.models import Frame, Hole, Seal
 from decimal import Decimal
 
 class VitrineContextBuilder:
@@ -39,9 +38,9 @@ class VitrineContextBuilder:
 
     @classmethod
     def _build_base_context(cls, vitrine):
-        frames = Frame.objects.for_order(vitrine)
-        holes = Hole.objects.for_order(vitrine)
-        seals = Seal.objects.for_order(vitrine)
+        frames = vitrine.frames.for_order(vitrine)
+        holes = vitrine.holes.for_order(vitrine)
+        seals = vitrine.seals.for_order(vitrine)
 
         black_profile_len = cls._profile_qty(frames, "Black")
         matte_profile_len = cls._profile_qty(frames, "Matte")

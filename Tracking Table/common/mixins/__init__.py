@@ -7,3 +7,7 @@ from .forms import (
 from .signals import (
     BaseChangeSignalMixin,
 )
+
+from .workflow import (
+    WorkflowModelMixin,
+)

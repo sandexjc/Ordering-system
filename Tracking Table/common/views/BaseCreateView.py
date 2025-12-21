@@ -16,13 +16,6 @@ class BaseCreateView(LoginRequiredMixin, CreateView):
     change_what = None
     redirect_name = None
 
-    # --- pre save hook --- #
-    def apply_creation_logic(self, object):
-
-        """ Hook for subclasses to modify the object before it is saved. """
-
-        pass
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.note_form_class:
@@ -40,8 +33,8 @@ class BaseCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form, note, user):
         # Save main object
         self.object = form.save(commit=False)
-        self.apply_creation_logic(self.object)
-        self.object.save()
+        # Run model custom save logic sequence
+        self.object.run_workflow_save()
 
         # Create Change record
         if self.change_model and self.change_what:

@@ -20,7 +20,8 @@ class BaseDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
         self.object = self.get_object()
 
         try:
-            self.object.soft_delete()
+            # Run custom workflow delete sequence
+            self.object.run_workflow_delete()
         except Exception as exc:
             return JsonResponse(
                 {"status": "error", "message": str(exc)},

@@ -1,9 +1,14 @@
 from django.db import models
+
 from common.models import BaseItem
+from table.service import BaseTableItemWorkflow
 from table.models.base import TableItem
 
 
 class Edge(TableItem, BaseItem):
+
+    # Service layer workflow model speific functionality
+    workflow_service_class = BaseTableItemWorkflow
 
     edge_type = models.CharField(max_length=50)
     color_code = models.CharField(max_length=50, default='')

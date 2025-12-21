@@ -1,2 +1,4 @@
-from .context import VitrineContextBuilder
-from .pricing import set_vitrine_prices
+from .VitrineContextBuilder import VitrineContextBuilder
+from .VitrinePriceSetter import VitrinePriceSetter
+from .VitrineTotals import VitrineTotals
+from .VitrineWorkflow import VitrineWorkflow

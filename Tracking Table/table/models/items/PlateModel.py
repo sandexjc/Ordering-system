@@ -1,9 +1,14 @@
 from django.db import models
+
 from common.models import BaseItem
+from table.service import BaseTableItemWorkflow
 from table.models.base import TableItem
 
 
 class Plate(TableItem, BaseItem):
+
+    # Service layer workflow model speific functionality
+    workflow_service_class = BaseTableItemWorkflow
 
     manufacturers = [
         ('Egger', 'Egger'),

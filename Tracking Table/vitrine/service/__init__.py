@@ -1,4 +1,15 @@
 from .vitrine import (
     VitrineContextBuilder,
-    set_vitrine_prices,
+    VitrinePriceSetter,
+    VitrineTotals,
+    VitrineWorkflow,
+)
+
+from .workflow import (
+    BaseVitrineItemWorkflow,
+)
+
+from .items import (
+    FrameWorkflow,
+    OtherWorkflow,
 )

@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+
+from vitrine.service import FrameWorkflow
 from common.models import BaseItem
 from vitrine.models.base import VitrineItem
 
@@ -31,6 +33,9 @@ class Frame(VitrineItem, BaseItem):
         ('length', 'дължина'),
         ('width', 'широчина'),
     ]
+
+    # Service layer workflow model speific functionality
+    workflow_service_class = FrameWorkflow
 
     profile_type = models.CharField(choices=profile_types, default='Black', max_length=10)
     length = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20000)], default=0)

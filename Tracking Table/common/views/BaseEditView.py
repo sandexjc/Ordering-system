@@ -61,26 +61,28 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
         user = self.request.user.first_name
 
         # handle order form
-        self.object = order_form.save()
+        self.object = order_form.save(commit=False)
+        self.object.run_workflow_save()
 
         # handle note form
         note = note_form.save(commit=False)
-        note.user = user
-        setattr(note, self.fk_field_name, self.object)
         if note.content:
-            note.save()
+            setattr(note, self.fk_field_name, self.object)
+            note.user = user
+            note.run_workflow_save()
 
         # Handle realated formsets
         for formset in formsets.values():
             instances = formset.save(commit=False)
+
             for item in instances:
                 item.modified_by = user
                 setattr(item, self.fk_field_name, self.object)
-                item.save()
+                item.run_workflow_save()
             
             for item in formset.deleted_objects:
                 item.modified_by = user
-                item.soft_delete()
+                item.run_workflow_delete()
 
         messages.success(self.request, "Промените са запазени успешно!")
         return redirect(self.redirect_url, self.object.pk)
