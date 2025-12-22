@@ -26,6 +26,6 @@ class BaseTotal:
                 order.total_price += getattr(order, field)
 
         # Calculate order balance
-        order.balance = order.paid - order.total_price
+        order.balance = order.total_price - order.paid
 
         order.save(update_fields=["total_price", "balance"])
