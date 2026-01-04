@@ -1,7 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.detail import SingleObjectMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.views import View
 from django.http import JsonResponse
+from django.db import transaction
 
 
 class BaseDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
@@ -16,8 +18,14 @@ class BaseDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
         # FIXME - Add permissions checks later
         return order
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
+        
+        try:
+            self.object = self.get_object()
+        except ObjectDoesNotExist:
+            # Already deleted
+            return JsonResponse({"status": "ok"})
 
         try:
             # Run custom workflow delete sequence

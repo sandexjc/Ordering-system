@@ -115,7 +115,13 @@ function handle_orders_properties()
 		})
 	})
 
-	document.addEventListener("click", function(event) {
+	/** Remove old window delete listener if already registered */
+	if (window.deleteHandler) {
+		document.removeEventListener("click", window.deleteHandler);
+	}
+
+	/** Create a single handler function and store it globally */
+	window.deleteHandler = function(event) {
 		const btn = event.target.closest(".btn-delete");
 		if (!btn) return;
 
@@ -125,66 +131,49 @@ function handle_orders_properties()
 		const url = btn.dataset.url;
 		const form = btn.closest("form");
 
-		// UI loading state
+		/** UI loading state */
 		btn.disabled = true;
 		const oldHtml = btn.innerHTML;
-		btn.innerHTML = `
-			Loading...
-			<span class="spinner-border spinner-border-sm"></span>
-		`;
+		btn.innerHTML = `Loading... <span class="spinner-border spinner-border-sm"></span>`;
 
-		// CSRF token
 		const csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
-
-		// form data
 		const formData = new FormData(form);
 
 		fetch(url, {
 			method: "POST",
-			headers: {
-				"X-CSRFToken": csrfToken
-			},
+			headers: { "X-CSRFToken": csrfToken },
 			body: formData
 		})
-		.then(function(response) {
-			// Convert response to JSON
-			return response.json().then(function(data) {
-				return { ok: response.ok, data: data };
-			});
-		})
-		.then(function(result) {
+		.then(r => r.json().then(d => ({ ok: r.ok, data: d })))
+		.then(result => {
 			if (!result.ok || result.data.status !== "ok") {
 				throw new Error(result.data.message || "Deletion error");
 			}
 
-			// Close modal
+			/** Close modal */
 			const modal = document.getElementById(`modal-delete-${id}`);
-			if (modal) {
-				bootstrap.Modal.getInstance(modal).hide();
-			}
+			if (modal) bootstrap.Modal.getInstance(modal).hide();
 
-			// Remove HTML elements
+			/** Remove HTML elements */
 			[
-				`#hidden-row-${id}`,			// remove hidden table row
-				`[data-row="${id}"]`,           // remove table row
-				`#delete-window-${id}`,         // remove delete modal wrapper
-				`#progress-window-${id}`,       // remove progress modal wrapper
-				`#offcanvas-history-tab-${id}`  // remove history offcanvas wrapper
-			].forEach(sel => {
-				const el = document.querySelector(sel);
-				if (el) el.remove();
-			});
-
+				`#hidden-row-${id}`,
+				`[data-row="${id}"]`,
+				`#delete-window-${id}`,
+				`#progress-window-${id}`,
+				`#offcanvas-history-tab-${id}`
+			].forEach(sel => document.querySelector(sel)?.remove());
 		})
-		.catch(function(error) {
-			console.error(error);
+		.catch(err => {
+			console.error(err);
 			alert("Error deleting item. Please try again.");
 
 			btn.disabled = false;
 			btn.innerHTML = oldHtml;
 		});
-	});
+	};
 
+	/** Attach the order delete handler */
+	document.addEventListener("click", window.deleteHandler);
 
 	$('#edit-order-button').click(function() {
 		$('#edit-order-form').submit();
