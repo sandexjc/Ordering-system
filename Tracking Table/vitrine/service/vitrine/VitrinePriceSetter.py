@@ -1,12 +1,11 @@
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from django.utils import timezone
 
 from common.service import CurrencyOperations
 
 
 class VitrinePriceSetter:
-
-    """ Service class responsible for setting vitrine prices on creation. """
+    """Service class responsible for setting vitrine prices on creation."""
 
     # FIXME: move prices into a configurable model
     CURRENT_PRICES = {
@@ -24,25 +23,17 @@ class VitrinePriceSetter:
 
     def set_prices(self) -> None:
         # Set vitrine order prices upon creation.
-
         if self.vitrine.pk:
             return
 
-        rate = self._get_rate()
+        currency = CurrencyOperations.get_currency(timezone.now().date())
 
-        for field, price in self.CURRENT_PRICES.items():
-            final_price = self._calculate_price(price, rate)
+        for field, price_bgn in self.CURRENT_PRICES.items():
+            final_price = self._convert_price(price_bgn, currency)
             setattr(self.vitrine, field, final_price)
 
     @staticmethod
-    def _calculate_price(price: Decimal, rate: Decimal) -> Decimal:
-        return (price / rate).quantize(
-            Decimal("0.01"),
-            rounding=ROUND_HALF_UP,
-        )
-
-    @classmethod
-    def _get_rate(cls) -> Decimal:
-        if timezone.now().year > 2025:
-            return CurrencyOperations.BGN_TO_EUR
-        return Decimal("1")
+    def _convert_price(price_bgn: Decimal, currency: str) -> Decimal:
+        if currency == "€":
+            return CurrencyOperations.to_eur(price_bgn)
+        return price_bgn
