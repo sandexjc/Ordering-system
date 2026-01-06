@@ -1,0 +1,15 @@
+.progress-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.3rem;
+}
+
+.progress-label {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.progress-field > * {
+    margin: 0 !important;
+}
