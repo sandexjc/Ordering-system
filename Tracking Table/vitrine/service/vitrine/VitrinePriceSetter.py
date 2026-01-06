@@ -10,8 +10,8 @@ class VitrinePriceSetter:
     # FIXME: move prices into a configurable model
     CURRENT_PRICES = {
         "black_profile_price": Decimal("15.50"),
-        "matte_profile_price": Decimal("16.60"),
-        "inox_profile_price": Decimal("17.70"),
+        "matte_profile_price": Decimal("13.30"),
+        "inox_profile_price": Decimal("13.30"),
         "white_seal_price": Decimal("1.00"),
         "black_seal_price": Decimal("1.00"),
         "add_hole_price": Decimal("2.00"),
