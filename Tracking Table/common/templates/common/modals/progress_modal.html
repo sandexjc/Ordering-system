@@ -23,9 +23,17 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary updateButtons" id="{{ object.id }}">Update</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Затвори
+                        </button>
+                        <button
+                            type="submit"
+                            class="btn btn-primary btn-update"
+                            data-url="{% url app_name|add:':update' object.id %}"
+                            data-id="{{ object.id }}"
+                        >Update</button>
                     </div>
+
                 </form>
 
             </div>

@@ -1,62 +1,54 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import UpdateView
-from django.shortcuts import redirect
-from django.http import JsonResponse
 from django.core import serializers
 
+from common.views import BaseUpdateView
 from table.models import Order
 from table.forms import PlateProgressFormSet, EdgeProgressFormSet, OrderProgressForm
 
 import json
 
-class UpdateOrder(LoginRequiredMixin, UpdateView):
+class UpdateOrder(BaseUpdateView):
+
+    """ Update table app orders progress class. """
 
     model = Order
+    form_class = OrderProgressForm
 
-    def post(self, request, pk, *args, **kwargs):
+    def get_extra_forms(self):
+        return {
+            "plates": PlateProgressFormSet(self.request.POST, instance=self.object),
+            "edges": EdgeProgressFormSet(self.request.POST, instance=self.object),
+        }
 
-        self.object = Order.objects.get_by_id(pk)
-        plates_progress = PlateProgressFormSet(self.request.POST, instance=self.object)
-        edges_progress = EdgeProgressFormSet(self.request.POST, instance=self.object)
-        order_progress = OrderProgressForm(self.request.POST, instance=self.object)
+    def handle_extra_forms(self, forms):
+        plates = forms["plates"].save(commit=False)
+        edges = forms["edges"].save(commit=False)
 
-        if plates_progress.is_valid() and edges_progress.is_valid() and order_progress.is_valid():
-            return self.form_valid(plates_progress, edges_progress, order_progress, self.object)
-        else:
-            print(plates_progress.errors)
-            print(edges_progress.errors)
-            return redirect('/')
-
-    def form_valid(self, plates_progress, edges_progress, order_progress, order):
-
-        plates_data = plates_progress.save(commit=False)
-        edges_data = edges_progress.save(commit=False)
-
-        for item in plates_data:
+        for item in plates:
             item.save()
 
-        for item in edges_data:
+        for item in edges:
             item.save()
 
-        if self.check_if_ready(order, plates_data, edges_data):
-            order.order_ready = True
-            order.save()
-            order_progress.save()
-        else:
-            order.order_ready = False
-            order.order_taken = False
-            order.save()
-        
-        return JsonResponse({
-            'order':    json.loads(serializers.serialize('json', [order])),
-            'plates':   json.loads(serializers.serialize('json', order.plates.all())),
-            'edges':    json.loads(serializers.serialize('json', order.edges.all())),
-            })
-
-    def check_if_ready(self, order, plates, edges):
-
+    def is_order_ready(self, order_instance, forms):
+        plates = forms["plates"].save(commit=False)
         for item in plates:
             if not item.delivered or not item.cutted or not item.edged:
                 return False
-
         return True
+
+    def serialize_response(self, order_instance):
+        return {
+            "order": json.loads(serializers.serialize("json", [order_instance])),
+            "plates": json.loads(
+                serializers.serialize(
+                    "json", order_instance.plates.model.objects.for_order(order_instance)
+                    )
+                ),
+            "edges": json.loads(
+                serializers.serialize(
+                    "json", order_instance.edges.model.objects.for_order(order_instance)
+                    )
+                ),
+        }

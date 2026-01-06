@@ -17,3 +17,7 @@ from .ItemsForms import (
     OthersFormSet,
     PaymentFormSet,
 )
+
+from .ProgressForms import (
+    VitrineProgressForm,
+)

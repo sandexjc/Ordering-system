@@ -3,6 +3,7 @@
 
 
 {# MODALS & OFFCANVAS #}
+{% include "common/modals/progress_modal.html" with object=vitrine app_name="vitrine" progress_table_template="vitrine/vitrine_progress_form.html" %}
 {% include "common/modals/delete_modal.html" with object=vitrine app_name="vitrine" %}
 
 <div class="container-fluid order-view" id="order-view-{{ vitrine.id }}">

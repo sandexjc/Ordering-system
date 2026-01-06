@@ -25,7 +25,7 @@
                             class="btn btn-danger btn-delete" 
                             id="delete-order-btn-{{ object.id }}"
                             data-app="{{ app_name }}"
-                            data-url="{% url app_name|add:':delete_order' object.id %}"
+                            data-url="{% url app_name|add:':delete' object.id %}"
                             data-id="{{ object.id }}"
                             >Изтрий</button>
                     </div>

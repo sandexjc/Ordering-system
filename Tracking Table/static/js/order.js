@@ -4,116 +4,148 @@
 
 function handle_orders_properties() 
 {
-	$(".updateButtons").each(function() {
-		$(this).click(function() {
+	/**
+	 * UPDATE (progress form) handler
+	 * Works for table + vitrine
+	 * Vanilla JS, delegated, app-agnostic
+	 */
 
-			$(this).prop('disabled', true);
-			$(this).html("Loading...");
-			$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-			var updateButton = this;
+	/** Remove old handler if already registered */
+	if (window.updateHandler) {
+		document.removeEventListener("click", window.updateHandler);
+	}
 
-			$.ajax({
-				method: "POST",
-				url: '/table/updateOrder/' + this.getAttribute('id'),
-				data: $("#modal-progress-"+this.getAttribute('id')+" .updateForms").serialize(),
-				timeout: 10000,
-				context: updateButton,
+	/** Create a single delegated handler */
+	window.updateHandler = function (event) {
+		const btn = event.target.closest(".btn-update");
+		if (!btn) return;
 
-				success: function(data) {
-					$(".ALERT-E-UPD-VIEW").css("display","none");
-					$(".ALERT-S-UPD-VIEW").css("display","inline");
-					$(this).prop('disabled', false);
-					$(this).html("Update");
-					$(this).find('span').remove();
+		event.preventDefault();
 
-					$(data.order).each(function() {
-						if (this.fields.order_taken == true) {
-							$("#"+this.pk+".visibleRows").removeClass('normalOrder');
-							$("#"+this.pk+".visibleRows").addClass('orderTaken');
-						}else{
-							$("#"+this.pk+".visibleRows").removeClass('orderTaken');
-							$("#"+this.pk+".visibleRows").addClass('normalOrder');
-						}
+		const url = btn.dataset.url;
+		const id = btn.dataset.id;
 
-						if (this.fields.invoice == true) {
-							$("#ID"+this.pk).css('color', 'red');
-						}else{
-							$("#ID"+this.pk).css('color', 'black');
-						}
-					})
+		const modal = btn.closest(".modal");
+		if (!modal) return;
 
-					$(data.plates).each(function() {
+		const form = modal.querySelector("form");
+		if (!form) return;
 
-						if ((this.fields.ordered == true) && (this.fields.from_client != true) && (this.fields.delivered != true)) {
-							$("#plate"+this.pk).css('color', 'red');
-						}else if (this.fields.delivered == true) {
-							$("#plate"+this.pk).css('color', '#8ac926');
-						}else if (this.fields.from_client == true) {
-							$("#plate"+this.pk).css('color', '#7b2cbf');
-						}else{
-							$("#plate"+this.pk).css('color', 'black');
-						}
+		/** Loading state */
+		btn.disabled = true;
+		const oldHtml = btn.innerHTML;
+		btn.innerHTML = `Loading... <span class="spinner-border spinner-border-sm" role="status"></span>`;
 
-						if ((this.fields.ordered == true) && (this.fields.from_client != true)) {
-							$("#plate-progress-ordered-"+this.pk).addClass("active");
-						}else{
-							$("#plate-progress-ordered-"+this.pk).removeClass("active");
-						}
+		const csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
+		const formData = new FormData(form);
 
-						if (this.fields.delivered == true) {
-							$("#plate-progress-delivered-"+this.pk).addClass("active");
-						}else{
-							$("#plate-progress-delivered-"+this.pk).removeClass("active");
-						}
-
-						if (this.fields.cutted == true) {
-							$("#plate-progress-cutted-"+this.pk).addClass("active");
-						}else{
-							$("#plate-progress-cutted-"+this.pk).removeClass("active");
-						}
-
-						if (this.fields.edged == true) {
-							$("#plate-progress-edged-"+this.pk).addClass("active");
-						}else{
-							$("#plate-progress-edged-"+this.pk).removeClass("active");
-						}
-					})
-
-					$(data.edges).each(function() {
-						if ((this.fields.ordered == true) && (this.fields.delivered != true)) {
-							$("#edge"+this.pk).css('color', 'red');
-						}else if ((this.fields.ordered == true) && (this.fields.delivered == true)) {
-							$("#edge"+this.pk).css('color', '#8ac926');
-						}else{
-							$("#edge"+this.pk).css('color', 'black');
-						}
-
-						if (this.fields.ordered == true) {
-							$("#edge-progress-ordered-"+this.pk).addClass("active");
-						}else{
-							$("#edge-progress-ordered-"+this.pk).removeClass("active");					
-						}
-
-						if (this.fields.delivered == true) {
-							$("#edge-progress-delivered-"+this.pk).addClass("active");
-						}else{
-							$("#edge-progress-delivered-"+this.pk).removeClass("active");	
-						}
-					})
-				},
-				error: function(status) {
-					$(".alertmsgdiv").find("div").remove();
-					$(".alertmsgdiv").append("<div>"+status.statusText+"</div>");
-					$(".ALERT-E-UPD-VIEW").css("display","inline");
-					$(".ALERT-S-UPD-VIEW").css("display","none");
-					$(this).prop('disabled', false);
-					$(this).html("Update");
-					$(this).find('span').remove();
-				}
-
-				})
+		fetch(url, {
+			method: "POST",
+			headers: { "X-CSRFToken": csrfToken },
+			body: formData
 		})
-	})
+		.then(r => r.json().then(d => ({ ok: r.ok, data: d })))
+		.then(result => {
+			if (!result.ok) {
+				throw new Error("Update failed");
+			}
+
+			/** Alerts */
+			document.querySelectorAll(".ALERT-E-UPD-VIEW").forEach(el => el.style.display = "none");
+			document.querySelectorAll(".ALERT-S-UPD-VIEW").forEach(el => el.style.display = "inline");
+
+			/** Restore button */
+			btn.disabled = false;
+			btn.innerHTML = "Update";
+
+			const data = result.data || {};
+
+			/** =========================
+			 * ORDERS
+			 * ========================= */
+			if (Array.isArray(data.order)) {
+				data.order.forEach(o => {
+					const row = document.getElementById(o.pk);
+
+					if (row) {
+						row.classList.toggle("orderTaken", o.fields.order_taken === true);
+						row.classList.toggle("normalOrder", o.fields.order_taken !== true);
+					}
+
+					const idLabel = document.getElementById(`ID${o.pk}`);
+					if (idLabel) {
+						idLabel.style.color = o.fields.invoice ? "red" : "black";
+					}
+				});
+			}
+
+			/** =========================
+			 * PLATES (table app only)
+			 * ========================= */
+			if (Array.isArray(data.plates)) {
+				data.plates.forEach(p => {
+					const plate = document.getElementById(`plate${p.pk}`);
+					if (plate) {
+						if (p.fields.ordered && !p.fields.from_client && !p.fields.delivered) {
+							plate.style.color = "red";
+						} else if (p.fields.delivered) {
+							plate.style.color = "#8ac926";
+						} else if (p.fields.from_client) {
+							plate.style.color = "#7b2cbf";
+						} else {
+							plate.style.color = "black";
+						}
+					}
+
+					const plateStates = ["ordered", "delivered", "cutted", "edged"];
+					plateStates.forEach(state => {
+						const el = document.getElementById(`plate-progress-${state}-${p.pk}`);
+						if (el) {
+							el.classList.toggle("active", p.fields[state] === true);
+						}
+					});
+				});
+			}
+
+			/** =========================
+			 * EDGES (table app only)
+			 * ========================= */
+			if (Array.isArray(data.edges)) {
+				data.edges.forEach(e => {
+					const edge = document.getElementById(`edge${e.pk}`);
+					if (edge) {
+						if (e.fields.ordered && !e.fields.delivered) {
+							edge.style.color = "red";
+						} else if (e.fields.delivered) {
+							edge.style.color = "#8ac926";
+						} else {
+							edge.style.color = "black";
+						}
+					}
+
+					["ordered", "delivered"].forEach(state => {
+						const el = document.getElementById(`edge-progress-${state}-${e.pk}`);
+						if (el) {
+							el.classList.toggle("active", e.fields[state] === true);
+						}
+					});
+				});
+			}
+		})
+		.catch(err => {
+			console.error(err);
+
+			document.querySelectorAll(".ALERT-E-UPD-VIEW").forEach(el => el.style.display = "inline");
+			document.querySelectorAll(".ALERT-S-UPD-VIEW").forEach(el => el.style.display = "none");
+
+			btn.disabled = false;
+			btn.innerHTML = oldHtml;
+		});
+	};
+
+	/** Attach handler */
+	document.addEventListener("click", window.updateHandler);
+
 
 	/** Remove old window delete listener if already registered */
 	if (window.deleteHandler) {
