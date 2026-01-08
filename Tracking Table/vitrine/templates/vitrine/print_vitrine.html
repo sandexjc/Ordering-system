@@ -70,13 +70,7 @@
 									</div>
 								</td>
 								<td>{{ item.quantity }}</td>
-								{% if item.profile_type == "Black" %}
-									<td>Черен</td>
-								{% elif item.profile_type == "Matte" %}
-									<td>Матов</td>
-								{% else %}
-									<td>Инокс</td>
-								{% endif %}
+								<td>{{ item.get_profile_type_display }}</td>
 								{% for glass in item.glasss.all %}
 									<td>{{ glass.glass_type }}</td>
 								{% endfor %}

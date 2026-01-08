@@ -10,13 +10,7 @@
         {% for payment in order.payments.all %}
             <tr>
                 <td>Плащане-{{ forloop.counter }}</td>
-                {% if payment.payment_method == "Cash" %}
-                    <td>в брой</td>
-                {% elif payment.payment_method == "Card" %}
-                    <td>банкова карта</td>
-                {% elif payment.payment_method == "Bank" %}
-                    <td>банков превод</td>
-                {% endif %}
+                <td>{{ payment.get_payment_method_display }}</td>
                 <td>{{ payment.value }} {{ currency }}</td>
             </tr>
         {% endfor %}

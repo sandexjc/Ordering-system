@@ -41,7 +41,7 @@
             <td>{{ vitrine.owner }}<br>{{ vitrine.telephone }}</td>
             <td>
                 {% for item in vitrine.frames.all %}
-                    <div class="frame-color" id="frame-color-{{ item.pk }}">{{ item.profile_type }}</div>
+                    <div class="frame-color" id="frame-color-{{ item.pk }}">{{ item.get_profile_type_display }}</div>
                 {% endfor %}
             </td>
             <td>

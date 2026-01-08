@@ -4,9 +4,9 @@ from django.core.validators import MinValueValidator
 class BasePayment(models.Model):
 
     payment_methods = [
-        ('Cash', 'Cash'),
-        ('Card', 'Card'),
-        ('Bank', 'Bank'),
+        ('Cash', 'в брой'),
+        ('Card', 'банкова карта'),
+        ('Bank', 'банков превод'),
     ]
 
     value = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(0.00)])

@@ -25,7 +25,7 @@ class Frame(VitrineItem, BaseItem):
 
     profile_types = [
         ('Black', 'Черен'),
-        ('Matte', 'Мат'),
+        ('Matte', 'Матов'),
         ('Inox', 'Инокс'),
     ]
 
