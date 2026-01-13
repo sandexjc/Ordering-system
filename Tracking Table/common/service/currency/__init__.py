@@ -1,1 +1,2 @@
 from .CurrencyOperations import CurrencyOperations
+from .CurrencyDecorator import CurrencyDecorator

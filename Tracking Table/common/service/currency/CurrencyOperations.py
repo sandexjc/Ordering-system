@@ -26,3 +26,24 @@ class CurrencyOperations:
     def get_currency(order_date: date) -> str:
         # Returns currency symbol based on order created date
         return "€" if order_date > CurrencyOperations.EURO_SWITCH_DATE else "лв"
+
+    @staticmethod
+    def present(amount: Decimal, order_date):
+        # Produces main + secondary currency values for display.
+        is_eur_main = order_date >= CurrencyOperations.EURO_SWITCH_DATE
+
+        if is_eur_main:
+            return {
+                "main": amount,
+                "secondary": CurrencyOperations.to_bgn(amount),
+                "main_symbol": "€",
+                "secondary_symbol": "лв",
+            }
+        else:
+            return {
+                "main": amount,
+                "secondary": CurrencyOperations.to_eur(amount),
+                "main_symbol": "лв",
+                "secondary_symbol": "€",
+            }
+

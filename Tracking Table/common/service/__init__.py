@@ -1,5 +1,6 @@
 from .currency import (
     CurrencyOperations,
+    CurrencyDecorator,
 )
 
 from .workflow import (
