@@ -1,0 +1,20 @@
+{% load math_filters %}
+
+{% with width=6 dot_radius=2 top_padding=6 bottom_padding=6 step=6 %}
+{% with dots_space=count|sub:1|at_least:0|mul:step %}
+{% with height=top_padding|add:dots_space|add:bottom_padding %}
+
+<svg class="holes-svg" width="{{ width }}" height="{{ height }}" viewBox="0 0 {{ width }} {{ height }}" xmlns="http://www.w3.org/2000/svg">
+    {% for _ in " "|ljust:count %}
+        {% with offset=forloop.counter0|mul:step %}
+        <circle
+            cx="{{ width|div:2 }}"
+            cy="{{ top_padding|add:offset }}"
+            r="{{ dot_radius }}" />
+        {% endwith %}
+    {% endfor %}
+</svg>
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
