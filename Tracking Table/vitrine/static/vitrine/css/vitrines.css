@@ -1,0 +1,12 @@
+.frame-size {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.frame-color, .frame-glass {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+

@@ -7,8 +7,9 @@
 	<title>МЕГА ТРЕЙДИНГ ЕООД</title>
 	<link rel="icon" type="image/x-icon" href="{% static 'images/printer.png' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.1.3/css/bootstrap.css' %}?v=1.1">
-	<link rel="stylesheet" type="text/css" href="{% static 'css/print_order.css' %}?v=1.0">
-	<link rel="stylesheet" type="text/css" href="{% static 'css/format_table.css' %}?v=1.0">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/print_order.css' %}?v=1.1">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/format_table.css' %}?v=1.1">
+	<link rel="stylesheet" type="text/css" href="{% static 'vitrine/css/vitrines.css' %}?v=1.0">
 	<link rel="stylesheet" type="text/css" href="{% static 'vitrine/css/holes_dots.css' %}?v=1.1">
 </head>
 <body>
@@ -53,8 +54,8 @@
 					<tbody>
 						{% for item in vitrine.frames.all %}
 							<tr>
-								<td>
-									<div class="frame-row" id="frame-size-{{ item.pk }}">
+								<td class="align-center">
+									<div class="frame-size" id="frame-size-{{ item.pk }}">
 										{% if item.holes_position == "length" %}
 											{% include "vitrine/components/holes_vertical.html" with count=item.holes_count %}
 											<div>{{ item.length }}</div>
@@ -69,10 +70,10 @@
 										{% endif %}
 									</div>
 								</td>
-								<td>{{ item.quantity }}</td>
-								<td>{{ item.get_profile_type_display }}</td>
+								<td class="align-center">{{ item.quantity }}</td>
+								<td class="align-center">{{ item.get_profile_type_display }}</td>
 								{% for glass in item.glasss.all %}
-									<td>{{ glass.glass_type }}</td>
+									<td class="align-center">{{ glass.glass_type }}</td>
 								{% endfor %}
 							</tr>
 						{% endfor %}

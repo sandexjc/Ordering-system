@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block links %}
+    <link rel="stylesheet" type="text/css" href="{% static 'vitrine/css/vitrines.css' %}?v=1.0">
     <link rel="stylesheet" type="text/css" href="{% static 'vitrine/css/holes_dots.css' %}?v=1.2">
     <link rel="stylesheet" type="text/css" href="{% static 'vitrine/css/modal_progress.css' %}?v=1.1">
 {% endblock %}
@@ -46,7 +47,7 @@
             </td>
             <td>
                 {% for item in vitrine.frames.all %}
-                    <div class="frame-row" id="frame-size-{{ item.pk }}">
+                    <div class="frame-size" id="frame-size-{{ item.pk }}">
                         {% if item.holes_position == "length" %}
                             {% include "vitrine/components/holes_vertical.html" with count=item.holes_count %}
                             <div>{{ item.length }}</div>
@@ -96,4 +97,8 @@
     {% endfor %}
     </tbody>
 </table>
+{% endblock %}
+
+{% block vitrine_scripts %}
+<script type="text/javascript" src="{% static 'vitrine/js/virtual_rows.js' %}?v=1.0"></script>
 {% endblock %}

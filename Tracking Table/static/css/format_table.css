@@ -7,6 +7,10 @@
     white-space: nowrap;
 }
 
+.table > tbody > tr > td.align-center {
+    vertical-align: middle !important;
+}
+
 .table > tbody > tr.section-header > th {
     font-weight: 700;
     border-bottom: 2px solid currentColor;
