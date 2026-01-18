@@ -21,27 +21,26 @@ function _cancelPendingTransitionAndLockHeight(hiddenRow) {
 }
 
 /* -----------------------------
-   Event delegation: main entry
+   Event listeners per row (optimized)
    ----------------------------- */
 function handle_orders() {
+  const visibleRows = document.querySelectorAll(".visibleRows");
 
-  document.addEventListener("click", function (event) {
+  visibleRows.forEach((visibleRow) => {
+    const row_id = visibleRow.id;
+    const hiddenRow = document.getElementById("hidden-row-" + row_id);
 
-    const row = event.target.closest(".visibleRows");
-    if (!row) return;
+    // safety check
+    if (!hiddenRow) return;
 
-    const row_id = row.id;
-    const targetId = "hidden-row-" + row_id;
-    const visibleRow = document.querySelector(`.visibleRows[id="${row_id}"]`);
-    const hiddenRows = document.querySelectorAll(".hiddenRows");
+    // initialize state (important for correctness)
+    hiddenRow._isOpen = false;
+    hiddenRow._isClosing = false;
+    hiddenRow._isAnimating = false;
+    hiddenRow._pendingTransitionHandler = null;
 
-    hiddenRows.forEach((hiddenRow) => {
-      if (hiddenRow.id !== targetId) return;
-
-      const cs = window.getComputedStyle(hiddenRow);
-      const isClosed = cs.display === "none" || cs.height === "0px";
-
-      if (isClosed) {
+    visibleRow.addEventListener("click", function () {
+      if (!hiddenRow._isOpen) {
         openHiddenRow(hiddenRow, row_id, visibleRow);
       } else {
         closeHiddenRow(hiddenRow, visibleRow);
@@ -112,6 +111,8 @@ function openHiddenRow(hiddenRow, row_id, visibleRow) {
     hiddenRow.classList.add("fetch-prevent");
     get_order(row_id);
   }
+
+  hiddenRow._isOpen = true;
 }
 
 
@@ -161,6 +162,8 @@ function closeHiddenRow(hiddenRow, visibleRow) {
 
   hiddenRow.classList.remove("orderClicked");
   if (visibleRow) visibleRow.classList.remove("rowSelected");
+
+  hiddenRow._isOpen = false;
 }
 
 
