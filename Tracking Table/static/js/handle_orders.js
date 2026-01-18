@@ -16,8 +16,7 @@ function _cancelPendingTransitionAndLockHeight(hiddenRow) {
   if (cs.display === "none") return;
 
   // convert computed height to px and lock as inline height so animations start from current visual height
-  const computedHeight = cs.height;
-  hiddenRow.style.height = computedHeight;
+  hiddenRow.style.height = hiddenRow.getBoundingClientRect().height + "px";
 }
 
 /* -----------------------------
@@ -67,12 +66,12 @@ function openHiddenRow(hiddenRow, row_id, visibleRow) {
 
   // Start from zero so the expand animation runs
   // But if height is currently a px value (from lock), keep it as start, else set to 0
-  const startHeightCss = window.getComputedStyle(hiddenRow).height || "0px";
+  const startHeight = hiddenRow.style.height;
   // If currently not 0 (e.g., we locked to some px), we start from that; otherwise zero
-  if (startHeightCss === "0px") {
+  if (!startHeight || startHeight === "0px") {
     hiddenRow.style.height = "0px";
   } else {
-    hiddenRow.style.height = startHeightCss;
+    hiddenRow.style.height = startHeight;
   }
 
   // Force reflow so the start height is applied
@@ -89,13 +88,12 @@ function openHiddenRow(hiddenRow, row_id, visibleRow) {
     hiddenRow._isAnimating = false;
     hiddenRow._pendingTransitionHandler = null;
     hiddenRow.classList.add("is-open");
-    hiddenRow.removeEventListener("transitionend", openHandler);
   };
 
   // store and attach handler
   hiddenRow._pendingTransitionHandler = openHandler;
   hiddenRow._isAnimating = true;
-  hiddenRow.addEventListener("transitionend", openHandler);
+  hiddenRow.addEventListener("transitionend", openHandler, { once: true });
 
   // trigger animation to target height
   requestAnimationFrame(() => {
@@ -128,8 +126,7 @@ function closeHiddenRow(hiddenRow, visibleRow) {
   hiddenRow._isClosing = true;
 
   // If height is 'auto' or blank, set it to the measured px so the transition can animate from there
-  const cs = window.getComputedStyle(hiddenRow);
-  if (cs.height === "auto" || hiddenRow.style.height === "") {
+  if (hiddenRow.style.height === "" || hiddenRow.style.height === "auto") {
     hiddenRow.style.height = hiddenRow.scrollHeight + "px";
   }
 
@@ -147,13 +144,12 @@ function closeHiddenRow(hiddenRow, visibleRow) {
     hiddenRow._isAnimating = false;
     hiddenRow._pendingTransitionHandler = null;
     hiddenRow.classList.remove("is-open");
-    hiddenRow.removeEventListener("transitionend", closeHandler);
   };
 
   // attach handler & mark animating
   hiddenRow._pendingTransitionHandler = closeHandler;
   hiddenRow._isAnimating = true;
-  hiddenRow.addEventListener("transitionend", closeHandler);
+  hiddenRow.addEventListener("transitionend", closeHandler, { once: true });
 
   // trigger collapse on next frame
   requestAnimationFrame(() => {
@@ -201,12 +197,11 @@ function onHiddenRowContentUpdated(hiddenRow) {
     hiddenRow.style.height = "auto";
     hiddenRow._isAnimating = false;
     hiddenRow._pendingTransitionHandler = null;
-    hiddenRow.removeEventListener("transitionend", updateHandler);
   };
 
   hiddenRow._pendingTransitionHandler = updateHandler;
   hiddenRow._isAnimating = true;
-  hiddenRow.addEventListener("transitionend", updateHandler);
+  hiddenRow.addEventListener("transitionend", updateHandler, { once: true });
 
   // animate to new height
   requestAnimationFrame(() => {
