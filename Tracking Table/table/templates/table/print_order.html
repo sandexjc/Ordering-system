@@ -63,7 +63,7 @@
 								<td>{{plate.value}} {{ currency }}</td>
 							</tr>
 						{% endfor %}
-						<th colspan="3">Обща стойност</th>
+						<th colspan="3">Общо</th>
 						<th>{{order.plates_total}} {{ currency }}</th>
 					</tbody>
 				</table>
@@ -89,7 +89,7 @@
 								<td>{{cut.value}} {{ currency }}</td>
 							</tr>
 						{% endfor %}
-						<th colspan="3">Обща стойност</th>
+						<th colspan="3">Общо</th>
 						<th>{{order.cutting_total}} {{ currency }}</th>
 					</tbody>
 				</table>
@@ -120,7 +120,7 @@
 								<td>{{edge.value}} {{ currency }}</td>
 							</tr>
 						{% endfor %}
-						<th colspan="4">Обща стойност</th>
+						<th colspan="4">Общо</th>
 						<th>{{order.edge_total}} {{ currency }}</th>
 					</tbody>
 				</table>
@@ -146,7 +146,7 @@
 								<td>{{edging.value}} {{ currency }}</td>
 							</tr>
 						{% endfor %}
-						<th colspan="3">Обща стойност</th>
+						<th colspan="3">Общо</th>
 						<th>{{order.edging_total}} {{ currency }}</th>
 					</tbody>
 				</table>
@@ -156,10 +156,12 @@
 		<div class="row">
 
 			<div class="col">
+				<h5>Други</h5>
 				{% include "common/tables/others_print_table.html" with props="custom-table-sm table-no-wrap" %}
 			</div>
 
 			<div class="col">
+				<h5>Разплащания</h5>
 				{% include "common/tables/payment_print_table.html" with props="custom-table-sm table-no-wrap" %}
 			</div>
 			

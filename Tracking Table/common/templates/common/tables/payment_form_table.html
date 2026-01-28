@@ -1,9 +1,8 @@
 <table class="table table-sm">
     <thead>
         <tr>
-            <th scope="col">Разплащания</th>
-            <th scope="col">Метод</th>
-            <th scope="col">Сума</th>
+            <th colspan="2"><strong>Обща стойност</strong></th>
+            <th><strong>{{ current_order.total_price }} {{ currency }}</strong></th>
         </tr>
     </thead>
     <tbody>
@@ -24,11 +23,7 @@
             <td><strong>{{ current_order.paid }} {{ currency }}</strong></td>
         </tr>
         <tr>
-            <th colspan="2"><strong>Обща стойност</strong></th>
-            <th><strong>{{ current_order.total_price }} {{ currency }}</strong></th>
-        </tr>
-        <tr>
-            <td><strong>БАЛАНС</strong></td>
+            <td colspan="2"><strong>Остатък за доплащане</strong></td>
             <td><strong>{{ current_order.balance }} {{ currency }}</strong></td>
         </tr>
     </tbody>
