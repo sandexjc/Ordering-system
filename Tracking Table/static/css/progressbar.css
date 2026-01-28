@@ -1,18 +1,20 @@
 /* === Base Progressbar Container === */
 .progressbar {
-	position: relative;
-	width: 100%;
-	text-align: left;
-	margin-left: 0%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    list-style: none;
 }
 
 /* === Each Step Item === */
 .progressbar li {
-	list-style-type: none;
-	float: left;
-	width: 25%;
-	position: relative;
-	text-align: left;
+    list-style: none;
+    position: relative;
+    display: flex;              /* key */
+    justify-content: center;    /* horizontal center */
+    align-items: flex-start;    /* keeps circle at top */
 }
 
 /* === Step Circle (default) === */
