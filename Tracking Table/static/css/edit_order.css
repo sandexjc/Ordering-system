@@ -1,3 +1,5 @@
+
+/** General sizes */
 .edit-order-form
 {
     padding: 2rem;
@@ -5,8 +7,16 @@
     background-color: white;
 }
 
+.indent-cell {
+    padding-left: 1rem !important;
+}
+
+.table-min-width {
+    min-width: 40rem;
+}
+
 /*
- * Vitrine app Frame table 
+ * Vitrine app Frame table cell sizes
  */
 
 /** Profile color */
@@ -51,10 +61,48 @@
     min-width: 5rem;
 }
 
-.indent-cell {
-    padding-left: 1rem !important;
+/*
+ * Table app Plates table cell sizes
+ */
+
+/** Plate material */
+.plate-table th:nth-child(1),
+.plate-table td:nth-child(1) {
+    min-width: 7rem;
 }
 
-.frame-info-table {
-    min-width: 35rem;
+/** Manufacturer */
+.plate-table th:nth-child(2),
+.plate-table td:nth-child(2) {
+    min-width: 4rem;
+}
+
+/** Plate from client */
+.plate-table th:nth-child(3),
+.plate-table td:nth-child(3) {
+    min-width: 4.5rem;
+}
+
+/** Quantity */
+.plate-table th:nth-child(4),
+.plate-table td:nth-child(4) {
+    min-width: 4rem;
+}
+
+/** Price */
+.plate-table th:nth-child(5),
+.plate-table td:nth-child(5) {
+    min-width: 6rem;
+}
+
+/** Value */
+.plate-table th:nth-child(6),
+.plate-table td:nth-child(6) {
+    min-width: 6.5rem;
+}
+
+/** Delete */
+.plate-table th:nth-child(7),
+.plate-table td:nth-child(7) {
+    min-width: 3rem;
 }

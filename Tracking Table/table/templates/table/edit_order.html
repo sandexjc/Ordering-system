@@ -4,6 +4,7 @@
 
 {% block links %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/new_order_form.css' %}?v=1.6">
+<link rel="stylesheet" type="text/css" href="{% static 'css/edit_order.css' %}?v=1.4">
 {% endblock %}
 
 {% block content %}
@@ -39,13 +40,13 @@
 		<div class="row">
 			<div class="col">
 				<h4>Плочи</h4>
-				<table class="table table-sm">
+				<table class="table table-sm plate-table table-min-width">
 					<thead>
 						<tr>
 							<th>Материал</th>
 							<th>Производител</th>
 							<th>От клиент</th>
-							<th>Количество</th>
+							<th>Брой</th>
 							<th>Цена за брой</th>
 							<th>Стойност</th>
 							<th>
@@ -65,8 +66,16 @@
 									</div>
 								</td>
 								<td>{{item.quantity}}</td>
-								<td>{{item.price}}</td>
-								<td>{{item.value}}</td>
+								<td>
+									<div class="input-group input-group-sm">
+										{{item.price}}<span class="input-group-text">{{ currency }}</span>
+									</div>
+								</td>
+								<td>
+									<div class="input-group input-group-sm">
+										{{item.value}}<span class="input-group-text">{{ currency }}</span>
+									</div>
+								</td>
 								<td>
 									<div class="form-check form-switch" style="margin-left: 10px; margin-top: 5px;">
 										{{item.DELETE}}
@@ -78,7 +87,7 @@
 							<th colspan="5">Общо</th>
 							<th>
 								<div>
-									{{current_order.plates_total}}
+									{{ current_order.plates_total }} {{ currency }}
 								</div>
 							</th>
 						</tr>
@@ -87,12 +96,12 @@
 			</div>
 
 			<div class="col">
-				<h4>Рязане</h4>
-				<table class="table table-sm">
+				<h4>Рязане</h4><br>
+				<table class="table table-sm table-min-width">
 					<thead>
 						<tr>
 							<th>Вид</th>
-							<th>Количество</th>
+							<th>Брой</th>
 							<th>Цена за брой</th>
 							<th>Стойност</th>
 							<th>
@@ -106,8 +115,16 @@
 							<tr>
 								<td>{{item.cutting_type}}</td>
 								<td>{{item.quantity}}</td>
-								<td>{{item.price}}</td>
-								<td>{{item.value}}</td>
+								<td>
+									<div class="input-group input-group-sm">
+										{{item.price}}<span class="input-group-text">{{ currency }}</span>
+									</div>
+								</td>
+								<td>
+									<div class="input-group input-group-sm">
+										{{item.value}}<span class="input-group-text">{{ currency }}</span>
+									</div>
+								</td>
 								<td>
 									<div class="form-check form-switch" style="margin-left: 10px; margin-top: 5px;">
 										{{item.DELETE}}
@@ -119,7 +136,7 @@
 							<th colspan="3">Общо</th>
 							<th>
 								<div>
-									{{current_order.cutting_total}}
+									{{ current_order.cutting_total }} {{ currency }}
 								</div>
 							</th>
 						</tr>
@@ -131,7 +148,7 @@
 		<div class="row">
 			<div class="col">
 				<h4>Кант</h4>
-				<table class="table table-sm">
+				<table class="table table-sm table-min-width">
 					<thead>
 						<tr>
 							<th>Вид</th>
@@ -158,8 +175,16 @@
 								<td>{{item.edge_type}}</td>
 								<td>{{item.color_code}}</td>
 								<td>{{item.quantity}}</td>
-								<td>{{item.price}}</td>
-								<td>{{item.value}}</td>
+								<td>
+									<div class="input-group input-group-sm">
+										{{item.price}}<span class="input-group-text">{{ currency }}</span>
+									</div>
+								</td>
+								<td>
+									<div class="input-group input-group-sm">
+										{{item.value}}<span class="input-group-text">{{ currency }}</span>
+									</div>
+								</td>
 								<td>
 									<div class="form-check form-switch" style="margin-left: 10px; margin-top: 5px;">
 										{{item.visible}}
@@ -176,7 +201,7 @@
 							<th colspan="4">All</th>
 							<th>
 								<div>
-									{{current_order.edge_total}}
+									{{ current_order.edge_total }} {{ currency }}
 								</div>
 							</th>
 						</tr>
@@ -186,7 +211,7 @@
 
 			<div class="col">
 				<h4>Кантиране</h4>
-				<table class="table table-sm">
+				<table class="table table-sm table-min-width">
 					<thead>
 						<tr>
 							<th>Вид</th>
@@ -204,8 +229,16 @@
 							<tr>
 								<td>{{item.edging_type}}</td>
 								<td>{{item.quantity}}</td>
-								<td>{{item.price}}</td>
-								<td>{{item.value}}</td>
+								<td>
+									<div class="input-group input-group-sm">
+										{{item.price}}<span class="input-group-text">{{ currency }}</span>
+									</div>
+								</td>
+								<td>
+									<div class="input-group input-group-sm">
+										{{item.value}}<span class="input-group-text">{{ currency }}</span>
+									</div>
+								</td>
 								<td>
 									<div class="form-check form-switch" style="margin-left: 10px; margin-top: 5px;">
 										{{item.DELETE}}
@@ -217,7 +250,7 @@
 							<th colspan="3">Общо</th>
 							<th>
 								<div>
-									{{current_order.edging_total}}
+									{{ current_order.edging_total }} {{ currency }}
 								</div>
 							</th>
 						</tr>
