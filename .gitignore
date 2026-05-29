@@ -3,5 +3,4 @@
 migrations
 *.pyc
 *.sqlite3
-settings.py
 .DS_Store
