@@ -1,6 +1,7 @@
 from decimal import Decimal
 from vitrine.service import BaseVitrineItemWorkflow
 from vitrine.mapping import MODEL_RNAME_MAP
+from django.conf import settings
 
 
 _PROFILE_PRICE_MAP = {
@@ -37,26 +38,32 @@ class FrameWorkflow(BaseVitrineItemWorkflow):
     @classmethod
     def post_save(cls, frame):
         vitrine = frame.vitrine_id
+        feature_auto_seal_enabled = settings.DJANGO_FEATURES__AUTO_SEAL_SELECT
 
         # --- SEAL --- #
-        seal_type = frame.profile_type if frame.profile_type == "Black" else "White"
-        seal_quantity = (cls.frame_perimeter(frame) * frame.quantity).quantize(Decimal("0.1"))
-        seal_price = getattr(vitrine, _SEAL_PRICE_MAP[seal_type])
-        seal_value = cls.calculate_value(seal_quantity, seal_price)
+        if (not feature_auto_seal_enabled) or frame.auto_calculate_seal:
+            seal_type = frame.profile_type if frame.profile_type == "Black" else "White"
+            seal_quantity = (cls.frame_perimeter(frame) * frame.quantity).quantize(Decimal("0.1"))
+            seal_price = getattr(vitrine, _SEAL_PRICE_MAP[seal_type])
+            seal_value = cls.calculate_value(seal_quantity, seal_price)
 
-        cls.workflow_get_or_create(
-            frame.seals,
-            lookup={
-                "vitrine_id": vitrine,
-                "frame_id": frame,
-            },
-            defaults={
-                "seal_type": seal_type,
-                "quantity": seal_quantity,
-                "price": seal_price,
-                "value": seal_value,
-            }
-        )
+            cls.workflow_get_or_create(
+                frame.seals,
+                lookup={
+                    "vitrine_id": vitrine,
+                    "frame_id": frame,
+                },
+                defaults={
+                    "seal_type": seal_type,
+                    "quantity": seal_quantity,
+                    "price": seal_price,
+                    "value": seal_value,
+                }
+            )
+        else:
+            # Remove auto-generated seals for frames where auto mode is disabled.
+            for seal in frame.seals.for_order(vitrine).filter(frame_id=frame):
+                seal.run_workflow_delete()
 
         # --- HOLES --- #
         holes_count = (frame.holes_count - 2 if frame.holes_count > 2 else 0) * frame.quantity

@@ -100,6 +100,7 @@ Optional variables supported in settings include:
 - `DJANGO_SESSION_COOKIE_AGE`
 - `DJANGO_CSRF_COOKIE_SECURE`
 - `DJANGO_CSRF_COOKIE_AGE`
+- `DJANGO_FEATURES__AUTO_SEAL_SELECT`
 
 ### 4) Run migrations and start the app
 
@@ -110,3 +111,50 @@ python manage.py runserver
 ```
 
 Then open `http://127.0.0.1:8000/`.
+
+## Auto Seal Feature Sync Command
+
+The `vitrine` app provides a management command to align frame auto-seal state with workflow recalculation:
+
+```bash
+python manage.py sync_auto_seal --mode <enable-all|sync-selected> [options]
+```
+
+Run it from the `Tracking Table` directory, or use `python "Tracking Table/manage.py" ...` from one level above.
+
+### Modes
+
+- `--mode enable-all`
+  - Sets `auto_calculate_seal=True` for all matched frames.
+  - Recalculates workflow for all matched frames.
+- `--mode sync-selected`
+  - Recalculates workflow only for matched frames where `auto_calculate_seal=True`.
+
+### Options
+
+- `--dry-run`: preview counts only, no DB writes.
+- `--batch-size <N>`: iterator chunk size (default: `1000`).
+- `--frame-id <id ...>`: limit processing to specific frame IDs.
+- `--vitrine-id <id ...>`: limit processing to frames from specific vitrine IDs.
+- `--no-atomic`: disable per-frame `transaction.atomic()`.
+
+### Examples
+
+```bash
+# Preview enable-all impact (no writes)
+python manage.py sync_auto_seal --mode enable-all --dry-run
+
+# Apply enable-all for specific vitrine IDs
+python manage.py sync_auto_seal --mode enable-all --vitrine-id 10 11
+
+# Recalculate only selected frames, in smaller batches
+python manage.py sync_auto_seal --mode sync-selected --batch-size 200
+```
+
+### Interpreting output
+
+In `enable-all` mode:
+- `updated` = frames switched from `auto_calculate_seal=False` to `True`.
+- `recalculated` = all matched frames that were processed for workflow recalculation.
+
+So `updated` can be `0` while `recalculated` is still greater than `0`.

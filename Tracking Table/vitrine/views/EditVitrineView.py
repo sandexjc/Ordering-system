@@ -1,4 +1,5 @@
 from common.views import BaseEditView
+from django.conf import settings
 from vitrine.service import VitrineContextBuilder
 from vitrine.models import Vitrine
 from vitrine import forms
@@ -24,6 +25,7 @@ class EditVitrine(BaseEditView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         vitrine = self.object
+        context["feature_auto_seal_enabled"] = settings.DJANGO_FEATURES__AUTO_SEAL_SELECT
         
         context.update(VitrineContextBuilder.build_context(vitrine))
         return context

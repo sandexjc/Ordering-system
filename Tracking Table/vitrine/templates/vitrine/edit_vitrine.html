@@ -14,7 +14,7 @@
 	{% include "common/components/alert.html" %}
 
 	<div style="text-align: center; margin: 20px;">
-		<h1>Редактиране на витрина</h1>
+		<h1>Редактиране на поръчка</h1>
 	</div>
 
 	<form method="POST" id="edit-vitrine-form" class="shadow-lg edit-order-form">
@@ -40,6 +40,9 @@
 							<th>Дължина</th>
 							<th>Широчина</th>
 							<th>Брой</th>
+							{% if feature_auto_seal_enabled %}
+								<th>Авто упл.</th>
+							{% endif %}
 							<th>Брой Отвори</th>
 							<th>Позиция отвори</th>
 							<th>Стъкло</th>
@@ -54,6 +57,13 @@
 								<td>{{ item.length }}</td>
 								<td>{{ item.width }}</td>
 								<td>{{ item.quantity }}</td>
+								{% if feature_auto_seal_enabled %}
+									<td>
+										<div class="form-check form-switch" style="display: flex; justify-content: center;">
+											{{ item.auto_calculate_seal }}
+										</div>
+									</td>
+								{% endif %}
 								<td>{{ item.holes_count }}</td>
 								<td>{{ item.holes_position }}</td>
 								<td>{{ item.glass_type }}</td>

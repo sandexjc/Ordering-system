@@ -36,3 +36,20 @@ The Ordering System helps teams manage the full order journey, from initial offe
 ## Access
 
 The system is intended for authenticated internal users and supports role-based operational usage through account login.
+
+## Auto-Seal Feature Operations
+
+For vitrine frames, auto-seal behavior is controlled by the feature flag:
+
+- `DJANGO_FEATURES__AUTO_SEAL_SELECT`
+
+Operational syncing can be run with:
+
+- `python manage.py sync_auto_seal --mode enable-all`
+- `python manage.py sync_auto_seal --mode sync-selected`
+
+Common options:
+
+- `--dry-run` to preview without DB writes
+- `--frame-id` / `--vitrine-id` to target specific records
+- `--batch-size` to control processing chunk size

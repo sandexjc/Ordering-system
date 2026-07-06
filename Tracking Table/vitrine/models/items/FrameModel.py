@@ -48,6 +48,7 @@ class Frame(VitrineItem, BaseItem):
     holes_count = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(99)], default=0)
     holes_position = models.CharField(choices=holes_positions, default="length", max_length=10)
     glass_type = models.CharField(null=True, blank=True, max_length=10)
+    auto_calculate_seal = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Frame color: {self.profile_type} / Vitrine ID: {self.vitrine_id}"
