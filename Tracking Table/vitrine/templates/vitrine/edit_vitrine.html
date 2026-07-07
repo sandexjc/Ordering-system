@@ -5,6 +5,9 @@
 {% block links %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/edit_order.css' %}?v=1.4">
 <link rel="stylesheet" type="text/css" href="{% static 'css/format_table.css' %}?v=1.0">
+{% if feature_manual_seal_enabled %}
+<link rel="stylesheet" type="text/css" href="{% static 'vitrine/css/manual_seal_toggle.css' %}?v=1.0">
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -23,7 +26,9 @@
 		<input type="text" id="vitrine_id" class="form-control" readonly value="{{ current_order.id }}">
 		<br>
 
-		{% bootstrap_form form bound_css_class='' %}
+		{% bootstrap_field form.created_date bound_css_class='' %}
+		{% bootstrap_field form.owner bound_css_class='' %}
+		{% bootstrap_field form.telephone bound_css_class='' %}
 		{% bootstrap_form add_note bound_css_class=''%}
 		
 		{{frame_forms.management_form}}
@@ -84,6 +89,28 @@
 			</div>
 		</div>
 
+		{% if feature_manual_seal_enabled %}
+			<div class="row">
+				<div class="col">
+					<h4>Уплътнение</h4>
+					<div class="manual-seal-mode-toggle">
+						<input type="radio" class="btn-check" name="manual-seal-mode" id="manual-seal-auto-mode" autocomplete="off" {% if not form.vitrine_manual_seal.value %}checked{% endif %}>
+						<label class="btn btn-outline-secondary" for="manual-seal-auto-mode">Автоматично въвеждане на уплътнение</label>
+						<input type="radio" class="btn-check" name="manual-seal-mode" id="manual-seal-custom-mode" autocomplete="off" {% if form.vitrine_manual_seal.value %}checked{% endif %}>
+						<label class="btn btn-outline-secondary" for="manual-seal-custom-mode">Ръчно въвеждане на уплътнение</label>
+					</div>
+					<div style="display: none;">{{ form.vitrine_manual_seal }}</div>
+					<div id="manual-seal-table-wrapper">
+						<div class="manual-seal-content">
+							{% include "vitrine/tables/manual_seal_form_table.html" %}
+						</div>
+					</div>
+				</div>
+				<div class="col">
+				</div>
+			</div>
+		{% endif %}
+
 		<div class="row">
 			<div class="col">
 				<h4>Други услуги</h4>
@@ -110,4 +137,10 @@
 	
 </div>
 
+{% endblock %}
+
+{% block vitrine_scripts %}
+{% if feature_manual_seal_enabled %}
+<script type="text/javascript" src="{% static 'vitrine/js/manual_seal_toggle.js' %}?v=1.0"></script>
+{% endif %}
 {% endblock %}

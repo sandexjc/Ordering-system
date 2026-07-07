@@ -1,4 +1,5 @@
 from decimal import Decimal
+from django.conf import settings
 
 class VitrineContextBuilder:
 
@@ -46,8 +47,14 @@ class VitrineContextBuilder:
         matte_profile_len = cls._profile_qty(frames, "Matte")
         inox_profile_len = cls._profile_qty(frames, "Inox")
 
-        white_seal_qty = sum(seal.quantity for seal in seals if seal.seal_type == "White")
-        black_seal_qty = sum(seal.quantity for seal in seals if seal.seal_type == "Black")
+        manual_seal_enabled = settings.DJANGO_FEATURES__MANUAL_SEAL
+
+        if manual_seal_enabled and vitrine.vitrine_manual_seal:
+            white_seal_qty = vitrine.white_seal_custom_amount
+            black_seal_qty = vitrine.black_seal_custom_amount
+        else:
+            white_seal_qty = sum(seal.quantity for seal in seals if seal.seal_type == "White")
+            black_seal_qty = sum(seal.quantity for seal in seals if seal.seal_type == "Black")
 
         total_frames_count = sum(frame.quantity for frame in frames)
         additional_holes_count = sum(hole.quantity for hole in holes)

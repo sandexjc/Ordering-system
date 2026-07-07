@@ -1,0 +1,42 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th><strong>Вид</strong></th>
+            <th><strong>Количество</strong></th>
+            <th><strong>Цена за л.м</strong></th>
+            <th><strong>Стойност</strong></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ form.white_seal_type }}</td>
+            <td>{{ form.white_seal_custom_amount }}</td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control form-control-sm" readonly value="{{ current_order.white_seal_price }}">
+                    <span class="input-group-text">{{ currency }}</span>
+                </div>
+            </td>
+            <td>
+                <div class="input-group input-group-sm">
+                    {{ form.white_seal_total_value }}<span class="input-group-text">{{ currency }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>{{ form.black_seal_type }}</td>
+            <td>{{ form.black_seal_custom_amount }}</td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control form-control-sm" readonly value="{{ current_order.black_seal_price }}">
+                    <span class="input-group-text">{{ currency }}</span>
+                </div>
+            </td>
+            <td>
+                <div class="input-group input-group-sm">
+                    {{ form.black_seal_total_value }}<span class="input-group-text">{{ currency }}</span>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>

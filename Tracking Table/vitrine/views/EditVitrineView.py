@@ -26,6 +26,7 @@ class EditVitrine(BaseEditView):
         context = super().get_context_data(**kwargs)
         vitrine = self.object
         context["feature_auto_seal_enabled"] = settings.DJANGO_FEATURES__AUTO_SEAL_SELECT
+        context["feature_manual_seal_enabled"] = settings.DJANGO_FEATURES__MANUAL_SEAL
         
         context.update(VitrineContextBuilder.build_context(vitrine))
         return context

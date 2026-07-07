@@ -37,5 +37,10 @@ class Vitrine(VitrineOrder, BaseOrder):
     glass_total = models.DecimalField(max_digits=7, decimal_places=2, default=0)
     manufacturing_total = models.DecimalField(max_digits=7, decimal_places=2, default=0)
     
+    # Custom seal amount
+    vitrine_manual_seal = models.BooleanField(default=False)
+    white_seal_custom_amount = models.DecimalField(max_digits=7, decimal_places=1, default=0)
+    black_seal_custom_amount = models.DecimalField(max_digits=7, decimal_places=1, default=0)
+    
     def __str__(self):
         return str(self.id)

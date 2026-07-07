@@ -30,6 +30,7 @@ CSRF_COOKIE_AGE = env_int("DJANGO_CSRF_COOKIE_AGE", default=43200)
 
 # Features
 DJANGO_FEATURES__AUTO_SEAL_SELECT = env_bool("DJANGO_FEATURES__AUTO_SEAL_SELECT", default=False)
+DJANGO_FEATURES__MANUAL_SEAL = env_bool("DJANGO_FEATURES__MANUAL_SEAL", default=False)
 
 # Directory configuration
 BASE_DIR = Path(__file__).resolve().parent.parent

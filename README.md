@@ -101,6 +101,7 @@ Optional variables supported in settings include:
 - `DJANGO_CSRF_COOKIE_SECURE`
 - `DJANGO_CSRF_COOKIE_AGE`
 - `DJANGO_FEATURES__AUTO_SEAL_SELECT`
+- `DJANGO_FEATURES__MANUAL_SEAL`
 
 ### 4) Run migrations and start the app
 
@@ -158,3 +159,20 @@ In `enable-all` mode:
 - `recalculated` = all matched frames that were processed for workflow recalculation.
 
 So `updated` can be `0` while `recalculated` is still greater than `0`.
+
+## Vitrine Seal Feature Flags
+
+The vitrine seal flow is controlled by two feature flags:
+
+- `DJANGO_FEATURES__AUTO_SEAL_SELECT`
+  - Enables frame-level `auto_calculate_seal` selector in edit forms.
+  - When enabled, only selected frames generate/update auto seals.
+- `DJANGO_FEATURES__MANUAL_SEAL`
+  - Enables manual seal mode UI in vitrine edit view.
+  - Adds mode switch (`Автоматично` / `Ръчно`) and manual white/black seal inputs.
+  - When manual mode is active, order `seals_total` uses:
+    - `white_seal_custom_amount * white_seal_price`
+    - `black_seal_custom_amount * black_seal_price`
+  - Auto-created seal objects per frame are still preserved.
+
+If `DJANGO_FEATURES__MANUAL_SEAL` is disabled, the system always uses seal objects for totals and the manual UI is hidden.
