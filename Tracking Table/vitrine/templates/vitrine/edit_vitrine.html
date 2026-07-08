@@ -3,10 +3,10 @@
 {% load static %}
 
 {% block links %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/edit_order.css' %}?v=1.4">
-<link rel="stylesheet" type="text/css" href="{% static 'css/format_table.css' %}?v=1.0">
+<link rel="stylesheet" type="text/css" href="{% static 'css/edit_order.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/format_table.css' %}">
 {% if feature_manual_seal_enabled %}
-<link rel="stylesheet" type="text/css" href="{% static 'vitrine/css/manual_seal_toggle.css' %}?v=1.0">
+	<link rel="stylesheet" type="text/css" href="{% static 'vitrine/css/manual_seal_toggle.css' %}">
 {% endif %}
 {% endblock %}
 
@@ -141,6 +141,6 @@
 
 {% block vitrine_scripts %}
 {% if feature_manual_seal_enabled %}
-<script type="text/javascript" src="{% static 'vitrine/js/manual_seal_toggle.js' %}?v=1.0"></script>
+<script type="text/javascript" src="{% static 'vitrine/js/manual_seal_toggle.js' %}"></script>
 {% endif %}
 {% endblock %}

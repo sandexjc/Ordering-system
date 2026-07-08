@@ -6,7 +6,7 @@ html
 
 body 
 {
-	background-image: url("../../../static/images/city-background.png");
+	background-image: url("/static/images/city-background.png");
 	background-repeat: no-repeat;
   	background-attachment: fixed;
 	background-size: 100% 100%;

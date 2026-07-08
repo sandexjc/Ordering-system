@@ -8,10 +8,10 @@
 		<title>TTable</title>
 		{% endblock %}
 		<link rel="icon" type="image/x-icon" href="{% static 'images/favico.png' %}">
-		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.1.3/css/bootstrap.css' %}?v=1.1">
-		<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}?v=1.7">
+		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.1.3/css/bootstrap.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
 		{% block links %}
-		<link rel="stylesheet" type="text/css" href="{% static 'css/progressbar.css' %}?v=1.7">
+		<link rel="stylesheet" type="text/css" href="{% static 'css/progressbar.css' %}">
 		{% endblock %}
 	</head>
 	<body>
@@ -61,18 +61,18 @@
 		{% block content %}
 		{% endblock %}
 		
-		<script type="text/javascript" src="{% static 'jquery/jquery-3.7.1.min.js' %}?v=1.1"></script>
-		<script type="text/javascript" src="{% static 'bootstrap/5.1.3/js/bootstrap.bundle.js' %}?v=1.1"></script>
-		<script type="text/javascript" src="{% static 'js/viewport.js' %}?v=1.2"></script>
+		<script type="text/javascript" src="{% static 'jquery/jquery-3.7.1.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'bootstrap/5.1.3/js/bootstrap.bundle.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/viewport.js' %}"></script>
 
 		{% block scripts %}
-		<script type="text/javascript" src="{% static 'js/order.js' %}?v=1.8"></script>
-		<script type="text/javascript" src="{% static 'js/history.js' %}?v=1.4"></script>
-		<script type="text/javascript" src="{% static 'js/fetch_order.js' %}?v=1.7"></script>
-		<script type="text/javascript" src="{% static 'js/handle_orders.js' %}?v=1.6"></script>
-		<script type="text/javascript" src="{% static 'js/base.js' %}?v=1.2"></script>
-		<script type="text/javascript" src="{% static 'js/spinner.js' %}?v=1.2"></script>
-		<script type="text/javascript" src="{% static 'js/order_view_error.js' %}?v=1.1"></script>
+		<script type="text/javascript" src="{% static 'js/order.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/history.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/fetch_order.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/handle_orders.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/base.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/spinner.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/order_view_error.js' %}"></script>
 
 		{% block vitrine_scripts %}
 		{% endblock %}

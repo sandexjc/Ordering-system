@@ -2,7 +2,6 @@
 """ Django settings for Ordering System project. """
 
 from pathlib import Path
-import os
 from .env import env_bool, env_str, env_list, env_int
 
 
@@ -34,6 +33,19 @@ DJANGO_FEATURES__MANUAL_SEAL = env_bool("DJANGO_FEATURES__MANUAL_SEAL", default=
 
 # Directory configuration
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    },
+}
 
 # Application definition
 DATE_FORMAT = '%d/%m/%Y'
@@ -114,10 +126,6 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Sofia'
 USE_I18N = True
 USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
