@@ -1,7 +1,7 @@
 """ Environment variable integer parser. """
 
 import os
-from .env_properties import COLOR_RESET, PRINT_COLOR, SETTING_COLUMN_WIDTH
+from .env_properties import COLOR_RESET, PRINT_COLOR, SETTING_COLUMN_WIDTH, display_env_value
 
 
 def env_int(name: str, default: int | None = None, *, required: bool = False) -> int | None:
@@ -16,5 +16,8 @@ def env_int(name: str, default: int | None = None, *, required: bool = False) ->
 
     # Parse and return the integer value
     value = int(raw_value.strip())
-    print(f"{name:<{SETTING_COLUMN_WIDTH}} -> {PRINT_COLOR}{value}{COLOR_RESET}")
+    print(
+        f"{name:<{SETTING_COLUMN_WIDTH}} -> "
+        f"{PRINT_COLOR}{display_env_value(name, value)}{COLOR_RESET}"
+    )
     return value
