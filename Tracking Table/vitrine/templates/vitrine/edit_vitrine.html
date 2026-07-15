@@ -17,7 +17,11 @@
 	{% include "common/components/alert.html" %}
 
 	<div style="text-align: center; margin: 20px;">
-		<h1>Редактиране на поръчка</h1>
+		{% if current_order.order_type == "offer" %}
+			<h1>Редактиране на оферта</h1>
+		{% else %}
+			<h1>Редактиране на поръчка</h1>
+		{% endif %}
 	</div>
 
 	<form method="POST" id="edit-vitrine-form" class="shadow-lg edit-order-form">
@@ -29,6 +33,7 @@
 		{% bootstrap_field form.created_date bound_css_class='' %}
 		{% bootstrap_field form.owner bound_css_class='' %}
 		{% bootstrap_field form.telephone bound_css_class='' %}
+		{% bootstrap_field form.order_type bound_css_class='' %}
 		{% bootstrap_form add_note bound_css_class=''%}
 		
 		{{frame_forms.management_form}}

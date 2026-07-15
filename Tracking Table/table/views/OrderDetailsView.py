@@ -23,8 +23,8 @@ class ViewOrder(LoginRequiredMixin, TemplateView):
             plate.plate_steps = [
                 ("ordered", plate.ordered, plate.from_client),
                 ("delivered", plate.delivered, False),
-                ("cutted", plate.cutted, order.client == "External"),
-                ("edged", plate.edged, order.client == "External"),
+                ("cutted", plate.cutted, order.order_type == "offer"),
+                ("edged", plate.edged, order.order_type == "offer"),
             ]
         
         # Edges

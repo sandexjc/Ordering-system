@@ -1,7 +1,9 @@
 from main.views.base import BaseVitrineView
 
-class Vitrines(BaseVitrineView):
+
+class VitrineOrders(BaseVitrineView):
 
     """ Main view for displaying vitrine orders. """
 
-    navigation = "Vitrine"
+    order_type = "order"
+    navigation = "vitrine"

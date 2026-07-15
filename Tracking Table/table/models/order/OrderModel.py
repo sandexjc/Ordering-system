@@ -4,13 +4,7 @@ from table.models.base import TableOrder
 
 class Order(TableOrder, BaseOrder):
 
-    client_statuses = [
-        ('Internal', 'Поръчка'),
-        ('External', 'Оферта'),
-    ]
-
     id = models.BigAutoField(primary_key=True)
-    client = models.CharField(choices=client_statuses, default='External', max_length=50)
 
     plates_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     edge_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)

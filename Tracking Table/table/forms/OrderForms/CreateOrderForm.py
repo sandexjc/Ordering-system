@@ -6,14 +6,14 @@ class CreateOrderForm(FormFieldsSetupMixin, TableForm):
 
     class Meta:
         model = Order
-        fields = ("owner", "telephone", "client")
+        fields = ("owner", "telephone", "order_type")
 
     def __init__(self, *args, **kwargs):
         order_type = kwargs.pop('order_type', None)
         super().__init__(*args, **kwargs)
 
-        self.fields['client'].initial = order_type
-        self.fields["client"].label = "Поръчка/Оферта"
+        # self.fields["order_type"].initial = order_type
+        self.fields["order_type"].label = "Поръчка/Оферта"
 
         # Customer contact information fields setup
         self.setup_contact_fields()

@@ -14,7 +14,7 @@
 	{% include "common/components/alert.html" %}
 
 	<div style="text-align: center; margin: 20px;">
-		{% if current_order.client == "External" %}
+		{% if current_order.order_type == "offer" %}
 			<h1>Редактиране на оферта</h1>
 		{% else %}
 			<h1>Редактиране на поръчка</h1>

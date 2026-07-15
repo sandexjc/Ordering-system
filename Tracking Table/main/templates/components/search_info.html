@@ -5,10 +5,10 @@
                 Резултати за: "{{category}}"="{{search_string}}"
             </span>
             <span class="badge text-bg-primary">
-                {% if nav_select == 'Internal' %}
-                    <a href="{% url 'internals' %}">изчисти търсенето</a>
-                {% elif nav_select == 'External' %}
-                    <a href="{% url 'externals' %}">изчисти търсенето</a>
+                {% if nav_select == 'table' %}
+                    <a href="{% url 'table' %}">изчисти търсенето</a>
+                {% elif nav_select == 'vitrine' %}
+                    <a href="{% url 'vitrine' %}">изчисти търсенето</a>
                 {% endif %}
             </span>
         </h5>

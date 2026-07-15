@@ -4,11 +4,10 @@ A Django-based production and sales workflow tool for managing furniture-related
 
 ## What the system does
 
-The project centralizes day-to-day order handling for three operational streams:
+The project centralizes day-to-day order handling for two operational boards:
 
-- `Orders`: placed orders (`/internals/`)
-- `Offers`: pre-order offers (`/externals/`)
-- `Vitrines`: vitrine-specific projects (`/vitrines/`)
+- `table`: table domain board (`/table/`)
+- `vitrine`: vitrine domain board (`/vitrine/`)
 
 Each stream supports searchable dashboards, order editing, progress tracking, printable documents, and historical change visibility.
 
@@ -16,6 +15,7 @@ Each stream supports searchable dashboards, order editing, progress tracking, pr
 
 - **Order lifecycle management**
   - Create, edit, update progress, view, print, and soft-delete orders.
+  - `order_type` marks each order as `order` or `offer`.
   - Track readiness (`order_ready`) and completion (`order_taken`) state.
 - **Operational item tracking**
   - Table domain tracks `Plate`, `Edge`, `Cutting`, `Edging`, `Other`, and `Payment` items.
@@ -60,9 +60,8 @@ Each stream supports searchable dashboards, order editing, progress tracking, pr
 
 ## Key URLs
 
-- `/internals/` - orders board (placed orders)
-- `/externals/` - offers board (pre-order offers)
-- `/vitrines/` - vitrine orders board
+- `/table/` - table board (records are filtered by `order_type`)
+- `/vitrine/` - vitrine board
 - `/accounts/login/` - authentication
 - `/admin/` - Django admin
 

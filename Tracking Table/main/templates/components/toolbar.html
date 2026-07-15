@@ -6,12 +6,12 @@
         <div class="col">
             <nav class="nav">
                 <!-- New order button -->
-                {% if nav_select == "Vitrine" %}
+                {% if nav_select == "vitrine" %}
                     <a class="btn btn-outline-primary" href="{% url 'vitrine:new_vitrine' %}">
                         <img src="{% static 'images/add.png' %}" class="tableIcons">
                     </a>
                 {% else %}
-                    <a class="btn btn-outline-primary" href="{% url 'table:newOrder' type=nav_select %}">
+                    <a class="btn btn-outline-primary" href="{% url 'table:newOrder' order_type='order' %}">
                         <img src="{% static 'images/add.png' %}" class="tableIcons">
                     </a>
                 {% endif %}

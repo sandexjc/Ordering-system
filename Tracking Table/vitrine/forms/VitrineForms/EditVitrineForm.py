@@ -20,6 +20,7 @@ class EditVitrineForm(FormFieldsSetupMixin, VitrineForm):
             "created_date",
             "owner",
             "telephone",
+            "order_type",
             "vitrine_manual_seal",
             "white_seal_custom_amount",
             "black_seal_custom_amount",
@@ -30,6 +31,7 @@ class EditVitrineForm(FormFieldsSetupMixin, VitrineForm):
 
         # Customer contact information fields setup
         self.setup_contact_fields()
+        self.fields["order_type"].label = "Поръчка/Оферта"
 
         if not settings.DJANGO_FEATURES__MANUAL_SEAL:
             for field_name in (

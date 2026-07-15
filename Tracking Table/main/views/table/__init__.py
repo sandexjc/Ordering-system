@@ -1,2 +1,1 @@
-from .OffersView import Offers
-from .OrdersView import Orders
+from .TableOrdersView import TableOrders

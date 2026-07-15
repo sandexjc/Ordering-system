@@ -4,6 +4,6 @@ class TableOrderQuerySet(BaseOrderQuerySet):
 
     """ Table app domain level shared Order models queryset. """
     
-    # Client type orders filtering
-    def client_type(self, client_type):
-        return self.filter(client=client_type)
+    # Order type filtering (order/offer)
+    def order_type(self, order_type):
+        return self.filter(order_type=order_type)

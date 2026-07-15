@@ -6,9 +6,9 @@ The Ordering System helps teams manage the full order journey, from initial offe
 
 ## Main workflows
 
-- `Offers`: order offers (pre-order stage, before becoming a placed order)
-- `Orders`: placed orders (active production and fulfillment stage)
-- `Vitrines`: vitrine-specific projects and execution flow
+- `table`: table domain board (`/table/`) for orders and offers
+- `vitrine`: vitrine domain board (`/vitrine/`) for vitrine jobs
+- `order_type` controls stage classification (`order` or `offer`)
 
 ## What teams can do
 
@@ -28,8 +28,8 @@ The Ordering System helps teams manage the full order journey, from initial offe
 
 ## Typical process
 
-1. Create an offer in `Offers`.
-2. When approved, continue as a placed order in `Orders`.
+1. Create a record with `order_type=offer`.
+2. When approved, continue as `order_type=order`.
 3. Track progress and updates until completion.
 4. Finalize payment and close the order.
 

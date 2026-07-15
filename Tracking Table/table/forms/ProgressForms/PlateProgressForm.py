@@ -30,7 +30,7 @@ class PlateProgressForm(TableForm):
         )
 
         # Disable 'cutted' and 'edged' fields in case order is offer
-        if getattr(order, "client", None) == "External":
+        if getattr(order, "order_type", None) == "offer":
             self.disable_if(True, "cutted", reason="Cutting not applicable for offers.")
             self.disable_if(True, "edged", reason="Edging not applicable for offers.")
 

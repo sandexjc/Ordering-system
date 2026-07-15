@@ -15,7 +15,7 @@ class MainView(LoginRequiredMixin, TemplateView):
     # Subclasses must define the below properties
     model = None
     template_name = None
-    clients_type = None
+    order_type = None
     navigation = None
 
     # Default count of items to display

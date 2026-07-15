@@ -15,5 +15,5 @@ class CreateOrder(BaseCreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["order_type"] = self.kwargs.get("type")
+        kwargs["order_type"] = self.kwargs.get("order_type")
         return kwargs

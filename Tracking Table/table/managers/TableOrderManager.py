@@ -8,10 +8,10 @@ class TableOrderManager(BaseOrderManager):
     def __get_queryset(self):
         return TableOrderQuerySet(self.model, using=self._db).active()
     
-    def __common_filter(self, client_type: str, *related_items):
+    def __common_filter(self, order_type: str, *related_items):
         return (
             self.__get_queryset()
-            .client_type(client_type)
+            .order_type(order_type)
             .last_created()
             .with_items(*related_items)
         )
@@ -21,49 +21,49 @@ class TableOrderManager(BaseOrderManager):
     #                                                   #
     #   Below querysets are sharing common logic:       #
     #                                                   #
-    #   - 1. Filtered by the given client type.         #
+    #   - 1. Filtered by the given order type.          #
     #   - 2. Results are ordered by -created_date.      #
     #   - 3. Each order is returned with related items. #
     #                                                   #
     #####################################################
 
     # Return all orders
-    def all_by_client_type(self, client_type: str, *related_items):
+    def all_by_order_type(self, order_type: str, *related_items):
         return (
-            self.__common_filter(client_type, *related_items)
+            self.__common_filter(order_type, *related_items)
         )
     
     # Return most recently N created orders 
-    def latest_by_count(self, client_type: str, count: int=100, *related_items):
+    def latest_by_count(self, order_type: str, count: int=100, *related_items):
         return (
-            self.__common_filter(client_type, *related_items)[:count]
+            self.__common_filter(order_type, *related_items)[:count]
         )
 
     # Return most recently created orders
-    def latest_by_date(self, client_type: str, days: int=30, *related_items):
+    def latest_by_date(self, order_type: str, days: int=30, *related_items):
         return (
-            self.__common_filter(client_type, *related_items)
+            self.__common_filter(order_type, *related_items)
             .most_recent(days)
         )
 
     # Return orders created in given time period
-    def created_between(self, client_type: str, start_date, end_date, *related_items):
+    def created_between(self, order_type: str, start_date, end_date, *related_items):
         return (
-            self.__common_filter(client_type, *related_items)
+            self.__common_filter(order_type, *related_items)
             .created_between(start_date, end_date)
         )
 
     # Return orders which contains given telephone number
-    def telephone_contains(self, client_type: str, number, *related_items):
+    def telephone_contains(self, order_type: str, number, *related_items):
         return (
-            self.__common_filter(client_type, *related_items)
+            self.__common_filter(order_type, *related_items)
             .telephone_contains(number)
         )
 
     # Return orders which contains given name
-    def owner_contains(self, client_type: str, name, *related_items):
+    def owner_contains(self, order_type: str, name, *related_items):
         return (
-            self.__common_filter(client_type, *related_items)
+            self.__common_filter(order_type, *related_items)
             .owner_contains(name)
         )
     

@@ -3,6 +3,11 @@ from django.utils import timezone
 
 class BaseOrder(models.Model):
 
+    order_type_choices = [
+        ("order", "Поръчка"),
+        ("offer", "Оферта"),
+    ]
+
     created_date = models.DateTimeField(default=timezone.now)
     owner = models.CharField(max_length=50)
     telephone = models.CharField(max_length=14, blank=True)
@@ -13,6 +18,7 @@ class BaseOrder(models.Model):
 
     order_ready = models.BooleanField(default=False)
     order_taken = models.BooleanField(default=False)
+    order_type = models.CharField(max_length=10, choices=order_type_choices, default="offer")
     
     class Meta:
         abstract = True

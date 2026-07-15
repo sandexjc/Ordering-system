@@ -1,1 +1,1 @@
-from .VitrinesView import Vitrines
+from .VitrineOrdersView import VitrineOrders
