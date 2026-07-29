@@ -6,7 +6,21 @@ from common.service import CurrencyOperations
 
 class BasePrintView(LoginRequiredMixin, TemplateView):
 
-    """ Base class for print views across multiple apps with shared logic. """
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> BasePrintView
+    TemplateView -> BasePrintView
+
+    --- Fields inherited from LoginRequiredMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from TemplateView ---
+
+    No explicit class fields inherited.
+
+    """
 
     # Subclasses must define the below properties
     model = None

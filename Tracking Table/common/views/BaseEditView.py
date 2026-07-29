@@ -6,7 +6,21 @@ from common.service import CurrencyOperations
 
 class BaseEditView(LoginRequiredMixin, UpdateView):
 
-    """ A reusable base view for editing order model and related items objects. """
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> BaseEditView
+    UpdateView -> BaseEditView
+
+    --- Fields inherited from LoginRequiredMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from UpdateView ---
+
+    No explicit class fields inherited.
+
+    """
 
     # Subclasses must define the below properties
     note_form_class = None

@@ -6,7 +6,21 @@ import time
 
 class MainView(LoginRequiredMixin, TemplateView):
 
-    """ Base view logic for all apps sharing main site page """
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> MainView
+    TemplateView -> MainView
+
+    --- Fields inherited from LoginRequiredMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from TemplateView ---
+
+    No explicit class fields inherited.
+
+    """
 
     # Forms remain the same for all apps
     search_form_class = SearchForm

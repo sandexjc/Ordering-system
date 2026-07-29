@@ -9,6 +9,22 @@ from table.models import Order, Change
 
 class OrderHistory(LoginRequiredMixin, ListView):
 
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> OrderHistory
+    ListView -> OrderHistory
+
+    --- Fields inherited from LoginRequiredMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from ListView ---
+
+    No explicit class fields inherited.
+
+    """
+
     model = Order
 
     def get(self, request, pk, *args, **kwargs):

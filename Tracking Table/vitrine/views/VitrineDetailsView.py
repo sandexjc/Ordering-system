@@ -7,6 +7,23 @@ from vitrine.forms import VitrineProgressForm
 
 
 class ViewVitrine(LoginRequiredMixin, TemplateView):
+
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> ViewVitrine
+    TemplateView -> ViewVitrine
+
+    --- Fields inherited from LoginRequiredMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from TemplateView ---
+
+    No explicit class fields inherited.
+
+    """
+
     template_name = 'vitrine/vitrine_details.html'
 
     def get_context_data(self, pk, **kwargs):

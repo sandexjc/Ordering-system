@@ -4,6 +4,15 @@ from vitrine.models import Vitrine
 
 class DeleteVitrine(BaseDeleteView):
 
-    """ Delete view dedicated to Vitrine app. """
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> SingleObjectMixin -> View -> BaseDeleteView -> DeleteVitrine
+
+    --- Fields inherited from BaseDeleteView ---
+
+    model = None
+
+    """
 
     model = Vitrine

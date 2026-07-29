@@ -4,7 +4,19 @@ from table import forms
 
 class EditOrder(BaseEditView):
 
-    """ Main view for editing table app specific orders. """
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> UpdateView -> BaseEditView -> EditOrder
+
+    --- Fields inherited from BaseEditView ---
+
+    note_form_class = None
+    related_formsets = []
+    fk_field_name = None
+    redirect_url = None
+
+    """
 
     model = Order
     form_class = forms.EditOrderForm

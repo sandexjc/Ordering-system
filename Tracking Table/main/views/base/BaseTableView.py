@@ -5,7 +5,27 @@ from django.core.exceptions import ObjectDoesNotExist
 
 class BaseTableView(MainView):
 
-    """ Table application specific base view """
+    """
+    Table application specific base view.
+
+    Hierarchy:
+    LoginRequiredMixin
+            \
+             -> MainView -> BaseTableView
+            /
+    TemplateView
+
+    --- Fields inherited from MainView ---
+
+    search_form_class = SearchForm
+    filter_form_class = FilterForm
+    model = None
+    template_name = None
+    order_type = None
+    navigation = None
+    default_items_count = 100
+
+    """
 
     model = Order
     template_name = 'table/orders.html'

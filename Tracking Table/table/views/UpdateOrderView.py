@@ -10,7 +10,18 @@ import json
 
 class UpdateOrder(BaseUpdateView):
 
-    """ Update table app orders progress class. """
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> UpdateView -> BaseUpdateView -> UpdateOrder
+
+    --- Fields inherited from BaseUpdateView ---
+
+    model = None
+    form_class = None
+    success_url = "/"
+
+    """
 
     model = Order
     form_class = OrderProgressForm

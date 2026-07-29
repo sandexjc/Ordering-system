@@ -8,7 +8,26 @@ from django.db import transaction
 
 class BaseDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
 
-    """ Reusable JSON-based common delete view for all apps.  """
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> BaseDeleteView
+    SingleObjectMixin -> BaseDeleteView
+    View -> BaseDeleteView
+
+    --- Fields inherited from LoginRequiredMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from SingleObjectMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from View ---
+
+    No explicit class fields inherited.
+
+    """
 
     # Subclasses must define
     model = None

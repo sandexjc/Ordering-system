@@ -5,6 +5,23 @@ from table.forms import CreateOrderForm, AddNoteForm
 
 class CreateOrder(BaseCreateView):
 
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> CreateView -> BaseCreateView -> CreateOrder
+
+    --- Fields inherited from BaseCreateView ---
+
+    template_name = "common/components/new_order.html"
+    form_class = None
+    change_model = None
+    note_form_class = None
+    related_field_name = None
+    change_what = None
+    redirect_name = None
+
+    """
+
     model = Order
     change_model = Change
     form_class = CreateOrderForm

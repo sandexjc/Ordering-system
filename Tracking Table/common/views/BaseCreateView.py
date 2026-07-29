@@ -4,7 +4,21 @@ from django.shortcuts import redirect
 
 class BaseCreateView(LoginRequiredMixin, CreateView):
 
-    """ A reusable base view for creating model objects. """
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> BaseCreateView
+    CreateView -> BaseCreateView
+
+    --- Fields inherited from LoginRequiredMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from CreateView ---
+
+    No explicit class fields inherited.
+
+    """
 
     template_name = "common/components/new_order.html"
 

@@ -4,6 +4,15 @@ from table.models import Order
 
 class DeleteOrder(BaseDeleteView):
 
-    """ Delete view dedicated to Table app. """
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> SingleObjectMixin -> View -> BaseDeleteView -> DeleteOrder
+
+    --- Fields inherited from BaseDeleteView ---
+
+    model = None
+
+    """
     
     model = Order

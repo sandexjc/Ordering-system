@@ -6,7 +6,19 @@ from vitrine import forms
 
 class EditVitrine(BaseEditView):
 
-    """ Main view for editing vitrine app specific orders. """
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> UpdateView -> BaseEditView -> EditVitrine
+
+    --- Fields inherited from BaseEditView ---
+
+    note_form_class = None
+    related_formsets = []
+    fk_field_name = None
+    redirect_url = None
+
+    """
 
     model = Vitrine
     form_class = forms.EditVitrineForm

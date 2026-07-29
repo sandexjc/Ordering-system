@@ -5,6 +5,19 @@ from vitrine.service import VitrineContextBuilder
 
 class PrintVitrine(BasePrintView):
 
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> TemplateView -> BasePrintView -> PrintVitrine
+
+    --- Fields inherited from BasePrintView ---
+
+    model = None
+    template_name = None
+    order_context = None
+
+    """
+
     model = Vitrine
     template_name = 'vitrine/print_vitrine.html'
     order_context = "vitrine"

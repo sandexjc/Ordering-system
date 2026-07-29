@@ -5,7 +5,27 @@ from django.core.exceptions import ObjectDoesNotExist
 
 class BaseVitrineView(MainView):
 
-    """ Vitrine application domain base view """
+    """
+    Vitrine application domain base view.
+
+    Hierarchy:
+    LoginRequiredMixin
+            \
+             -> MainView -> BaseVitrineView
+            /
+    TemplateView
+
+    --- Fields inherited from MainView ---
+
+    search_form_class = SearchForm
+    filter_form_class = FilterForm
+    model = None
+    template_name = None
+    order_type = None
+    navigation = None
+    default_items_count = 100
+
+    """
 
     model = Vitrine
     template_name = 'vitrine/vitrines.html'

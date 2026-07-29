@@ -9,8 +9,22 @@ import json
 
 
 class BaseUpdateView(LoginRequiredMixin, UpdateView):
-    
-    """ Shared update progress logic for all apps. """
+
+    """
+
+    Hierarchy:
+    LoginRequiredMixin -> BaseUpdateView
+    UpdateView -> BaseUpdateView
+
+    --- Fields inherited from LoginRequiredMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from UpdateView ---
+
+    No explicit class fields inherited.
+
+    """
 
     # must be defined in subclasses
     model = None
