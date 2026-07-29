@@ -3,7 +3,19 @@ from table.querysets import TableOrderQuerySet
 
 class TableOrderManager(BaseOrderManager):
 
-    """ Table app domain level Orders manager. """
+    """
+    Table app domain level Orders manager.
+
+    Hierarchy:
+    models.Manager
+        \
+         -> BaseManager -> BaseOrderManager -> TableOrderManager
+
+    --- Fields inherited from BaseOrderManager ---
+
+    No explicit class fields inherited.
+
+    """
     
     def __get_queryset(self):
         return TableOrderQuerySet(self.model, using=self._db).active()

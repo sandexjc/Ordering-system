@@ -2,7 +2,19 @@ from common.querysets import BaseItemQuerySet
 
 class TableItemQuerySet(BaseItemQuerySet):
 
-    """ Table app domain level queryset sharing common order related ( FK ) models logic. """
+    """
+    Table app domain level queryset sharing common order related ( FK ) models logic.
+
+    Hierarchy:
+    models.QuerySet
+        \
+         -> BaseQuerySet -> BaseItemQuerySet -> TableItemQuerySet
+
+    --- Fields inherited from BaseItemQuerySet ---
+
+    No explicit class fields inherited.
+
+    """
     
     # Get order specific items by class
     def for_order(self, order):

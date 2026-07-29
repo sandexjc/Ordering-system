@@ -3,7 +3,19 @@ from .BaseQuerySet import BaseQuerySet
 
 class BaseOrderQuerySet(BaseQuerySet):
 
-    """ Queryset designed to share common Order models logic between apps. """
+    """
+    Queryset designed to share common Order models logic between apps.
+
+    Hierarchy:
+    models.QuerySet
+        \
+         -> BaseQuerySet -> BaseOrderQuerySet
+
+    --- Fields inherited from BaseQuerySet ---
+
+    No explicit class fields inherited.
+
+    """
 
     # Load order related items 
     def with_items(self, *related_items):

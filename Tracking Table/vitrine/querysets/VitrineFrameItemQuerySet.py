@@ -2,7 +2,19 @@ from common.querysets import BaseItemQuerySet
 
 class VitrineFrameItemQuerySet(BaseItemQuerySet):
 
-    """ Vitrine app queryset for frame model related ( with FK ) items. """
+    """
+    Vitrine app queryset for frame model related ( with FK ) items.
+
+    Hierarchy:
+    models.QuerySet
+        \
+         -> BaseQuerySet -> BaseItemQuerySet -> VitrineFrameItemQuerySet
+
+    --- Fields inherited from BaseItemQuerySet ---
+
+    No explicit class fields inherited.
+
+    """
 
     # Get frame specific items by object
     def for_frame(self, frame):

@@ -2,7 +2,19 @@ from common.querysets import BaseItemQuerySet
 
 class VitrineItemQuerySet(BaseItemQuerySet):
 
-    """ Vitrine app domain level queryset sharing common order related ( FK ) models logic. """
+    """
+    Vitrine app domain level queryset sharing common order related ( FK ) models logic.
+
+    Hierarchy:
+    models.QuerySet
+        \
+         -> BaseQuerySet -> BaseItemQuerySet -> VitrineItemQuerySet
+
+    --- Fields inherited from BaseItemQuerySet ---
+
+    No explicit class fields inherited.
+
+    """
 
     # Get order specific items by object
     def for_vitrine(self, vitrine):

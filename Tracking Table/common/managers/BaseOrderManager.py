@@ -3,7 +3,19 @@ from common.querysets import BaseOrderQuerySet
 
 class BaseOrderManager(BaseManager):
 
-    """ Queryset Manager designed to share common Order models logic between apps. """
+    """
+    Queryset Manager designed to share common Order models logic between apps.
+
+    Hierarchy:
+    models.Manager
+        \
+         -> BaseManager -> BaseOrderManager
+
+    --- Fields inherited from BaseManager ---
+
+    No explicit class fields inherited.
+
+    """
 
     def __get_queryset(self):
         return BaseOrderQuerySet(self.model, using=self._db).active()

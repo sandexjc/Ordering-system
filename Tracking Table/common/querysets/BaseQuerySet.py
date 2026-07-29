@@ -3,7 +3,19 @@ from django.utils import timezone
 
 class BaseQuerySet(models.QuerySet):
 
-    """ Top level QuerySet designed to share common logic for all models. """
+    """
+    Top level QuerySet designed to share common logic for all models.
+
+    Hierarchy:
+    models.QuerySet
+        \
+         -> BaseQuerySet
+
+    --- Fields inherited from models.QuerySet ---
+
+    No explicit class fields inherited.
+
+    """
 
     # Return only active objects
     def active(self):

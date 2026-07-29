@@ -3,7 +3,19 @@ from common.querysets import BaseQuerySet
 
 class BaseManager(models.Manager):
 
-    """ Top level Manager designed to share common models logic across different apps. """
+    """
+    Top level Manager designed to share common models logic across different apps.
+
+    Hierarchy:
+    models.Manager
+        \
+         -> BaseManager
+
+    --- Fields inherited from models.Manager ---
+
+    No explicit class fields inherited.
+
+    """
 
     # Return active only objects
     def get_queryset(self):

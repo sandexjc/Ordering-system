@@ -4,7 +4,19 @@ from vitrine.querysets import VitrineItemQuerySet
 
 class VitrineItemManager(BaseItemManager):
 
-    """ Vitrine app domain level order related items ( FK ) queryset manager. """
+    """
+    Vitrine app domain level order related items ( FK ) queryset manager.
+
+    Hierarchy:
+    models.Manager
+        \
+         -> BaseManager -> BaseItemManager -> VitrineItemManager
+
+    --- Fields inherited from BaseItemManager ---
+
+    No explicit class fields inherited.
+
+    """
 
     def __get_queryset(self):
         return VitrineItemQuerySet(self.model, using=self._db).active()

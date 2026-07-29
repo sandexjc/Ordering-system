@@ -4,7 +4,19 @@ from vitrine.querysets import VitrineFrameItemQuerySet
 
 class VitrineFrameItemManager(BaseItemManager):
 
-    """ Vitrine app manager for frame model related ( with FK )items. """
+    """
+    Vitrine app manager for frame model related ( with FK )items.
+
+    Hierarchy:
+    models.Manager
+        \
+         -> BaseManager -> BaseItemManager -> VitrineFrameItemManager
+
+    --- Fields inherited from BaseItemManager ---
+
+    No explicit class fields inherited.
+
+    """
 
     def __get_queryset(self):
         return VitrineFrameItemQuerySet(self.model, using=self._db).active()

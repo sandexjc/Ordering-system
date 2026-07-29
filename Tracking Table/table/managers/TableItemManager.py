@@ -4,7 +4,19 @@ from table.querysets import TableItemQuerySet
 
 class TableItemManager(BaseItemManager):
 
-    """ Application specific (intermediate level) order related items queryset manager. """
+    """
+    Application specific (intermediate level) order related items queryset manager.
+
+    Hierarchy:
+    models.Manager
+        \
+         -> BaseManager -> BaseItemManager -> TableItemManager
+
+    --- Fields inherited from BaseItemManager ---
+
+    No explicit class fields inherited.
+
+    """
 
     def __get_queryset(self):
         return TableItemQuerySet(self.model, using=self._db).active()

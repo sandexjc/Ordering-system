@@ -3,7 +3,19 @@ from vitrine.querysets import VitrineOrderQuerySet
 
 class VitrineOrderManager(BaseOrderManager):
 
-    """ Vitrine app domain level manager. """
+    """
+    Vitrine app domain level manager.
+
+    Hierarchy:
+    models.Manager
+        \
+         -> BaseManager -> BaseOrderManager -> VitrineOrderManager
+
+    --- Fields inherited from BaseOrderManager ---
+
+    No explicit class fields inherited.
+
+    """
     
     def __get_queryset(self):
         return VitrineOrderQuerySet(self.model, using=self._db).active()
