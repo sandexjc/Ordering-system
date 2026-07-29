@@ -4,6 +4,18 @@ from django.forms import inlineformset_factory
 
 class AddCuttingForm(TableForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> TableForm -> AddCuttingForm
+    forms.ModelForm -> BaseModelForm -> TableForm -> AddCuttingForm
+
+    --- Fields inherited from TableForm ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
         model = Cutting
         fields = ("cutting_type", "quantity", "price", "value")

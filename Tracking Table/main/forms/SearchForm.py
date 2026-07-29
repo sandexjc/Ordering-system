@@ -3,6 +3,18 @@ from django import forms
 
 class SearchForm(BaseForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseForm -> SearchForm
+    forms.Form -> BaseForm -> SearchForm
+
+    --- Fields inherited from BaseForm ---
+
+    No explicit class fields inherited.
+
+    """
+
     category_choices = [
         ('All', 'All'),
         ('ID', 'ID'),

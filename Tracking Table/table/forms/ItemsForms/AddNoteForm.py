@@ -3,7 +3,24 @@ from common.mixins import FormFieldsSetupMixin
 from table.models import Note
 
 class AddNoteForm(FormFieldsSetupMixin, BaseModelForm):
-    
+
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> AddNoteForm
+    forms.ModelForm -> BaseModelForm -> AddNoteForm
+    FormFieldsSetupMixin -> AddNoteForm
+
+    --- Fields inherited from BaseModelForm ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from FormFieldsSetupMixin ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
         model = Note
         fields = ("content",)

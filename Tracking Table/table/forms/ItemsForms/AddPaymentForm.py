@@ -4,6 +4,18 @@ from django.forms import inlineformset_factory
 
 class AddPaymentForm(TableForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> TableForm -> AddPaymentForm
+    forms.ModelForm -> BaseModelForm -> TableForm -> AddPaymentForm
+
+    --- Fields inherited from TableForm ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
         model = Payment
         fields = ("payment_method", "value")

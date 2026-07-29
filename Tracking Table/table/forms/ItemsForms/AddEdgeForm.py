@@ -4,6 +4,18 @@ from django.forms import inlineformset_factory
 
 class AddEdgeForm(TableForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> TableForm -> AddEdgeForm
+    forms.ModelForm -> BaseModelForm -> TableForm -> AddEdgeForm
+
+    --- Fields inherited from TableForm ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
         model = Edge
         fields = ("edge_type", "color_code", "quantity", "price", "value", "visible")

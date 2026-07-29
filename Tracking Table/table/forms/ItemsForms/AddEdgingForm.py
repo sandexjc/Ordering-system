@@ -4,6 +4,18 @@ from django.forms import inlineformset_factory
 
 class AddEdgingForm(TableForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> TableForm -> AddEdgingForm
+    forms.ModelForm -> BaseModelForm -> TableForm -> AddEdgingForm
+
+    --- Fields inherited from TableForm ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
         model = Edging
         fields = ("edging_type", "quantity", "price", "value")

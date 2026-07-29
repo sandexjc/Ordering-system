@@ -1,8 +1,17 @@
 from common.service import BaseWorkflow
 
 class WorkflowModelMixin:
-    
-    """ Mixin for models to add workflow service. """
+
+    """
+
+    Hierarchy:
+    WorkflowModelMixin
+
+    --- Fields inherited from parent classes ---
+
+    No inherited class fields.
+
+    """
 
     workflow_service_class = BaseWorkflow
 

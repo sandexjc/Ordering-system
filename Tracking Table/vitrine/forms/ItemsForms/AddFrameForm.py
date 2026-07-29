@@ -5,6 +5,18 @@ from django.conf import settings
 
 class AddFrameForm(VitrineForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> VitrineForm -> AddFrameForm
+    forms.ModelForm -> BaseModelForm -> VitrineForm -> AddFrameForm
+
+    --- Fields inherited from VitrineForm ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
         model = Frame
         fields = (

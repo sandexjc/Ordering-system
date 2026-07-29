@@ -2,7 +2,16 @@
 
 class FormFieldsStyleMixin:
 
-    """ Mixin that provides helper methods for styling and controlling form fields. """
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin
+
+    --- Fields inherited from parent classes ---
+
+    No inherited class fields.
+
+    """
 
     def is_valid(self):
         # --- Lifecycle override to apply error styling automatically ---

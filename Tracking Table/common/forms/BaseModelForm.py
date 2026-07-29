@@ -2,8 +2,22 @@ from django import forms
 from common.mixins import FormFieldsStyleMixin
 
 class BaseModelForm(FormFieldsStyleMixin, forms.ModelForm):
-    
-    """ Top level model form for the whole project. """
+
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm
+    forms.ModelForm -> BaseModelForm
+
+    --- Fields inherited from FormFieldsStyleMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from forms.ModelForm ---
+
+    No explicit class fields inherited.
+
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

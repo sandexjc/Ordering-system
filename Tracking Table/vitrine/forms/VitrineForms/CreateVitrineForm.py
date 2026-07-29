@@ -4,6 +4,23 @@ from common.mixins import FormFieldsSetupMixin
 
 class CreateVitrineForm(FormFieldsSetupMixin, VitrineForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> VitrineForm -> CreateVitrineForm
+    forms.ModelForm -> BaseModelForm -> VitrineForm -> CreateVitrineForm
+    FormFieldsSetupMixin -> CreateVitrineForm
+
+    --- Fields inherited from VitrineForm ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from FormFieldsSetupMixin ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
         model = Vitrine
         fields = ("owner", "telephone", "order_type")

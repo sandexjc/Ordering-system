@@ -4,7 +4,17 @@ from django.forms import inlineformset_factory
 
 class EdgeProgressForm(TableForm):
 
-    # Form for updating the progress of individual edges in an order.
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> TableForm -> EdgeProgressForm
+    forms.ModelForm -> BaseModelForm -> TableForm -> EdgeProgressForm
+
+    --- Fields inherited from TableForm ---
+
+    No explicit class fields inherited.
+
+    """
 
     class Meta:
         model = Edge

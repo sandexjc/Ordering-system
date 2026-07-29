@@ -3,7 +3,21 @@ from common.mixins import FormFieldsStyleMixin
 
 class BaseForm(FormFieldsStyleMixin, forms.Form):
 
-    """ Top level base form for all non-model forms. """
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseForm
+    forms.Form -> BaseForm
+
+    --- Fields inherited from FormFieldsStyleMixin ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from forms.Form ---
+
+    No explicit class fields inherited.
+
+    """
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

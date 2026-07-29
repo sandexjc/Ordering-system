@@ -4,6 +4,23 @@ from common.mixins import FormFieldsSetupMixin
 
 class CreateOrderForm(FormFieldsSetupMixin, TableForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> TableForm -> CreateOrderForm
+    forms.ModelForm -> BaseModelForm -> TableForm -> CreateOrderForm
+    FormFieldsSetupMixin -> CreateOrderForm
+
+    --- Fields inherited from TableForm ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from FormFieldsSetupMixin ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
         model = Order
         fields = ("owner", "telephone", "order_type")

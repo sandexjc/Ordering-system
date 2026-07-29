@@ -3,6 +3,17 @@ from accounts.models import User
 
 class UserCreateForm(UserCreationForm):
 
+    """
+
+    Hierarchy:
+    UserCreationForm -> UserCreateForm
+
+    --- Fields inherited from UserCreationForm ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
 
         model = User
@@ -23,6 +34,17 @@ class UserCreateForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
+
+    """
+
+    Hierarchy:
+    AuthenticationForm -> LoginForm
+
+    --- Fields inherited from AuthenticationForm ---
+
+    No explicit class fields inherited.
+
+    """
 
     class Meta:
 

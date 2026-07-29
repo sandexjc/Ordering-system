@@ -2,8 +2,17 @@ from common.helpers import log_change
 
 
 class BaseChangeSignalMixin:
-    
-    """ Base mixin for handling Change log creation in signals. """
+
+    """
+
+    Hierarchy:
+    BaseChangeSignalMixin
+
+    --- Fields inherited from parent classes ---
+
+    No inherited class fields.
+
+    """
 
     # Subclasses must define the below properties
     change_model = None

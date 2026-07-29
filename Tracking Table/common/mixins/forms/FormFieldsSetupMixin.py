@@ -2,7 +2,16 @@
 
 class FormFieldsSetupMixin:
 
-    """ Mixin that standardizes setup for fields in forms. """
+    """
+
+    Hierarchy:
+    FormFieldsSetupMixin
+
+    --- Fields inherited from parent classes ---
+
+    No inherited class fields.
+
+    """
 
     def setup_contact_fields(self):
         # Setup customer contact information fields

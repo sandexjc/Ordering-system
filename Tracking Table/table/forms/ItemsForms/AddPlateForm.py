@@ -4,6 +4,18 @@ from django.forms import inlineformset_factory
 
 class AddPlateForm(TableForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> TableForm -> AddPlateForm
+    forms.ModelForm -> BaseModelForm -> TableForm -> AddPlateForm
+
+    --- Fields inherited from TableForm ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
         model = Plate
         fields = ("material", "manufacturer", "from_client", "quantity", "price", "value")

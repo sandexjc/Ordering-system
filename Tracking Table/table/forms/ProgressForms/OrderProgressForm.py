@@ -2,8 +2,18 @@ from table.forms import TableForm
 from table.models import Order
 
 class OrderProgressForm(TableForm):
-    
-    # Form for updating the overall order progress (order taken, invoice).
+
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> TableForm -> OrderProgressForm
+    forms.ModelForm -> BaseModelForm -> TableForm -> OrderProgressForm
+
+    --- Fields inherited from TableForm ---
+
+    No explicit class fields inherited.
+
+    """
 
     class Meta:
         model = Order

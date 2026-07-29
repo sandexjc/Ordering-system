@@ -1,7 +1,17 @@
 from common.forms import BaseModelForm
 
 class VitrineForm(BaseModelForm):
-    
-    """ Intermediate domain level base model form for all vitrine app forms. """
+
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> VitrineForm
+    forms.ModelForm -> BaseModelForm -> VitrineForm
+
+    --- Fields inherited from BaseModelForm ---
+
+    No explicit class fields inherited.
+
+    """
 
     pass

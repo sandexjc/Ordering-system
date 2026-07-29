@@ -8,6 +8,23 @@ from common.mixins import FormFieldsSetupMixin
 
 class EditVitrineForm(FormFieldsSetupMixin, VitrineForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> VitrineForm -> EditVitrineForm
+    forms.ModelForm -> BaseModelForm -> VitrineForm -> EditVitrineForm
+    FormFieldsSetupMixin -> EditVitrineForm
+
+    --- Fields inherited from VitrineForm ---
+
+    No explicit class fields inherited.
+
+    --- Fields inherited from FormFieldsSetupMixin ---
+
+    No explicit class fields inherited.
+
+    """
+
     white_seal_type = forms.CharField(required=False)
     black_seal_type = forms.CharField(required=False)
     white_seal_total_value = forms.DecimalField(max_digits=10, decimal_places=2, required=False)

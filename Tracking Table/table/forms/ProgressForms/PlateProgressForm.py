@@ -4,7 +4,17 @@ from django.forms import inlineformset_factory
 
 class PlateProgressForm(TableForm):
 
-    # Form for updating the progress of individual plates in an order.
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> TableForm -> PlateProgressForm
+    forms.ModelForm -> BaseModelForm -> TableForm -> PlateProgressForm
+
+    --- Fields inherited from TableForm ---
+
+    No explicit class fields inherited.
+
+    """
 
     class Meta:
         model = Plate

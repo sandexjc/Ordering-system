@@ -2,8 +2,18 @@ from vitrine.forms import VitrineForm
 from vitrine.models import Vitrine
 
 class VitrineProgressForm(VitrineForm):
-    
-    """ Form for updating the vitrine order state (order taken, invoice). """
+
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> VitrineForm -> VitrineProgressForm
+    forms.ModelForm -> BaseModelForm -> VitrineForm -> VitrineProgressForm
+
+    --- Fields inherited from VitrineForm ---
+
+    No explicit class fields inherited.
+
+    """
 
     class Meta:
         model = Vitrine

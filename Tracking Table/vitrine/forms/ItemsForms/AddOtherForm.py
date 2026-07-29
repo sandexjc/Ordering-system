@@ -4,6 +4,18 @@ from django.forms import inlineformset_factory
 
 class AddOtherForm(VitrineForm):
 
+    """
+
+    Hierarchy:
+    FormFieldsStyleMixin -> BaseModelForm -> VitrineForm -> AddOtherForm
+    forms.ModelForm -> BaseModelForm -> VitrineForm -> AddOtherForm
+
+    --- Fields inherited from VitrineForm ---
+
+    No explicit class fields inherited.
+
+    """
+
     class Meta:
         model = Other
         fields = ("description", "quantity", "price", "value")
