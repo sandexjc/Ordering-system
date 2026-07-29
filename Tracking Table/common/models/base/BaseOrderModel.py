@@ -3,6 +3,17 @@ from django.utils import timezone
 
 class BaseOrder(models.Model):
 
+    """
+
+    Hierarchy:
+    models.Model -> BaseOrder
+
+    --- Fields inherited from models.Model ---
+
+    No explicit class fields inherited.
+
+    """
+
     order_type_choices = [
         ("order", "Поръчка"),
         ("offer", "Оферта"),

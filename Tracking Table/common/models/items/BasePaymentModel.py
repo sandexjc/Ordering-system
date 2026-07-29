@@ -3,6 +3,17 @@ from django.core.validators import MinValueValidator
 
 class BasePayment(models.Model):
 
+    """
+
+    Hierarchy:
+    models.Model -> BasePayment
+
+    --- Fields inherited from models.Model ---
+
+    No explicit class fields inherited.
+
+    """
+
     payment_methods = [
         ('Cash', 'в брой'),
         ('Card', 'банкова карта'),
