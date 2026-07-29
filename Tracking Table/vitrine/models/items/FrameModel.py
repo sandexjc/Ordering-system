@@ -1,9 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from vitrine.service import FrameWorkflow
 from common.models import BaseItem
 from vitrine.models.base import VitrineItem
+from vitrine.service import FrameWorkflow
 
 
 class Frame(VitrineItem, BaseItem):

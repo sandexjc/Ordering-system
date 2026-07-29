@@ -1,8 +1,8 @@
 from django.db import models
 
-from vitrine.service import OtherWorkflow
 from common.models import BaseItem
 from vitrine.models.base import VitrineItem
+from vitrine.service import OtherWorkflow
 
 
 class Other(VitrineItem, BaseItem):
