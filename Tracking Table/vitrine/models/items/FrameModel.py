@@ -47,7 +47,7 @@ class Frame(VitrineItem, BaseItem):
     # Helper fields for easier handling Frame related items
     holes_count = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(99)], default=0)
     holes_position = models.CharField(choices=holes_positions, default="length", max_length=10)
-    glass_type = models.CharField(null=True, blank=True, max_length=10)
+    glass_type = models.CharField(null=True, blank=True, max_length=50)
     auto_calculate_seal = models.BooleanField(default=True)
 
     def __str__(self):
