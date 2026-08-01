@@ -1,0 +1,45 @@
+{% extends "layout/content.html" %}
+{% load static %}
+
+{% block links %}
+    {{ block.super }}
+    {% if current_dynamic_view == "vitrine" %}
+        <link id="dynamic-vitrine-css-vitrines" rel="stylesheet" type="text/css" href="{% static 'vitrine/css/vitrines.css' %}">
+        <link id="dynamic-vitrine-css-holes" rel="stylesheet" type="text/css" href="{% static 'vitrine/css/holes_dots.css' %}">
+        <link id="dynamic-vitrine-css-modal" rel="stylesheet" type="text/css" href="{% static 'vitrine/css/modal_progress.css' %}">
+    {% endif %}
+{% endblock %}
+
+{% block table_content %}
+    <div
+        id="dynamic-orders-root"
+        data-current-view="{{ current_dynamic_view }}"
+        data-vitrine-css-vitrines="{% static 'vitrine/css/vitrines.css' %}"
+        data-vitrine-css-holes="{% static 'vitrine/css/holes_dots.css' %}"
+        data-vitrine-css-modal="{% static 'vitrine/css/modal_progress.css' %}"
+    >
+        <div id="dynamic-orders-table-container">
+            {% if current_dynamic_view == "vitrine" %}
+                {% include "dynamic/components/vitrine_shell.html" %}
+            {% else %}
+                {% include "dynamic/components/table_shell.html" %}
+            {% endif %}
+        </div>
+
+        <template id="dynamic-table-shell-template">
+            {% include "dynamic/components/table_shell.html" %}
+        </template>
+        <template id="dynamic-vitrine-shell-template">
+            {% include "dynamic/components/vitrine_shell.html" %}
+        </template>
+    </div>
+{% endblock %}
+
+{% block vitrine_scripts %}
+<script type="text/javascript" src="{% static 'vitrine/js/virtual_rows.js' %}"></script>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static 'js/dynamic_orders_page.js' %}"></script>
+{% endblock %}

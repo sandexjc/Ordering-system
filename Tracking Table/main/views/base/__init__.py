@@ -1,2 +1,2 @@
-from .BaseTableView import BaseTableView
-from .BaseVitrineView import BaseVitrineView
+from .StaticView import StaticView
+from .DynamicView import DynamicView

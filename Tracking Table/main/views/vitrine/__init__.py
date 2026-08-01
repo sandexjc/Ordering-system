@@ -1,1 +1,2 @@
 from .VitrineOrdersView import VitrineOrders
+from .DynamicVitrineOrdersDataView import DynamicVitrineOrdersData

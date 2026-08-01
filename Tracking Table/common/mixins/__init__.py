@@ -11,3 +11,7 @@ from .signals import (
 from .workflow import (
     WorkflowModelMixin,
 )
+
+from .views import (
+    DynamicFeatureFlagRequiredMixin,
+)

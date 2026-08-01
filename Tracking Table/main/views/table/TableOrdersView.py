@@ -1,7 +1,8 @@
-from main.views.base import BaseTableView
+from main.views.base import StaticView
+from table.models import Order
 
 
-class TableOrders(BaseTableView):
+class TableOrders(StaticView):
 
     """
     Main view for displaying table orders.
@@ -9,16 +10,18 @@ class TableOrders(BaseTableView):
     Hierarchy:
     LoginRequiredMixin
             \
-             -> MainView -> BaseTableView -> TableOrders
+             -> MainView -> StaticView -> TableOrders
             /
     TemplateView
 
-    --- Fields inherited from BaseTableView ---
+    --- Fields inherited from StaticView ---
 
     model = Order
     template_name = "table/orders.html"
 
     """
 
+    model = Order
+    template_name = "table/orders.html"
     order_type = "order"
     navigation = "table"

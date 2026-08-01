@@ -21,7 +21,7 @@
 
                 <div class="container-fluid">
                     <p class="text-center text-muted" style="font-size: 70%; font-weight: bold;">
-                        {{ visible_items }} елемент{{ visible_items|pluralize:"a" }}
+                        <span id="visible-items-count">{{ visible_items }}</span> елемент<span id="visible-items-suffix">{{ visible_items|pluralize:"a" }}</span>
                     </p>
 
                     <!-- app-specific tables -->

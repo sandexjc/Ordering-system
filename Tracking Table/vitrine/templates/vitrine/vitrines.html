@@ -9,92 +9,9 @@
 
 {% block table_content %}
 <table class="table table-hover table-bordered table-content-brake">
-    <thead>
-        <tr>
-            <th scope="col" colspan="3">Основна Информация</th>
-            <th scope="col" colspan="2">Рамка</th>
-            <th scope="col" colspan="1">Стъкло</th>
-            <th scope="col" colspan="3">Други</th>
-        </tr>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Дата</th>
-            <th scope="col">Клиент</th>
-            <th scope="col">Профил</th>
-            <th scope="col">Размери</th>
-            <th scope="col">Стъкло</th>
-            <th scope="col">Други услуги</th>
-            <th scope="col">Бележки</th>
-            <th scope="col">Баланс</th>
-        </tr>
-    </thead>
+    {% include "vitrine/components/table_header.html" %}
     <tbody>
-    {% for vitrine in orders %}
-
-        {% if vitrine.order_taken %}
-            <tr class="visibleRows orderTaken fixed-min-width" id="{{ vitrine.id }}" data-app-url="/vitrine/view_vitrine/" data-row="{{ vitrine.id }}">
-        {% else %}
-            <tr class="visibleRows normalOrder fixed-min-width" id="{{ vitrine.id }}" data-app-url="/vitrine/view_vitrine/" data-row="{{ vitrine.id }}">
-        {% endif %}
-
-            <td>{{ vitrine.id }}</td>
-            <td>{{ vitrine.created_date|date:"d.m.Y" }}</td>
-            <td>{{ vitrine.owner }}<br>{{ vitrine.telephone }}</td>
-            <td>
-                {% for item in vitrine.frames.all %}
-                    <div class="frame-color" id="frame-color-{{ item.pk }}">{{ item.get_profile_type_display }}</div>
-                {% endfor %}
-            </td>
-            <td>
-                {% for item in vitrine.frames.all %}
-                    <div class="frame-size" id="frame-size-{{ item.pk }}">
-                        {% if item.holes_position == "length" %}
-                            {% include "vitrine/components/holes_vertical.html" with count=item.holes_count %}
-                            <div>{{ item.length }}</div>
-                            <div>x</div>
-                            <div>{{ item.width }}</div>
-                        {% else %}
-                            <div class="empty"></div>
-                            <div>{{ item.length }}</div>
-                            <div>x</div>
-                            {% include "vitrine/components/holes_vertical.html" with count=item.holes_count %}
-                            <div>{{ item.width }}</div>
-                        {% endif %}
-                        <div> - {{ item.quantity }}</div>
-                    </div>
-                {% endfor %}
-            </td>
-            <td>
-                {% for item in vitrine.frames.all %}
-                    <div class="frame-glass" id="frame-glass-{{ item.pk }}">{{ item.glass_type }}</div>
-                {% endfor %}
-            </td>
-            <td>
-                {% for item in vitrine.others.all %}
-                    <div class="frame-others" id="vitrine-other-{{ item.pk }}">{{ item.description }} - {{ item.quantity }}</div>
-                {% endfor %}
-            </td>
-            <td>
-                {% for item in vitrine.notes.all %}
-                    <div class="vitrine-notes" id="vitrine-note-{{ item.pk }}">
-                        {{ item.user }} -> <span style="color: red;">{{ item.content }}</span>
-                    </div>
-                {% endfor %}
-            </td>
-            <td>
-                <div class="vitrine-balance" id="vitrine-balance-{{ vitrine.id }}">{{ vitrine.balance }}</div>
-            </td>
-            
-        </tr>
-        <tr>
-            <td colspan="9" class="no-padding-cell">
-                <div class="container-fluid hiddenRows" id="hidden-row-{{ vitrine.id }}" style="display: none">
-                    <div class="container-fluid hidden-table" id="hidden-table-{{ vitrine.id }}">
-                    </div>
-                </div>
-            </td>
-        </tr>
-    {% endfor %}
+        {% include "vitrine/components/table_rows.html" %}
     </tbody>
 </table>
 {% endblock %}

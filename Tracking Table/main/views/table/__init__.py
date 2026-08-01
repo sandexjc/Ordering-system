@@ -1,1 +1,2 @@
 from .TableOrdersView import TableOrders
+from .DynamicTableOrdersDataView import DynamicTableOrdersData

@@ -1,13 +1,17 @@
 <ul class="nav justify-content-center nav-tabs" role="tablist">
     <li class="nav-item" role="presentation">
-        {% if nav_select == "table" %}
+        {% if dynamic_mode %}
+            <button class="nav-link {% if nav_select == 'table' %}active{% endif %}" type="button" data-dynamic-view="table">разкрой</button>
+        {% elif nav_select == "table" %}
             <button class="nav-link active">разкрой</button>
         {% else %}
             <a class="nav-link" href="{% url 'table' %}">разкрой</a>
         {% endif %}
     </li>
     <li class="nav-item" role="presentation">
-        {% if nav_select == "vitrine" %}
+        {% if dynamic_mode %}
+            <button class="nav-link {% if nav_select == 'vitrine' %}active{% endif %}" type="button" data-dynamic-view="vitrine">витрини</button>
+        {% elif nav_select == "vitrine" %}
             <button class="nav-link active">витрини</button>
         {% else %}
             <a class="nav-link" href="{% url 'vitrine' %}">витрини</a>
