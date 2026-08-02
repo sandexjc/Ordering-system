@@ -3,6 +3,51 @@
  * Get order modal windows
  * @param {*} order_id 
  */
+
+/**
+ * Resolve current dynamic view name (table/vitrine) when available.
+ * Returns null outside dynamic page context.
+ */
+function get_current_dynamic_view_name()
+{
+    let root = document.getElementById("dynamic-orders-root");
+    if (!root) {
+        return null;
+    }
+    return root.getAttribute("data-current-view");
+}
+
+/**
+ * Store hidden row HTML into per-view cache to avoid refetch.
+ */
+function cache_order_details(order_id)
+{
+    if (!window.viewOrdersCache) {
+        return;
+    }
+
+    let current_view = get_current_dynamic_view_name();
+    if (!current_view) {
+        return;
+    }
+
+    let cache_entry = window.viewOrdersCache.get(current_view);
+    if (!cache_entry) {
+        return;
+    }
+
+    let hidden_table = document.getElementById("hidden-table-" + order_id);
+    if (!hidden_table) {
+        return;
+    }
+
+    if (!cache_entry.orderDetails) {
+        cache_entry.orderDetails = {};
+    }
+    cache_entry.orderDetails[order_id] = hidden_table.innerHTML;
+    window.viewOrdersCache.set(current_view, cache_entry);
+}
+
 function get_order(order_id)
 {
     /** Add loading indication */
@@ -89,6 +134,7 @@ function get_order(order_id)
             /** Recompute height after dynamic content is fully updated */
             const hiddenRow = document.getElementById("hidden-row-" + order_id);
             onHiddenRowContentUpdated(hiddenRow);
+            cache_order_details(order_id);
 
         })
         .catch((error) => {

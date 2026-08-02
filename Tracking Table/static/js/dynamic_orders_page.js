@@ -11,6 +11,10 @@ function updateVisibleItemsCounter(visibleItems) {
     }
 }
 
+/** Cache rows per view to avoid re-fetching on tab switch. */
+const viewOrdersCache = window.viewOrdersCache || new Map();
+window.viewOrdersCache = viewOrdersCache;
+
 /** Build loading-state row HTML while async request is in progress. */
 function buildLoadingRow(colspan) {
     return `
@@ -149,8 +153,98 @@ function fadeInRows(tableBody) {
     });
 }
 
+/** Run post-render setup hooks for row interactions and vitrine layout. */
+function setupRenderedRows() {
+    if (typeof handle_orders === "function") {
+        handle_orders();
+    }
+    if (typeof syncFrameHeights === "function") {
+        syncFrameHeights();
+    }
+}
+
+/** Rehydrate cached hidden-row order details and prevent re-fetching them. */
+function restoreCachedOrderDetails(viewName) {
+    const cached = viewOrdersCache.get(viewName);
+    if (!cached || !cached.orderDetails) {
+        return;
+    }
+
+    Object.entries(cached.orderDetails).forEach(([orderId, detailsHtml]) => {
+        const hiddenTable = document.getElementById(`hidden-table-${orderId}`);
+        const hiddenRow = document.getElementById(`hidden-row-${orderId}`);
+        if (!hiddenTable || !hiddenRow || !detailsHtml) {
+            return;
+        }
+        hiddenTable.innerHTML = detailsHtml;
+        hiddenRow.classList.add("fetch-prevent");
+    });
+
+    if (typeof handle_orders_properties === "function") {
+        handle_orders_properties();
+    }
+    if (typeof handle_orders_history === "function") {
+        handle_orders_history();
+    }
+}
+
+/** Capture currently expanded row ids for a specific view before switching away. */
+function captureOpenRows(viewName) {
+    if (!viewName) {
+        return;
+    }
+    const cacheEntry = viewOrdersCache.get(viewName);
+    if (!cacheEntry) {
+        return;
+    }
+
+    const openRowIds = Array.from(document.querySelectorAll(".hiddenRows.is-open"))
+        .map((hiddenRow) => hiddenRow.id.replace("hidden-row-", ""))
+        .filter(Boolean);
+
+    cacheEntry.openRowIds = openRowIds;
+    viewOrdersCache.set(viewName, cacheEntry);
+}
+
+/** Re-open previously expanded rows from cache without refetching details. */
+function restoreOpenRows(viewName) {
+    const cacheEntry = viewOrdersCache.get(viewName);
+    if (!cacheEntry || !Array.isArray(cacheEntry.openRowIds) || !cacheEntry.openRowIds.length) {
+        return;
+    }
+
+    cacheEntry.openRowIds.forEach((rowId) => {
+        const visibleRow = document.getElementById(rowId);
+        const hiddenRow = document.getElementById(`hidden-row-${rowId}`);
+        if (!visibleRow || !hiddenRow) {
+            return;
+        }
+        if (hiddenRow.classList.contains("is-open")) {
+            return;
+        }
+        visibleRow.click();
+    });
+}
+
+/** Render cached rows immediately for already-loaded view content. */
+async function renderCachedRowsIfAvailable(tableBody, viewName, colspan) {
+    const cached = viewOrdersCache.get(viewName);
+    if (!cached) {
+        return false;
+    }
+
+    await fadeOutRows(tableBody);
+    tableBody.innerHTML = cached.rowsHtml || buildEmptyRow(colspan);
+    fadeInRows(tableBody);
+    updateVisibleItemsCounter(cached.visibleItems);
+    setupRenderedRows();
+    restoreCachedOrderDetails(viewName);
+    restoreOpenRows(viewName);
+    return true;
+}
+
 /** Fetch rows from endpoint and render loading/success/error states. */
-async function fetchAndRenderOrders() {
+async function fetchAndRenderOrders(forceRefresh = false) {
     const tableBody = document.getElementById("dynamic-orders-body");
     if (!tableBody) {
         return;
@@ -158,8 +252,16 @@ async function fetchAndRenderOrders() {
 
     const endpoint = tableBody.dataset.endpoint;
     const colspan = Number.parseInt(tableBody.dataset.colspan || "10", 10);
+    const viewName = tableBody.dataset.view || "table";
     if (!endpoint) {
         return;
+    }
+
+    if (!forceRefresh) {
+        const renderedFromCache = await renderCachedRowsIfAvailable(tableBody, viewName, colspan);
+        if (renderedFromCache) {
+            return;
+        }
     }
 
     await fadeOutRows(tableBody);
@@ -178,17 +280,17 @@ async function fetchAndRenderOrders() {
         const payload = await response.json();
         const rowsHtml = payload.rows_html || "";
         const visibleItems = Number.parseInt(payload.visible_items, 10) || 0;
+        const previousCache = viewOrdersCache.get(viewName);
+        viewOrdersCache.set(viewName, {
+            rowsHtml,
+            visibleItems,
+            orderDetails: previousCache?.orderDetails || {},
+        });
 
         tableBody.innerHTML = rowsHtml || buildEmptyRow(colspan);
         fadeInRows(tableBody);
         updateVisibleItemsCounter(visibleItems);
-
-        if (typeof handle_orders === "function") {
-            handle_orders();
-        }
-        if (typeof syncFrameHeights === "function") {
-            syncFrameHeights();
-        }
+        setupRenderedRows();
     } catch (error) {
         console.error(error);
         tableBody.innerHTML = buildErrorRow(colspan);
@@ -197,7 +299,7 @@ async function fetchAndRenderOrders() {
 
         const retryButton = document.getElementById("dynamic-orders-retry");
         if (retryButton) {
-            retryButton.addEventListener("click", fetchAndRenderOrders, { once: true });
+            retryButton.addEventListener("click", () => fetchAndRenderOrders(true), { once: true });
         }
     }
 }
@@ -209,6 +311,9 @@ function switchDynamicView(viewName) {
     if (!root || !container) {
         return;
     }
+
+    const previousViewName = root.dataset.currentView;
+    captureOpenRows(previousViewName);
 
     root.dataset.currentView = viewName;
     updateDynamicNavigation(viewName);
