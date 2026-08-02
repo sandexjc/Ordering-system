@@ -1,3 +1,4 @@
+/** Update top counter text to match currently rendered rows. */
 function updateVisibleItemsCounter(visibleItems) {
     const itemsNode = document.getElementById("visible-items-count");
     const suffixNode = document.getElementById("visible-items-suffix");
@@ -10,6 +11,7 @@ function updateVisibleItemsCounter(visibleItems) {
     }
 }
 
+/** Build loading-state row HTML while async request is in progress. */
 function buildLoadingRow(colspan) {
     return `
         <tr>
@@ -23,6 +25,7 @@ function buildLoadingRow(colspan) {
     `;
 }
 
+/** Build error-state row HTML with retry action. */
 function buildErrorRow(colspan) {
     return `
         <tr>
@@ -34,6 +37,7 @@ function buildErrorRow(colspan) {
     `;
 }
 
+/** Build empty-state row HTML when endpoint returns no rows. */
 function buildEmptyRow(colspan) {
     return `
         <tr>
@@ -42,6 +46,7 @@ function buildEmptyRow(colspan) {
     `;
 }
 
+/** Toggle active nav tab based on selected dynamic view. */
 function updateDynamicNavigation(viewName) {
     const navButtons = document.querySelectorAll("[data-dynamic-view]");
     navButtons.forEach((button) => {
@@ -50,6 +55,7 @@ function updateDynamicNavigation(viewName) {
     });
 }
 
+/** Point "new order" button to table/vitrine create URL. */
 function updateNewOrderLink(viewName) {
     const newOrderLink = document.getElementById("dynamic-new-order-link");
     if (!newOrderLink) {
@@ -61,6 +67,7 @@ function updateNewOrderLink(viewName) {
     newOrderLink.href = viewName === "vitrine" ? vitrineUrl : tableUrl;
 }
 
+/** Get pre-rendered shell markup template for selected view. */
 function getShellMarkup(viewName) {
     const template = document.getElementById(`dynamic-${viewName}-shell-template`);
     if (!template) {
@@ -69,6 +76,7 @@ function getShellMarkup(viewName) {
     return template.innerHTML;
 }
 
+/** Ensure a stylesheet is attached once in document head. */
 function ensureStylesheetLink(id, href) {
     if (!href || document.getElementById(id)) {
         return;
@@ -81,6 +89,7 @@ function ensureStylesheetLink(id, href) {
     document.head.appendChild(link);
 }
 
+/** Lazy-load vitrine CSS only when vitrine view is needed. */
 function ensureVitrineStylesIfNeeded(viewName) {
     if (viewName !== "vitrine") {
         return;
@@ -95,6 +104,52 @@ function ensureVitrineStylesIfNeeded(viewName) {
     ensureStylesheetLink("dynamic-vitrine-css-modal", root.dataset.vitrineCssModal);
 }
 
+/** Fade out currently rendered rows before replacing tbody content. */
+async function fadeOutRows(tableBody) {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    if (!rows.length) {
+        return;
+    }
+
+    await Promise.all(
+        rows.map(
+            (row) =>
+                new Promise((resolve) => {
+                    row.style.transition = "opacity 100ms ease-out";
+                    row.style.opacity = "0";
+                    window.setTimeout(resolve, 110);
+                })
+        )
+    );
+}
+
+/** Fade in newly rendered rows with a tiny stagger for smoother reveal. */
+function fadeInRows(tableBody) {
+    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    rows.forEach((row, index) => {
+        row.style.opacity = "0";
+        row.style.transform = "translateY(4px)";
+        row.style.transition = "opacity 180ms ease-in, transform 180ms ease-in";
+        row.style.willChange = "opacity, transform";
+
+        window.setTimeout(() => {
+            row.style.opacity = "1";
+            row.style.transform = "translateY(0)";
+        }, index * 12);
+
+        row.addEventListener(
+            "transitionend",
+            () => {
+                row.style.transition = "";
+                row.style.transform = "";
+                row.style.willChange = "";
+            },
+            { once: true }
+        );
+    });
+}
+
+/** Fetch rows from endpoint and render loading/success/error states. */
 async function fetchAndRenderOrders() {
     const tableBody = document.getElementById("dynamic-orders-body");
     if (!tableBody) {
@@ -107,6 +162,7 @@ async function fetchAndRenderOrders() {
         return;
     }
 
+    await fadeOutRows(tableBody);
     tableBody.innerHTML = buildLoadingRow(colspan);
 
     try {
@@ -124,6 +180,7 @@ async function fetchAndRenderOrders() {
         const visibleItems = Number.parseInt(payload.visible_items, 10) || 0;
 
         tableBody.innerHTML = rowsHtml || buildEmptyRow(colspan);
+        fadeInRows(tableBody);
         updateVisibleItemsCounter(visibleItems);
 
         if (typeof handle_orders === "function") {
@@ -135,6 +192,7 @@ async function fetchAndRenderOrders() {
     } catch (error) {
         console.error(error);
         tableBody.innerHTML = buildErrorRow(colspan);
+        fadeInRows(tableBody);
         updateVisibleItemsCounter(0);
 
         const retryButton = document.getElementById("dynamic-orders-retry");
@@ -144,6 +202,7 @@ async function fetchAndRenderOrders() {
     }
 }
 
+/** Switch between table/vitrine shells and trigger new async load. */
 function switchDynamicView(viewName) {
     const root = document.getElementById("dynamic-orders-root");
     const container = document.getElementById("dynamic-orders-table-container");
@@ -161,6 +220,7 @@ function switchDynamicView(viewName) {
     fetchAndRenderOrders();
 }
 
+/** Initialize dynamic page behavior after DOM is ready. */
 document.addEventListener("DOMContentLoaded", () => {
     const root = document.getElementById("dynamic-orders-root");
     if (!root) {
