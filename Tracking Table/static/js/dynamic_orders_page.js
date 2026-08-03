@@ -15,6 +15,54 @@ function updateVisibleItemsCounter(visibleItems) {
 const viewOrdersCache = window.viewOrdersCache || new Map();
 window.viewOrdersCache = viewOrdersCache;
 
+let infiniteScrollObserver = null;
+let isLoadingMore = false;
+/** Bumped on every view switch / top-level render so stale async work cannot touch the wrong tab. */
+let ordersRenderGeneration = 0;
+
+/** Start a new render generation for the given view. */
+function beginOrdersRender(viewName) {
+    ordersRenderGeneration += 1;
+    return { generation: ordersRenderGeneration, viewName };
+}
+
+/** True when this async render is still the active one for the expected view. */
+function isOrdersRenderCurrent(generation, viewName) {
+    if (generation !== ordersRenderGeneration) {
+        return false;
+    }
+    const root = document.getElementById("dynamic-orders-root");
+    if (!root || root.dataset.currentView !== viewName) {
+        return false;
+    }
+    const tableBody = document.getElementById("dynamic-orders-body");
+    return Boolean(tableBody && tableBody.isConnected && tableBody.dataset.view === viewName);
+}
+
+/** Live tbody for a view, or null if the DOM has moved on. */
+function getLiveOrdersBody(viewName) {
+    const tableBody = document.getElementById("dynamic-orders-body");
+    if (!tableBody || !tableBody.isConnected || tableBody.dataset.view !== viewName) {
+        return null;
+    }
+    return tableBody;
+}
+
+/** Reject cache entries polluted by a cross-view race (wrong app URL in rows). */
+function cacheMatchesView(rowsHtml, viewName) {
+    if (!rowsHtml) {
+        return true;
+    }
+    // Only fail when the other app's row URLs are present.
+    if (viewName === "table" && rowsHtml.includes("/vitrine/view_vitrine/")) {
+        return false;
+    }
+    if (viewName === "vitrine" && rowsHtml.includes("/table/viewOrder/")) {
+        return false;
+    }
+    return true;
+}
+
 /** Build loading-state row HTML while async request is in progress. */
 function buildLoadingRow(colspan) {
     return `
@@ -48,6 +96,29 @@ function buildEmptyRow(colspan) {
             <td colspan="${colspan}" class="text-center text-muted py-4">Няма поръчки за показване.</td>
         </tr>
     `;
+}
+
+/** Footer status: loading more spinner. */
+function buildLoadingMoreStatus() {
+    return `
+        <div class="d-inline-flex align-items-center gap-2 text-muted">
+            <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+            <span>Зареждане...</span>
+        </div>
+    `;
+}
+
+/** Footer status: load-more error with retry. */
+function buildLoadMoreErrorStatus() {
+    return `
+        <div class="text-danger mb-2">Грешка при зареждане на още поръчки.</div>
+        <button type="button" class="btn btn-sm btn-outline-primary" id="dynamic-orders-load-more-retry">Опитай отново</button>
+    `;
+}
+
+/** Footer status: end of list. */
+function buildEndOfListStatus() {
+    return `<div class="text-muted">Това са всички поръчки</div>`;
 }
 
 /** Toggle active nav tab based on selected dynamic view. */
@@ -110,57 +181,113 @@ function ensureVitrineStylesIfNeeded(viewName) {
 
 /** Fade out currently rendered rows before replacing tbody content. */
 async function fadeOutRows(tableBody) {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
+    const rows = resolveFadeTargetRows(tableBody);
     if (!rows.length) {
         return;
     }
 
-    await Promise.all(
-        rows.map(
-            (row) =>
-                new Promise((resolve) => {
-                    row.style.transition = "opacity 100ms ease-out";
-                    row.style.opacity = "0";
-                    window.setTimeout(resolve, 110);
-                })
-        )
-    );
+    rows.forEach((row) => {
+        row.style.transition = "opacity 100ms ease-out";
+        row.style.opacity = "0";
+    });
+
+    await new Promise((resolve) => window.setTimeout(resolve, 110));
 }
 
-/** Fade in newly rendered rows with a tiny stagger for smoother reveal. */
-function fadeInRows(tableBody) {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    rows.forEach((row, index) => {
+/**
+ * Pick rows to animate. Prefer visible order rows so hidden detail rows
+ * are not staggered (keeps the reveal smooth and roughly 2x shorter).
+ */
+function resolveFadeTargetRows(rowsOrBody) {
+    if (Array.isArray(rowsOrBody)) {
+        const visible = rowsOrBody.filter((row) => row.classList.contains("visibleRows"));
+        return visible.length ? visible : rowsOrBody;
+    }
+    const visible = Array.from(rowsOrBody.querySelectorAll("tr.visibleRows"));
+    if (visible.length) {
+        return visible;
+    }
+    return Array.from(rowsOrBody.querySelectorAll("tr"));
+}
+
+/**
+ * Fade in rows with CSS transition-delay (one paint) instead of per-row timers.
+ * Double-rAF ensures the browser commits the initial hidden state before animating.
+ */
+function fadeInRows(rowsOrBody) {
+    const targetRows = resolveFadeTargetRows(rowsOrBody);
+    if (!targetRows.length) {
+        return;
+    }
+
+    targetRows.forEach((row) => {
+        row.style.transition = "none";
         row.style.opacity = "0";
         row.style.transform = "translateY(4px)";
-        row.style.transition = "opacity 180ms ease-in, transform 180ms ease-in";
         row.style.willChange = "opacity, transform";
+    });
 
+    // Force style flush so the "hidden" state is painted before transitions run.
+    void targetRows[0].offsetHeight;
+
+    targetRows.forEach((row, index) => {
+        const delayMs = index * 12;
+        row.style.transition = `opacity 180ms ease-in ${delayMs}ms, transform 180ms ease-in ${delayMs}ms`;
+    });
+
+    window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+            targetRows.forEach((row) => {
+                row.style.opacity = "1";
+                row.style.transform = "translateY(0)";
+            });
+        });
+    });
+
+    targetRows.forEach((row, index) => {
+        const cleanupDelay = index * 12 + 200;
         window.setTimeout(() => {
-            row.style.opacity = "1";
-            row.style.transform = "translateY(0)";
-        }, index * 12);
-
-        row.addEventListener(
-            "transitionend",
-            () => {
-                row.style.transition = "";
-                row.style.transform = "";
-                row.style.willChange = "";
-            },
-            { once: true }
-        );
+            row.style.transition = "";
+            row.style.transform = "";
+            row.style.willChange = "";
+        }, cleanupDelay);
     });
 }
 
-/** Run post-render setup hooks for row interactions and vitrine layout. */
-function setupRenderedRows() {
+/** Bind row click handlers immediately (keep this before animation). */
+function bindOrderRowHandlers() {
     if (typeof handle_orders === "function") {
         handle_orders();
+    }
+}
+
+/** Heavier post-render work that can wait until the fade has started. */
+function finalizeRenderedRows(viewName, generation) {
+    if (!isOrdersRenderCurrent(generation, viewName)) {
+        return;
     }
     if (typeof syncFrameHeights === "function") {
         syncFrameHeights();
     }
+    restoreCachedOrderDetails(viewName);
+    restoreOpenRows(viewName);
+}
+
+/** Run light setup now; defer layout/details so fade-in stays smooth. */
+function setupRenderedRows(viewName, generation, { deferHeavyWork = false } = {}) {
+    if (!isOrdersRenderCurrent(generation, viewName)) {
+        return;
+    }
+    bindOrderRowHandlers();
+
+    if (!deferHeavyWork) {
+        finalizeRenderedRows(viewName, generation);
+        return;
+    }
+
+    window.requestAnimationFrame(() => {
+        window.setTimeout(() => finalizeRenderedRows(viewName, generation), 0);
+    });
 }
 
 /** Rehydrate cached hidden-row order details and prevent re-fetching them. */
@@ -206,6 +333,30 @@ function captureOpenRows(viewName) {
     viewOrdersCache.set(viewName, cacheEntry);
 }
 
+/** Save window scroll position for the active view. */
+function captureScrollPosition(viewName) {
+    if (!viewName) {
+        return;
+    }
+    const cacheEntry = viewOrdersCache.get(viewName);
+    if (!cacheEntry) {
+        return;
+    }
+    cacheEntry.scrollY = window.scrollY;
+    viewOrdersCache.set(viewName, cacheEntry);
+}
+
+/** Restore previously saved scroll position for a view. */
+function restoreScrollPosition(viewName) {
+    const cacheEntry = viewOrdersCache.get(viewName);
+    if (!cacheEntry || typeof cacheEntry.scrollY !== "number") {
+        return;
+    }
+    window.requestAnimationFrame(() => {
+        window.scrollTo(0, cacheEntry.scrollY);
+    });
+}
+
 /** Re-open previously expanded rows from cache without refetching details. */
 function restoreOpenRows(viewName) {
     const cacheEntry = viewOrdersCache.get(viewName);
@@ -226,49 +377,272 @@ function restoreOpenRows(viewName) {
     });
 }
 
+/** Update or clear the footer status area under the table. */
+function setFooterStatus(html) {
+    const statusNode = document.getElementById("dynamic-orders-status");
+    if (!statusNode) {
+        return;
+    }
+    statusNode.innerHTML = html || "";
+}
+
+/** Persist current tbody + pagination state into the per-view cache. */
+function updateViewCache(viewName, patch) {
+    const previous = viewOrdersCache.get(viewName) || {
+        rowsHtml: "",
+        visibleItems: 0,
+        orderDetails: {},
+        openRowIds: [],
+        nextCursor: null,
+        hasMore: false,
+        scrollY: 0,
+    };
+    viewOrdersCache.set(viewName, { ...previous, ...patch });
+}
+
+/** Disconnect previous infinite-scroll observer. */
+function teardownInfiniteScroll() {
+    if (infiniteScrollObserver) {
+        infiniteScrollObserver.disconnect();
+        infiniteScrollObserver = null;
+    }
+}
+
+/** Observe the sentinel and load the next page when it enters the viewport. */
+function setupInfiniteScroll(viewName, generation) {
+    teardownInfiniteScroll();
+
+    if (!isOrdersRenderCurrent(generation, viewName)) {
+        return;
+    }
+
+    const cacheEntry = viewOrdersCache.get(viewName);
+    const sentinel = document.getElementById("dynamic-orders-sentinel");
+    if (!sentinel || !cacheEntry || !cacheEntry.hasMore) {
+        if (cacheEntry && cacheEntry.visibleItems > 0 && !cacheEntry.hasMore) {
+            setFooterStatus(buildEndOfListStatus());
+        }
+        return;
+    }
+
+    setFooterStatus("");
+    infiniteScrollObserver = new IntersectionObserver(
+        (entries) => {
+            const entry = entries[0];
+            if (!entry || !entry.isIntersecting || isLoadingMore) {
+                return;
+            }
+            if (!isOrdersRenderCurrent(generation, viewName)) {
+                teardownInfiniteScroll();
+                return;
+            }
+            loadMoreOrders(viewName, generation);
+        },
+        {
+            root: null,
+            rootMargin: "200px 0px",
+            threshold: 0,
+        }
+    );
+    infiniteScrollObserver.observe(sentinel);
+}
+
+/** Build paginated endpoint URL with optional cursor. */
+function buildOrdersUrl(endpoint, cursor) {
+    const url = new URL(endpoint, window.location.origin);
+    url.searchParams.set("limit", "50");
+    if (cursor) {
+        url.searchParams.set("cursor", cursor);
+    }
+    return url.toString();
+}
+
+/** Append the next page of rows for infinite scroll. */
+async function loadMoreOrders(viewName, generation) {
+    if (!isOrdersRenderCurrent(generation, viewName) || isLoadingMore) {
+        return;
+    }
+
+    const tableBody = getLiveOrdersBody(viewName);
+    if (!tableBody) {
+        return;
+    }
+
+    const cacheEntry = viewOrdersCache.get(viewName);
+    if (!cacheEntry || !cacheEntry.hasMore || !cacheEntry.nextCursor) {
+        setFooterStatus(cacheEntry && cacheEntry.visibleItems > 0 ? buildEndOfListStatus() : "");
+        teardownInfiniteScroll();
+        return;
+    }
+
+    const endpoint = tableBody.dataset.endpoint;
+    if (!endpoint || tableBody.dataset.view !== viewName) {
+        return;
+    }
+
+    isLoadingMore = true;
+    setFooterStatus(buildLoadingMoreStatus());
+
+    try {
+        const response = await fetch(buildOrdersUrl(endpoint, cacheEntry.nextCursor), {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status} ${response.statusText}`);
+        }
+
+        const payload = await response.json();
+        if (!isOrdersRenderCurrent(generation, viewName)) {
+            return;
+        }
+
+        const liveBody = getLiveOrdersBody(viewName);
+        if (!liveBody) {
+            return;
+        }
+
+        const rowsHtml = payload.rows_html || "";
+        const pageCount = Number.parseInt(payload.visible_items, 10) || 0;
+        const hasMore = Boolean(payload.has_more);
+        const nextCursor = payload.next_cursor || null;
+
+        if (!rowsHtml) {
+            updateViewCache(viewName, { hasMore: false, nextCursor: null });
+            setFooterStatus(buildEndOfListStatus());
+            teardownInfiniteScroll();
+            return;
+        }
+
+        const template = document.createElement("tbody");
+        template.innerHTML = rowsHtml;
+        const newRows = Array.from(template.children);
+        newRows.forEach((row) => liveBody.appendChild(row));
+
+        const visibleItems = (cacheEntry.visibleItems || 0) + pageCount;
+        updateViewCache(viewName, {
+            rowsHtml: liveBody.innerHTML,
+            visibleItems,
+            hasMore,
+            nextCursor,
+        });
+        updateVisibleItemsCounter(visibleItems);
+        setupRenderedRows(viewName, generation, { deferHeavyWork: true });
+        fadeInRows(newRows);
+
+        if (hasMore) {
+            setFooterStatus("");
+        } else {
+            setFooterStatus(buildEndOfListStatus());
+            teardownInfiniteScroll();
+        }
+    } catch (error) {
+        if (!isOrdersRenderCurrent(generation, viewName)) {
+            return;
+        }
+        console.error(error);
+        setFooterStatus(buildLoadMoreErrorStatus());
+        const retryButton = document.getElementById("dynamic-orders-load-more-retry");
+        if (retryButton) {
+            retryButton.addEventListener(
+                "click",
+                () => {
+                    setFooterStatus("");
+                    loadMoreOrders(viewName, generation);
+                },
+                { once: true }
+            );
+        }
+    } finally {
+        if (generation === ordersRenderGeneration) {
+            isLoadingMore = false;
+        }
+    }
+}
+
 /** Render cached rows immediately for already-loaded view content. */
-async function renderCachedRowsIfAvailable(tableBody, viewName, colspan) {
+async function renderCachedRowsIfAvailable(tableBody, viewName, colspan, generation) {
     const cached = viewOrdersCache.get(viewName);
-    if (!cached) {
+    if (!cached || !cached.rowsHtml) {
+        return false;
+    }
+
+    // Drop cache polluted by an earlier cross-view race and refetch.
+    if (!cacheMatchesView(cached.rowsHtml, viewName)) {
+        viewOrdersCache.delete(viewName);
         return false;
     }
 
     await fadeOutRows(tableBody);
-    tableBody.innerHTML = cached.rowsHtml || buildEmptyRow(colspan);
-    fadeInRows(tableBody);
-    updateVisibleItemsCounter(cached.visibleItems);
-    setupRenderedRows();
-    restoreCachedOrderDetails(viewName);
-    restoreOpenRows(viewName);
+    if (!isOrdersRenderCurrent(generation, viewName)) {
+        return true;
+    }
+
+    const liveBody = getLiveOrdersBody(viewName);
+    if (!liveBody) {
+        return true;
+    }
+
+    liveBody.innerHTML = cached.rowsHtml;
+    updateVisibleItemsCounter(cached.visibleItems || 0);
+    setupRenderedRows(viewName, generation, { deferHeavyWork: true });
+    fadeInRows(liveBody);
+    setupInfiniteScroll(viewName, generation);
+    restoreScrollPosition(viewName);
     return true;
 }
 
-/** Fetch rows from endpoint and render loading/success/error states. */
-async function fetchAndRenderOrders(forceRefresh = false) {
+/** Fetch first page from endpoint and render loading/success/error states. */
+async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, generation = null } = {}) {
     const tableBody = document.getElementById("dynamic-orders-body");
     if (!tableBody) {
         return;
     }
 
+    const resolvedView = viewName || tableBody.dataset.view || "table";
     const endpoint = tableBody.dataset.endpoint;
     const colspan = Number.parseInt(tableBody.dataset.colspan || "10", 10);
-    const viewName = tableBody.dataset.view || "table";
-    if (!endpoint) {
+    if (!endpoint || tableBody.dataset.view !== resolvedView) {
         return;
     }
 
+    const renderGeneration =
+        generation == null ? beginOrdersRender(resolvedView).generation : generation;
+
+    teardownInfiniteScroll();
+    isLoadingMore = false;
+
     if (!forceRefresh) {
-        const renderedFromCache = await renderCachedRowsIfAvailable(tableBody, viewName, colspan);
+        const renderedFromCache = await renderCachedRowsIfAvailable(
+            tableBody,
+            resolvedView,
+            colspan,
+            renderGeneration
+        );
         if (renderedFromCache) {
             return;
         }
     }
 
+    if (!isOrdersRenderCurrent(renderGeneration, resolvedView)) {
+        return;
+    }
+
     await fadeOutRows(tableBody);
-    tableBody.innerHTML = buildLoadingRow(colspan);
+    if (!isOrdersRenderCurrent(renderGeneration, resolvedView)) {
+        return;
+    }
+
+    const loadingBody = getLiveOrdersBody(resolvedView);
+    if (!loadingBody) {
+        return;
+    }
+    loadingBody.innerHTML = buildLoadingRow(colspan);
+    setFooterStatus("");
 
     try {
-        const response = await fetch(endpoint, {
+        const response = await fetch(buildOrdersUrl(endpoint), {
             headers: {
                 "X-Requested-With": "XMLHttpRequest",
             },
@@ -280,26 +654,62 @@ async function fetchAndRenderOrders(forceRefresh = false) {
         const payload = await response.json();
         const rowsHtml = payload.rows_html || "";
         const visibleItems = Number.parseInt(payload.visible_items, 10) || 0;
-        const previousCache = viewOrdersCache.get(viewName);
-        viewOrdersCache.set(viewName, {
+        const hasMore = Boolean(payload.has_more);
+        const nextCursor = payload.next_cursor || null;
+        const previousCache = viewOrdersCache.get(resolvedView);
+
+        // Always keep the payload for this view, even if the user already switched away.
+        // That way switching back can use cache instead of depending on a DOM write.
+        updateViewCache(resolvedView, {
             rowsHtml,
             visibleItems,
+            hasMore,
+            nextCursor,
             orderDetails: previousCache?.orderDetails || {},
+            openRowIds: [],
+            scrollY: 0,
         });
 
-        tableBody.innerHTML = rowsHtml || buildEmptyRow(colspan);
-        fadeInRows(tableBody);
+        if (!isOrdersRenderCurrent(renderGeneration, resolvedView)) {
+            return;
+        }
+
+        const liveBody = getLiveOrdersBody(resolvedView);
+        if (!liveBody) {
+            return;
+        }
+
+        liveBody.innerHTML = rowsHtml || buildEmptyRow(colspan);
         updateVisibleItemsCounter(visibleItems);
-        setupRenderedRows();
+        setupRenderedRows(resolvedView, renderGeneration, { deferHeavyWork: true });
+        fadeInRows(liveBody);
+
+        if (rowsHtml) {
+            setupInfiniteScroll(resolvedView, renderGeneration);
+        } else {
+            setFooterStatus("");
+        }
     } catch (error) {
+        if (!isOrdersRenderCurrent(renderGeneration, resolvedView)) {
+            return;
+        }
         console.error(error);
-        tableBody.innerHTML = buildErrorRow(colspan);
-        fadeInRows(tableBody);
+        const liveBody = getLiveOrdersBody(resolvedView);
+        if (!liveBody) {
+            return;
+        }
+        liveBody.innerHTML = buildErrorRow(colspan);
+        fadeInRows(liveBody);
         updateVisibleItemsCounter(0);
+        setFooterStatus("");
 
         const retryButton = document.getElementById("dynamic-orders-retry");
         if (retryButton) {
-            retryButton.addEventListener("click", () => fetchAndRenderOrders(true), { once: true });
+            retryButton.addEventListener(
+                "click",
+                () => fetchAndRenderOrders({ forceRefresh: true, viewName: resolvedView }),
+                { once: true }
+            );
         }
     }
 }
@@ -314,7 +724,10 @@ function switchDynamicView(viewName) {
 
     const previousViewName = root.dataset.currentView;
     captureOpenRows(previousViewName);
+    captureScrollPosition(previousViewName);
+    teardownInfiniteScroll();
 
+    const { generation } = beginOrdersRender(viewName);
     root.dataset.currentView = viewName;
     updateDynamicNavigation(viewName);
     updateNewOrderLink(viewName);
@@ -322,7 +735,7 @@ function switchDynamicView(viewName) {
     ensureVitrineStylesIfNeeded(viewName);
 
     container.innerHTML = getShellMarkup(viewName);
-    fetchAndRenderOrders();
+    fetchAndRenderOrders({ viewName, generation });
 }
 
 /** Initialize dynamic page behavior after DOM is ready. */
@@ -333,7 +746,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     ensureVitrineStylesIfNeeded(root.dataset.currentView);
-    fetchAndRenderOrders();
+    fetchAndRenderOrders({ viewName: root.dataset.currentView || "table" });
 
     const navButtons = document.querySelectorAll("[data-dynamic-view]");
     navButtons.forEach((button) => {
