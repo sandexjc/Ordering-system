@@ -61,3 +61,15 @@ Common options:
 - `--dry-run` to preview without DB writes
 - `--frame-id` / `--vitrine-id` to target specific records
 - `--batch-size` to control processing chunk size
+
+## Demo data commands (beta / local only)
+
+For local testing only (requires `pip install faker` for seeding):
+
+- `python manage.py seed_orders --app table|vitrine [--count 100]`
+- `python manage.py delete_orders --app table|vitrine (--all | --count N) [--dry-run]`
+
+`seed_orders` creates demo orders with related items (`table`: plates/edges/payments; `vitrine`: frames/holes).  
+`delete_orders` permanently removes orders for the selected app (`--all` or newest `--count N`), including related rows, and resets SQLite ID sequences when none remain.
+
+Both commands require `DJANGO_DEBUG=True` and will refuse to run in production when debug is disabled. Keep `Faker` out of production requirements.

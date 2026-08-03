@@ -159,6 +159,81 @@ In `enable-all` mode:
 
 So `updated` can be `0` while `recalculated` is still greater than `0`.
 
+## Demo Data Commands (beta / local only)
+
+The `common` app provides two management commands for local/demo databases. They are **not intended for production**.
+
+### Seed orders
+
+```bash
+python manage.py seed_orders --app <table|vitrine> [--count N] [--locale LOCALE]
+```
+
+- `--app` (required): `table` or `vitrine`.
+- `--count`: number of orders to create (default: `100`).
+- `--locale`: Faker locale (default: `bg_BG`).
+
+What gets created:
+
+- `table`: orders plus plates, edges, and payments.
+- `vitrine`: orders plus frames and holes.
+- `created_date` values are strictly ascending so they align with sequential order IDs.
+- `order_type` is randomly `order` or `offer`, so list pages filtered by type may show fewer than `--count` rows.
+
+Examples:
+
+```bash
+python manage.py seed_orders --app table --count 100
+python manage.py seed_orders --app vitrine --count 50
+```
+
+### Delete orders
+
+```bash
+python manage.py delete_orders --app <table|vitrine> (--all | --count N) [--dry-run]
+```
+
+- `--app` (required): `table` or `vitrine`.
+- `--all`: delete all orders for the selected app.
+- `--count N`: delete the `N` newest orders (highest IDs first).
+- `--dry-run`: preview how many orders would be deleted, without writing.
+
+Use either `--all` or `--count`, not both.
+
+Deletes are permanent (`hard_delete`), including related items for the targeted orders. Soft-deleted rows are included. On SQLite, autoincrement sequences are reset only when no orders remain for that app.
+
+Examples:
+
+```bash
+python manage.py delete_orders --app table --all --dry-run
+python manage.py delete_orders --app table --all
+python manage.py delete_orders --app table --count 20
+python manage.py delete_orders --app vitrine --all
+```
+
+Typical local reset:
+
+```bash
+python manage.py delete_orders --app table --all
+python manage.py delete_orders --app vitrine --all
+python manage.py seed_orders --app table --count 100
+python manage.py seed_orders --app vitrine --count 100
+```
+
+### Keeping these safe on production branches
+
+These commands stay tracked in git (including prod checkouts from master).  
+They refuse to run unless `DJANGO_DEBUG=True` (`settings.DEBUG`).
+
+On production, keep `DJANGO_DEBUG=False` so:
+
+```bash
+python manage.py seed_orders --app table
+python manage.py delete_orders --app table --all
+```
+
+both exit with an error and do not touch the database.
+
 ## Vitrine Seal Feature Flags
 
 The vitrine seal flow is controlled by two feature flags:
