@@ -23,8 +23,7 @@ function _cancelPendingTransitionAndLockHeight(hiddenRow) {
    Event listeners per row (optimized)
    ----------------------------- */
 
-// Track bound rows in memory only. Do not use a data-* attribute: it gets
-// serialized into cached innerHTML and then blocks rebinding after tab switch.
+/** Track bound rows in memory only. A data-* flag would serialize into cached HTML and block rebinding. */
 const boundOrderRows = window.__boundOrderRows || new WeakSet();
 window.__boundOrderRows = boundOrderRows;
 
@@ -35,15 +34,17 @@ function handle_orders() {
     const row_id = visibleRow.id;
     const hiddenRow = document.getElementById("hidden-row-" + row_id);
 
-    // safety check
+    /** Safety check. */
     if (!hiddenRow) return;
 
-    // Avoid duplicate listeners when new rows are appended (infinite scroll).
+    /** Avoid duplicate listeners when new rows are appended (infinite scroll). */
     if (boundOrderRows.has(visibleRow)) return;
     boundOrderRows.add(visibleRow);
 
-    // initialize state (important for correctness)
-    hiddenRow._isOpen = false;
+    /** Initialize open state from DOM so restored expanded rows fold on first click. */
+    hiddenRow._isOpen = hiddenRow.classList.contains("is-open")
+      || hiddenRow.classList.contains("orderClicked")
+      || hiddenRow.style.display === "block";
     hiddenRow._isClosing = false;
     hiddenRow._isAnimating = false;
     hiddenRow._pendingTransitionHandler = null;

@@ -53,7 +53,7 @@ function cacheMatchesView(rowsHtml, viewName) {
     if (!rowsHtml) {
         return true;
     }
-    // Only fail when the other app's row URLs are present.
+    /** Only fail when the other app's row URLs are present. */
     if (viewName === "table" && rowsHtml.includes("/vitrine/view_vitrine/")) {
         return false;
     }
@@ -194,10 +194,7 @@ async function fadeOutRows(tableBody) {
     await new Promise((resolve) => window.setTimeout(resolve, 110));
 }
 
-/**
- * Pick rows to animate. Prefer visible order rows so hidden detail rows
- * are not staggered (keeps the reveal smooth and roughly 2x shorter).
- */
+/** Pick rows to animate. Prefer visible order rows so hidden detail rows are not staggered. */
 function resolveFadeTargetRows(rowsOrBody) {
     if (Array.isArray(rowsOrBody)) {
         const visible = rowsOrBody.filter((row) => row.classList.contains("visibleRows"));
@@ -210,10 +207,7 @@ function resolveFadeTargetRows(rowsOrBody) {
     return Array.from(rowsOrBody.querySelectorAll("tr"));
 }
 
-/**
- * Fade in rows with CSS transition-delay (one paint) instead of per-row timers.
- * Double-rAF ensures the browser commits the initial hidden state before animating.
- */
+/** Fade in rows with CSS transition-delay in one paint instead of per-row timers. */
 function fadeInRows(rowsOrBody) {
     const targetRows = resolveFadeTargetRows(rowsOrBody);
     if (!targetRows.length) {
@@ -227,7 +221,7 @@ function fadeInRows(rowsOrBody) {
         row.style.willChange = "opacity, transform";
     });
 
-    // Force style flush so the "hidden" state is painted before transitions run.
+    /** Force style flush so the hidden state is painted before transitions run. */
     void targetRows[0].offsetHeight;
 
     targetRows.forEach((row, index) => {
@@ -270,7 +264,13 @@ function finalizeRenderedRows(viewName, generation) {
         syncFrameHeights();
     }
     restoreCachedOrderDetails(viewName);
-    restoreOpenRows(viewName);
+    /** Re-open after details are in the DOM so expand height is measured correctly. */
+    window.requestAnimationFrame(() => {
+        if (!isOrdersRenderCurrent(generation, viewName)) {
+            return;
+        }
+        restoreOpenRows(viewName);
+    });
 }
 
 /** Run light setup now; defer layout/details so fade-in stays smooth. */
@@ -315,6 +315,58 @@ function restoreCachedOrderDetails(viewName) {
     }
 }
 
+/** True when a hidden row looks expanded in the DOM. */
+function isHiddenRowVisuallyOpen(hiddenRow) {
+    if (!hiddenRow) {
+        return false;
+    }
+    if (hiddenRow.classList.contains("is-open") || hiddenRow.classList.contains("orderClicked")) {
+        return true;
+    }
+    return hiddenRow.style.display === "block";
+}
+
+/** Sync JS open flag with restored DOM so the next click folds instead of re-opening. */
+function syncHiddenRowOpenState(hiddenRow, visibleRow, isOpen) {
+    if (!hiddenRow) {
+        return;
+    }
+    hiddenRow._isOpen = Boolean(isOpen);
+    hiddenRow._isClosing = false;
+    hiddenRow._isAnimating = false;
+    if (isOpen) {
+        hiddenRow.classList.add("is-open", "orderClicked");
+        hiddenRow.classList.remove("is-closing");
+        hiddenRow.style.display = "block";
+        if (!hiddenRow.style.height || hiddenRow.style.height === "0px") {
+            hiddenRow.style.height = "auto";
+        }
+        if (visibleRow) {
+            visibleRow.classList.add("rowSelected");
+        }
+        return;
+    }
+    hiddenRow.classList.remove("is-open", "orderClicked", "is-closing");
+    hiddenRow.style.display = "none";
+    hiddenRow.style.height = "0px";
+    if (visibleRow) {
+        visibleRow.classList.remove("rowSelected");
+    }
+}
+
+/** Collapse any open markup baked into cached HTML before rehydrating open rows. */
+function resetCachedRowsOpenMarkup(tableBody) {
+    if (!tableBody) {
+        return;
+    }
+    tableBody.querySelectorAll(".hiddenRows").forEach((hiddenRow) => {
+        syncHiddenRowOpenState(hiddenRow, null, false);
+    });
+    tableBody.querySelectorAll(".visibleRows.rowSelected").forEach((visibleRow) => {
+        visibleRow.classList.remove("rowSelected");
+    });
+}
+
 /** Capture currently expanded row ids for a specific view before switching away. */
 function captureOpenRows(viewName) {
     if (!viewName) {
@@ -325,7 +377,14 @@ function captureOpenRows(viewName) {
         return;
     }
 
-    const openRowIds = Array.from(document.querySelectorAll(".hiddenRows.is-open"))
+    /** Prefer is-open/orderClicked/_isOpen/display:block; is-open is only set on transitionend. */
+    const openRowIds = Array.from(document.querySelectorAll(".hiddenRows"))
+        .filter((hiddenRow) => {
+            if (hiddenRow._isOpen || isHiddenRowVisuallyOpen(hiddenRow)) {
+                return true;
+            }
+            return false;
+        })
         .map((hiddenRow) => hiddenRow.id.replace("hidden-row-", ""))
         .filter(Boolean);
 
@@ -370,10 +429,20 @@ function restoreOpenRows(viewName) {
         if (!visibleRow || !hiddenRow) {
             return;
         }
-        if (hiddenRow.classList.contains("is-open")) {
+        if (hiddenRow._isOpen) {
             return;
         }
-        visibleRow.click();
+        /** Cached HTML may already look open; sync flag so the next click folds. */
+        if (isHiddenRowVisuallyOpen(hiddenRow)) {
+            syncHiddenRowOpenState(hiddenRow, visibleRow, true);
+            return;
+        }
+        /** Call open directly: more reliable than synthetic click after rebind. */
+        if (typeof openHiddenRow === "function") {
+            openHiddenRow(hiddenRow, rowId, visibleRow);
+        } else {
+            visibleRow.click();
+        }
     });
 }
 
@@ -568,7 +637,7 @@ async function renderCachedRowsIfAvailable(tableBody, viewName, colspan, generat
         return false;
     }
 
-    // Drop cache polluted by an earlier cross-view race and refetch.
+    /** Drop cache polluted by an earlier cross-view race and refetch. */
     if (!cacheMatchesView(cached.rowsHtml, viewName)) {
         viewOrdersCache.delete(viewName);
         return false;
@@ -585,6 +654,8 @@ async function renderCachedRowsIfAvailable(tableBody, viewName, colspan, generat
     }
 
     liveBody.innerHTML = cached.rowsHtml;
+    /** Strip any open markup baked into cached HTML, then re-open via openRowIds. */
+    resetCachedRowsOpenMarkup(liveBody);
     updateVisibleItemsCounter(cached.visibleItems || 0);
     setupRenderedRows(viewName, generation, { deferHeavyWork: true });
     fadeInRows(liveBody);
@@ -658,16 +729,13 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
         const nextCursor = payload.next_cursor || null;
         const previousCache = viewOrdersCache.get(resolvedView);
 
-        // Always keep the payload for this view, even if the user already switched away.
-        // That way switching back can use cache instead of depending on a DOM write.
+        /** Keep payload for this view even after switch; do not wipe openRowIds/scrollY. */
         updateViewCache(resolvedView, {
             rowsHtml,
             visibleItems,
             hasMore,
             nextCursor,
             orderDetails: previousCache?.orderDetails || {},
-            openRowIds: [],
-            scrollY: 0,
         });
 
         if (!isOrdersRenderCurrent(renderGeneration, resolvedView)) {
