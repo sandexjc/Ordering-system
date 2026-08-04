@@ -1,9 +1,11 @@
 import base64
+from datetime import datetime, time
 
 from django.db.models import Q
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-from django.utils.dateparse import parse_datetime
+from django.utils import timezone
+from django.utils.dateparse import parse_date, parse_datetime
 
 from common.mixins import DynamicFeatureFlagRequiredMixin
 from common.views import MainView
@@ -35,6 +37,8 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
     page_size = 50
     rows_template_name = None
     rows_context_name = "orders"
+    allowed_sorts = ("asc", "desc")
+    allowed_order_types = ("order", "offer")
 
     def get_requested_view(self):
         requested_view = (
@@ -66,6 +70,44 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
             return max(1, min(int(raw_limit), 100))
         return self.page_size
 
+    def get_sort(self):
+        sort = (self.request.GET.get("sort") or "desc").lower()
+        if sort in self.allowed_sorts:
+            return sort
+        return "desc"
+
+    def get_order_types(self):
+        if "order_type" in self.request.GET:
+            return [
+                value
+                for value in self.request.GET.getlist("order_type")
+                if value in self.allowed_order_types
+            ]
+        return [self.order_type]
+
+    def get_date_bounds(self):
+        start = parse_date(self.request.GET.get("start") or "")
+        end = parse_date(self.request.GET.get("end") or "")
+        start_dt = None
+        end_dt = None
+        if start is not None:
+            start_dt = timezone.make_aware(datetime.combine(start, time.min))
+        if end is not None:
+            end_dt = timezone.make_aware(datetime.combine(end, time.max))
+        return start_dt, end_dt
+
+    def get_filtered_queryset(self):
+        queryset = self.model.objects.for_list()
+        queryset = queryset.of_types(*self.get_order_types())
+
+        start_dt, end_dt = self.get_date_bounds()
+        if start_dt is not None or end_dt is not None:
+            queryset = queryset.created_between(start_dt, end_dt)
+
+        if self.get_sort() == "asc":
+            return queryset.first_created()
+        return queryset.last_created()
+
     def encode_cursor(self, order):
         raw = f"{order.created_date.isoformat()}|{order.pk}"
         return base64.urlsafe_b64encode(raw.encode("utf-8")).decode("ascii")
@@ -77,22 +119,34 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
             created_date = parse_datetime(date_str)
             if created_date is None:
                 return None
+            if timezone.is_naive(created_date):
+                created_date = timezone.make_aware(created_date)
             return created_date, int(pk_str)
         except Exception:
             return None
 
+    def apply_cursor(self, queryset, cursor, sort):
+        if not cursor:
+            return queryset
+
+        decoded = self.decode_cursor(cursor)
+        if decoded is None:
+            return queryset
+
+        created_date, pk = decoded
+        if sort == "asc":
+            return queryset.filter(
+                Q(created_date__gt=created_date)
+                | Q(created_date=created_date, pk__gt=pk)
+            )
+        return queryset.filter(
+            Q(created_date__lt=created_date)
+            | Q(created_date=created_date, pk__lt=pk)
+        )
+
     def get_paginated_queryset(self, limit, cursor=None):
-        queryset = self.model.objects.all_by_order_type(self.order_type)
-
-        if cursor:
-            decoded = self.decode_cursor(cursor)
-            if decoded is not None:
-                created_date, pk = decoded
-                queryset = queryset.filter(
-                    Q(created_date__lt=created_date)
-                    | Q(created_date=created_date, pk__lt=pk)
-                )
-
+        sort = self.get_sort()
+        queryset = self.apply_cursor(self.get_filtered_queryset(), cursor, sort)
         # Fetch one extra row to detect whether more pages exist.
         return list(queryset[: limit + 1])
 

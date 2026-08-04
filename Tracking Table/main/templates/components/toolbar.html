@@ -16,6 +16,21 @@
                     >
                         <img src="{% static 'images/add.png' %}" class="tableIcons">
                     </a>
+                    <!-- Filter button -->
+                    <button
+                        class="btn btn-outline-primary position-relative"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseExample"
+                        aria-expanded="false"
+                        aria-controls="collapseExample"
+                    >
+                        <img src="{% static 'images/filter.png' %}" class="tableIcons">
+                        <span
+                            id="dynamic-filter-badge"
+                            class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle d-none"
+                        ></span>
+                    </button>
                 {% elif nav_select == "vitrine" %}
                     <a class="btn btn-outline-primary" href="{% url 'vitrine:new_vitrine' %}">
                         <img src="{% static 'images/add.png' %}" class="tableIcons">
@@ -53,10 +68,12 @@
         {% endif %}
     </div>
 
-    {% if not dynamic_mode %}
+    {% if dynamic_mode %}
+        {% include "components/dynamic_filter_form.html" %}
+    {% else %}
         <!-- Filter Form -->
         {% include "components/filter_form.html" %}
-        
+
         <!-- Search Form -->
         {% include "modals/search_form.html" %}
     {% endif %}

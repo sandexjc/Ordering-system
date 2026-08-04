@@ -28,6 +28,10 @@ class VitrineOrderManager(BaseOrderManager):
             .with_items(*related_items)
         )
 
+    # Active orders with related items (no type/sort forced — for dynamic filters)
+    def for_list(self, *related_items):
+        return self.__get_queryset().with_items(*related_items)
+
     # Return all orders by type
     def all_by_order_type(self, order_type: str, *related_items):
         return self.__common_filter(order_type, *related_items)

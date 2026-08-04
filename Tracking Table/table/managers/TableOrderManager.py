@@ -27,6 +27,10 @@ class TableOrderManager(BaseOrderManager):
             .last_created()
             .with_items(*related_items)
         )
+
+    # Active orders with related items (no type/sort forced — for dynamic filters)
+    def for_list(self, *related_items):
+        return self.__get_queryset().with_items(*related_items)
     
     
     #####################################################

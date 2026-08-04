@@ -28,19 +28,33 @@ class BaseOrderQuerySet(BaseQuerySet):
     # Client name based orers filtering
     def owner_contains(self, name):
         return self.filter(owner__icontains=name)
+
+    # Filter by one or more order types (order/offer). Empty → no rows.
+    def of_types(self, *order_types):
+        types = [value for value in order_types if value]
+        if not types:
+            return self.none()
+        if len(types) == 1:
+            return self.filter(order_type=types[0])
+        return self.filter(order_type__in=types)
     
     # Last created orders sorting
     def last_created(self):
-        return self.order_by("-created_date")
+        return self.order_by("-created_date", "-pk")
     
     # First created orders sorting
     def first_created(self):
-        return self.order_by("created_date")
+        return self.order_by("created_date", "pk")
     
     # Time based orders filtering 
     def most_recent(self, days):
-        return self.filter(created_at__gte=timezone.now() - timezone.timedelta(days=days))
+        return self.filter(created_date__gte=timezone.now() - timezone.timedelta(days=days))
 
-    # Period based orders filtering (start-end date)
-    def created_between(self, start_date, end_date):
-        return self.filter(created_date__range=(start_date, end_date))
+    # Period based orders filtering (start and/or end date)
+    def created_between(self, start_date=None, end_date=None):
+        queryset = self
+        if start_date is not None:
+            queryset = queryset.filter(created_date__gte=start_date)
+        if end_date is not None:
+            queryset = queryset.filter(created_date__lte=end_date)
+        return queryset

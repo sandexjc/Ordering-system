@@ -20,6 +20,247 @@ let isLoadingMore = false;
 /** Bumped on every view switch / top-level render so stale async work cannot touch the wrong tab. */
 let ordersRenderGeneration = 0;
 
+/** Default list filters (matches previous dynamic behavior: newest first, orders only). */
+const DEFAULT_ORDER_FILTERS = Object.freeze({
+    sort: "desc",
+    start: null,
+    end: null,
+    includeOrder: true,
+    includeOffer: false,
+});
+
+/** Clone default or stored filters for a view. */
+function getDefaultOrderFilters() {
+    return {
+        sort: DEFAULT_ORDER_FILTERS.sort,
+        start: DEFAULT_ORDER_FILTERS.start,
+        end: DEFAULT_ORDER_FILTERS.end,
+        includeOrder: DEFAULT_ORDER_FILTERS.includeOrder,
+        includeOffer: DEFAULT_ORDER_FILTERS.includeOffer,
+    };
+}
+
+/** Active filters for a view (falls back to defaults). */
+function getFiltersForView(viewName) {
+    const cacheEntry = viewOrdersCache.get(viewName);
+    if (cacheEntry && cacheEntry.filters) {
+        return { ...cacheEntry.filters };
+    }
+    return getDefaultOrderFilters();
+}
+
+/** True when filters differ from defaults (drives the toolbar badge). */
+function filtersAreActive(filters) {
+    return (
+        filters.sort !== DEFAULT_ORDER_FILTERS.sort
+        || Boolean(filters.start)
+        || Boolean(filters.end)
+        || filters.includeOrder !== DEFAULT_ORDER_FILTERS.includeOrder
+        || filters.includeOffer !== DEFAULT_ORDER_FILTERS.includeOffer
+    );
+}
+
+/** Toggle the red filter badge. */
+function updateFilterBadge(filters) {
+    const badge = document.getElementById("dynamic-filter-badge");
+    if (!badge) {
+        return;
+    }
+    badge.classList.toggle("d-none", !filtersAreActive(filters));
+}
+
+/** Format YYYY-MM-DD for display under date buttons. */
+function formatFilterDateLabel(value) {
+    if (!value) {
+        return "—";
+    }
+    const parts = value.split("-");
+    if (parts.length !== 3) {
+        return value;
+    }
+    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+}
+
+/** Sync filter controls to the given filter state (no refetch). */
+function syncFilterControls(filters) {
+    const sortInput = document.querySelector(
+        `input[name="filter-sort"][value="${filters.sort}"]`
+    );
+    if (sortInput) {
+        sortInput.checked = true;
+    }
+
+    const orderCheckbox = document.getElementById("filter-type-order");
+    const offerCheckbox = document.getElementById("filter-type-offer");
+    if (orderCheckbox) {
+        orderCheckbox.checked = Boolean(filters.includeOrder);
+    }
+    if (offerCheckbox) {
+        offerCheckbox.checked = Boolean(filters.includeOffer);
+    }
+
+    const startDisplay = document.getElementById("filter-start-display");
+    const endDisplay = document.getElementById("filter-end-display");
+    if (startDisplay) {
+        startDisplay.textContent = formatFilterDateLabel(filters.start);
+    }
+    if (endDisplay) {
+        endDisplay.textContent = formatFilterDateLabel(filters.end);
+    }
+
+    const dateInput = document.getElementById("dynamic-filter-date-input");
+    const dateTarget = document.querySelector('input[name="filter-date-target"]:checked');
+    if (dateInput && dateTarget) {
+        dateInput.value = filters[dateTarget.value] || "";
+    }
+
+    updateFilterBadge(filters);
+}
+
+/** Show the options panel for the selected filter category. */
+function showFilterCategoryPanel(category) {
+    document.querySelectorAll("[data-filter-panel]").forEach((panel) => {
+        panel.classList.toggle("d-none", panel.dataset.filterPanel !== category);
+    });
+
+    const calendarPanel = document.getElementById("dynamic-filter-calendar-panel");
+    if (!calendarPanel) {
+        return;
+    }
+
+    if (category !== "date") {
+        calendarPanel.classList.add("d-none");
+        const dateTarget = document.querySelector('input[name="filter-date-target"]:checked');
+        if (dateTarget) {
+            dateTarget.checked = false;
+        }
+        return;
+    }
+
+    const dateTarget = document.querySelector('input[name="filter-date-target"]:checked');
+    calendarPanel.classList.toggle("d-none", !dateTarget);
+}
+
+/** Open the calendar column for start/end date editing. */
+function openDateCalendar(target, filters) {
+    const calendarPanel = document.getElementById("dynamic-filter-calendar-panel");
+    const calendarLabel = document.getElementById("dynamic-filter-calendar-label");
+    const dateInput = document.getElementById("dynamic-filter-date-input");
+    if (!calendarPanel || !dateInput) {
+        return;
+    }
+
+    calendarPanel.classList.remove("d-none");
+    if (calendarLabel) {
+        calendarLabel.textContent = target === "start" ? "Начална дата" : "Крайна дата";
+    }
+    dateInput.dataset.dateTarget = target;
+    dateInput.value = filters[target] || "";
+
+    window.requestAnimationFrame(() => {
+        dateInput.focus();
+        if (typeof dateInput.showPicker === "function") {
+            try {
+                dateInput.showPicker();
+            } catch (error) {
+                // Browser may block showPicker without a direct gesture; input remains usable.
+            }
+        }
+    });
+}
+
+/** Persist filters, clear cached rows, and refetch the active view. */
+function applyFiltersAndRefresh(patch) {
+    const root = document.getElementById("dynamic-orders-root");
+    if (!root) {
+        return;
+    }
+
+    const viewName = root.dataset.currentView || "table";
+    const filters = { ...getFiltersForView(viewName), ...patch };
+
+    updateViewCache(viewName, {
+        filters,
+        rowsHtml: "",
+        visibleItems: 0,
+        nextCursor: null,
+        hasMore: false,
+        openRowIds: [],
+        orderDetails: {},
+        scrollY: 0,
+    });
+    syncFilterControls(filters);
+
+    const { generation } = beginOrdersRender(viewName);
+    fetchAndRenderOrders({ forceRefresh: true, viewName, generation });
+}
+
+/** Wire filter UI events (category panels + immediate filter applies). */
+function setupDynamicFilters() {
+    const filterRoot = document.getElementById("collapseExample");
+    if (!filterRoot || filterRoot.dataset.filtersBound === "1") {
+        return;
+    }
+    filterRoot.dataset.filtersBound = "1";
+
+    const root = document.getElementById("dynamic-orders-root");
+    const initialView = root?.dataset.currentView || "table";
+    syncFilterControls(getFiltersForView(initialView));
+    showFilterCategoryPanel("sort");
+
+    filterRoot.querySelectorAll('input[name="filter-category"]').forEach((input) => {
+        input.addEventListener("change", () => {
+            if (input.checked) {
+                showFilterCategoryPanel(input.value);
+            }
+        });
+    });
+
+    filterRoot.querySelectorAll('input[name="filter-sort"]').forEach((input) => {
+        input.addEventListener("change", () => {
+            if (input.checked) {
+                applyFiltersAndRefresh({ sort: input.value });
+            }
+        });
+    });
+
+    filterRoot.querySelectorAll('input[name="filter-date-target"]').forEach((input) => {
+        input.addEventListener("change", () => {
+            if (!input.checked) {
+                return;
+            }
+            const viewName = root?.dataset.currentView || "table";
+            openDateCalendar(input.value, getFiltersForView(viewName));
+        });
+    });
+
+    const dateInput = document.getElementById("dynamic-filter-date-input");
+    if (dateInput) {
+        dateInput.addEventListener("change", () => {
+            const target = dateInput.dataset.dateTarget;
+            if (target !== "start" && target !== "end") {
+                return;
+            }
+            applyFiltersAndRefresh({ [target]: dateInput.value || null });
+        });
+    }
+
+    const orderCheckbox = document.getElementById("filter-type-order");
+    const offerCheckbox = document.getElementById("filter-type-offer");
+    const onTypeChange = () => {
+        applyFiltersAndRefresh({
+            includeOrder: Boolean(orderCheckbox?.checked),
+            includeOffer: Boolean(offerCheckbox?.checked),
+        });
+    };
+    if (orderCheckbox) {
+        orderCheckbox.addEventListener("change", onTypeChange);
+    }
+    if (offerCheckbox) {
+        offerCheckbox.addEventListener("change", onTypeChange);
+    }
+}
+
 /** Start a new render generation for the given view. */
 function beginOrdersRender(viewName) {
     ordersRenderGeneration += 1;
@@ -465,6 +706,7 @@ function updateViewCache(viewName, patch) {
         nextCursor: null,
         hasMore: false,
         scrollY: 0,
+        filters: getDefaultOrderFilters(),
     };
     viewOrdersCache.set(viewName, { ...previous, ...patch });
 }
@@ -516,10 +758,34 @@ function setupInfiniteScroll(viewName, generation) {
     infiniteScrollObserver.observe(sentinel);
 }
 
-/** Build paginated endpoint URL with optional cursor. */
-function buildOrdersUrl(endpoint, cursor) {
+/** Build paginated endpoint URL with active filters and optional cursor. */
+function buildOrdersUrl(endpoint, cursor, viewName = null) {
     const url = new URL(endpoint, window.location.origin);
     url.searchParams.set("limit", "50");
+
+    const root = document.getElementById("dynamic-orders-root");
+    const resolvedView = viewName || root?.dataset.currentView || "table";
+    const filters = getFiltersForView(resolvedView);
+
+    url.searchParams.set("sort", filters.sort || "desc");
+    if (filters.start) {
+        url.searchParams.set("start", filters.start);
+    }
+    if (filters.end) {
+        url.searchParams.set("end", filters.end);
+    }
+
+    if (filters.includeOrder) {
+        url.searchParams.append("order_type", "order");
+    }
+    if (filters.includeOffer) {
+        url.searchParams.append("order_type", "offer");
+    }
+    if (!filters.includeOrder && !filters.includeOffer) {
+        // Explicit empty selection so the backend returns no rows (not the default type).
+        url.searchParams.append("order_type", "");
+    }
+
     if (cursor) {
         url.searchParams.set("cursor", cursor);
     }
@@ -553,7 +819,7 @@ async function loadMoreOrders(viewName, generation) {
     setFooterStatus(buildLoadingMoreStatus());
 
     try {
-        const response = await fetch(buildOrdersUrl(endpoint, cacheEntry.nextCursor), {
+        const response = await fetch(buildOrdersUrl(endpoint, cacheEntry.nextCursor, viewName), {
             headers: {
                 "X-Requested-With": "XMLHttpRequest",
             },
@@ -713,7 +979,7 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
     setFooterStatus("");
 
     try {
-        const response = await fetch(buildOrdersUrl(endpoint), {
+        const response = await fetch(buildOrdersUrl(endpoint, null, resolvedView), {
             headers: {
                 "X-Requested-With": "XMLHttpRequest",
             },
@@ -803,6 +1069,7 @@ function switchDynamicView(viewName) {
     ensureVitrineStylesIfNeeded(viewName);
 
     container.innerHTML = getShellMarkup(viewName);
+    syncFilterControls(getFiltersForView(viewName));
     fetchAndRenderOrders({ viewName, generation });
 }
 
@@ -814,6 +1081,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     ensureVitrineStylesIfNeeded(root.dataset.currentView);
+    setupDynamicFilters();
     fetchAndRenderOrders({ viewName: root.dataset.currentView || "table" });
 
     const navButtons = document.querySelectorAll("[data-dynamic-view]");
