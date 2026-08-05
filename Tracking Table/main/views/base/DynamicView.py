@@ -1,5 +1,6 @@
 import base64
 from datetime import datetime, time
+from decimal import Decimal, InvalidOperation
 
 from django.db.models import Q
 from django.http import JsonResponse
@@ -38,7 +39,13 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
     rows_template_name = None
     rows_context_name = "orders"
     allowed_sorts = ("asc", "desc")
+    allowed_sort_by = ("order_id", "date", "balance")
     allowed_order_types = ("order", "offer")
+    sort_field_map = {
+        "order_id": "pk",
+        "date": "created_date",
+        "balance": "balance",
+    }
 
     def get_requested_view(self):
         requested_view = (
@@ -76,6 +83,12 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
             return sort
         return "desc"
 
+    def get_sort_by(self):
+        sort_by = (self.request.GET.get("sort_by") or "date").lower()
+        if sort_by in self.allowed_sort_by:
+            return sort_by
+        return "date"
+
     def get_order_types(self):
         if "order_type" in self.request.GET:
             return [
@@ -96,6 +109,15 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
             end_dt = timezone.make_aware(datetime.combine(end, time.max))
         return start_dt, end_dt
 
+    def apply_ordering(self, queryset):
+        sort_by = self.get_sort_by()
+        sort = self.get_sort()
+        field = self.sort_field_map[sort_by]
+        prefix = "" if sort == "asc" else "-"
+        if field == "pk":
+            return queryset.order_by(f"{prefix}pk")
+        return queryset.order_by(f"{prefix}{field}", f"{prefix}pk")
+
     def get_filtered_queryset(self):
         queryset = self.model.objects.for_list()
         queryset = queryset.of_types(*self.get_order_types())
@@ -104,28 +126,40 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         if start_dt is not None or end_dt is not None:
             queryset = queryset.created_between(start_dt, end_dt)
 
-        if self.get_sort() == "asc":
-            return queryset.first_created()
-        return queryset.last_created()
+        return self.apply_ordering(queryset)
 
     def encode_cursor(self, order):
-        raw = f"{order.created_date.isoformat()}|{order.pk}"
+        sort_by = self.get_sort_by()
+        if sort_by == "order_id":
+            raw = str(order.pk)
+        elif sort_by == "balance":
+            raw = f"{order.balance}|{order.pk}"
+        else:
+            raw = f"{order.created_date.isoformat()}|{order.pk}"
         return base64.urlsafe_b64encode(raw.encode("utf-8")).decode("ascii")
 
     def decode_cursor(self, cursor):
+        sort_by = self.get_sort_by()
         try:
             raw = base64.urlsafe_b64decode(cursor.encode("ascii")).decode("utf-8")
-            date_str, pk_str = raw.rsplit("|", 1)
-            created_date = parse_datetime(date_str)
+            if sort_by == "order_id":
+                return int(raw), None
+
+            value_str, pk_str = raw.rsplit("|", 1)
+            pk = int(pk_str)
+            if sort_by == "balance":
+                return Decimal(value_str), pk
+
+            created_date = parse_datetime(value_str)
             if created_date is None:
                 return None
             if timezone.is_naive(created_date):
                 created_date = timezone.make_aware(created_date)
-            return created_date, int(pk_str)
-        except Exception:
+            return created_date, pk
+        except (ValueError, InvalidOperation, TypeError):
             return None
 
-    def apply_cursor(self, queryset, cursor, sort):
+    def apply_cursor(self, queryset, cursor, sort, sort_by):
         if not cursor:
             return queryset
 
@@ -133,20 +167,33 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         if decoded is None:
             return queryset
 
-        created_date, pk = decoded
+        if sort_by == "order_id":
+            pk, _ = decoded
+            if sort == "asc":
+                return queryset.filter(pk__gt=pk)
+            return queryset.filter(pk__lt=pk)
+
+        sort_value, pk = decoded
+        field = self.sort_field_map[sort_by]
         if sort == "asc":
             return queryset.filter(
-                Q(created_date__gt=created_date)
-                | Q(created_date=created_date, pk__gt=pk)
+                Q(**{f"{field}__gt": sort_value})
+                | Q(**{field: sort_value, "pk__gt": pk})
             )
         return queryset.filter(
-            Q(created_date__lt=created_date)
-            | Q(created_date=created_date, pk__lt=pk)
+            Q(**{f"{field}__lt": sort_value})
+            | Q(**{field: sort_value, "pk__lt": pk})
         )
 
     def get_paginated_queryset(self, limit, cursor=None):
         sort = self.get_sort()
-        queryset = self.apply_cursor(self.get_filtered_queryset(), cursor, sort)
+        sort_by = self.get_sort_by()
+        queryset = self.apply_cursor(
+            self.get_filtered_queryset(),
+            cursor,
+            sort,
+            sort_by,
+        )
         # Fetch one extra row to detect whether more pages exist.
         return list(queryset[: limit + 1])
 

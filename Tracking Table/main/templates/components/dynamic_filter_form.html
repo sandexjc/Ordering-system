@@ -1,69 +1,97 @@
-<!-- Dynamic filter form: category | options | calendar -->
 <div class="collapse" id="collapseExample" style="margin-top: 20px;">
-    <div class="card card-body">
-        <div class="row g-3 align-items-start">
-            <!-- Category switcher -->
-            <div class="col-md-4">
-                <div class="btn-group-vertical w-100" role="group" aria-label="Филтър категории">
-                    <input type="radio" class="btn-check" name="filter-category" id="filter-cat-sort" value="sort" autocomplete="off" checked>
-                    <label class="btn btn-outline-primary" for="filter-cat-sort">Сортиране</label>
+    <div class="card dynamic-filter-card">
+        <div class="card-body dynamic-filter-card-body">
+            <div class="row align-items-start dynamic-filter-row">
+                <div class="col-md-4 dynamic-filter-col">
+                    <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Филтър категории">
+                        <input type="radio" class="btn-check" name="filter-category" id="filter-cat-sort" value="sort" autocomplete="off" checked>
+                        <label class="btn btn-outline-primary" for="filter-cat-sort">Сортиране</label>
 
-                    <input type="radio" class="btn-check" name="filter-category" id="filter-cat-date" value="date" autocomplete="off">
-                    <label class="btn btn-outline-primary" for="filter-cat-date">Дата</label>
+                        <input type="radio" class="btn-check" name="filter-category" id="filter-cat-date" value="date" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="filter-cat-date">Период</label>
 
-                    <input type="radio" class="btn-check" name="filter-category" id="filter-cat-type" value="type" autocomplete="off">
-                    <label class="btn btn-outline-primary" for="filter-cat-type">Тип</label>
-                </div>
-            </div>
-
-            <!-- Category options -->
-            <div class="col-md-4">
-                <div data-filter-panel="sort">
-                    <div class="btn-group-vertical w-100" role="group" aria-label="Ред на показване">
-                        <input type="radio" class="btn-check" name="filter-sort" id="filter-sort-desc" value="desc" autocomplete="off" checked>
-                        <label class="btn btn-outline-primary" for="filter-sort-desc">Низходящо</label>
-
-                        <input type="radio" class="btn-check" name="filter-sort" id="filter-sort-asc" value="asc" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="filter-sort-asc">Възходящо</label>
+                        <input type="radio" class="btn-check" name="filter-category" id="filter-cat-type" value="type" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="filter-cat-type">Тип</label>
                     </div>
                 </div>
+                <div class="col-md-4 dynamic-filter-col">
+                    <div data-filter-panel="sort">
+                        <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Сортиране по">
+                            <input type="radio" class="btn-check" name="filter-sort-by" id="filter-sort-by-date" value="date" autocomplete="off" checked>
+                            <label class="btn btn-outline-primary" for="filter-sort-by-date">Дата</label>
 
-                <div data-filter-panel="date" class="d-none">
-                    <div class="btn-group-vertical w-100" role="group" aria-label="Избор на период">
-                        <input type="radio" class="btn-check" name="filter-date-target" id="filter-date-start" value="start" autocomplete="off">
-                        <label class="btn btn-outline-primary text-start" for="filter-date-start">
-                            Начална дата
-                            <small class="d-block text-muted" id="filter-start-display">—</small>
-                        </label>
+                            <input type="radio" class="btn-check" name="filter-sort-by" id="filter-sort-by-order-id" value="order_id" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="filter-sort-by-order-id">Номер</label>
 
-                        <input type="radio" class="btn-check" name="filter-date-target" id="filter-date-end" value="end" autocomplete="off">
-                        <label class="btn btn-outline-primary text-start" for="filter-date-end">
-                            Крайна дата
-                            <small class="d-block text-muted" id="filter-end-display">—</small>
-                        </label>
-                    </div>
-                </div>
-
-                <div data-filter-panel="type" class="d-none">
-                    <div class="d-flex flex-column gap-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="filter-type-order" value="order" checked>
-                            <label class="form-check-label" for="filter-type-order">Поръчка</label>
+                            <input type="radio" class="btn-check" name="filter-sort-by" id="filter-sort-by-balance" value="balance" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="filter-sort-by-balance">Баланс</label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="filter-type-offer" value="offer">
-                            <label class="form-check-label" for="filter-type-offer">Оферта</label>
+                    </div>
+                    <div data-filter-panel="date" class="d-none">
+                        <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Избор на период">
+                            <input type="radio" class="btn-check" name="filter-date-target" id="filter-date-start" value="start" autocomplete="off">
+                            <label class="btn btn-outline-primary text-start" for="filter-date-start">
+                                Начална дата
+                                <small class="d-block text-muted" id="filter-start-display">—</small>
+                            </label>
+
+                            <input type="radio" class="btn-check" name="filter-date-target" id="filter-date-end" value="end" autocomplete="off">
+                            <label class="btn btn-outline-primary text-start" for="filter-date-end">
+                                Крайна дата
+                                <small class="d-block text-muted" id="filter-end-display">—</small>
+                            </label>
+                        </div>
+                    </div>
+                    <div data-filter-panel="type" class="d-none">
+                        <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Тип поръчки">
+                            <input type="checkbox" class="btn-check" id="filter-type-order" value="order" autocomplete="off" checked>
+                            <label class="btn btn-outline-primary" for="filter-type-order">Поръчки</label>
+
+                            <input type="checkbox" class="btn-check" id="filter-type-offer" value="offer" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="filter-type-offer">Оферти</label>
                         </div>
                     </div>
                 </div>
-            </div>
+                <div class="col-md-4 dynamic-filter-col">
+                    <div id="dynamic-filter-sort-dir-panel">
+                        <div data-sort-dir-for="order_id" class="d-none">
+                            <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Посока по номер">
+                                <input type="radio" class="btn-check" name="filter-sort-dir-order_id" id="filter-sort-dir-order-id-asc" value="asc" autocomplete="off" data-sort-dir>
+                                <label class="btn btn-outline-primary" for="filter-sort-dir-order-id-asc">Възходящо</label>
 
-            <!-- Calendar slot (Date category only) -->
-            <div class="col-md-4">
-                <div id="dynamic-filter-calendar-panel" class="d-none">
-                    <label class="form-label" id="dynamic-filter-calendar-label" for="dynamic-filter-date-input">Изберете дата</label>
-                    <input type="date" class="form-control" id="dynamic-filter-date-input">
+                                <input type="radio" class="btn-check" name="filter-sort-dir-order_id" id="filter-sort-dir-order-id-desc" value="desc" autocomplete="off" data-sort-dir checked>
+                                <label class="btn btn-outline-primary" for="filter-sort-dir-order-id-desc">Низходящо</label>
+                            </div>
+                        </div>
+                        <div data-sort-dir-for="date">
+                            <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Посока по дата">
+                                <input type="radio" class="btn-check" name="filter-sort-dir-date" id="filter-sort-dir-date-desc" value="desc" autocomplete="off" data-sort-dir checked>
+                                <label class="btn btn-outline-primary" for="filter-sort-dir-date-desc">Най-нови</label>
+
+                                <input type="radio" class="btn-check" name="filter-sort-dir-date" id="filter-sort-dir-date-asc" value="asc" autocomplete="off" data-sort-dir>
+                                <label class="btn btn-outline-primary" for="filter-sort-dir-date-asc">Най-стари</label>
+                            </div>
+                        </div>
+                        <div data-sort-dir-for="balance" class="d-none">
+                            <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Посока по баланс">
+                                <input type="radio" class="btn-check" name="filter-sort-dir-balance" id="filter-sort-dir-balance-asc" value="asc" autocomplete="off" data-sort-dir>
+                                <label class="btn btn-outline-primary" for="filter-sort-dir-balance-asc">Възходящо</label>
+
+                                <input type="radio" class="btn-check" name="filter-sort-dir-balance" id="filter-sort-dir-balance-desc" value="desc" autocomplete="off" data-sort-dir checked>
+                                <label class="btn btn-outline-primary" for="filter-sort-dir-balance-desc">Низходящо</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="dynamic-filter-calendar-panel" class="d-none">
+                        <label class="form-label" id="dynamic-filter-calendar-label" for="dynamic-filter-date-input">Изберете дата</label>
+                        <input type="date" class="form-control" id="dynamic-filter-date-input">
+                    </div>
                 </div>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                <button type="button" class="btn btn-primary btn-sm" id="dynamic-filter-reset" disabled>
+                    Премахни филтъра
+                </button>
             </div>
         </div>
     </div>

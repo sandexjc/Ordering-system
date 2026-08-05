@@ -23,6 +23,7 @@
                     <p class="text-center text-muted" style="font-size: 70%; font-weight: bold;">
                         <span id="visible-items-count">{{ visible_items }}</span> елемент<span id="visible-items-suffix">{{ visible_items|pluralize:"a" }}</span>
                     </p>
+                    <p id="visible-items-filters" class="text-center d-none mb-2"></p>
 
                     <!-- app-specific tables -->
                     {% block table_content %}

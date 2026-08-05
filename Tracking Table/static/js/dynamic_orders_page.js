@@ -1,5 +1,5 @@
 /** Update top counter text to match currently rendered rows. */
-function updateVisibleItemsCounter(visibleItems) {
+function updateVisibleItemsCounter(visibleItems, viewName = null) {
     const itemsNode = document.getElementById("visible-items-count");
     const suffixNode = document.getElementById("visible-items-suffix");
 
@@ -9,6 +9,10 @@ function updateVisibleItemsCounter(visibleItems) {
     if (suffixNode) {
         suffixNode.textContent = visibleItems === 1 ? "" : "a";
     }
+
+    const root = document.getElementById("dynamic-orders-root");
+    const resolvedView = viewName || root?.dataset.currentView || "table";
+    updateVisibleFiltersSummary(getFiltersForView(resolvedView));
 }
 
 /** Cache rows per view to avoid re-fetching on tab switch. */
@@ -20,19 +24,27 @@ let isLoadingMore = false;
 /** Bumped on every view switch / top-level render so stale async work cannot touch the wrong tab. */
 let ordersRenderGeneration = 0;
 
-/** Default list filters (matches previous dynamic behavior: newest first, orders only). */
+/** Default list filters (newest by date, orders only). */
 const DEFAULT_ORDER_FILTERS = Object.freeze({
-    sort: "desc",
+    sortBy: "date",
+    sortDir: "desc",
     start: null,
     end: null,
     includeOrder: true,
     includeOffer: false,
 });
 
-/** Clone default or stored filters for a view. */
+const SORT_BY_LABELS = {
+    order_id: "номер",
+    date: "дата",
+    balance: "баланс",
+};
+
+/** Clone default filters. */
 function getDefaultOrderFilters() {
     return {
-        sort: DEFAULT_ORDER_FILTERS.sort,
+        sortBy: DEFAULT_ORDER_FILTERS.sortBy,
+        sortDir: DEFAULT_ORDER_FILTERS.sortDir,
         start: DEFAULT_ORDER_FILTERS.start,
         end: DEFAULT_ORDER_FILTERS.end,
         includeOrder: DEFAULT_ORDER_FILTERS.includeOrder,
@@ -40,33 +52,64 @@ function getDefaultOrderFilters() {
     };
 }
 
+/** Normalize legacy/partial filter objects into the current shape. */
+function normalizeOrderFilters(filters) {
+    const normalized = getDefaultOrderFilters();
+    if (!filters || typeof filters !== "object") {
+        return normalized;
+    }
+
+    if (filters.sortBy === "order_id" || filters.sortBy === "date" || filters.sortBy === "balance") {
+        normalized.sortBy = filters.sortBy;
+    }
+    if (filters.sortDir === "asc" || filters.sortDir === "desc") {
+        normalized.sortDir = filters.sortDir;
+    } else if (filters.sort === "asc" || filters.sort === "desc") {
+        // Backward compatible with the previous sort-only filter shape.
+        normalized.sortDir = filters.sort;
+    }
+
+    normalized.start = filters.start || null;
+    normalized.end = filters.end || null;
+    normalized.includeOrder = Boolean(filters.includeOrder);
+    normalized.includeOffer = Boolean(filters.includeOffer);
+    return normalized;
+}
+
 /** Active filters for a view (falls back to defaults). */
 function getFiltersForView(viewName) {
     const cacheEntry = viewOrdersCache.get(viewName);
     if (cacheEntry && cacheEntry.filters) {
-        return { ...cacheEntry.filters };
+        return normalizeOrderFilters(cacheEntry.filters);
     }
     return getDefaultOrderFilters();
 }
 
 /** True when filters differ from defaults (drives the toolbar badge). */
 function filtersAreActive(filters) {
+    const current = normalizeOrderFilters(filters);
     return (
-        filters.sort !== DEFAULT_ORDER_FILTERS.sort
-        || Boolean(filters.start)
-        || Boolean(filters.end)
-        || filters.includeOrder !== DEFAULT_ORDER_FILTERS.includeOrder
-        || filters.includeOffer !== DEFAULT_ORDER_FILTERS.includeOffer
+        current.sortBy !== DEFAULT_ORDER_FILTERS.sortBy
+        || current.sortDir !== DEFAULT_ORDER_FILTERS.sortDir
+        || Boolean(current.start)
+        || Boolean(current.end)
+        || current.includeOrder !== DEFAULT_ORDER_FILTERS.includeOrder
+        || current.includeOffer !== DEFAULT_ORDER_FILTERS.includeOffer
     );
 }
 
-/** Toggle the red filter badge. */
+/** Toggle the red filter badge and enable/disable the reset button. */
 function updateFilterBadge(filters) {
+    const active = filtersAreActive(filters);
     const badge = document.getElementById("dynamic-filter-badge");
-    if (!badge) {
-        return;
+    if (badge) {
+        badge.classList.toggle("d-none", !active);
     }
-    badge.classList.toggle("d-none", !filtersAreActive(filters));
+
+    const resetButton = document.getElementById("dynamic-filter-reset");
+    if (resetButton) {
+        resetButton.disabled = !active;
+    }
 }
 
 /** Format YYYY-MM-DD for display under date buttons. */
@@ -81,40 +124,123 @@ function formatFilterDateLabel(value) {
     return `${parts[2]}.${parts[1]}.${parts[0]}`;
 }
 
+/** Human-readable direction label for the active sort field. */
+function formatSortDirectionLabel(sortBy, sortDir) {
+    if (sortBy === "date") {
+        return sortDir === "asc" ? "най-стари" : "най-нови";
+    }
+    return sortDir === "asc" ? "възходящо" : "низходящо";
+}
+
+/** Build the compact “what filters are applied” text. */
+function buildVisibleFiltersSummary(filters) {
+    const current = normalizeOrderFilters(filters);
+    const parts = [];
+
+    parts.push(
+        `сортиране: ${SORT_BY_LABELS[current.sortBy] || current.sortBy} (${formatSortDirectionLabel(
+            current.sortBy,
+            current.sortDir
+        )})`
+    );
+
+    const types = [];
+    if (current.includeOrder) {
+        types.push("поръчки");
+    }
+    if (current.includeOffer) {
+        types.push("оферти");
+    }
+    parts.push(types.length ? `тип: ${types.join(" + ")}` : "тип: няма");
+
+    if (current.start || current.end) {
+        const startLabel = current.start ? formatFilterDateLabel(current.start) : "…";
+        const endLabel = current.end ? formatFilterDateLabel(current.end) : "…";
+        parts.push(`период: ${startLabel} – ${endLabel}`);
+    }
+
+    return parts.join(" · ");
+}
+
+/** Update the filter summary below the visible-items counter (only when non-default). */
+function updateVisibleFiltersSummary(filters) {
+    const summaryNode = document.getElementById("visible-items-filters");
+    if (!summaryNode) {
+        return;
+    }
+
+    const current = normalizeOrderFilters(filters);
+    if (!filtersAreActive(current)) {
+        summaryNode.textContent = "";
+        summaryNode.classList.add("d-none");
+        return;
+    }
+
+    summaryNode.textContent = buildVisibleFiltersSummary(current);
+    summaryNode.classList.remove("d-none");
+}
+
+/** Show the direction options matching the selected sort field. */
+function showSortDirectionPanel(sortBy) {
+    const sortDirPanel = document.getElementById("dynamic-filter-sort-dir-panel");
+    if (!sortDirPanel) {
+        return;
+    }
+
+    sortDirPanel.querySelectorAll("[data-sort-dir-for]").forEach((panel) => {
+        panel.classList.toggle("d-none", panel.dataset.sortDirFor !== sortBy);
+    });
+}
+
 /** Sync filter controls to the given filter state (no refetch). */
 function syncFilterControls(filters) {
-    const sortInput = document.querySelector(
-        `input[name="filter-sort"][value="${filters.sort}"]`
+    const current = normalizeOrderFilters(filters);
+
+    const sortByInput = document.querySelector(
+        `input[name="filter-sort-by"][value="${current.sortBy}"]`
     );
-    if (sortInput) {
-        sortInput.checked = true;
+    if (sortByInput) {
+        sortByInput.checked = true;
+    }
+
+    const sortDirInput = document.querySelector(
+        `input[name="filter-sort-dir-${current.sortBy}"][value="${current.sortDir}"]`
+    );
+    if (sortDirInput) {
+        sortDirInput.checked = true;
     }
 
     const orderCheckbox = document.getElementById("filter-type-order");
     const offerCheckbox = document.getElementById("filter-type-offer");
     if (orderCheckbox) {
-        orderCheckbox.checked = Boolean(filters.includeOrder);
+        orderCheckbox.checked = Boolean(current.includeOrder);
     }
     if (offerCheckbox) {
-        offerCheckbox.checked = Boolean(filters.includeOffer);
+        offerCheckbox.checked = Boolean(current.includeOffer);
     }
 
     const startDisplay = document.getElementById("filter-start-display");
     const endDisplay = document.getElementById("filter-end-display");
     if (startDisplay) {
-        startDisplay.textContent = formatFilterDateLabel(filters.start);
+        startDisplay.textContent = formatFilterDateLabel(current.start);
     }
     if (endDisplay) {
-        endDisplay.textContent = formatFilterDateLabel(filters.end);
+        endDisplay.textContent = formatFilterDateLabel(current.end);
     }
 
     const dateInput = document.getElementById("dynamic-filter-date-input");
     const dateTarget = document.querySelector('input[name="filter-date-target"]:checked');
     if (dateInput && dateTarget) {
-        dateInput.value = filters[dateTarget.value] || "";
+        dateInput.value = current[dateTarget.value] || "";
     }
 
-    updateFilterBadge(filters);
+    const category = document.querySelector('input[name="filter-category"]:checked');
+    if (!category || category.value === "sort") {
+        showSortDirectionPanel(current.sortBy);
+    }
+
+    updateFilterBadge(current);
+    updateVisibleFiltersSummary(current);
 }
 
 /** Show the options panel for the selected filter category. */
@@ -123,26 +249,50 @@ function showFilterCategoryPanel(category) {
         panel.classList.toggle("d-none", panel.dataset.filterPanel !== category);
     });
 
+    const sortDirPanel = document.getElementById("dynamic-filter-sort-dir-panel");
     const calendarPanel = document.getElementById("dynamic-filter-calendar-panel");
-    if (!calendarPanel) {
-        return;
-    }
+    const root = document.getElementById("dynamic-orders-root");
+    const filters = getFiltersForView(root?.dataset.currentView || "table");
 
-    if (category !== "date") {
-        calendarPanel.classList.add("d-none");
+    if (category === "sort") {
+        if (sortDirPanel) {
+            sortDirPanel.classList.remove("d-none");
+        }
+        if (calendarPanel) {
+            calendarPanel.classList.add("d-none");
+        }
         const dateTarget = document.querySelector('input[name="filter-date-target"]:checked');
         if (dateTarget) {
             dateTarget.checked = false;
         }
+        showSortDirectionPanel(filters.sortBy);
         return;
     }
 
+    if (sortDirPanel) {
+        sortDirPanel.classList.add("d-none");
+    }
+
+    if (category === "date") {
+        const dateTarget = document.querySelector('input[name="filter-date-target"]:checked');
+        if (calendarPanel) {
+            calendarPanel.classList.toggle("d-none", !dateTarget);
+        }
+        return;
+    }
+
+    if (calendarPanel) {
+        calendarPanel.classList.add("d-none");
+    }
     const dateTarget = document.querySelector('input[name="filter-date-target"]:checked');
-    calendarPanel.classList.toggle("d-none", !dateTarget);
+    if (dateTarget) {
+        dateTarget.checked = false;
+    }
 }
 
 /** Open the calendar column for start/end date editing. */
 function openDateCalendar(target, filters) {
+    const sortDirPanel = document.getElementById("dynamic-filter-sort-dir-panel");
     const calendarPanel = document.getElementById("dynamic-filter-calendar-panel");
     const calendarLabel = document.getElementById("dynamic-filter-calendar-label");
     const dateInput = document.getElementById("dynamic-filter-date-input");
@@ -150,6 +300,9 @@ function openDateCalendar(target, filters) {
         return;
     }
 
+    if (sortDirPanel) {
+        sortDirPanel.classList.add("d-none");
+    }
     calendarPanel.classList.remove("d-none");
     if (calendarLabel) {
         calendarLabel.textContent = target === "start" ? "Начална дата" : "Крайна дата";
@@ -177,7 +330,7 @@ function applyFiltersAndRefresh(patch) {
     }
 
     const viewName = root.dataset.currentView || "table";
-    const filters = { ...getFiltersForView(viewName), ...patch };
+    const filters = normalizeOrderFilters({ ...getFiltersForView(viewName), ...patch });
 
     updateViewCache(viewName, {
         filters,
@@ -190,9 +343,15 @@ function applyFiltersAndRefresh(patch) {
         scrollY: 0,
     });
     syncFilterControls(filters);
+    updateVisibleItemsCounter(0, viewName);
 
     const { generation } = beginOrdersRender(viewName);
     fetchAndRenderOrders({ forceRefresh: true, viewName, generation });
+}
+
+/** Reset filters for the active view back to defaults. */
+function resetFiltersAndRefresh() {
+    applyFiltersAndRefresh(getDefaultOrderFilters());
 }
 
 /** Wire filter UI events (category panels + immediate filter applies). */
@@ -216,10 +375,20 @@ function setupDynamicFilters() {
         });
     });
 
-    filterRoot.querySelectorAll('input[name="filter-sort"]').forEach((input) => {
+    filterRoot.querySelectorAll('input[name="filter-sort-by"]').forEach((input) => {
+        input.addEventListener("change", () => {
+            if (!input.checked) {
+                return;
+            }
+            showSortDirectionPanel(input.value);
+            applyFiltersAndRefresh({ sortBy: input.value });
+        });
+    });
+
+    filterRoot.querySelectorAll("[data-sort-dir]").forEach((input) => {
         input.addEventListener("change", () => {
             if (input.checked) {
-                applyFiltersAndRefresh({ sort: input.value });
+                applyFiltersAndRefresh({ sortDir: input.value });
             }
         });
     });
@@ -258,6 +427,18 @@ function setupDynamicFilters() {
     }
     if (offerCheckbox) {
         offerCheckbox.addEventListener("change", onTypeChange);
+    }
+
+    const resetButton = document.getElementById("dynamic-filter-reset");
+    if (resetButton) {
+        resetButton.addEventListener("click", () => {
+            resetFiltersAndRefresh();
+            const sortCategory = document.getElementById("filter-cat-sort");
+            if (sortCategory) {
+                sortCategory.checked = true;
+                showFilterCategoryPanel("sort");
+            }
+        });
     }
 }
 
@@ -767,7 +948,8 @@ function buildOrdersUrl(endpoint, cursor, viewName = null) {
     const resolvedView = viewName || root?.dataset.currentView || "table";
     const filters = getFiltersForView(resolvedView);
 
-    url.searchParams.set("sort", filters.sort || "desc");
+    url.searchParams.set("sort_by", filters.sortBy || "date");
+    url.searchParams.set("sort", filters.sortDir || "desc");
     if (filters.start) {
         url.searchParams.set("start", filters.start);
     }
@@ -862,7 +1044,7 @@ async function loadMoreOrders(viewName, generation) {
             hasMore,
             nextCursor,
         });
-        updateVisibleItemsCounter(visibleItems);
+        updateVisibleItemsCounter(visibleItems, viewName);
         setupRenderedRows(viewName, generation, { deferHeavyWork: true });
         fadeInRows(newRows);
 
@@ -922,7 +1104,7 @@ async function renderCachedRowsIfAvailable(tableBody, viewName, colspan, generat
     liveBody.innerHTML = cached.rowsHtml;
     /** Strip any open markup baked into cached HTML, then re-open via openRowIds. */
     resetCachedRowsOpenMarkup(liveBody);
-    updateVisibleItemsCounter(cached.visibleItems || 0);
+    updateVisibleItemsCounter(cached.visibleItems || 0, viewName);
     setupRenderedRows(viewName, generation, { deferHeavyWork: true });
     fadeInRows(liveBody);
     setupInfiniteScroll(viewName, generation);
@@ -1014,7 +1196,7 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
         }
 
         liveBody.innerHTML = rowsHtml || buildEmptyRow(colspan);
-        updateVisibleItemsCounter(visibleItems);
+        updateVisibleItemsCounter(visibleItems, resolvedView);
         setupRenderedRows(resolvedView, renderGeneration, { deferHeavyWork: true });
         fadeInRows(liveBody);
 
@@ -1034,7 +1216,7 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
         }
         liveBody.innerHTML = buildErrorRow(colspan);
         fadeInRows(liveBody);
-        updateVisibleItemsCounter(0);
+        updateVisibleItemsCounter(0, resolvedView);
         setFooterStatus("");
 
         const retryButton = document.getElementById("dynamic-orders-retry");
@@ -1065,7 +1247,7 @@ function switchDynamicView(viewName) {
     root.dataset.currentView = viewName;
     updateDynamicNavigation(viewName);
     updateNewOrderLink(viewName);
-    updateVisibleItemsCounter(0);
+    updateVisibleItemsCounter(0, viewName);
     ensureVitrineStylesIfNeeded(viewName);
 
     container.innerHTML = getShellMarkup(viewName);

@@ -207,3 +207,37 @@ table.table-order-details thead tr th:not(:first-child) {
 {
 	margin-bottom: 5rem;
 }
+
+/* Dynamic filter card */
+.dynamic-filter-card > .dynamic-filter-card-body
+{
+	padding-top: 1.25rem;
+	padding-bottom: 1.25rem;
+	padding-left: 5rem !important;
+	padding-right: 5rem !important;
+}
+
+.dynamic-filter-row > .dynamic-filter-col
+{
+	padding-left: 3rem !important;
+	padding-right: 3rem !important;
+}
+
+.dynamic-filter-btn-group.btn-group-vertical > .btn
+{
+	margin-top: 2px;
+	border-radius: 0.375rem !important;
+}
+
+.dynamic-filter-btn-group.btn-group-vertical > .btn:first-of-type,
+.dynamic-filter-btn-group.btn-group-vertical > .btn-check:first-child + .btn
+{
+	margin-top: 0;
+}
+
+#visible-items-filters
+{
+	color: #dc3545;
+	font-size: 70%;
+	font-weight: bold;
+}
