@@ -241,3 +241,53 @@ table.table-order-details thead tr th:not(:first-child) {
 	font-size: 70%;
 	font-weight: bold;
 }
+
+/* Dynamic expandable search */
+.dynamic-search
+{
+	display: inline-flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.35rem;
+	max-width: 100%;
+}
+
+.dynamic-search-toggle
+{
+	flex: 0 0 auto;
+}
+
+.dynamic-search-input
+{
+	width: 0;
+	min-width: 0;
+	opacity: 0;
+	padding-left: 0;
+	padding-right: 0;
+	border-width: 0;
+	pointer-events: none;
+	transition:
+		width 0.25s ease,
+		opacity 0.2s ease,
+		padding 0.25s ease,
+		border-width 0.2s ease;
+}
+
+.dynamic-search.is-open .dynamic-search-input,
+.dynamic-search:hover .dynamic-search-input
+{
+	width: min(20.8rem, 71.5vw);
+	opacity: 1;
+	padding-left: 0.75rem;
+	padding-right: 0.75rem;
+	border-width: 1px;
+	pointer-events: auto;
+}
+
+mark.search-highlight
+{
+	background-color: #ffe566;
+	color: inherit;
+	padding: 0 0.1em;
+	border-radius: 0.15rem;
+}

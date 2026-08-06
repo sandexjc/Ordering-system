@@ -109,6 +109,9 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
             end_dt = timezone.make_aware(datetime.combine(end, time.max))
         return start_dt, end_dt
 
+    def get_search_query(self):
+        return (self.request.GET.get("q") or "").strip()
+
     def apply_ordering(self, queryset):
         sort_by = self.get_sort_by()
         sort = self.get_sort()
@@ -125,6 +128,10 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         start_dt, end_dt = self.get_date_bounds()
         if start_dt is not None or end_dt is not None:
             queryset = queryset.created_between(start_dt, end_dt)
+
+        search_query = self.get_search_query()
+        if len(search_query) >= 2:
+            queryset = queryset.search_contains(search_query)
 
         return self.apply_ordering(queryset)
 

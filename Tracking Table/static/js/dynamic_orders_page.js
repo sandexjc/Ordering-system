@@ -12,7 +12,7 @@ function updateVisibleItemsCounter(visibleItems, viewName = null) {
 
     const root = document.getElementById("dynamic-orders-root");
     const resolvedView = viewName || root?.dataset.currentView || "table";
-    updateVisibleFiltersSummary(getFiltersForView(resolvedView));
+    updateVisibleFiltersSummary(getFiltersForView(resolvedView), resolvedView);
 }
 
 /** Cache rows per view to avoid re-fetching on tab switch. */
@@ -23,6 +23,10 @@ let infiniteScrollObserver = null;
 let isLoadingMore = false;
 /** Bumped on every view switch / top-level render so stale async work cannot touch the wrong tab. */
 let ordersRenderGeneration = 0;
+let searchDebounceTimer = null;
+
+const SEARCH_MIN_LENGTH = 2;
+const SEARCH_DEBOUNCE_MS = 700;
 
 /** Default list filters (newest by date, orders only). */
 const DEFAULT_ORDER_FILTERS = Object.freeze({
@@ -39,6 +43,191 @@ const SORT_BY_LABELS = {
     date: "дата",
     balance: "баланс",
 };
+
+/** Active search query for a view (empty when inactive). */
+function getSearchForView(viewName) {
+    const cacheEntry = viewOrdersCache.get(viewName);
+    if (cacheEntry && typeof cacheEntry.searchQuery === "string") {
+        return cacheEntry.searchQuery;
+    }
+    return "";
+}
+
+/** True when search text is long enough to be sent to the backend. */
+function isSearchActive(searchQuery) {
+    return (searchQuery || "").trim().length >= SEARCH_MIN_LENGTH;
+}
+
+/** Normalize a raw input value into the committed search query (or empty). */
+function normalizeSearchQuery(value) {
+    const trimmed = (value || "").trim();
+    return trimmed.length >= SEARCH_MIN_LENGTH ? trimmed : "";
+}
+
+/** Toggle search badge and keep the field open while a query is active. */
+function updateSearchBadge(searchQuery) {
+    const active = isSearchActive(searchQuery);
+    const badge = document.getElementById("dynamic-search-badge");
+    if (badge) {
+        badge.classList.toggle("d-none", !active);
+    }
+
+    const searchRoot = document.getElementById("dynamic-search");
+    const toggle = document.getElementById("dynamic-search-toggle");
+    if (active && searchRoot) {
+        searchRoot.classList.add("is-open");
+        if (toggle) {
+            toggle.setAttribute("aria-expanded", "true");
+        }
+    }
+}
+
+/** Sync the search input to the active view's stored query. */
+function syncSearchControls(viewName) {
+    const searchQuery = getSearchForView(viewName);
+    const input = document.getElementById("dynamic-search-input");
+    if (input && document.activeElement !== input) {
+        input.value = searchQuery;
+    }
+    updateSearchBadge(searchQuery);
+}
+
+/** Open the expandable search field and focus the input. */
+function openDynamicSearch({ focusInput = true } = {}) {
+    const searchRoot = document.getElementById("dynamic-search");
+    const toggle = document.getElementById("dynamic-search-toggle");
+    const input = document.getElementById("dynamic-search-input");
+    if (!searchRoot) {
+        return;
+    }
+
+    searchRoot.classList.add("is-open");
+    if (toggle) {
+        toggle.setAttribute("aria-expanded", "true");
+    }
+    if (focusInput && input) {
+        window.requestAnimationFrame(() => input.focus());
+    }
+}
+
+/** Close the search field unless it is focused or has an active query. */
+function maybeCloseDynamicSearch() {
+    const searchRoot = document.getElementById("dynamic-search");
+    const toggle = document.getElementById("dynamic-search-toggle");
+    const input = document.getElementById("dynamic-search-input");
+    if (!searchRoot) {
+        return;
+    }
+
+    const root = document.getElementById("dynamic-orders-root");
+    const viewName = root?.dataset.currentView || "table";
+    if (isSearchActive(getSearchForView(viewName))) {
+        return;
+    }
+    if (input && document.activeElement === input) {
+        return;
+    }
+    if (searchRoot.matches(":hover")) {
+        return;
+    }
+
+    searchRoot.classList.remove("is-open");
+    if (toggle) {
+        toggle.setAttribute("aria-expanded", "false");
+    }
+}
+
+/** Persist search query, clear cached rows, and refetch. */
+function applySearchAndRefresh(rawValue) {
+    const root = document.getElementById("dynamic-orders-root");
+    if (!root) {
+        return;
+    }
+
+    const viewName = root.dataset.currentView || "table";
+    const searchQuery = normalizeSearchQuery(rawValue);
+    if (getSearchForView(viewName) === searchQuery) {
+        syncSearchControls(viewName);
+        updateVisibleFiltersSummary(getFiltersForView(viewName), viewName);
+        return;
+    }
+
+    updateViewCache(viewName, {
+        searchQuery,
+        rowsHtml: "",
+        visibleItems: 0,
+        nextCursor: null,
+        hasMore: false,
+        openRowIds: [],
+        orderDetails: {},
+        scrollY: 0,
+    });
+    syncSearchControls(viewName);
+    updateVisibleItemsCounter(0, viewName);
+
+    const { generation } = beginOrdersRender(viewName);
+    fetchAndRenderOrders({ forceRefresh: true, viewName, generation });
+}
+
+/** Schedule a debounced search commit after typing pauses. */
+function scheduleSearchCommit(rawValue) {
+    if (searchDebounceTimer) {
+        window.clearTimeout(searchDebounceTimer);
+    }
+    searchDebounceTimer = window.setTimeout(() => {
+        searchDebounceTimer = null;
+        applySearchAndRefresh(rawValue);
+    }, SEARCH_DEBOUNCE_MS);
+}
+
+/** Wire expandable search UI + debounced requests. */
+function setupDynamicSearch() {
+    const searchRoot = document.getElementById("dynamic-search");
+    const toggle = document.getElementById("dynamic-search-toggle");
+    const input = document.getElementById("dynamic-search-input");
+    if (!searchRoot || !toggle || !input || searchRoot.dataset.searchBound === "1") {
+        return;
+    }
+    searchRoot.dataset.searchBound = "1";
+
+    const root = document.getElementById("dynamic-orders-root");
+    const initialView = root?.dataset.currentView || "table";
+    syncSearchControls(initialView);
+
+    searchRoot.addEventListener("mouseenter", () => {
+        openDynamicSearch({ focusInput: false });
+    });
+    searchRoot.addEventListener("mouseleave", () => {
+        maybeCloseDynamicSearch();
+    });
+
+    toggle.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (searchRoot.classList.contains("is-open") && document.activeElement === input) {
+            input.blur();
+            maybeCloseDynamicSearch();
+            return;
+        }
+        openDynamicSearch({ focusInput: true });
+    });
+
+    input.addEventListener("focus", () => {
+        openDynamicSearch({ focusInput: false });
+    });
+    input.addEventListener("blur", () => {
+        window.setTimeout(() => maybeCloseDynamicSearch(), 120);
+    });
+    input.addEventListener("input", () => {
+        openDynamicSearch({ focusInput: false });
+        scheduleSearchCommit(input.value);
+    });
+    input.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            input.blur();
+            maybeCloseDynamicSearch();
+        }
+    });
+}
 
 /** Clone default filters. */
 function getDefaultOrderFilters() {
@@ -162,21 +351,33 @@ function buildVisibleFiltersSummary(filters) {
     return parts.join(" · ");
 }
 
-/** Update the filter summary below the visible-items counter (only when non-default). */
-function updateVisibleFiltersSummary(filters) {
+/** Update the filter/search summary below the counter (only when non-default). */
+function updateVisibleFiltersSummary(filters, viewName = null) {
     const summaryNode = document.getElementById("visible-items-filters");
     if (!summaryNode) {
         return;
     }
 
+    const root = document.getElementById("dynamic-orders-root");
+    const resolvedView = viewName || root?.dataset.currentView || "table";
     const current = normalizeOrderFilters(filters);
-    if (!filtersAreActive(current)) {
+    const searchQuery = getSearchForView(resolvedView);
+    const parts = [];
+
+    if (filtersAreActive(current)) {
+        parts.push(buildVisibleFiltersSummary(current));
+    }
+    if (isSearchActive(searchQuery)) {
+        parts.push(`търсене: ${searchQuery.trim()}`);
+    }
+
+    if (!parts.length) {
         summaryNode.textContent = "";
         summaryNode.classList.add("d-none");
         return;
     }
 
-    summaryNode.textContent = buildVisibleFiltersSummary(current);
+    summaryNode.textContent = parts.join(" · ");
     summaryNode.classList.remove("d-none");
 }
 
@@ -240,7 +441,8 @@ function syncFilterControls(filters) {
     }
 
     updateFilterBadge(current);
-    updateVisibleFiltersSummary(current);
+    const root = document.getElementById("dynamic-orders-root");
+    updateVisibleFiltersSummary(current, root?.dataset.currentView || "table");
 }
 
 /** Show the options panel for the selected filter category. */
@@ -695,12 +897,111 @@ function finalizeRenderedRows(viewName, generation) {
     });
 }
 
+/** Escape a string for safe use inside a RegExp. */
+function escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** Remove previous search highlight marks from a container. */
+function clearSearchHighlights(container) {
+    if (!container) {
+        return;
+    }
+    container.querySelectorAll("mark.search-highlight").forEach((mark) => {
+        const parent = mark.parentNode;
+        if (!parent) {
+            return;
+        }
+        parent.replaceChild(document.createTextNode(mark.textContent || ""), mark);
+        parent.normalize();
+    });
+}
+
+/** Wrap case-insensitive matches of the active search term in yellow marks. */
+function highlightSearchMatches(container, searchQuery) {
+    if (!container) {
+        return;
+    }
+
+    clearSearchHighlights(container);
+    if (!isSearchActive(searchQuery)) {
+        return;
+    }
+
+    const term = searchQuery.trim();
+    const regex = new RegExp(`(${escapeRegExp(term)})`, "gi");
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            if (!node.nodeValue || !node.nodeValue.trim()) {
+                return NodeFilter.FILTER_REJECT;
+            }
+            const parent = node.parentElement;
+            if (!parent) {
+                return NodeFilter.FILTER_REJECT;
+            }
+            if (parent.closest("script, style, mark.search-highlight")) {
+                return NodeFilter.FILTER_REJECT;
+            }
+            if (!parent.closest("tr.visibleRows")) {
+                return NodeFilter.FILTER_REJECT;
+            }
+            return NodeFilter.FILTER_ACCEPT;
+        },
+    });
+
+    const textNodes = [];
+    while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+    }
+
+    textNodes.forEach((textNode) => {
+        const text = textNode.nodeValue;
+        regex.lastIndex = 0;
+        if (!regex.test(text)) {
+            return;
+        }
+        regex.lastIndex = 0;
+
+        const fragment = document.createDocumentFragment();
+        let lastIndex = 0;
+        let match = regex.exec(text);
+        while (match) {
+            if (match.index > lastIndex) {
+                fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            }
+            const mark = document.createElement("mark");
+            mark.className = "search-highlight";
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            lastIndex = match.index + match[0].length;
+            if (match[0].length === 0) {
+                regex.lastIndex += 1;
+            }
+            match = regex.exec(text);
+        }
+        if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+        }
+        textNode.parentNode.replaceChild(fragment, textNode);
+    });
+}
+
+/** Highlight active search matches in the live orders table body. */
+function highlightSearchInOrders(viewName) {
+    const tableBody = getLiveOrdersBody(viewName);
+    if (!tableBody) {
+        return;
+    }
+    highlightSearchMatches(tableBody, getSearchForView(viewName));
+}
+
 /** Run light setup now; defer layout/details so fade-in stays smooth. */
 function setupRenderedRows(viewName, generation, { deferHeavyWork = false } = {}) {
     if (!isOrdersRenderCurrent(generation, viewName)) {
         return;
     }
     bindOrderRowHandlers();
+    highlightSearchInOrders(viewName);
 
     if (!deferHeavyWork) {
         finalizeRenderedRows(viewName, generation);
@@ -888,6 +1189,7 @@ function updateViewCache(viewName, patch) {
         hasMore: false,
         scrollY: 0,
         filters: getDefaultOrderFilters(),
+        searchQuery: "",
     };
     viewOrdersCache.set(viewName, { ...previous, ...patch });
 }
@@ -947,6 +1249,7 @@ function buildOrdersUrl(endpoint, cursor, viewName = null) {
     const root = document.getElementById("dynamic-orders-root");
     const resolvedView = viewName || root?.dataset.currentView || "table";
     const filters = getFiltersForView(resolvedView);
+    const searchQuery = getSearchForView(resolvedView);
 
     url.searchParams.set("sort_by", filters.sortBy || "date");
     url.searchParams.set("sort", filters.sortDir || "desc");
@@ -966,6 +1269,10 @@ function buildOrdersUrl(endpoint, cursor, viewName = null) {
     if (!filters.includeOrder && !filters.includeOffer) {
         // Explicit empty selection so the backend returns no rows (not the default type).
         url.searchParams.append("order_type", "");
+    }
+
+    if (isSearchActive(searchQuery)) {
+        url.searchParams.set("q", searchQuery.trim());
     }
 
     if (cursor) {
@@ -1252,6 +1559,7 @@ function switchDynamicView(viewName) {
 
     container.innerHTML = getShellMarkup(viewName);
     syncFilterControls(getFiltersForView(viewName));
+    syncSearchControls(viewName);
     fetchAndRenderOrders({ viewName, generation });
 }
 
@@ -1264,6 +1572,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     ensureVitrineStylesIfNeeded(root.dataset.currentView);
     setupDynamicFilters();
+    setupDynamicSearch();
     fetchAndRenderOrders({ viewName: root.dataset.currentView || "table" });
 
     const navButtons = document.querySelectorAll("[data-dynamic-view]");
