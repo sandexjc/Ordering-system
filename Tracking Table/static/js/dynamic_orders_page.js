@@ -28,7 +28,7 @@ let searchDebounceTimer = null;
 const SEARCH_MIN_LENGTH = 2;
 const SEARCH_DEBOUNCE_MS = 700;
 
-/** Default list filters (newest by date, orders only). */
+/** Default list filters (newest by date, orders only, full id/balance range). */
 const DEFAULT_ORDER_FILTERS = Object.freeze({
     sortBy: "date",
     sortDir: "desc",
@@ -36,7 +36,14 @@ const DEFAULT_ORDER_FILTERS = Object.freeze({
     end: null,
     includeOrder: true,
     includeOffer: false,
+    idMin: null,
+    idMax: null,
+    balanceMin: null,
+    balanceMax: null,
 });
+
+const RANGE_FILTER_DEBOUNCE_MS = 300;
+let rangeFilterDebounceTimer = null;
 
 /** Active search query for a view (empty when inactive). */
 function getSearchForView(viewName) {
@@ -232,7 +239,20 @@ function getDefaultOrderFilters() {
         end: DEFAULT_ORDER_FILTERS.end,
         includeOrder: DEFAULT_ORDER_FILTERS.includeOrder,
         includeOffer: DEFAULT_ORDER_FILTERS.includeOffer,
+        idMin: DEFAULT_ORDER_FILTERS.idMin,
+        idMax: DEFAULT_ORDER_FILTERS.idMax,
+        balanceMin: DEFAULT_ORDER_FILTERS.balanceMin,
+        balanceMax: DEFAULT_ORDER_FILTERS.balanceMax,
     };
+}
+
+/** Parse a finite number or return null. */
+function parseOptionalNumber(value) {
+    if (value === null || value === undefined || value === "") {
+        return null;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
 }
 
 /** Normalize legacy/partial filter objects into the current shape. */
@@ -256,6 +276,10 @@ function normalizeOrderFilters(filters) {
     normalized.end = filters.end || null;
     normalized.includeOrder = Boolean(filters.includeOrder);
     normalized.includeOffer = Boolean(filters.includeOffer);
+    normalized.idMin = parseOptionalNumber(filters.idMin);
+    normalized.idMax = parseOptionalNumber(filters.idMax);
+    normalized.balanceMin = parseOptionalNumber(filters.balanceMin);
+    normalized.balanceMax = parseOptionalNumber(filters.balanceMax);
     return normalized;
 }
 
@@ -268,20 +292,44 @@ function getFiltersForView(viewName) {
     return getDefaultOrderFilters();
 }
 
+/** True when id/balance values differ from the full available bounds (or bounds unknown). */
+function isRangeFilterActive(minValue, maxValue, boundMin, boundMax) {
+    if (minValue == null && maxValue == null) {
+        return false;
+    }
+    if (boundMin == null || boundMax == null) {
+        return minValue != null || maxValue != null;
+    }
+    const effectiveMin = minValue == null ? boundMin : minValue;
+    const effectiveMax = maxValue == null ? boundMax : maxValue;
+    return effectiveMin > boundMin || effectiveMax < boundMax;
+}
+
 /** True when filters differ from defaults (drives the toolbar badge). Sort is table-driven and ignored here. */
-function filtersAreActive(filters) {
+function filtersAreActive(filters, viewName = null) {
     const current = normalizeOrderFilters(filters);
+    const root = document.getElementById("dynamic-orders-root");
+    const resolvedView = viewName || root?.dataset.currentView || "table";
+    const bounds = getFilterBoundsForView(resolvedView);
+
     return (
         Boolean(current.start)
         || Boolean(current.end)
         || current.includeOrder !== DEFAULT_ORDER_FILTERS.includeOrder
         || current.includeOffer !== DEFAULT_ORDER_FILTERS.includeOffer
+        || isRangeFilterActive(current.idMin, current.idMax, bounds?.idMin, bounds?.idMax)
+        || isRangeFilterActive(
+            current.balanceMin,
+            current.balanceMax,
+            bounds?.balanceMin,
+            bounds?.balanceMax
+        )
     );
 }
 
 /** Toggle the red filter badge and enable/disable the reset button. */
-function updateFilterBadge(filters) {
-    const active = filtersAreActive(filters);
+function updateFilterBadge(filters, viewName = null) {
+    const active = filtersAreActive(filters, viewName);
     const badge = document.getElementById("dynamic-filter-badge");
     if (badge) {
         badge.classList.toggle("d-none", !active);
@@ -305,9 +353,248 @@ function formatFilterDateLabel(value) {
     return `${parts[2]}.${parts[1]}.${parts[0]}`;
 }
 
-/** Build the compact “what filters are applied” text (period + type only). */
-function buildVisibleFiltersSummary(filters) {
+/** Stored min/max bounds for id/balance sliders per view. */
+function getFilterBoundsForView(viewName) {
+    const cacheEntry = viewOrdersCache.get(viewName);
+    return cacheEntry?.filterBounds || null;
+}
+
+/** Resolve endpoint URL for the given dynamic view. */
+function getOrdersEndpointForView(viewName) {
+    const liveBody = typeof getLiveOrdersBody === "function" ? getLiveOrdersBody(viewName) : null;
+    if (liveBody?.dataset.endpoint) {
+        return liveBody.dataset.endpoint;
+    }
+    const template = document.getElementById(`dynamic-${viewName}-shell-template`);
+    if (template) {
+        const probe = document.createElement("div");
+        probe.innerHTML = template.innerHTML;
+        const body = probe.querySelector("#dynamic-orders-body");
+        if (body?.dataset.endpoint) {
+            return body.dataset.endpoint;
+        }
+    }
+    return document.getElementById("dynamic-orders-body")?.dataset.endpoint || null;
+}
+
+/** Fetch and cache id/balance slider bounds for a view. */
+async function ensureFilterBounds(viewName) {
+    const existing = getFilterBoundsForView(viewName);
+    if (existing) {
+        return existing;
+    }
+
+    const endpoint = getOrdersEndpointForView(viewName);
+    if (!endpoint) {
+        return null;
+    }
+
+    try {
+        const url = new URL(endpoint, window.location.origin);
+        url.searchParams.set("bounds", "1");
+        const response = await fetch(url.toString(), {
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const payload = await response.json();
+        const bounds = {
+            idMin: Number(payload.id_min) || 0,
+            idMax: Number(payload.id_max) || 0,
+            balanceMin: Number(payload.balance_min) || 0,
+            balanceMax: Number(payload.balance_max) || 0,
+        };
+        if (bounds.idMax < bounds.idMin) {
+            bounds.idMax = bounds.idMin;
+        }
+        if (bounds.balanceMax < bounds.balanceMin) {
+            bounds.balanceMax = bounds.balanceMin;
+        }
+        updateViewCache(viewName, { filterBounds: bounds });
+        return bounds;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+/** Map range key to filter state field names. */
+function getRangeFilterFields(rangeKey) {
+    if (rangeKey === "order_id") {
+        return { minKey: "idMin", maxKey: "idMax", boundMinKey: "idMin", boundMaxKey: "idMax" };
+    }
+    return {
+        minKey: "balanceMin",
+        maxKey: "balanceMax",
+        boundMinKey: "balanceMin",
+        boundMaxKey: "balanceMax",
+    };
+}
+
+/** Read the DOM controls for a range filter panel. */
+function getRangeFilterElements(rangeKey) {
+    const root = document.querySelector(`.dynamic-range-filter[data-range-key="${rangeKey}"]`);
+    if (!root) {
+        return null;
+    }
+    return {
+        root,
+        minRange: root.querySelector(".dynamic-range-min"),
+        maxRange: root.querySelector(".dynamic-range-max"),
+        minInput: root.querySelector(".dynamic-range-min-input"),
+        maxInput: root.querySelector(".dynamic-range-max-input"),
+    };
+}
+
+/** Convert current slider/input values into filter patch (null/null = all). */
+function buildRangeFilterPatch(rangeKey, minValue, maxValue, bounds) {
+    const fields = getRangeFilterFields(rangeKey);
+    const boundMin = bounds?.[fields.boundMinKey];
+    const boundMax = bounds?.[fields.boundMaxKey];
+    let nextMin = parseOptionalNumber(minValue);
+    let nextMax = parseOptionalNumber(maxValue);
+
+    if (nextMin != null && nextMax != null && nextMin > nextMax) {
+        const swap = nextMin;
+        nextMin = nextMax;
+        nextMax = swap;
+    }
+
+    if (
+        boundMin != null
+        && boundMax != null
+        && (nextMin == null || nextMin <= boundMin)
+        && (nextMax == null || nextMax >= boundMax)
+    ) {
+        return { [fields.minKey]: null, [fields.maxKey]: null };
+    }
+
+    return { [fields.minKey]: nextMin, [fields.maxKey]: nextMax };
+}
+
+/** Push filter values into a range slider + number fields. */
+function syncRangeFilterControls(rangeKey, filters, bounds) {
+    const elements = getRangeFilterElements(rangeKey);
+    if (!elements) {
+        return;
+    }
+
+    const fields = getRangeFilterFields(rangeKey);
+    const boundMin = bounds?.[fields.boundMinKey] ?? 0;
+    const boundMax = bounds?.[fields.boundMaxKey] ?? 0;
+    const valueMin = filters[fields.minKey] == null ? boundMin : filters[fields.minKey];
+    const valueMax = filters[fields.maxKey] == null ? boundMax : filters[fields.maxKey];
+
+    [elements.minRange, elements.maxRange].forEach((rangeInput) => {
+        if (!rangeInput) {
+            return;
+        }
+        rangeInput.min = String(boundMin);
+        rangeInput.max = String(boundMax);
+        rangeInput.step = rangeKey === "balance" ? "0.01" : "1";
+    });
+
+    if (elements.minRange) {
+        elements.minRange.value = String(valueMin);
+    }
+    if (elements.maxRange) {
+        elements.maxRange.value = String(valueMax);
+    }
+    if (elements.minInput) {
+        elements.minInput.min = String(boundMin);
+        elements.minInput.max = String(boundMax);
+        elements.minInput.value = String(valueMin);
+    }
+    if (elements.maxInput) {
+        elements.maxInput.min = String(boundMin);
+        elements.maxInput.max = String(boundMax);
+        elements.maxInput.value = String(valueMax);
+    }
+}
+
+/** Debounced apply for range slider/input changes. */
+function scheduleRangeFilterCommit(rangeKey) {
+    const elements = getRangeFilterElements(rangeKey);
+    if (!elements) {
+        return;
+    }
+
+    const root = document.getElementById("dynamic-orders-root");
+    const viewName = root?.dataset.currentView || "table";
+    const bounds = getFilterBoundsForView(viewName);
+
+    if (rangeFilterDebounceTimer) {
+        window.clearTimeout(rangeFilterDebounceTimer);
+    }
+    rangeFilterDebounceTimer = window.setTimeout(() => {
+        rangeFilterDebounceTimer = null;
+        const patch = buildRangeFilterPatch(
+            rangeKey,
+            elements.minInput?.value,
+            elements.maxInput?.value,
+            bounds
+        );
+        applyFiltersAndRefresh(patch);
+    }, RANGE_FILTER_DEBOUNCE_MS);
+}
+
+/** Wire one dual-range control set. */
+function bindRangeFilterControls(rangeKey) {
+    const elements = getRangeFilterElements(rangeKey);
+    if (!elements || elements.root.dataset.rangeBound === "1") {
+        return;
+    }
+    elements.root.dataset.rangeBound = "1";
+
+    const syncFromRanges = () => {
+        let minValue = parseOptionalNumber(elements.minRange.value);
+        let maxValue = parseOptionalNumber(elements.maxRange.value);
+        if (minValue != null && maxValue != null && minValue > maxValue) {
+            if (document.activeElement === elements.minRange) {
+                maxValue = minValue;
+                elements.maxRange.value = String(maxValue);
+            } else {
+                minValue = maxValue;
+                elements.minRange.value = String(minValue);
+            }
+        }
+        elements.minInput.value = String(minValue ?? "");
+        elements.maxInput.value = String(maxValue ?? "");
+        scheduleRangeFilterCommit(rangeKey);
+    };
+
+    const syncFromInputs = () => {
+        let minValue = parseOptionalNumber(elements.minInput.value);
+        let maxValue = parseOptionalNumber(elements.maxInput.value);
+        if (minValue != null && maxValue != null && minValue > maxValue) {
+            const swap = minValue;
+            minValue = maxValue;
+            maxValue = swap;
+            elements.minInput.value = String(minValue);
+            elements.maxInput.value = String(maxValue);
+        }
+        if (minValue != null) {
+            elements.minRange.value = String(minValue);
+        }
+        if (maxValue != null) {
+            elements.maxRange.value = String(maxValue);
+        }
+        scheduleRangeFilterCommit(rangeKey);
+    };
+
+    elements.minRange.addEventListener("input", syncFromRanges);
+    elements.maxRange.addEventListener("input", syncFromRanges);
+    elements.minInput.addEventListener("change", syncFromInputs);
+    elements.maxInput.addEventListener("change", syncFromInputs);
+}
+
+/** Build the compact “what filters are applied” text. */
+function buildVisibleFiltersSummary(filters, viewName = null) {
     const current = normalizeOrderFilters(filters);
+    const root = document.getElementById("dynamic-orders-root");
+    const resolvedView = viewName || root?.dataset.currentView || "table";
+    const bounds = getFilterBoundsForView(resolvedView);
     const parts = [];
 
     const types = [];
@@ -317,12 +604,33 @@ function buildVisibleFiltersSummary(filters) {
     if (current.includeOffer) {
         types.push("оферти");
     }
-    parts.push(types.length ? `тип: ${types.join(" + ")}` : "тип: няма");
+    parts.push(types.length ? `вид: ${types.join(" + ")}` : "вид: няма");
 
     if (current.start || current.end) {
         const startLabel = current.start ? formatFilterDateLabel(current.start) : "…";
         const endLabel = current.end ? formatFilterDateLabel(current.end) : "…";
         parts.push(`период: ${startLabel} – ${endLabel}`);
+    }
+
+    if (isRangeFilterActive(current.idMin, current.idMax, bounds?.idMin, bounds?.idMax)) {
+        const minLabel = current.idMin == null ? bounds?.idMin ?? "…" : current.idMin;
+        const maxLabel = current.idMax == null ? bounds?.idMax ?? "…" : current.idMax;
+        parts.push(`номер: ${minLabel} – ${maxLabel}`);
+    }
+
+    if (
+        isRangeFilterActive(
+            current.balanceMin,
+            current.balanceMax,
+            bounds?.balanceMin,
+            bounds?.balanceMax
+        )
+    ) {
+        const minLabel =
+            current.balanceMin == null ? bounds?.balanceMin ?? "…" : current.balanceMin;
+        const maxLabel =
+            current.balanceMax == null ? bounds?.balanceMax ?? "…" : current.balanceMax;
+        parts.push(`баланс: ${minLabel} – ${maxLabel}`);
     }
 
     return parts.join(" · ");
@@ -341,8 +649,8 @@ function updateVisibleFiltersSummary(filters, viewName = null) {
     const searchQuery = getSearchForView(resolvedView);
     const parts = [];
 
-    if (filtersAreActive(current)) {
-        parts.push(buildVisibleFiltersSummary(current));
+    if (filtersAreActive(current, resolvedView)) {
+        parts.push(buildVisibleFiltersSummary(current, resolvedView));
     }
     if (isSearchActive(searchQuery)) {
         parts.push(`търсене: ${searchQuery.trim()}`);
@@ -382,8 +690,11 @@ function syncSortHeaders(filters) {
 }
 
 /** Sync filter controls to the given filter state (no refetch). */
-function syncFilterControls(filters) {
+function syncFilterControls(filters, viewName = null) {
     const current = normalizeOrderFilters(filters);
+    const root = document.getElementById("dynamic-orders-root");
+    const resolvedView = viewName || root?.dataset.currentView || "table";
+    const bounds = getFilterBoundsForView(resolvedView);
 
     const orderCheckbox = document.getElementById("filter-type-order");
     const offerCheckbox = document.getElementById("filter-type-offer");
@@ -409,10 +720,11 @@ function syncFilterControls(filters) {
         dateInput.value = current[dateTarget.value] || "";
     }
 
+    syncRangeFilterControls("order_id", current, bounds);
+    syncRangeFilterControls("balance", current, bounds);
     syncSortHeaders(current);
-    updateFilterBadge(current);
-    const root = document.getElementById("dynamic-orders-root");
-    updateVisibleFiltersSummary(current, root?.dataset.currentView || "table");
+    updateFilterBadge(current, resolvedView);
+    updateVisibleFiltersSummary(current, resolvedView);
 }
 
 /** Show the options panel for the selected filter category. */
@@ -488,14 +800,14 @@ function applyFiltersAndRefresh(patch) {
         orderDetails: {},
         scrollY: 0,
     });
-    syncFilterControls(filters);
+    syncFilterControls(filters, viewName);
     updateVisibleItemsCounter(0, viewName);
 
     const { generation } = beginOrdersRender(viewName);
     fetchAndRenderOrders({ forceRefresh: true, viewName, generation });
 }
 
-/** Reset period/type filters for the active view; keep current table sort. */
+/** Reset period/type/range filters for the active view; keep current table sort. */
 function resetFiltersAndRefresh() {
     const root = document.getElementById("dynamic-orders-root");
     const viewName = root?.dataset.currentView || "table";
@@ -562,8 +874,16 @@ function setupDynamicFilters() {
 
     const root = document.getElementById("dynamic-orders-root");
     const initialView = root?.dataset.currentView || "table";
-    syncFilterControls(getFiltersForView(initialView));
-    showFilterCategoryPanel("date");
+    bindRangeFilterControls("order_id");
+    bindRangeFilterControls("balance");
+    syncFilterControls(getFiltersForView(initialView), initialView);
+    showFilterCategoryPanel("type");
+    ensureFilterBounds(initialView).then((bounds) => {
+        if (!bounds) {
+            return;
+        }
+        syncFilterControls(getFiltersForView(initialView), initialView);
+    });
 
     filterRoot.querySelectorAll('input[name="filter-category"]').forEach((input) => {
         input.addEventListener("change", () => {
@@ -613,10 +933,10 @@ function setupDynamicFilters() {
     if (resetButton) {
         resetButton.addEventListener("click", () => {
             resetFiltersAndRefresh();
-            const periodCategory = document.getElementById("filter-cat-date");
-            if (periodCategory) {
-                periodCategory.checked = true;
-                showFilterCategoryPanel("date");
+            const typeCategory = document.getElementById("filter-cat-type");
+            if (typeCategory) {
+                typeCategory.checked = true;
+                showFilterCategoryPanel("type");
             }
         });
     }
@@ -1253,6 +1573,19 @@ function buildOrdersUrl(endpoint, cursor, viewName = null) {
         url.searchParams.set("q", searchQuery.trim());
     }
 
+    if (filters.idMin != null) {
+        url.searchParams.set("id_min", String(filters.idMin));
+    }
+    if (filters.idMax != null) {
+        url.searchParams.set("id_max", String(filters.idMax));
+    }
+    if (filters.balanceMin != null) {
+        url.searchParams.set("balance_min", String(filters.balanceMin));
+    }
+    if (filters.balanceMax != null) {
+        url.searchParams.set("balance_max", String(filters.balanceMax));
+    }
+
     if (cursor) {
         url.searchParams.set("cursor", cursor);
     }
@@ -1536,8 +1869,14 @@ function switchDynamicView(viewName) {
     ensureVitrineStylesIfNeeded(viewName);
 
     container.innerHTML = getShellMarkup(viewName);
-    syncFilterControls(getFiltersForView(viewName));
+    syncFilterControls(getFiltersForView(viewName), viewName);
     syncSearchControls(viewName);
+    ensureFilterBounds(viewName).then((bounds) => {
+        if (!bounds) {
+            return;
+        }
+        syncFilterControls(getFiltersForView(viewName), viewName);
+    });
     fetchAndRenderOrders({ viewName, generation });
 }
 

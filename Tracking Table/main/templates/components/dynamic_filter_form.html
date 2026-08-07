@@ -4,15 +4,31 @@
             <div class="row align-items-start dynamic-filter-row">
                 <div class="col-md-4 dynamic-filter-col">
                     <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Филтър категории">
-                        <input type="radio" class="btn-check" name="filter-category" id="filter-cat-date" value="date" autocomplete="off" checked>
+                        <input type="radio" class="btn-check" name="filter-category" id="filter-cat-type" value="type" autocomplete="off" checked>
+                        <label class="btn btn-outline-primary" for="filter-cat-type">Вид</label>
+
+                        <input type="radio" class="btn-check" name="filter-category" id="filter-cat-date" value="date" autocomplete="off">
                         <label class="btn btn-outline-primary" for="filter-cat-date">Период</label>
 
-                        <input type="radio" class="btn-check" name="filter-category" id="filter-cat-type" value="type" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="filter-cat-type">Тип</label>
+                        <input type="radio" class="btn-check" name="filter-category" id="filter-cat-order-id" value="order_id" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="filter-cat-order-id">Номер</label>
+
+                        <input type="radio" class="btn-check" name="filter-category" id="filter-cat-balance" value="balance" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="filter-cat-balance">Баланс</label>
                     </div>
                 </div>
                 <div class="col-md-4 dynamic-filter-col">
-                    <div data-filter-panel="date">
+                    <div data-filter-panel="type">
+                        <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Вид поръчки">
+                            <input type="checkbox" class="btn-check" id="filter-type-order" value="order" autocomplete="off" checked>
+                            <label class="btn btn-outline-primary" for="filter-type-order">Поръчки</label>
+
+                            <input type="checkbox" class="btn-check" id="filter-type-offer" value="offer" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="filter-type-offer">Оферти</label>
+                        </div>
+                    </div>
+
+                    <div data-filter-panel="date" class="d-none">
                         <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Избор на период">
                             <input type="radio" class="btn-check" name="filter-date-target" id="filter-date-start" value="start" autocomplete="off">
                             <label class="btn btn-outline-primary text-start" for="filter-date-start">
@@ -27,13 +43,42 @@
                             </label>
                         </div>
                     </div>
-                    <div data-filter-panel="type" class="d-none">
-                        <div class="btn-group-vertical w-100 dynamic-filter-btn-group" role="group" aria-label="Тип поръчки">
-                            <input type="checkbox" class="btn-check" id="filter-type-order" value="order" autocomplete="off" checked>
-                            <label class="btn btn-outline-primary" for="filter-type-order">Поръчки</label>
 
-                            <input type="checkbox" class="btn-check" id="filter-type-offer" value="offer" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="filter-type-offer">Оферти</label>
+                    <div data-filter-panel="order_id" class="d-none">
+                        <div class="dynamic-range-filter" data-range-key="order_id">
+                            <div class="dynamic-range-slider" aria-label="Диапазон по номер">
+                                <input type="range" class="dynamic-range-thumb dynamic-range-min" id="filter-id-range-min" value="0">
+                                <input type="range" class="dynamic-range-thumb dynamic-range-max" id="filter-id-range-max" value="0">
+                            </div>
+                            <div class="row g-2 mt-2">
+                                <div class="col-6">
+                                    <label class="form-label mb-1" for="filter-id-min">От</label>
+                                    <input type="number" class="form-control form-control-sm dynamic-range-min-input" id="filter-id-min" step="1">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label mb-1" for="filter-id-max">До</label>
+                                    <input type="number" class="form-control form-control-sm dynamic-range-max-input" id="filter-id-max" step="1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-filter-panel="balance" class="d-none">
+                        <div class="dynamic-range-filter" data-range-key="balance">
+                            <div class="dynamic-range-slider" aria-label="Диапазон по баланс">
+                                <input type="range" class="dynamic-range-thumb dynamic-range-min" id="filter-balance-range-min" value="0" step="0.01">
+                                <input type="range" class="dynamic-range-thumb dynamic-range-max" id="filter-balance-range-max" value="0" step="0.01">
+                            </div>
+                            <div class="row g-2 mt-2">
+                                <div class="col-6">
+                                    <label class="form-label mb-1" for="filter-balance-min">От</label>
+                                    <input type="number" class="form-control form-control-sm dynamic-range-min-input" id="filter-balance-min" step="0.01">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label mb-1" for="filter-balance-max">До</label>
+                                    <input type="number" class="form-control form-control-sm dynamic-range-max-input" id="filter-balance-max" step="0.01">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

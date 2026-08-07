@@ -2,7 +2,7 @@ import base64
 from datetime import datetime, time
 from decimal import Decimal, InvalidOperation
 
-from django.db.models import Q
+from django.db.models import Max, Min, Q
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -112,6 +112,33 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
     def get_search_query(self):
         return (self.request.GET.get("q") or "").strip()
 
+    def parse_optional_int(self, key):
+        raw = self.request.GET.get(key)
+        if raw is None or raw == "":
+            return None
+        try:
+            return int(raw)
+        except (TypeError, ValueError):
+            return None
+
+    def parse_optional_decimal(self, key):
+        raw = self.request.GET.get(key)
+        if raw is None or raw == "":
+            return None
+        try:
+            return Decimal(raw)
+        except (InvalidOperation, TypeError, ValueError):
+            return None
+
+    def get_id_range(self):
+        return self.parse_optional_int("id_min"), self.parse_optional_int("id_max")
+
+    def get_balance_range(self):
+        return (
+            self.parse_optional_decimal("balance_min"),
+            self.parse_optional_decimal("balance_max"),
+        )
+
     def apply_ordering(self, queryset):
         sort_by = self.get_sort_by()
         sort = self.get_sort()
@@ -128,6 +155,18 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         start_dt, end_dt = self.get_date_bounds()
         if start_dt is not None or end_dt is not None:
             queryset = queryset.created_between(start_dt, end_dt)
+
+        id_min, id_max = self.get_id_range()
+        if id_min is not None:
+            queryset = queryset.filter(pk__gte=id_min)
+        if id_max is not None:
+            queryset = queryset.filter(pk__lte=id_max)
+
+        balance_min, balance_max = self.get_balance_range()
+        if balance_min is not None:
+            queryset = queryset.filter(balance__gte=balance_min)
+        if balance_max is not None:
+            queryset = queryset.filter(balance__lte=balance_max)
 
         search_query = self.get_search_query()
         if len(search_query) >= 2:
@@ -214,6 +253,25 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
             request=self.request,
         )
 
+    def render_bounds_json_response(self):
+        queryset = self.model.objects.for_list()
+        aggregates = queryset.aggregate(
+            id_min=Min("pk"),
+            id_max=Max("pk"),
+            balance_min=Min("balance"),
+            balance_max=Max("balance"),
+        )
+        balance_min = aggregates["balance_min"]
+        balance_max = aggregates["balance_max"]
+        return JsonResponse(
+            {
+                "id_min": aggregates["id_min"] or 0,
+                "id_max": aggregates["id_max"] or 0,
+                "balance_min": float(balance_min if balance_min is not None else 0),
+                "balance_max": float(balance_max if balance_max is not None else 0),
+            }
+        )
+
     def render_rows_json_response(self):
         limit = self.get_page_size()
         cursor = self.request.GET.get("cursor") or None
@@ -234,5 +292,7 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
 
     def get(self, request, *args, **kwargs):
         if self.model is not None and self.rows_template_name:
+            if request.GET.get("bounds") == "1":
+                return self.render_bounds_json_response()
             return self.render_rows_json_response()
         return super().get(request, *args, **kwargs)

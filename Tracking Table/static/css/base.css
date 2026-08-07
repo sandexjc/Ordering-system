@@ -311,3 +311,72 @@ mark.search-highlight
 	padding: 0 0.1em;
 	border-radius: 0.15rem;
 }
+
+/* Dual range filter slider */
+.dynamic-range-slider
+{
+	position: relative;
+	height: 1.5rem;
+	margin: 0.75rem 0 0.25rem;
+}
+
+.dynamic-range-slider .dynamic-range-thumb
+{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	margin: 0;
+	pointer-events: none;
+	appearance: none;
+	background: transparent;
+	height: 1.5rem;
+}
+
+.dynamic-range-slider .dynamic-range-thumb::-webkit-slider-runnable-track
+{
+	height: 0.35rem;
+	border-radius: 999px;
+	background: #dee2e6;
+}
+
+.dynamic-range-slider .dynamic-range-thumb::-moz-range-track
+{
+	height: 0.35rem;
+	border-radius: 999px;
+	background: #dee2e6;
+}
+
+.dynamic-range-slider .dynamic-range-thumb::-webkit-slider-thumb
+{
+	appearance: none;
+	pointer-events: auto;
+	width: 1rem;
+	height: 1rem;
+	border-radius: 50%;
+	border: 2px solid #0d6efd;
+	background: #fff;
+	margin-top: -0.325rem;
+	cursor: pointer;
+	position: relative;
+	z-index: 2;
+}
+
+.dynamic-range-slider .dynamic-range-thumb::-moz-range-thumb
+{
+	pointer-events: auto;
+	width: 1rem;
+	height: 1rem;
+	border-radius: 50%;
+	border: 2px solid #0d6efd;
+	background: #fff;
+	cursor: pointer;
+	position: relative;
+	z-index: 2;
+}
+
+.dynamic-range-slider .dynamic-range-max
+{
+	z-index: 1;
+}
+
