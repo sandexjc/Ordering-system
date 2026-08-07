@@ -242,6 +242,26 @@ table.table-order-details thead tr th:not(:first-child) {
 	font-weight: bold;
 }
 
+/* Sortable table headers (dynamic mode) */
+#dynamic-orders-root .th-sortable
+{
+	cursor: pointer;
+	user-select: none;
+	white-space: nowrap;
+}
+
+#dynamic-orders-root .th-sortable .sort-arrow
+{
+	color: #dc3545;
+	font-size: 0.75em;
+	margin-left: 0.25rem;
+}
+
+#dynamic-orders-root .th-sortable.is-sorted
+{
+	color: inherit;
+}
+
 /* Dynamic expandable search */
 .dynamic-search
 {

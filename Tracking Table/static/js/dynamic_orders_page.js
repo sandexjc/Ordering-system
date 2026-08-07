@@ -38,12 +38,6 @@ const DEFAULT_ORDER_FILTERS = Object.freeze({
     includeOffer: false,
 });
 
-const SORT_BY_LABELS = {
-    order_id: "номер",
-    date: "дата",
-    balance: "баланс",
-};
-
 /** Active search query for a view (empty when inactive). */
 function getSearchForView(viewName) {
     const cacheEntry = viewOrdersCache.get(viewName);
@@ -274,13 +268,11 @@ function getFiltersForView(viewName) {
     return getDefaultOrderFilters();
 }
 
-/** True when filters differ from defaults (drives the toolbar badge). */
+/** True when filters differ from defaults (drives the toolbar badge). Sort is table-driven and ignored here. */
 function filtersAreActive(filters) {
     const current = normalizeOrderFilters(filters);
     return (
-        current.sortBy !== DEFAULT_ORDER_FILTERS.sortBy
-        || current.sortDir !== DEFAULT_ORDER_FILTERS.sortDir
-        || Boolean(current.start)
+        Boolean(current.start)
         || Boolean(current.end)
         || current.includeOrder !== DEFAULT_ORDER_FILTERS.includeOrder
         || current.includeOffer !== DEFAULT_ORDER_FILTERS.includeOffer
@@ -313,25 +305,10 @@ function formatFilterDateLabel(value) {
     return `${parts[2]}.${parts[1]}.${parts[0]}`;
 }
 
-/** Human-readable direction label for the active sort field. */
-function formatSortDirectionLabel(sortBy, sortDir) {
-    if (sortBy === "date") {
-        return sortDir === "asc" ? "най-стари" : "най-нови";
-    }
-    return sortDir === "asc" ? "възходящо" : "низходящо";
-}
-
-/** Build the compact “what filters are applied” text. */
+/** Build the compact “what filters are applied” text (period + type only). */
 function buildVisibleFiltersSummary(filters) {
     const current = normalizeOrderFilters(filters);
     const parts = [];
-
-    parts.push(
-        `сортиране: ${SORT_BY_LABELS[current.sortBy] || current.sortBy} (${formatSortDirectionLabel(
-            current.sortBy,
-            current.sortDir
-        )})`
-    );
 
     const types = [];
     if (current.includeOrder) {
@@ -381,35 +358,32 @@ function updateVisibleFiltersSummary(filters, viewName = null) {
     summaryNode.classList.remove("d-none");
 }
 
-/** Show the direction options matching the selected sort field. */
-function showSortDirectionPanel(sortBy) {
-    const sortDirPanel = document.getElementById("dynamic-filter-sort-dir-panel");
-    if (!sortDirPanel) {
+/** Sync red sort arrows on the live table headers. */
+function syncSortHeaders(filters) {
+    const current = normalizeOrderFilters(filters);
+    const container = document.getElementById("dynamic-orders-table-container");
+    if (!container) {
         return;
     }
 
-    sortDirPanel.querySelectorAll("[data-sort-dir-for]").forEach((panel) => {
-        panel.classList.toggle("d-none", panel.dataset.sortDirFor !== sortBy);
+    container.querySelectorAll("th[data-sort-by]").forEach((th) => {
+        const sortBy = th.dataset.sortBy;
+        const arrow = th.querySelector(".sort-arrow");
+        const isActive = sortBy === current.sortBy;
+        th.classList.toggle("is-sorted", isActive);
+        th.setAttribute(
+            "aria-sort",
+            isActive ? (current.sortDir === "asc" ? "ascending" : "descending") : "none"
+        );
+        if (arrow) {
+            arrow.textContent = isActive ? (current.sortDir === "asc" ? "▲" : "▼") : "";
+        }
     });
 }
 
 /** Sync filter controls to the given filter state (no refetch). */
 function syncFilterControls(filters) {
     const current = normalizeOrderFilters(filters);
-
-    const sortByInput = document.querySelector(
-        `input[name="filter-sort-by"][value="${current.sortBy}"]`
-    );
-    if (sortByInput) {
-        sortByInput.checked = true;
-    }
-
-    const sortDirInput = document.querySelector(
-        `input[name="filter-sort-dir-${current.sortBy}"][value="${current.sortDir}"]`
-    );
-    if (sortDirInput) {
-        sortDirInput.checked = true;
-    }
 
     const orderCheckbox = document.getElementById("filter-type-order");
     const offerCheckbox = document.getElementById("filter-type-offer");
@@ -435,11 +409,7 @@ function syncFilterControls(filters) {
         dateInput.value = current[dateTarget.value] || "";
     }
 
-    const category = document.querySelector('input[name="filter-category"]:checked');
-    if (!category || category.value === "sort") {
-        showSortDirectionPanel(current.sortBy);
-    }
-
+    syncSortHeaders(current);
     updateFilterBadge(current);
     const root = document.getElementById("dynamic-orders-root");
     updateVisibleFiltersSummary(current, root?.dataset.currentView || "table");
@@ -451,29 +421,7 @@ function showFilterCategoryPanel(category) {
         panel.classList.toggle("d-none", panel.dataset.filterPanel !== category);
     });
 
-    const sortDirPanel = document.getElementById("dynamic-filter-sort-dir-panel");
     const calendarPanel = document.getElementById("dynamic-filter-calendar-panel");
-    const root = document.getElementById("dynamic-orders-root");
-    const filters = getFiltersForView(root?.dataset.currentView || "table");
-
-    if (category === "sort") {
-        if (sortDirPanel) {
-            sortDirPanel.classList.remove("d-none");
-        }
-        if (calendarPanel) {
-            calendarPanel.classList.add("d-none");
-        }
-        const dateTarget = document.querySelector('input[name="filter-date-target"]:checked');
-        if (dateTarget) {
-            dateTarget.checked = false;
-        }
-        showSortDirectionPanel(filters.sortBy);
-        return;
-    }
-
-    if (sortDirPanel) {
-        sortDirPanel.classList.add("d-none");
-    }
 
     if (category === "date") {
         const dateTarget = document.querySelector('input[name="filter-date-target"]:checked');
@@ -494,7 +442,6 @@ function showFilterCategoryPanel(category) {
 
 /** Open the calendar column for start/end date editing. */
 function openDateCalendar(target, filters) {
-    const sortDirPanel = document.getElementById("dynamic-filter-sort-dir-panel");
     const calendarPanel = document.getElementById("dynamic-filter-calendar-panel");
     const calendarLabel = document.getElementById("dynamic-filter-calendar-label");
     const dateInput = document.getElementById("dynamic-filter-date-input");
@@ -502,9 +449,6 @@ function openDateCalendar(target, filters) {
         return;
     }
 
-    if (sortDirPanel) {
-        sortDirPanel.classList.add("d-none");
-    }
     calendarPanel.classList.remove("d-none");
     if (calendarLabel) {
         calendarLabel.textContent = target === "start" ? "Начална дата" : "Крайна дата";
@@ -551,9 +495,61 @@ function applyFiltersAndRefresh(patch) {
     fetchAndRenderOrders({ forceRefresh: true, viewName, generation });
 }
 
-/** Reset filters for the active view back to defaults. */
+/** Reset period/type filters for the active view; keep current table sort. */
 function resetFiltersAndRefresh() {
-    applyFiltersAndRefresh(getDefaultOrderFilters());
+    const root = document.getElementById("dynamic-orders-root");
+    const viewName = root?.dataset.currentView || "table";
+    const current = getFiltersForView(viewName);
+    applyFiltersAndRefresh({
+        ...getDefaultOrderFilters(),
+        sortBy: current.sortBy,
+        sortDir: current.sortDir,
+    });
+}
+
+/** Handle click/keyboard on a sortable table header. */
+function handleSortHeaderClick(sortBy) {
+    if (sortBy !== "order_id" && sortBy !== "date" && sortBy !== "balance") {
+        return;
+    }
+
+    const root = document.getElementById("dynamic-orders-root");
+    const viewName = root?.dataset.currentView || "table";
+    const current = getFiltersForView(viewName);
+    const sortDir =
+        current.sortBy === sortBy && current.sortDir === "desc" ? "asc" : "desc";
+
+    applyFiltersAndRefresh({ sortBy, sortDir });
+}
+
+/** Wire delegated click/keyboard handlers for sortable headers. */
+function setupTableSortHeaders() {
+    const container = document.getElementById("dynamic-orders-table-container");
+    if (!container || container.dataset.sortBound === "1") {
+        return;
+    }
+    container.dataset.sortBound = "1";
+
+    container.addEventListener("click", (event) => {
+        const th = event.target.closest("th[data-sort-by]");
+        if (!th || !container.contains(th)) {
+            return;
+        }
+        event.preventDefault();
+        handleSortHeaderClick(th.dataset.sortBy);
+    });
+
+    container.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") {
+            return;
+        }
+        const th = event.target.closest("th[data-sort-by]");
+        if (!th || !container.contains(th)) {
+            return;
+        }
+        event.preventDefault();
+        handleSortHeaderClick(th.dataset.sortBy);
+    });
 }
 
 /** Wire filter UI events (category panels + immediate filter applies). */
@@ -567,30 +563,12 @@ function setupDynamicFilters() {
     const root = document.getElementById("dynamic-orders-root");
     const initialView = root?.dataset.currentView || "table";
     syncFilterControls(getFiltersForView(initialView));
-    showFilterCategoryPanel("sort");
+    showFilterCategoryPanel("date");
 
     filterRoot.querySelectorAll('input[name="filter-category"]').forEach((input) => {
         input.addEventListener("change", () => {
             if (input.checked) {
                 showFilterCategoryPanel(input.value);
-            }
-        });
-    });
-
-    filterRoot.querySelectorAll('input[name="filter-sort-by"]').forEach((input) => {
-        input.addEventListener("change", () => {
-            if (!input.checked) {
-                return;
-            }
-            showSortDirectionPanel(input.value);
-            applyFiltersAndRefresh({ sortBy: input.value });
-        });
-    });
-
-    filterRoot.querySelectorAll("[data-sort-dir]").forEach((input) => {
-        input.addEventListener("change", () => {
-            if (input.checked) {
-                applyFiltersAndRefresh({ sortDir: input.value });
             }
         });
     });
@@ -635,10 +613,10 @@ function setupDynamicFilters() {
     if (resetButton) {
         resetButton.addEventListener("click", () => {
             resetFiltersAndRefresh();
-            const sortCategory = document.getElementById("filter-cat-sort");
-            if (sortCategory) {
-                sortCategory.checked = true;
-                showFilterCategoryPanel("sort");
+            const periodCategory = document.getElementById("filter-cat-date");
+            if (periodCategory) {
+                periodCategory.checked = true;
+                showFilterCategoryPanel("date");
             }
         });
     }
@@ -1572,7 +1550,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     ensureVitrineStylesIfNeeded(root.dataset.currentView);
     setupDynamicFilters();
+    setupTableSortHeaders();
     setupDynamicSearch();
+    syncSortHeaders(getFiltersForView(root.dataset.currentView || "table"));
     fetchAndRenderOrders({ viewName: root.dataset.currentView || "table" });
 
     const navButtons = document.querySelectorAll("[data-dynamic-view]");
