@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_bootstrap5',
-    'common',
+    'common.apps.CommonConfig',
     'accounts',
     'table',
     'vitrine'

@@ -1,4 +1,7 @@
 from django.utils import timezone
+
+from common.db import unicode_contains
+
 from .BaseQuerySet import BaseQuerySet
 
 class BaseOrderQuerySet(BaseQuerySet):
@@ -23,11 +26,11 @@ class BaseOrderQuerySet(BaseQuerySet):
     
     # Telephone number orders filtering
     def telephone_contains(self, number):
-        return self.filter(telephone__icontains=number)
+        return self.filter(unicode_contains("telephone", number))
     
     # Client name based orers filtering
     def owner_contains(self, name):
-        return self.filter(owner__icontains=name)
+        return self.filter(unicode_contains("owner", name))
 
     # Filter by one or more order types (order/offer). Empty → no rows.
     def of_types(self, *order_types):

@@ -1,5 +1,6 @@
 from django.db.models import Q
 
+from common.db import unicode_contains
 from common.querysets import BaseOrderQuerySet
 
 
@@ -29,10 +30,10 @@ class VitrineOrderQuerySet(BaseOrderQuerySet):
             return self
 
         return self.filter(
-            Q(owner__icontains=term)
-            | Q(telephone__icontains=term)
-            | Q(frames__profile_type__icontains=term, frames__deleted_at__isnull=True)
-            | Q(frames__glass_type__icontains=term, frames__deleted_at__isnull=True)
-            | Q(notes__content__icontains=term, notes__deleted_at__isnull=True)
-            | Q(others__description__icontains=term, others__deleted_at__isnull=True)
+            unicode_contains("owner", term)
+            | unicode_contains("telephone", term)
+            | Q(unicode_contains("frames__profile_type", term), frames__deleted_at__isnull=True)
+            | Q(unicode_contains("frames__glass_type", term), frames__deleted_at__isnull=True)
+            | Q(unicode_contains("notes__content", term), notes__deleted_at__isnull=True)
+            | Q(unicode_contains("others__description", term), others__deleted_at__isnull=True)
         ).distinct()
