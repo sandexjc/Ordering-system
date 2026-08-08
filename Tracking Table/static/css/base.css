@@ -145,6 +145,17 @@ table.table-order-details thead tr th:not(:first-child) {
 	background-color: white;
 }
 
+/* Offer rows: light blue highlight only in dynamic mode */
+#dynamic-orders-root .offer-row
+{
+	background-color: #e9f2fc;
+}
+
+#dynamic-orders-root .offer-row.rowSelected
+{
+	background-color: #b3d4f7;
+}
+
 .orderClicked
 {
 	background-color: #e5e5e5;

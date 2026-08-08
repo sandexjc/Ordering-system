@@ -1,7 +1,7 @@
 {% if order.order_taken %}
-    <tr class="visibleRows orderTaken fixed-min-width" id="{{ order.id }}" data-app-url="/table/viewOrder/" data-row="{{ order.id }}">
+    <tr class="visibleRows orderTaken fixed-min-width{% if order.order_type == 'offer' %} offer-row{% endif %}" id="{{ order.id }}" data-app-url="/table/viewOrder/" data-row="{{ order.id }}">
 {% else %}
-    <tr class="visibleRows normalOrder fixed-min-width" id="{{ order.id }}" data-app-url="/table/viewOrder/" data-row="{{ order.id }}">
+    <tr class="visibleRows normalOrder fixed-min-width{% if order.order_type == 'offer' %} offer-row{% endif %}" id="{{ order.id }}" data-app-url="/table/viewOrder/" data-row="{{ order.id }}">
 {% endif %}
 
     {% if order.invoice %}

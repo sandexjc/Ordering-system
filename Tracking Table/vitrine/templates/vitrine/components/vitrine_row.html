@@ -1,7 +1,7 @@
 {% if vitrine.order_taken %}
-    <tr class="visibleRows orderTaken fixed-min-width" id="{{ vitrine.id }}" data-app-url="/vitrine/view_vitrine/" data-row="{{ vitrine.id }}">
+    <tr class="visibleRows orderTaken fixed-min-width{% if vitrine.order_type == 'offer' %} offer-row{% endif %}" id="{{ vitrine.id }}" data-app-url="/vitrine/view_vitrine/" data-row="{{ vitrine.id }}">
 {% else %}
-    <tr class="visibleRows normalOrder fixed-min-width" id="{{ vitrine.id }}" data-app-url="/vitrine/view_vitrine/" data-row="{{ vitrine.id }}">
+    <tr class="visibleRows normalOrder fixed-min-width{% if vitrine.order_type == 'offer' %} offer-row{% endif %}" id="{{ vitrine.id }}" data-app-url="/vitrine/view_vitrine/" data-row="{{ vitrine.id }}">
 {% endif %}
 
     <td>{{ vitrine.id }}</td>
