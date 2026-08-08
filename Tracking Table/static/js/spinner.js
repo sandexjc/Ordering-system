@@ -6,14 +6,21 @@ function add_spinner(order_id)
 
     var main_div = document.createElement("div");
     var inner_div = document.createElement("div");
+    var text_span = document.createElement("span");
 
-    main_div.className = "d-flex justify-content-center";
+    main_div.className = "order-spinner d-flex justify-content-center align-items-center gap-2";
     main_div.setAttribute("id", "order-spinner-" + order_id);
+    main_div.setAttribute("role", "status");
+    main_div.setAttribute("aria-live", "polite");
 
     inner_div.className = "spinner-border";
-    inner_div.setAttribute("role", "status");
+    inner_div.setAttribute("aria-hidden", "true");
+
+    text_span.className = "order-spinner-text";
+    text_span.textContent = "Зареждане на поръчка";
 
     main_div.appendChild(inner_div);
+    main_div.appendChild(text_span);
 
     return main_div;
 
@@ -30,4 +37,19 @@ function remove_spinner(order_id) {
         spinner.remove();
     }
     
+}
+
+/**
+ * Show or hide the fold button under a hidden row.
+ */
+function set_hidden_row_close_visible(order_id, visible) {
+    const hiddenRow = document.getElementById("hidden-row-" + order_id);
+    if (!hiddenRow) {
+        return;
+    }
+    const closeBtn = hiddenRow.querySelector(".hidden-row-close");
+    if (!closeBtn) {
+        return;
+    }
+    closeBtn.classList.toggle("is-visible", Boolean(visible));
 }

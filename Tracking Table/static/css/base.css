@@ -60,6 +60,63 @@ body
 	padding-top: 20px;
 }
 
+.order-spinner
+{
+	min-height: 72px;
+	width: 100%;
+	color: #6c757d;
+}
+
+.order-spinner-text
+{
+	font-size: 0.95rem;
+	line-height: 1.2;
+}
+
+.hidden-row-close
+{
+	display: none;
+	width: 100%;
+	margin: 0;
+	padding: 0.45rem 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	color: #6c757d;
+	line-height: 1;
+	transition: background 0.15s ease, color 0.15s ease;
+}
+
+.hidden-row-close.is-visible
+{
+	display: block;
+}
+
+.hidden-row-close:hover,
+.hidden-row-close:focus-visible
+{
+	background: linear-gradient(
+		to right,
+		transparent 0%,
+		rgba(0, 0, 0, 0.08) 20%,
+		rgba(0, 0, 0, 0.08) 80%,
+		transparent 100%
+	);
+	color: #212529;
+	outline: none;
+}
+
+.hidden-row-close-arrow
+{
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-left: 7px solid transparent;
+	border-right: 7px solid transparent;
+	border-bottom: 8px solid currentColor;
+	vertical-align: middle;
+}
+
 .order-details
 {
 	padding-bottom: 20px;

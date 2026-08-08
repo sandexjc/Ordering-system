@@ -1326,6 +1326,9 @@ function restoreCachedOrderDetails(viewName) {
         }
         hiddenTable.innerHTML = detailsHtml;
         hiddenRow.classList.add("fetch-prevent");
+        if (typeof set_hidden_row_close_visible === "function") {
+            set_hidden_row_close_visible(orderId, true);
+        }
     });
 
     if (typeof handle_orders_properties === "function") {

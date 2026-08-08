@@ -50,9 +50,18 @@ function cache_order_details(order_id)
 
 function get_order(order_id)
 {
-    /** Add loading indication */
-    document.getElementById("hidden-row-" + order_id).appendChild(add_spinner(order_id));
-    
+    const hiddenRow = document.getElementById("hidden-row-" + order_id);
+    const hiddenTable = document.getElementById("hidden-table-" + order_id);
+
+    /** Hide fold button while loading; spinner lives inside the content area. */
+    set_hidden_row_close_visible(order_id, false);
+    if (hiddenTable) {
+        hiddenTable.appendChild(add_spinner(order_id));
+    }
+    if (typeof onHiddenRowContentUpdated === "function") {
+        onHiddenRowContentUpdated(hiddenRow);
+    }
+
     /** Get app specific resource address from element */
     let url_resource = document.getElementById(order_id).getAttribute("data-app-url");
 
@@ -131,9 +140,11 @@ function get_order(order_id)
             handle_orders_properties();
             handle_orders_history();
 
+            /** Show fold button only after content is ready */
+            set_hidden_row_close_visible(order_id, true);
+
             /** Recompute height after dynamic content is fully updated */
-            const hiddenRow = document.getElementById("hidden-row-" + order_id);
-            onHiddenRowContentUpdated(hiddenRow);
+            onHiddenRowContentUpdated(document.getElementById("hidden-row-" + order_id));
             cache_order_details(order_id);
 
         })
@@ -143,11 +154,14 @@ function get_order(order_id)
             remove_spinner(order_id);
 
             /** Show fallback message in placeholder */
-            let hiddenTable = document.getElementById("hidden-table-" + order_id);
-            if (hiddenTable)
+            let errorHiddenTable = document.getElementById("hidden-table-" + order_id);
+            if (errorHiddenTable)
             {
-                hiddenTable.appendChild(create_order_error(order_id));
+                errorHiddenTable.appendChild(create_order_error(order_id));
             }
+
+            set_hidden_row_close_visible(order_id, true);
+            onHiddenRowContentUpdated(document.getElementById("hidden-row-" + order_id));
 
             console.log(error);
         });
@@ -179,5 +193,6 @@ function retry_order(order_id) {
         }
 
     }
+    set_hidden_row_close_visible(order_id, false);
     get_order(order_id);
 }

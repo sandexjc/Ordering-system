@@ -56,6 +56,34 @@ function handle_orders() {
         closeHiddenRow(hiddenRow, visibleRow);
       }
     });
+
+    const closeBtn = hiddenRow.querySelector(".hidden-row-close");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (hiddenRow._isOpen) {
+          closeHiddenRow(hiddenRow, visibleRow);
+          focusClosedOrderRow(visibleRow);
+        }
+      });
+    }
+  });
+}
+
+/** After folding via the close button, bring the order row back into view and focus it. */
+function focusClosedOrderRow(visibleRow) {
+  if (!visibleRow) {
+    return;
+  }
+
+  if (!visibleRow.hasAttribute("tabindex")) {
+    visibleRow.setAttribute("tabindex", "-1");
+  }
+
+  visibleRow.scrollIntoView({ block: "center", behavior: "smooth", inline: "nearest" });
+  requestAnimationFrame(() => {
+    visibleRow.focus({ preventScroll: true });
   });
 }
 
@@ -119,6 +147,9 @@ function openHiddenRow(hiddenRow, row_id, visibleRow) {
   if (!hiddenRow.classList.contains("fetch-prevent")) {
     hiddenRow.classList.add("fetch-prevent");
     get_order(row_id);
+  } else if (typeof set_hidden_row_close_visible === "function") {
+    /** Content already loaded (cache / prior fetch) — keep fold button available. */
+    set_hidden_row_close_visible(row_id, true);
   }
 
   hiddenRow._isOpen = true;
