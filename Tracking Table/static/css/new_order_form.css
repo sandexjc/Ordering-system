@@ -1,3 +1,20 @@
+/*
+ * new_order_form.css
+ * ------------------
+ * Shared white card shell for create/edit order forms.
+ *
+ * Loaded from:
+ *   - common/templates/common/components/new_order.html  (create order)
+ *   - table/templates/table/edit_order.html              (edit order; uses .new-order-form)
+ *
+ * Used by:
+ *   - Form elements with class .new-order-form
+ *
+ * Note:
+ *   .edit-order-form in edit_order.css is the vitrine-edit equivalent (same visual shell).
+ *   Candidates for a future merge into a single order_forms.css.
+ */
+
 .new-order-form
 {
     padding: 2rem;

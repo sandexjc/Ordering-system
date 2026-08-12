@@ -1,3 +1,22 @@
+/*
+ * format_table.css
+ * ----------------
+ * Small table formatting utilities (compact size, nowrap, section headers).
+ *
+ * Loaded from:
+ *   - vitrine/templates/vitrine/edit_vitrine.html
+ *   - table/templates/table/print_order.html
+ *   - vitrine/templates/vitrine/print_vitrine.html
+ *
+ * Used by:
+ *   - vitrine/.../vitrine_order_info.html     (.custom-table-sm, .table-no-wrap, .section-header)
+ *   - print_order.html / print_vitrine.html   (.custom-table-sm, .table-no-wrap, .align-center)
+ *   - common print table includes via props="custom-table-sm table-no-wrap"
+ *
+ * Unused (no current template references):
+ *   - .bordered-row
+ */
+
 .custom-table-sm {
     font-size: 0.80rem;
 }
@@ -16,9 +35,9 @@
     border-bottom: 2px solid currentColor;
 }
 
+/* Unused: no current template uses .bordered-row */
 .table > tbody > tr.bordered-row > th {
     font-weight: 700;
     border-bottom: 2px solid currentColor;
     border-top: 2px solid currentColor;
 }
-

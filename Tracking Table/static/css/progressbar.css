@@ -1,3 +1,17 @@
+/*
+ * progressbar.css
+ * ---------------
+ * Multi-step progress indicator (plates / edges / vitrine stages).
+ *
+ * Loaded from:
+ *   - main/templates/layout/base.html  ({% block links %}, site-wide default)
+ *
+ * Used by:
+ *   - common/templates/common/components/progress_bar.html  (.progressbar, .active, .disabled)
+ *   - Injected into expanded order rows / progress modals (table + vitrine)
+ *   - static/js/order.js toggles .active on plate/edge progress steps after update
+ */
+
 /* === Base Progressbar Container === */
 .progressbar {
     display: grid;
@@ -12,9 +26,9 @@
 .progressbar li {
     list-style: none;
     position: relative;
-    display: flex;              /* key */
-    justify-content: center;    /* horizontal center */
-    align-items: flex-start;    /* keeps circle at top */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 /* === Step Circle (default) === */

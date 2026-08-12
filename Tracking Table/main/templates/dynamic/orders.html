@@ -3,6 +3,7 @@
 
 {% block links %}
     {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dynamic_orders.css' %}">
     {% if current_dynamic_view == "vitrine" %}
         <link id="dynamic-vitrine-css-vitrines" rel="stylesheet" type="text/css" href="{% static 'vitrine/css/vitrines.css' %}">
         <link id="dynamic-vitrine-css-holes" rel="stylesheet" type="text/css" href="{% static 'vitrine/css/holes_dots.css' %}">

@@ -1,5 +1,25 @@
+/*
+ * edit_order.css
+ * --------------
+ * Edit-order / edit-vitrine form shell and column width rules for item tables.
+ *
+ * Loaded from:
+ *   - table/templates/table/edit_order.html
+ *   - vitrine/templates/vitrine/edit_vitrine.html
+ *
+ * Used by:
+ *   - edit_vitrine.html          (.edit-order-form, .frame-table, .table-min-width)
+ *   - edit_order.html            (.plate-table, .table-min-width)
+ *   - vitrine/.../vitrine_order_info.html  (.indent-cell; also uses format_table.css)
+ *
+ * Related:
+ *   - new_order_form.css supplies .new-order-form (create form + table edit form shell)
+ */
 
-/** General sizes */
+/* =============================================================================
+   Form shell (vitrine edit)
+   ============================================================================= */
+
 .edit-order-form
 {
     padding: 2rem;
@@ -15,9 +35,9 @@
     min-width: 40rem;
 }
 
-/*
- * Vitrine app Frame table cell sizes
- */
+/* =============================================================================
+   Vitrine app — Frame table column sizes
+   ============================================================================= */
 
 /** Profile color */
 .frame-table th:nth-child(1),
@@ -61,9 +81,9 @@
     min-width: 5rem;
 }
 
-/*
- * Table app Plates table cell sizes
- */
+/* =============================================================================
+   Table app — Plates table column sizes
+   ============================================================================= */
 
 /** Plate material */
 .plate-table th:nth-child(1),
