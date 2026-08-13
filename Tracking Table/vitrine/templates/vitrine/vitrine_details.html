@@ -3,13 +3,17 @@
 
 
 {# MODALS & OFFCANVAS #}
-{% include "common/modals/progress_modal.html" with object=vitrine app_name="vitrine" progress_table_template="vitrine/vitrine_progress_form.html" %}
+{% if not dynamic_mode %}
+    {% include "common/modals/progress_modal.html" with object=vitrine app_name="vitrine" progress_table_template="vitrine/vitrine_progress_form.html" %}
+{% endif %}
 {% include "common/modals/delete_modal.html" with object=vitrine app_name="vitrine" %}
 
 <div class="container-fluid order-view" id="order-view-{{ vitrine.id }}">
+    {% if dynamic_mode %}
+        {% csrf_token %}
+        {% include "vitrine/vitrine_table.html" with vitrine=vitrine %}
+    {% endif %}
 
-    {# ORDER ITEMS PROGRESS TABLE #}
-    
     {# ORDER TOOLBAR #}
     {% include "common/components/order_toolbar.html" with object=vitrine %}
 </div>

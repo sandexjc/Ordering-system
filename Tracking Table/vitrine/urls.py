@@ -10,4 +10,7 @@ urlpatterns = [
     path('update_vitrine/<int:pk>', views.UpdateVitrine.as_view(), name='update'),
     path('delete_vitrine/<int:pk>', views.DeleteVitrine.as_view(), name='delete'),
     path('print_vitrine/<int:pk>', views.PrintVitrine.as_view(), name='print_vitrine'),
+
+    # Dynamic vitrine view: click-to-toggle order_ready / order_taken (JSON POST).
+    path('update_progress/<int:pk>', views.UpdateProgressStep.as_view(), name='update_progress'),
 ]

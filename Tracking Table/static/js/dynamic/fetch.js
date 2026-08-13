@@ -259,7 +259,7 @@ async function loadMoreOrders(viewName, generation) {
             nextCursor,
         });
         updateVisibleItemsCounter(visibleItems, viewName);
-        setupRenderedRows(viewName, generation, { deferHeavyWork: true });
+        setupRenderedRows(viewName, generation, { deferHeavyWork: true, restoreExpandedRows: false });
         fadeInRows(newRows);
 
         if (hasMore) {

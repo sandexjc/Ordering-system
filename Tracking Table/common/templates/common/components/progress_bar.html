@@ -3,12 +3,41 @@
     Expected context:
         - item: the object this bar represents (used for ID binding)
         - steps: a list of tuples (step_name, active, disabled)
+        - interactive: optional; when true, steps are clickable (dynamic table / vitrine)
+        - progress_update_url: required when interactive
+        - bar_suffix: optional; unique bar id when the same item has more than one bar
     Example: [("ordered", True, False), ("delivered", False, False)]
 
 {% endcomment %}
 
-<ul class="progressbar" id="{{ item.type }}-bar-{{ item.pk }}">
+<ul
+    class="progressbar{% if interactive %} progressbar-interactive{% endif %}"
+    id="{{ item.type }}-bar-{{ item.pk }}{% if bar_suffix %}-{{ bar_suffix }}{% endif %}"
+>
     {% for step, active, disabled in steps %}
-        <li class="{{ step }}{% if disabled %} disabled{% elif active %} active{% endif %}" id="{{ item.type }}-progress-{{ step }}-{{ item.pk }}"></li>
+        <li
+            class="{{ step }}{% if disabled %} disabled{% elif active %} active{% endif %}"
+            id="{{ item.type }}-progress-{{ step }}-{{ item.pk }}"
+            {% if interactive %}
+                data-progress-step
+                data-item-type="{{ item.type }}"
+                data-item-id="{{ item.pk }}"
+                data-field="{{ step }}"
+                data-active="{% if active %}1{% else %}0{% endif %}"
+                data-url="{{ progress_update_url }}"
+                {% if not disabled %}
+                    role="button"
+                    tabindex="0"
+                {% endif %}
+            {% endif %}
+        >
+            {% if interactive %}
+                <span class="progress-step-hit" aria-hidden="true">
+                    <span class="progress-step-mark">✔️</span>
+                </span>
+                <span class="progress-step-spinner spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <button type="button" class="btn btn-sm btn-outline-danger progress-step-retry">Опитай отново</button>
+            {% endif %}
+        </li>
     {% endfor %}
 </ul>

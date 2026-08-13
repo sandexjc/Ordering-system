@@ -26,7 +26,10 @@ Each stream supports searchable dashboards, order editing, progress tracking, pr
 - **Progress and production flow**
   - Plate progress includes ordered/delivered/cutted/edged stages.
   - Edge progress includes ordered/delivered stages.
-  - Order-ready logic is derived from item completion state.
+  - Table order-ready is derived from plate completion (`plates_make_order_ready`).
+  - Vitrine order-ready / order-taken are set directly on the vitrine.
+  - Static `/table/` and `/vitrine/` update progress through the modal form (`UpdateOrder` / `UpdateVitrine`).
+  - Dynamic `/dynamic/` updates table and vitrine progress by clicking a step (`UpdateProgressStep`).
 - **Audit trail and collaboration context**
   - Notes can be attached to orders.
   - Changes are stored with user, operation, related item, and state transitions.
@@ -62,8 +65,19 @@ Each stream supports searchable dashboards, order editing, progress tracking, pr
 
 - `/table/` - table board (records are filtered by `order_type`)
 - `/vitrine/` - vitrine board
+- `/dynamic/` - dynamic board (requires `DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING=True`)
 - `/accounts/login/` - authentication
 - `/admin/` - Django admin
+
+Table progress POST endpoints:
+
+- `/table/updateOrder/<pk>` (`table:update`) - static progress modal form POST
+- `/table/updateProgress/<pk>` (`table:update_progress`) - dynamic click-to-toggle JSON POST
+
+Vitrine progress POST endpoints:
+
+- `/vitrine/update_vitrine/<pk>` (`vitrine:update`) - static progress modal form POST
+- `/vitrine/update_progress/<pk>` (`vitrine:update_progress`) - dynamic click-to-toggle JSON POST
 
 ## Local setup
 
@@ -101,6 +115,7 @@ Optional variables supported in settings include:
 - `DJANGO_CSRF_COOKIE_AGE`
 - `DJANGO_FEATURES__AUTO_SEAL_SELECT`
 - `DJANGO_FEATURES__MANUAL_SEAL`
+- `DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING`
 
 ### 4) Run migrations and start the app
 
@@ -275,6 +290,7 @@ static/js/
       fetch.js
     actions/
       progress-delete.js
+      progress-step.js     ← dynamic table / vitrine click-to-toggle (loaded from dynamic/orders.html)
       edit-submit.js
       alerts.js
       properties.js      ← handle_orders_properties() orchestrator
@@ -310,6 +326,7 @@ static/js/
 5. `dynamic/render.js`
 6. `dynamic/fetch.js`
 7. `dynamic/page.js`
+8. `orders/actions/progress-step.js` (dynamic table / vitrine click-to-toggle; not loaded on static boards)
 
 **Login**
 
@@ -327,7 +344,8 @@ static/js/
 | `orders/details/spinner.js` | `add_spinner`, `remove_spinner`, `set_hidden_row_close_visible` |
 | `orders/details/error.js` | `create_order_error` |
 | `orders/details/fetch.js` | `get_current_dynamic_view_name`, `cache_order_details`, `get_order`, `retry_order` |
-| `orders/actions/progress-delete.js` | `setup_progress_delete_handlers` |
+| `orders/actions/progress-delete.js` | `setup_progress_delete_handlers`, `apply_progress_update_response`, `sync_progress_step`, `sync_vitrine_order_taken_enabled` |
+| `orders/actions/progress-step.js` | click/hover/retry handlers; POSTs one step to `table:update_progress` or `vitrine:update_progress` |
 | `orders/actions/edit-submit.js` | `setup_edit_submit_handlers` |
 | `orders/actions/alerts.js` | `setup_alert_handlers` |
 | `orders/actions/properties.js` | `handle_orders_properties` |
@@ -345,3 +363,60 @@ static/js/
 - `handle_orders_properties()` orchestrates progress/delete, edit-submit, and alert setup helpers.
 - jQuery is still required for `orders/actions/{edit-submit,alerts,history}.js`.
 - Keep this map in **developer docs only** (`README.md`). Do not publish it in `PUBLIC.md` or under publicly served `static/` paths.
+
+## Table progress updates (static vs dynamic)
+
+Static `/table/` and dynamic `/dynamic/` share `ViewOrder` (`table:order_view`) but take different update paths.
+
+### Static `/table/` (unchanged)
+
+- Expand a row without `?dynamic=1`.
+- Details include the progress modal, plate/edge formsets, `OrderProgressForm`, and the toolbar Update button.
+- Submit POSTs to `/table/updateOrder/<pk>` (`UpdateOrder` / `BaseUpdateView`).
+- `progress-step.js` is not loaded on this page.
+
+### Dynamic `/dynamic/` (table view)
+
+- Details fetch appends `?dynamic=1`.
+- Modal, formsets, and the toolbar Update button are omitted.
+- Clicking a progress circle POSTs JSON to `/table/updateProgress/<pk>` (`UpdateProgressStep`).
+
+## Vitrine progress updates (static vs dynamic)
+
+Static `/vitrine/` and dynamic `/dynamic/` share `ViewVitrine` (`vitrine:vitrine_view`).
+
+### Static `/vitrine/` (unchanged)
+
+- Expand a row without `?dynamic=1`.
+- Details include the progress modal, `VitrineProgressForm`, and the toolbar Update button.
+- Submit POSTs to `/vitrine/update_vitrine/<pk>` (`UpdateVitrine` / `BaseUpdateView`).
+- `progress-step.js` is not loaded on this page.
+
+### Dynamic `/dynamic/` (vitrine view)
+
+- Details fetch appends `?dynamic=1`.
+- Modal, form, and the toolbar Update button are omitted.
+- Clicking **Поръчката е готова** or **Поръчката е взета** POSTs JSON to `/vitrine/update_progress/<pk>`.
+- `order_taken` stays disabled until `order_ready` is true (same as `BaseUpdateView` clearing taken when not ready).
+
+### Switching back to the static board
+
+Set `DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING=False`:
+
+- `/` redirects to `/table/` instead of `/dynamic/`.
+- `/dynamic/`, `/table/updateProgress/<pk>`, and `/vitrine/update_progress/<pk>` return 404.
+- `/table/` keeps the original modal + `table:update` POST.
+- `/vitrine/` keeps the original modal + `vitrine:update` POST.
+
+### Backend helpers
+
+| Symbol | Role |
+|--------|------|
+| `BaseUpdateProgressStepView` | Shared login + CSRF + POST-only JSON toggle, payload parse, field allowlist. |
+| `DynamicDetailsModeMixin` | Shared `?dynamic=1` details context (`dynamic_mode`, `progress_update_url`). |
+| `table.views.UpdateProgressStep` | Plate/edge sequential updates and order_taken/invoice; same disabled rules as `PlateProgressForm`. |
+| `vitrine.views.UpdateProgressStep` | `order_ready` / `order_taken`; taken cannot be set while not ready. |
+| `plates_make_order_ready(order)` | True when every plate is delivered, cutted, and edged (empty plate list counts as ready). Shared by `UpdateOrder` and table `UpdateProgressStep`. |
+| `apply_progress_update_response` | Applies the JSON payload to row colors and progress-bar `.active` classes. |
+| `sync_progress_step` | Toggles one progress `<li>` `.active` / `data-active`. |
+| `sync_vitrine_order_taken_enabled` | Enables or disables the vitrine taken step from `order_ready`. |

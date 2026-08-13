@@ -7,7 +7,7 @@
  *   - main/templates/layout/base.html
  *
  * Depends on (runtime):
- *   - orders/row-expand/transitions.js → _cancelPendingTransitionAndLockHeight
+ *   - orders/row-expand/transitions.js → _cancelPendingTransitionAndLockHeight, _onRowHeightTransitionEnd
  *   - orders/details/fetch.js          → get_order
  *   - orders/details/spinner.js        → set_hidden_row_close_visible
  *
@@ -73,20 +73,12 @@ function openHiddenRow(hiddenRow, row_id, visibleRow) {
   // Target height is the scrollHeight (content height)
   const targetHeight = hiddenRow.scrollHeight + "px";
 
-  // add transitionend handler — ensure only one is attached and it's removable
-  const openHandler = function (e) {
-    if (e.target !== hiddenRow || e.propertyName !== "height") return;
-    // finalize
+  hiddenRow._isAnimating = true;
+  _onRowHeightTransitionEnd(hiddenRow, function () {
     hiddenRow.style.height = "auto";
     hiddenRow._isAnimating = false;
-    hiddenRow._pendingTransitionHandler = null;
     hiddenRow.classList.add("is-open");
-  };
-
-  // store and attach handler
-  hiddenRow._pendingTransitionHandler = openHandler;
-  hiddenRow._isAnimating = true;
-  hiddenRow.addEventListener("transitionend", openHandler, { once: true });
+  });
 
   // trigger animation to target height
   requestAnimationFrame(() => {
@@ -107,6 +99,9 @@ function openHiddenRow(hiddenRow, row_id, visibleRow) {
   }
 
   hiddenRow._isOpen = true;
+  if (typeof syncOpenRowId === "function") {
+    syncOpenRowId(row_id, true);
+  }
 }
 
 /**
@@ -132,23 +127,15 @@ function closeHiddenRow(hiddenRow, visibleRow) {
   // Force layout so the locked height applies
   hiddenRow.getBoundingClientRect();
 
-  // Create a single close handler
-  const closeHandler = function (e) {
-    if (e.target !== hiddenRow || e.propertyName !== "height") return;
-    // finalize close
+  hiddenRow._isAnimating = true;
+  _onRowHeightTransitionEnd(hiddenRow, function () {
     hiddenRow.style.display = "none";
     hiddenRow.style.height = "0px";
     hiddenRow.classList.remove("is-closing");
     hiddenRow._isClosing = false;
     hiddenRow._isAnimating = false;
-    hiddenRow._pendingTransitionHandler = null;
     hiddenRow.classList.remove("is-open");
-  };
-
-  // attach handler & mark animating
-  hiddenRow._pendingTransitionHandler = closeHandler;
-  hiddenRow._isAnimating = true;
-  hiddenRow.addEventListener("transitionend", closeHandler, { once: true });
+  });
 
   // trigger collapse on next frame
   requestAnimationFrame(() => {
@@ -159,4 +146,8 @@ function closeHiddenRow(hiddenRow, visibleRow) {
   if (visibleRow) visibleRow.classList.remove("rowSelected");
 
   hiddenRow._isOpen = false;
+  if (typeof syncOpenRowId === "function") {
+    const rowId = hiddenRow.id.replace("hidden-row-", "");
+    syncOpenRowId(rowId, false);
+  }
 }

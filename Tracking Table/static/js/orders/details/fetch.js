@@ -91,8 +91,13 @@ function get_order(order_id)
 
     /** Get app specific resource address from element */
     let url_resource = document.getElementById(order_id).getAttribute("data-app-url");
+    let url = url_resource + order_id;
+    // Dynamic page only: ViewOrder / ViewVitrine skip the progress modal.
+    if (get_current_dynamic_view_name()) {
+        url += (url.indexOf("?") === -1 ? "?" : "&") + "dynamic=1";
+    }
 
-    fetch(url_resource + order_id)
+    fetch(url)
         .then((response) => {
             /** Raise an error for a non network issues as well */
             if (!response.ok) {

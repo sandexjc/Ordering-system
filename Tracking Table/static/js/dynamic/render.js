@@ -260,12 +260,15 @@ function bindOrderRowHandlers() {
  * @param {*} generation - Render generation token from beginOrdersRender.
  * @returns {void}
  */
-function finalizeRenderedRows(viewName, generation) {
+function finalizeRenderedRows(viewName, generation, { restoreExpandedRows = true } = {}) {
     if (!isOrdersRenderCurrent(generation, viewName)) {
         return;
     }
     if (typeof syncFrameHeights === "function") {
         syncFrameHeights();
+    }
+    if (!restoreExpandedRows) {
+        return;
     }
     restoreCachedOrderDetails(viewName);
     /** Re-open after details are in the DOM so expand height is measured correctly. */
@@ -281,7 +284,7 @@ function finalizeRenderedRows(viewName, generation) {
  * setupRenderedRows
  * @returns {void}
  */
-function setupRenderedRows(viewName, generation, { deferHeavyWork = false } = {}) {
+function setupRenderedRows(viewName, generation, { deferHeavyWork = false, restoreExpandedRows = true } = {}) {
     if (!isOrdersRenderCurrent(generation, viewName)) {
         return;
     }
@@ -289,12 +292,12 @@ function setupRenderedRows(viewName, generation, { deferHeavyWork = false } = {}
     highlightSearchInOrders(viewName);
 
     if (!deferHeavyWork) {
-        finalizeRenderedRows(viewName, generation);
+        finalizeRenderedRows(viewName, generation, { restoreExpandedRows });
         return;
     }
 
     window.requestAnimationFrame(() => {
-        window.setTimeout(() => finalizeRenderedRows(viewName, generation), 0);
+        window.setTimeout(() => finalizeRenderedRows(viewName, generation, { restoreExpandedRows }), 0);
     });
 }
 

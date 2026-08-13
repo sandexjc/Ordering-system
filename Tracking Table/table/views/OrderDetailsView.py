@@ -1,16 +1,26 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django.urls import reverse
+from common.mixins import DynamicDetailsModeMixin
 from table.models import Order, Plate, Edge
 from table.forms import PlateProgressFormSet, EdgeProgressFormSet, OrderProgressForm
 
-class ViewOrder(LoginRequiredMixin, TemplateView):
+class ViewOrder(DynamicDetailsModeMixin, LoginRequiredMixin, TemplateView):
 
     """
 
     Hierarchy:
+    DynamicDetailsModeMixin -> ViewOrder
     LoginRequiredMixin -> ViewOrder
     TemplateView -> ViewOrder
+
+    Expanded order details HTML. Static `/table/` omits `?dynamic=1` and keeps
+    the progress modal + formsets. Dynamic `/dynamic/` fetch adds `?dynamic=1`
+    for click-to-toggle steps.
+
+    --- Fields inherited from DynamicDetailsModeMixin ---
+
+    progress_update_url_name = None
 
     --- Fields inherited from LoginRequiredMixin ---
 
@@ -23,6 +33,7 @@ class ViewOrder(LoginRequiredMixin, TemplateView):
     """
 
     template_name = 'table/order_details.html'
+    progress_update_url_name = "table:update_progress"
 
     def get_context_data(self, pk, **kwargs):
         context = super(ViewOrder, self).get_context_data(**kwargs)
@@ -51,12 +62,19 @@ class ViewOrder(LoginRequiredMixin, TemplateView):
                 ("ordered", edge.ordered, False),
                 ("delivered", edge.delivered, False),
             ]
+
+        order.type = "order"
+        order.order_taken_steps = [
+            ("order_taken", order.order_taken, False),
+        ]
+        order.invoice_steps = [
+            ("invoice", order.invoice, False),
+        ]
         
         # Order toolbar urls and targets
         edit_url = reverse("table:editOrder", kwargs={"pk": order.id})
         print_url = reverse("table:printOrder", kwargs={"pk": order.id})
         delete_target = f"modal-delete-{order.id}"
-        progress_target = f"modal-progress-{order.id}"
         history_target = f"history-tab-{order.id}"
         refresh_option = True
 
@@ -68,21 +86,20 @@ class ViewOrder(LoginRequiredMixin, TemplateView):
             'plates': plates,
             'edges': edges,
 
-            # Forms
-            'plate_forms': PlateProgressFormSet(instance=order, queryset=plates),
-            'edge_forms': EdgeProgressFormSet(instance=order, queryset=edges),
-            'order_progress': OrderProgressForm(instance=order),
-
             # Toolbar
             "toolbar_edit_url": edit_url,
             "toolbar_print_url": print_url,
             "toolbar_delete_target": delete_target,
-            "toolbar_progress_target": progress_target,
             "toolbar_history_target": history_target,
             "toolbar_refresh_option": refresh_option,
         })
 
+        dynamic_mode = self.add_dynamic_progress_context(context, order.id)
+        if not dynamic_mode:
+            # Static /table/: progress modal + UpdateOrder form POST (unchanged).
+            context["plate_forms"] = PlateProgressFormSet(instance=order, queryset=plates)
+            context["edge_forms"] = EdgeProgressFormSet(instance=order, queryset=edges)
+            context["order_progress"] = OrderProgressForm(instance=order)
+            context["toolbar_progress_target"] = f"modal-progress-{order.id}"
+
         return context
-    
-    def post(self, request, *args, **kwargs):
-        return self.render_to_response(self.get_context_data())

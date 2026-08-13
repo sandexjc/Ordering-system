@@ -35,6 +35,31 @@ function _cancelPendingTransitionAndLockHeight(hiddenRow) {
 }
 
 /**
+ * Run `handler` only for this row's own height transition (ignore bubbled
+ * child transitions such as the fold button hover).
+ *
+ * @param {HTMLElement} hiddenRow - The `.hiddenRows` element being animated.
+ * @param {function(TransitionEvent): void} handler - Called once on height end.
+ * @returns {function(TransitionEvent): void} Listener stored on the row.
+ */
+function _onRowHeightTransitionEnd(hiddenRow, handler)
+{
+  const wrapped = function (e) {
+    if (e.target !== hiddenRow || e.propertyName !== "height") {
+      return;
+    }
+    hiddenRow.removeEventListener("transitionend", wrapped);
+    if (hiddenRow._pendingTransitionHandler === wrapped) {
+      hiddenRow._pendingTransitionHandler = null;
+    }
+    handler(e);
+  };
+  hiddenRow._pendingTransitionHandler = wrapped;
+  hiddenRow.addEventListener("transitionend", wrapped);
+  return wrapped;
+}
+
+/**
  * After async content is inserted into an open hidden row, re-animate height
  * from the current size to the new scrollHeight. No-op if the row is closing or hidden.
  *
@@ -65,17 +90,11 @@ function onHiddenRowContentUpdated(hiddenRow) {
   // compute new height after content inserted
   const newHeight = hiddenRow.scrollHeight;
 
-  // attach a once transitionend handler to reset to auto
-  const updateHandler = function (e) {
-    if (e.target !== hiddenRow || e.propertyName !== "height") return;
+  hiddenRow._isAnimating = true;
+  _onRowHeightTransitionEnd(hiddenRow, function () {
     hiddenRow.style.height = "auto";
     hiddenRow._isAnimating = false;
-    hiddenRow._pendingTransitionHandler = null;
-  };
-
-  hiddenRow._pendingTransitionHandler = updateHandler;
-  hiddenRow._isAnimating = true;
-  hiddenRow.addEventListener("transitionend", updateHandler, { once: true });
+  });
 
   // animate to new height
   requestAnimationFrame(() => {

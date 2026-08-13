@@ -1,7 +1,7 @@
 {% load static %}
 
 <div class="container-fluid order-details">
-    <table class="table table-content-brake table-order-details">
+    <table class="table table-content-brake table-order-details{% if dynamic_mode %} table-order-details-interactive{% endif %}">
         <thead>
             <tr>
                 <th scope="col">Материал</th>
@@ -16,10 +16,10 @@
             <tr><th scope="row" colspan="5">ЕГЕР</th></tr>
             {% for item in plates %}
                 {% if item.manufacturer == "Egger" %}
-                    <tr>
+                    <tr class="order-progress-item-row">
                         <td>{{ item.material }} - {{ item.quantity }}</td>
                         <td colspan="4">
-                            {% include "common/components/progress_bar.html" with item=item steps=item.plate_steps %}
+                            {% include "common/components/progress_bar.html" with item=item steps=item.plate_steps interactive=dynamic_mode %}
                         </td>
                     </tr>
                 {% endif %}
@@ -28,10 +28,10 @@
             <tr><th scope="row" colspan="5">КРОНО</th></tr>
             {% for item in plates %}
                 {% if item.manufacturer == "Kronospan" %}
-                    <tr>
+                    <tr class="order-progress-item-row">
                         <td>{{ item.material }} - {{ item.quantity }}</td>
                         <td colspan="4">
-                            {% include "common/components/progress_bar.html" with item=item steps=item.plate_steps %}
+                            {% include "common/components/progress_bar.html" with item=item steps=item.plate_steps interactive=dynamic_mode %}
                         </td>
                     </tr>
                 {% endif %}
@@ -40,10 +40,10 @@
             <tr><th scope="row" colspan="5">ДРУГИ</th></tr>
             {% for item in plates %}
                 {% if item.manufacturer == "Other" %}
-                    <tr>
+                    <tr class="order-progress-item-row">
                         <td>{{ item.material }} - {{ item.quantity }}</td>
                         <td colspan="4">
-                            {% include "common/components/progress_bar.html" with item=item steps=item.plate_steps %}
+                            {% include "common/components/progress_bar.html" with item=item steps=item.plate_steps interactive=dynamic_mode %}
                         </td>
                     </tr>
                 {% endif %}
@@ -51,13 +51,29 @@
 
             <tr><th scope="row" colspan="5">КАНТ</th></tr>
             {% for item in edges %}
-                <tr>
+                <tr class="order-progress-item-row">
                     <td>{{ item.edge_type }}-{{ item.color_code }} - {{ item.quantity }}</td>
                     <td colspan="4">
-                        {% include "common/components/progress_bar.html" with item=item steps=item.edge_steps %}
+                        {% include "common/components/progress_bar.html" with item=item steps=item.edge_steps interactive=dynamic_mode %}
                     </td>
                 </tr>
             {% endfor %}
+
+            {% if dynamic_mode %}
+                <tr><th scope="row" colspan="5">ПОРЪЧКА</th></tr>
+                <tr class="order-progress-item-row">
+                    <td>Поръчката е взета</td>
+                    <td colspan="4">
+                        {% include "common/components/progress_bar.html" with item=order steps=order.order_taken_steps interactive=dynamic_mode bar_suffix="taken" %}
+                    </td>
+                </tr>
+                <tr class="order-progress-item-row">
+                    <td>Издадена фактура</td>
+                    <td colspan="4">
+                        {% include "common/components/progress_bar.html" with item=order steps=order.invoice_steps interactive=dynamic_mode bar_suffix="invoice" %}
+                    </td>
+                </tr>
+            {% endif %}
         </tbody>
     </table>
 </div>

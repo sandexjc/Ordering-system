@@ -11,4 +11,7 @@ urlpatterns = [
     path('printOrder/<int:pk>', views.PrintOrder.as_view(), name='printOrder'),
     path('getOrderHistory/<int:pk>', views.OrderHistory.as_view(), name='orderHistory'),
     path('viewOrder/<int:pk>', views.ViewOrder.as_view(), name='order_view'),
+
+    # Dynamic table view: click-to-toggle a single progress step.
+    path('updateProgress/<int:pk>', views.UpdateProgressStep.as_view(), name='update_progress'),
 ]

@@ -4,3 +4,4 @@ from .BaseEditView import BaseEditView
 from .BaseDeleteView import BaseDeleteView
 from .BasePrintView import BasePrintView
 from .BaseUpdateView import BaseUpdateView
+from .BaseUpdateProgressStepView import BaseUpdateProgressStepView

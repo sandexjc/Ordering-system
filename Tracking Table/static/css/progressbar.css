@@ -10,6 +10,7 @@
  *   - common/templates/common/components/progress_bar.html  (.progressbar, .active, .disabled)
  *   - Injected into expanded order rows / progress modals (table + vitrine)
  *   - static/js/orders/actions/progress-delete.js toggles .active on plate/edge progress steps after update
+ *   - static/js/orders/actions/progress-step.js (dynamic table / vitrine click-to-toggle)
  */
 
 /* === Base Progressbar Container === */
@@ -146,4 +147,167 @@
 	background-color: #f5f5f5;
 	content: "✖️";
 	color: #aaa;
+}
+
+/* =============================================================================
+   Interactive steps (dynamic table / vitrine)
+   ============================================================================= */
+
+#dynamic-orders-root .progressbar-interactive li {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+#dynamic-orders-root .progressbar-interactive li[data-progress-step] {
+    cursor: default;
+    user-select: none;
+    pointer-events: none;
+}
+
+#dynamic-orders-root .progressbar-interactive .progress-step-hit {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin-left: -15px;
+    border-radius: 50%;
+    z-index: 3;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+#dynamic-orders-root .progressbar-interactive li.disabled .progress-step-hit {
+    pointer-events: none;
+    cursor: default;
+}
+
+#dynamic-orders-root .progressbar-interactive .progress-step-mark {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+}
+
+#dynamic-orders-root .progressbar-interactive li:before,
+#dynamic-orders-root .progressbar-interactive li:after {
+    transition: border-color 0.22s ease, background-color 0.22s ease, color 0.22s ease;
+}
+
+#dynamic-orders-root .progressbar-interactive li.active:before {
+    content: "";
+}
+
+#dynamic-orders-root .progressbar-interactive li.active .progress-step-mark {
+    opacity: 1;
+}
+
+#dynamic-orders-root .progressbar-interactive li.disabled .progress-step-mark {
+    display: none;
+}
+
+#dynamic-orders-root .progressbar-interactive .progress-step-retry {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+#dynamic-orders-root .progressbar-interactive li[data-progress-step].is-loading {
+    cursor: wait;
+}
+
+#dynamic-orders-root .progressbar-interactive li[data-progress-step]:focus {
+    outline: none;
+}
+
+#dynamic-orders-root .progressbar-interactive li[data-progress-step]:focus-visible:before {
+    box-shadow: 0 0 0 3px rgba(22, 198, 12, 0.35);
+}
+
+#dynamic-orders-root .progressbar-interactive .progress-step-spinner {
+    display: none;
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    width: 1rem;
+    height: 1rem;
+    margin-left: -0.5rem;
+    z-index: 3;
+    color: #6c757d;
+    pointer-events: none;
+}
+
+#dynamic-orders-root .progressbar-interactive .progress-step-retry {
+    display: none;
+    margin-top: 0.25rem;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+@media (hover: hover) {
+    #dynamic-orders-root .progressbar-interactive li.is-preview:before {
+        content: "";
+        border-color: #16c60c;
+    }
+
+    #dynamic-orders-root .progressbar-interactive li.is-preview .progress-step-mark {
+        opacity: 0.35;
+    }
+
+    #dynamic-orders-root .progressbar-interactive li.is-preview-off:before {
+        border-color: #ddd;
+        background-color: #fff;
+    }
+
+    #dynamic-orders-root .progressbar-interactive li.is-preview-off .progress-step-mark {
+        opacity: 0.2;
+    }
+}
+
+#dynamic-orders-root .progressbar-interactive li.is-loading:before {
+    content: "" !important;
+    border-color: #dee2e6;
+    background-color: #fff;
+    opacity: 1;
+}
+
+#dynamic-orders-root .progressbar-interactive li.is-loading .progress-step-mark {
+    opacity: 0;
+}
+
+#dynamic-orders-root .progressbar-interactive li.is-loading .progress-step-spinner {
+    display: block;
+}
+
+#dynamic-orders-root .progressbar-interactive li.is-error {
+    color: #dc3545;
+}
+
+#dynamic-orders-root .progressbar-interactive li.is-error:before {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+#dynamic-orders-root .progressbar-interactive li.is-error.active:before {
+    content: "";
+    border-color: #dc3545;
+}
+
+#dynamic-orders-root .progressbar-interactive li.is-error .progress-step-retry {
+    display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #dynamic-orders-root .progressbar-interactive .progress-step-mark,
+    #dynamic-orders-root .progressbar-interactive li:before,
+    #dynamic-orders-root .progressbar-interactive li:after {
+        transition: none;
+    }
 }

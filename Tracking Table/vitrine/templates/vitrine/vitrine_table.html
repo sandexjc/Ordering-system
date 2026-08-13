@@ -1,0 +1,21 @@
+{% load static %}
+
+<div class="container-fluid order-details">
+    <table class="table table-content-brake table-order-details table-order-details-interactive">
+        <tbody>
+            <tr><th scope="row" colspan="2">ПОРЪЧКА</th></tr>
+            <tr class="order-progress-item-row">
+                <td>Поръчката е готова</td>
+                <td>
+                    {% include "common/components/progress_bar.html" with item=vitrine steps=vitrine.order_ready_steps interactive=True bar_suffix="ready" %}
+                </td>
+            </tr>
+            <tr class="order-progress-item-row">
+                <td>Поръчката е взета</td>
+                <td>
+                    {% include "common/components/progress_bar.html" with item=vitrine steps=vitrine.order_taken_steps interactive=True bar_suffix="taken" %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

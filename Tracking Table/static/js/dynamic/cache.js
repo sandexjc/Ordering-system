@@ -123,18 +123,55 @@ function captureOpenRows(viewName) {
         return;
     }
 
-    /** Prefer is-open/orderClicked/_isOpen/display:block; is-open is only set on transitionend. */
+    /** Explicit close (_isOpen false / is-closing) wins over leftover display:block. */
     const openRowIds = Array.from(document.querySelectorAll(".hiddenRows"))
         .filter((hiddenRow) => {
-            if (hiddenRow._isOpen || isHiddenRowVisuallyOpen(hiddenRow)) {
-                return true;
+            if (hiddenRow._isClosing || hiddenRow.classList.contains("is-closing")) {
+                return false;
             }
-            return false;
+            if (hiddenRow._isOpen === false) {
+                return false;
+            }
+            return hiddenRow._isOpen === true || isHiddenRowVisuallyOpen(hiddenRow);
         })
         .map((hiddenRow) => hiddenRow.id.replace("hidden-row-", ""))
         .filter(Boolean);
 
     cacheEntry.openRowIds = openRowIds;
+    viewOrdersCache.set(viewName, cacheEntry);
+}
+
+/** Add or remove a row id from the cached expanded-row list.
+ * @param {string|number} rowId - Order / vitrine id.
+ * @param {boolean} isOpen - Whether the row is currently expanded.
+ * @returns {void}
+ */
+function syncOpenRowId(rowId, isOpen)
+{
+    if (!window.viewOrdersCache || rowId == null || rowId === "") {
+        return;
+    }
+    const viewName = typeof get_current_dynamic_view_name === "function"
+        ? get_current_dynamic_view_name()
+        : (document.getElementById("dynamic-orders-root") || {}).dataset?.currentView;
+    if (!viewName) {
+        return;
+    }
+    const cacheEntry = viewOrdersCache.get(viewName);
+    if (!cacheEntry) {
+        return;
+    }
+    const key = String(rowId);
+    const ids = Array.isArray(cacheEntry.openRowIds)
+        ? cacheEntry.openRowIds.map(String)
+        : [];
+    const index = ids.indexOf(key);
+    if (isOpen && index === -1) {
+        ids.push(key);
+    } else if (!isOpen && index !== -1) {
+        ids.splice(index, 1);
+    }
+    cacheEntry.openRowIds = ids;
     viewOrdersCache.set(viewName, cacheEntry);
 }
 
@@ -151,6 +188,27 @@ function captureScrollPosition(viewName) {
         return;
     }
     cacheEntry.scrollY = window.scrollY;
+    viewOrdersCache.set(viewName, cacheEntry);
+}
+
+/** Snapshot the live tbody into the view cache so row colors/classes survive a tab switch.
+ * @param {*} viewName - Dynamic view key ("table" | "vitrine").
+ * @returns {void}
+ */
+function captureLiveRowsHtml(viewName)
+{
+    if (!viewName) {
+        return;
+    }
+    const cacheEntry = viewOrdersCache.get(viewName);
+    if (!cacheEntry) {
+        return;
+    }
+    const tableBody = document.getElementById("dynamic-orders-body");
+    if (!tableBody || !tableBody.isConnected || tableBody.dataset.view !== viewName) {
+        return;
+    }
+    cacheEntry.rowsHtml = tableBody.innerHTML;
     viewOrdersCache.set(viewName, cacheEntry);
 }
 

@@ -24,6 +24,7 @@ function switchDynamicView(viewName) {
     const previousViewName = root.dataset.currentView;
     captureOpenRows(previousViewName);
     captureScrollPosition(previousViewName);
+    captureLiveRowsHtml(previousViewName);
     teardownInfiniteScroll();
 
     const { generation } = beginOrdersRender(viewName);

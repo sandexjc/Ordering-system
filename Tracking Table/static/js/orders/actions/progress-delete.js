@@ -8,7 +8,137 @@
  *
  * Used by:
  *   - orders/actions/properties.js → handle_orders_properties
+ *   - orders/actions/progress-step.js (apply_progress_update_response)
  */
+
+/**
+ * Sync a progress-bar step's active class and data-active flag.
+ *
+ * @param {string} elementId - DOM id of the step `<li>`.
+ * @param {boolean} isActive - Whether the step should appear complete.
+ * @returns {void}
+ */
+function sync_progress_step(elementId, isActive)
+{
+	const el = document.getElementById(elementId);
+	if (!el) {
+		return;
+	}
+	el.classList.toggle("active", isActive === true);
+	if (el.hasAttribute("data-active")) {
+		el.dataset.active = isActive === true ? "1" : "0";
+	}
+}
+
+/**
+ * Enable or disable the vitrine "order taken" step from order_ready.
+ * No-op on table details, which have no order_ready circle.
+ *
+ * @param {string|number} orderPk - Vitrine / order id.
+ * @param {boolean} isReady - Whether order_ready is true.
+ * @returns {void}
+ */
+function sync_vitrine_order_taken_enabled(orderPk, isReady)
+{
+	if (!document.getElementById("order-progress-order_ready-" + orderPk)) {
+		return;
+	}
+
+	const taken = document.getElementById("order-progress-order_taken-" + orderPk);
+	if (!taken) {
+		return;
+	}
+
+	taken.classList.toggle("disabled", isReady !== true);
+	if (isReady === true) {
+		taken.setAttribute("role", "button");
+		taken.setAttribute("tabindex", "0");
+	} else {
+		taken.removeAttribute("role");
+		taken.removeAttribute("tabindex");
+		taken.classList.remove("is-preview", "is-preview-off", "is-error");
+	}
+}
+
+/**
+ * Apply JSON from a progress update to list-row colors and progress bars.
+ *
+ * @param {object} data - Serialized `{ order, plates?, edges? }` payload.
+ * @returns {void}
+ */
+function apply_progress_update_response(data)
+{
+	const payload = data || {};
+
+	if (Array.isArray(payload.order)) {
+		payload.order.forEach(o => {
+			const row = document.getElementById(o.pk);
+
+			if (row) {
+				row.classList.toggle("orderTaken", o.fields.order_taken === true);
+				row.classList.toggle("normalOrder", o.fields.order_taken !== true);
+			}
+
+			const idLabel = document.getElementById(`ID${o.pk}`);
+			if (idLabel) {
+				idLabel.style.color = o.fields.invoice ? "red" : "black";
+			}
+
+			sync_progress_step(`order-progress-order_taken-${o.pk}`, o.fields.order_taken === true);
+			sync_progress_step(`order-progress-invoice-${o.pk}`, o.fields.invoice === true);
+			sync_progress_step(`order-progress-order_ready-${o.pk}`, o.fields.order_ready === true);
+			sync_vitrine_order_taken_enabled(o.pk, o.fields.order_ready === true);
+		});
+	}
+
+	if (Array.isArray(payload.plates)) {
+		payload.plates.forEach(p => {
+			const plate = document.getElementById(`plate${p.pk}`);
+			if (plate) {
+				if (p.fields.ordered && !p.fields.from_client && !p.fields.delivered) {
+					plate.style.color = "red";
+				} else if (p.fields.delivered) {
+					plate.style.color = "#8ac926";
+				} else if (p.fields.from_client) {
+					plate.style.color = "#7b2cbf";
+				} else {
+					plate.style.color = "black";
+				}
+			}
+
+			["ordered", "delivered", "cutted", "edged"].forEach(state => {
+				sync_progress_step(`plate-progress-${state}-${p.pk}`, p.fields[state] === true);
+			});
+		});
+	}
+
+	if (Array.isArray(payload.edges)) {
+		payload.edges.forEach(e => {
+			const edge = document.getElementById(`edge${e.pk}`);
+			if (edge) {
+				if (e.fields.ordered && !e.fields.delivered) {
+					edge.style.color = "red";
+				} else if (e.fields.delivered) {
+					edge.style.color = "#8ac926";
+				} else {
+					edge.style.color = "black";
+				}
+			}
+
+			["ordered", "delivered"].forEach(state => {
+				sync_progress_step(`edge-progress-${state}-${e.pk}`, e.fields[state] === true);
+			});
+		});
+	}
+
+	if (typeof captureLiveRowsHtml === "function") {
+		const root = document.getElementById("dynamic-orders-root");
+		const viewName = root && root.getAttribute("data-current-view");
+		if (viewName) {
+			captureLiveRowsHtml(viewName);
+		}
+	}
+}
 
 /**
  * Register (or re-register) document-level click handlers for `.btn-update` and `.btn-delete`.
@@ -72,79 +202,7 @@ function setup_progress_delete_handlers()
 			btn.disabled = false;
 			btn.innerHTML = "Update";
 
-			const data = result.data || {};
-
-			/** =========================
-			 * ORDERS
-			 * ========================= */
-			if (Array.isArray(data.order)) {
-				data.order.forEach(o => {
-					const row = document.getElementById(o.pk);
-
-					if (row) {
-						row.classList.toggle("orderTaken", o.fields.order_taken === true);
-						row.classList.toggle("normalOrder", o.fields.order_taken !== true);
-					}
-
-					const idLabel = document.getElementById(`ID${o.pk}`);
-					if (idLabel) {
-						idLabel.style.color = o.fields.invoice ? "red" : "black";
-					}
-				});
-			}
-
-			/** =========================
-			 * PLATES (table app only)
-			 * ========================= */
-			if (Array.isArray(data.plates)) {
-				data.plates.forEach(p => {
-					const plate = document.getElementById(`plate${p.pk}`);
-					if (plate) {
-						if (p.fields.ordered && !p.fields.from_client && !p.fields.delivered) {
-							plate.style.color = "red";
-						} else if (p.fields.delivered) {
-							plate.style.color = "#8ac926";
-						} else if (p.fields.from_client) {
-							plate.style.color = "#7b2cbf";
-						} else {
-							plate.style.color = "black";
-						}
-					}
-
-					const plateStates = ["ordered", "delivered", "cutted", "edged"];
-					plateStates.forEach(state => {
-						const el = document.getElementById(`plate-progress-${state}-${p.pk}`);
-						if (el) {
-							el.classList.toggle("active", p.fields[state] === true);
-						}
-					});
-				});
-			}
-
-			/** =========================
-			 * EDGES (table app only)
-			 * ========================= */
-			if (Array.isArray(data.edges)) {
-				data.edges.forEach(e => {
-					const edge = document.getElementById(`edge${e.pk}`);
-					if (edge) {
-						if (e.fields.ordered && !e.fields.delivered) {
-							edge.style.color = "red";
-						} else if (e.fields.delivered) {
-							edge.style.color = "#8ac926";
-						} else {
-							edge.style.color = "black";
-						}
-					}
-
-					["ordered", "delivered"].forEach(state => {
-						const el = document.getElementById(`edge-progress-${state}-${e.pk}`);
-						if (el) {
-							el.classList.toggle("active", e.fields[state] === true);
-						}
-					});
-				});
-			}
+			apply_progress_update_response(result.data);
 		})
 		.catch(err => {
 			console.error(err);

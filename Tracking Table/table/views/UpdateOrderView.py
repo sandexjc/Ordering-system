@@ -5,6 +5,7 @@ from django.core import serializers
 from common.views import BaseUpdateView
 from table.models import Order
 from table.forms import PlateProgressFormSet, EdgeProgressFormSet, OrderProgressForm
+from table.service.table.OrderReady import plates_make_order_ready
 
 import json
 
@@ -43,11 +44,7 @@ class UpdateOrder(BaseUpdateView):
             item.save()
 
     def is_order_ready(self, order_instance, forms):
-        plates = forms["plates"].save(commit=False)
-        for item in plates:
-            if not item.delivered or not item.cutted or not item.edged:
-                return False
-        return True
+        return plates_make_order_ready(order_instance)
 
     def serialize_response(self, order_instance):
         return {

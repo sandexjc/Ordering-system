@@ -197,3 +197,35 @@ mark.search-highlight
 {
 	z-index: 1;
 }
+
+/* =============================================================================
+   Interactive order-details progress table
+   ============================================================================= */
+
+@media (max-width: 767.98px)
+{
+	#dynamic-orders-root .table-order-details-interactive thead
+	{
+		display: none;
+	}
+
+	#dynamic-orders-root .table-order-details-interactive .order-progress-item-row
+	{
+		display: flex;
+		flex-direction: column;
+	}
+
+	#dynamic-orders-root .table-order-details-interactive .order-progress-item-row > td
+	{
+		display: block;
+		width: 100%;
+		max-width: 100%;
+		padding-top: 0.35rem;
+		padding-bottom: 0.35rem;
+	}
+
+	#dynamic-orders-root .table-order-details-interactive .order-progress-item-row > td:first-child
+	{
+		font-size: 0.9rem;
+	}
+}

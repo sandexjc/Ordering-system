@@ -14,4 +14,5 @@ from .workflow import (
 
 from .views import (
     DynamicFeatureFlagRequiredMixin,
+    DynamicDetailsModeMixin,
 )

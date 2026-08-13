@@ -1,1 +1,2 @@
 from .DynamicFeatureFlagRequiredMixin import DynamicFeatureFlagRequiredMixin
+from .DynamicDetailsModeMixin import DynamicDetailsModeMixin
