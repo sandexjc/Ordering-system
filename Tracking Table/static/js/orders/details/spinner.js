@@ -1,5 +1,22 @@
+/*
+ * orders/details/spinner.js
+ * -------------------------
+ * Loading spinner and fold-button visibility for expanded order details.
+ *
+ * Loaded from:
+ *   - main/templates/layout/base.html
+ *
+ * Used by:
+ *   - orders/details/fetch.js
+ *   - orders/row-expand/open-close.js
+ *   - js/dynamic/cache.js
+ */
+
 /**
- * Function to create HTML spinner element and return it
+ * Build a Bootstrap spinner element for an order detail load.
+ *
+ * @param {string|number} order_id - Order / vitrine id used in the element id.
+ * @returns {HTMLDivElement} Spinner wrapper ready to append to the DOM.
  */
 function add_spinner(order_id)
 {
@@ -27,7 +44,10 @@ function add_spinner(order_id)
 }
 
 /**
- * Function to remove HTML spinner element from specified element
+ * Remove the loading spinner for a given order, if present.
+ *
+ * @param {string|number} order_id - Order / vitrine id.
+ * @returns {void}
  */
 function remove_spinner(order_id) {
 
@@ -36,11 +56,15 @@ function remove_spinner(order_id) {
     {
         spinner.remove();
     }
-    
+
 }
 
 /**
- * Show or hide the fold button under a hidden row.
+ * Show or hide the fold (close) button under a hidden detail row.
+ *
+ * @param {string|number} order_id - Order / vitrine id.
+ * @param {boolean} visible - When true, adds `.is-visible` to the close button.
+ * @returns {void}
  */
 function set_hidden_row_close_visible(order_id, visible) {
     const hiddenRow = document.getElementById("hidden-row-" + order_id);

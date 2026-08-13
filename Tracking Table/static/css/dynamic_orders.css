@@ -11,7 +11,7 @@
  *   - main/templates/components/toolbar.html          (dynamic-search*)
  *   - main/templates/layout/content.html             (#visible-items-filters)
  *   - table/.../table_header.html, vitrine/.../table_header.html  (.th-sortable)
- *   - static/js/dynamic_orders_page.js
+ *   - static/js/dynamic/*.js
  */
 
 /* =============================================================================

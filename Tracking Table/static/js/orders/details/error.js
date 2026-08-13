@@ -1,8 +1,25 @@
-/**
- * This function builds "error + retry" view and returns a DocumentFragment.
- * @param {*} order_id 
+/*
+ * orders/details/error.js
+ * -----------------------
+ * Error + retry UI when expanded order details fail to load.
+ *
+ * Loaded from:
+ *   - main/templates/layout/base.html
+ *
+ * Depends on (runtime):
+ *   - orders/details/fetch.js → retry_order
+ *
+ * Used by:
+ *   - orders/details/fetch.js (get_order catch path)
  */
-function create_order_error(order_id) 
+
+/**
+ * Build an "error + retry" block for a failed order-detail fetch.
+ *
+ * @param {string|number} order_id - Order / vitrine id (used for element id and retry).
+ * @returns {HTMLDivElement} Wrapper element (append to the hidden-table container).
+ */
+function create_order_error(order_id)
 {
     const wrapper = document.createElement("div");
     wrapper.id = `order-error-${order_id}`;

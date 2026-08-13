@@ -250,3 +250,98 @@ The vitrine seal flow is controlled by two feature flags:
   - Auto-created seal objects per frame are still preserved.
 
 If `DJANGO_FEATURES__MANUAL_SEAL` is disabled, the system always uses seal objects for totals and the manual UI is hidden.
+
+## Frontend static JS map (`Tracking Table/static/js`)
+
+Shared client scripts live under `Tracking Table/static/js`, grouped by concern. **Public global function names are stable** across files so template `onclick` handlers and cross-file callers keep working.
+
+App-specific assets under `accounts/static`, `vitrine/static`, etc. are outside this map.
+
+### Folder tree
+
+```text
+static/js/
+  core/
+    viewport.js
+    boot.js
+  orders/
+    row-expand/
+      transitions.js
+      open-close.js
+      bind-rows.js
+    details/
+      spinner.js
+      error.js
+      fetch.js
+    actions/
+      progress-delete.js
+      edit-submit.js
+      alerts.js
+      properties.js      ← handle_orders_properties() orchestrator
+      history.js
+  dynamic/
+    state.js
+    filters.js
+    search.js
+    cache.js
+    render.js
+    fetch.js
+    page.js
+```
+
+### Load order
+
+**`main/templates/layout/base.html`**
+
+1. jQuery, Bootstrap
+2. `core/viewport.js`
+3. `orders/row-expand/{transitions,open-close,bind-rows}.js`
+4. `orders/details/{spinner,error,fetch}.js`
+5. `orders/actions/{progress-delete,edit-submit,alerts,properties,history}.js`
+6. `core/boot.js`
+7. optional `vitrine_scripts`
+
+**`main/templates/dynamic/orders.html`** (after `{{ block.super }}`)
+
+1. `dynamic/state.js`
+2. `dynamic/filters.js`
+3. `dynamic/search.js`
+4. `dynamic/cache.js`
+5. `dynamic/render.js`
+6. `dynamic/fetch.js`
+7. `dynamic/page.js`
+
+**Login**
+
+- `accounts/templates/accounts/login.html` → `core/viewport.js` (plus accounts login-base)
+
+### File → main exports
+
+| File | Functions / role |
+|------|------------------|
+| `core/viewport.js` | `set_viewport_scale` |
+| `core/boot.js` | side effects: scale + `handle_orders()` |
+| `orders/row-expand/transitions.js` | `_cancelPendingTransitionAndLockHeight`, `onHiddenRowContentUpdated` |
+| `orders/row-expand/open-close.js` | `focusClosedOrderRow`, `openHiddenRow`, `closeHiddenRow` |
+| `orders/row-expand/bind-rows.js` | `handle_orders` |
+| `orders/details/spinner.js` | `add_spinner`, `remove_spinner`, `set_hidden_row_close_visible` |
+| `orders/details/error.js` | `create_order_error` |
+| `orders/details/fetch.js` | `get_current_dynamic_view_name`, `cache_order_details`, `get_order`, `retry_order` |
+| `orders/actions/progress-delete.js` | `setup_progress_delete_handlers` |
+| `orders/actions/edit-submit.js` | `setup_edit_submit_handlers` |
+| `orders/actions/alerts.js` | `setup_alert_handlers` |
+| `orders/actions/properties.js` | `handle_orders_properties` |
+| `orders/actions/history.js` | `handle_orders_history` |
+| `dynamic/state.js` | shared cache / timers / constants |
+| `dynamic/filters.js` | filters, sort, ranges, counter summary |
+| `dynamic/search.js` | search UI + highlight |
+| `dynamic/cache.js` | open-row / scroll / details restore, `updateViewCache` |
+| `dynamic/render.js` | builders, fade, shell/nav, `setupRenderedRows` |
+| `dynamic/fetch.js` | URL, first page, infinite scroll |
+| `dynamic/page.js` | `switchDynamicView` + `DOMContentLoaded` |
+
+### Notes for maintainers
+
+- `handle_orders_properties()` orchestrates progress/delete, edit-submit, and alert setup helpers.
+- jQuery is still required for `orders/actions/{edit-submit,alerts,history}.js`.
+- Keep this map in **developer docs only** (`README.md`). Do not publish it in `PUBLIC.md` or under publicly served `static/` paths.

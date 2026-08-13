@@ -9,7 +9,7 @@
  * Used by:
  *   - common/templates/common/components/progress_bar.html  (.progressbar, .active, .disabled)
  *   - Injected into expanded order rows / progress modals (table + vitrine)
- *   - static/js/order.js toggles .active on plate/edge progress steps after update
+ *   - static/js/orders/actions/progress-delete.js toggles .active on plate/edge progress steps after update
  */
 
 /* === Base Progressbar Container === */

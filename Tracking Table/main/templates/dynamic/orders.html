@@ -42,5 +42,12 @@
 
 {% block scripts %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static 'js/dynamic_orders_page.js' %}"></script>
+    {# Dynamic orders page modules (load order matters for shared state) #}
+    <script type="text/javascript" src="{% static 'js/dynamic/state.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dynamic/filters.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dynamic/search.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dynamic/cache.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dynamic/render.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dynamic/fetch.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dynamic/page.js' %}"></script>
 {% endblock %}

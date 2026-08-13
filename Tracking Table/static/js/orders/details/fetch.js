@@ -1,12 +1,28 @@
-/**
- * Get order information
- * Get order modal windows
- * @param {*} order_id 
+/*
+ * orders/details/fetch.js
+ * -----------------------
+ * Fetch and inject expanded order / vitrine detail HTML (progress, delete, history, view).
+ *
+ * Loaded from:
+ *   - main/templates/layout/base.html
+ *
+ * Depends on (runtime):
+ *   - orders/details/spinner.js
+ *   - orders/details/error.js
+ *   - orders/row-expand/transitions.js → onHiddenRowContentUpdated
+ *   - orders/actions/properties.js    → handle_orders_properties
+ *   - orders/actions/history.js       → handle_orders_history
+ *
+ * Used by:
+ *   - orders/row-expand/open-close.js → openHiddenRow
+ *   - common/.../order_toolbar.html refresh button (retry_order)
+ *   - orders/details/error.js retry button
  */
 
 /**
- * Resolve current dynamic view name (table/vitrine) when available.
- * Returns null outside dynamic page context.
+ * Resolve the current dynamic view name (table / vitrine) when on the dynamic page.
+ *
+ * @returns {string|null} View name from `#dynamic-orders-root`, or null outside that page.
  */
 function get_current_dynamic_view_name()
 {
@@ -18,7 +34,10 @@ function get_current_dynamic_view_name()
 }
 
 /**
- * Store hidden row HTML into per-view cache to avoid refetch.
+ * Store `#hidden-table-{id}` HTML into the per-view dynamic cache to avoid refetch.
+ *
+ * @param {string|number} order_id - Order / vitrine id whose details to cache.
+ * @returns {void}
  */
 function cache_order_details(order_id)
 {
@@ -48,6 +67,14 @@ function cache_order_details(order_id)
     window.viewOrdersCache.set(current_view, cache_entry);
 }
 
+/**
+ * Fetch order/vitrine detail HTML and inject progress modal, delete modal,
+ * history offcanvas, and the in-row order view. Shows spinner while loading;
+ * on failure shows create_order_error UI.
+ *
+ * @param {string|number} order_id - Order / vitrine id (element id + fetch URL suffix).
+ * @returns {void}
+ */
 function get_order(order_id)
 {
     const hiddenRow = document.getElementById("hidden-row-" + order_id);
@@ -111,7 +138,7 @@ function get_order(order_id)
             }
 
             /*
-             * Load offcanvas history tab 
+             * Load offcanvas history tab
              */
             let history_tab = document.getElementById("offcanvas-history-tab-" + order_id);
             let new_history_tab = newHtml.getElementById("offcanvas-history-tab-" + order_id);
@@ -121,7 +148,7 @@ function get_order(order_id)
             }
 
             /*
-             * Load order progress view table 
+             * Load order progress view table
              */
             let order_progress_view = document.getElementById("order-view-" + order_id);
             let new_progress_view = newHtml.getElementById("order-view-" + order_id);
@@ -168,11 +195,10 @@ function get_order(order_id)
 }
 
 /**
- * Retry wrapper
- * Clear error messages
- * Adds spinner loading again before re-calling get_order
+ * Clear error/order-view fragments and re-fetch order details.
  *
- * @param {*} order_id 
+ * @param {string|number} order_id - Order / vitrine id to reload.
+ * @returns {void}
  */
 function retry_order(order_id) {
     let hiddenTable = document.getElementById("hidden-table-" + order_id);

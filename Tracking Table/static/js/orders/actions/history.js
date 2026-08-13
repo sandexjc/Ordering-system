@@ -1,15 +1,33 @@
-/**
- * Add history button event handler
- * On Click -> load history for selected order 
+/*
+ * orders/actions/history.js
+ * -------------------------
+ * Order history offcanvas loader (jQuery + $.ajax).
+ *
+ * Loaded from:
+ *   - main/templates/layout/base.html
+ *
+ * Depends on:
+ *   - jQuery (global $)
+ *
+ * Used by:
+ *   - orders/details/fetch.js (after details load)
+ *   - js/dynamic/cache.js (after restoring cached details)
+ *
+ * Note: history URL is currently hardcoded to /table/getOrderHistory/{id}.
  */
 
-function handle_orders_history() 
+/**
+ * Bind each `.Historybtns` click to fetch and render order history into its offcanvas body.
+ *
+ * @returns {void}
+ */
+function handle_orders_history()
 {
 	$('.Historybtns').each(function() {
 		$(this).click(function() {
 			var historyBtn = this;
 			var historyBtn_body = $('#'+this.getAttribute("data-id")+'.offcanvas-body')
-			
+
 			$.ajax({
 				method: "GET",
 				url: '/table/getOrderHistory/' + this.getAttribute('data-id'),
@@ -25,7 +43,7 @@ function handle_orders_history()
 						'font-weight':'bold',
 						});
 					historyBtn_body.append("<br>");
-				
+
 					$.each(data, function() {
 						$.each(this, function() {
 

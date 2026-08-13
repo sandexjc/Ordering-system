@@ -1,8 +1,22 @@
-/**
- * All order properties and events handling
+/*
+ * orders/actions/progress-delete.js
+ * ---------------------------------
+ * Delegated handlers for progress-form Update and order Delete buttons (vanilla JS).
+ *
+ * Loaded from:
+ *   - main/templates/layout/base.html
+ *
+ * Used by:
+ *   - orders/actions/properties.js → handle_orders_properties
  */
 
-function handle_orders_properties() 
+/**
+ * Register (or re-register) document-level click handlers for `.btn-update` and `.btn-delete`.
+ * Stores handlers on window.updateHandler / window.deleteHandler so they can be replaced safely.
+ *
+ * @returns {void}
+ */
+function setup_progress_delete_handlers()
 {
 	/**
 	 * UPDATE (progress form) handler
@@ -206,30 +220,4 @@ function handle_orders_properties()
 
 	/** Attach the order delete handler */
 	document.addEventListener("click", window.deleteHandler);
-
-	$('#edit-order-button').click(function() {
-		$('#edit-order-form').submit();
-		$(this).html("Loading...");
-		$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-		$(this).prop('disabled', true);
-	})
-
-	$('#edit-vitrine-button').click(function() {
-		$('#edit-vitrine-form').submit();
-		$(this).html("Loading...");
-		$(this).append('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>');
-		$(this).prop('disabled', true);
-	})
-
-	$(".SuccessAlertBtn").click(function() {
-		$(".ALERT-S-UPD-VIEW").css("display","none");
-		$(".ALERT-S-DEL-VIEW").css("display","none");
-	})
-
-	$(".ErrorAlertBtn").click(function() {
-		$(".ALERT-E-UPD-VIEW").css("display","none");
-		$(".ALERT-E-DEL-VIEW").css("display","none");
-	})
-
-	$(".alertmsg").focus();
 }

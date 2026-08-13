@@ -14,7 +14,7 @@
  *       (hiddenRows, hidden-table, hidden-row-close, orderTaken, normalOrder, offer-row, fixed-min-width)
  *   - common/.../order_toolbar.html             (hidden-buttons, tableIcons)
  *   - table/.../order_table.html                (order-details, table-order-details)
- *   - static/js/spinner.js, handle_orders.js, fetch_order.js
+ *   - static/js/orders/details/spinner.js, orders/row-expand/*, orders/details/fetch.js
  *       (order-spinner*, orderClicked, rowSelected, hidden-row-close)
  *
  * Dynamic filter/search/sort styles live in dynamic_orders.css
