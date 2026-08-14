@@ -12,6 +12,7 @@ class DeleteOrder(BaseDeleteView):
     --- Fields inherited from BaseDeleteView ---
 
     model = None
+    http_method_names = ["post"]
 
     """
     

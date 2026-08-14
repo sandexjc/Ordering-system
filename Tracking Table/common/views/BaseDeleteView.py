@@ -1,11 +1,14 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.detail import SingleObjectMixin
 from django.core.exceptions import ObjectDoesNotExist
-from django.views import View
-from django.http import JsonResponse
 from django.db import transaction
+from django.http import Http404, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.csrf import csrf_protect
+from django.views.generic.detail import SingleObjectMixin
 
 
+@method_decorator(csrf_protect, name="dispatch")
 class BaseDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
 
     """
@@ -14,6 +17,13 @@ class BaseDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
     LoginRequiredMixin -> BaseDeleteView
     SingleObjectMixin -> BaseDeleteView
     View -> BaseDeleteView
+
+    Shared JSON POST for order / vitrine delete (static modal + dynamic row).
+
+    Security:
+    - login required
+    - CSRF required (middleware + csrf_protect; client sends X-CSRFToken)
+    - POST only
 
     --- Fields inherited from LoginRequiredMixin ---
 
@@ -25,12 +35,13 @@ class BaseDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
 
     --- Fields inherited from View ---
 
-    No explicit class fields inherited.
+    http_method_names = ["get", "post", "put", "patch", "delete", "head", "options", "trace"]
 
     """
 
     # Subclasses must define
     model = None
+    http_method_names = ["post"]
 
     def get_object(self, queryset=None):
         order = super().get_object(queryset)
@@ -42,8 +53,8 @@ class BaseDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
         
         try:
             self.object = self.get_object()
-        except ObjectDoesNotExist:
-            # Already deleted
+        except (Http404, ObjectDoesNotExist):
+            # Already deleted (soft-deleted rows 404 from the default manager)
             return JsonResponse({"status": "ok"})
 
         try:

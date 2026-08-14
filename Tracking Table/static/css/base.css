@@ -16,6 +16,7 @@
  *   - table/.../order_table.html                (order-details, table-order-details)
  *   - static/js/orders/details/spinner.js, orders/row-expand/*, orders/details/fetch.js
  *       (order-spinner*, orderClicked, rowSelected, hidden-row-close)
+ *   - static/js/orders/actions/progress-delete.js (visibleRows.is-deleting)
  *
  * Dynamic filter/search/sort styles live in dynamic_orders.css
  * (loaded from main/templates/dynamic/orders.html).
@@ -300,6 +301,13 @@ table.table-order-details thead tr th:not(:first-child) {
 {
 	background-blend-mode: multiply;
 	background-color: #d2d2d2;
+}
+
+.visibleRows.is-deleting
+{
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 180ms ease-out;
 }
 
 /* =============================================================================
