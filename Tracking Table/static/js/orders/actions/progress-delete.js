@@ -13,6 +13,8 @@
 
 /**
  * Sync a progress-bar step's active class and data-active flag.
+ * Disabled steps never get `.active`, matching the server-rendered template
+ * (`disabled` takes precedence so the inactive "x" stays visible).
  *
  * @param {string} elementId - DOM id of the step `<li>`.
  * @param {boolean} isActive - Whether the step should appear complete.
@@ -24,7 +26,8 @@ function sync_progress_step(elementId, isActive)
 	if (!el) {
 		return;
 	}
-	el.classList.toggle("active", isActive === true);
+	const showActive = isActive === true && !el.classList.contains("disabled");
+	el.classList.toggle("active", showActive);
 	el.classList.remove("is-error", "is-loading", "is-preview", "is-preview-off");
 	el.removeAttribute("aria-busy");
 	el.removeAttribute("aria-label");

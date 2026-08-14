@@ -34,6 +34,15 @@
             {% if interactive %}
                 <span class="progress-step-hit" aria-hidden="true">
                     <span class="progress-step-mark">✔️</span>
+                    <svg class="progress-step-disabled-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path
+                            d="M6 6l12 12M18 6L6 18"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="3.25"
+                            stroke-linecap="round"
+                        />
+                    </svg>
                     <svg class="progress-step-retry-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                         <title>Опитай отново</title>
                         <path

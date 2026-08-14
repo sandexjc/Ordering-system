@@ -38,9 +38,11 @@
 	position: relative;
 	width: 30px;
 	height: 30px;
-	line-height: 25px;
+	line-height: 1;
 	border: 3px solid #ddd;
-	display: block;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	text-align: center;
 	margin: 0 auto 10px auto;
 	border-radius: 50%;
@@ -201,7 +203,8 @@
     transition: border-color 0.22s ease, background-color 0.22s ease, color 0.22s ease;
 }
 
-#dynamic-orders-root .progressbar-interactive li.active:before {
+#dynamic-orders-root .progressbar-interactive li.active:before,
+#dynamic-orders-root .progressbar-interactive li.disabled:before {
     content: "";
 }
 
@@ -211,6 +214,22 @@
 
 #dynamic-orders-root .progressbar-interactive li.disabled .progress-step-mark {
     display: none;
+}
+
+#dynamic-orders-root .progressbar-interactive .progress-step-disabled-icon {
+    position: absolute;
+    inset: 0;
+    width: 14px;
+    height: 14px;
+    margin: auto;
+    color: #aaa;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+}
+
+#dynamic-orders-root .progressbar-interactive li.disabled .progress-step-disabled-icon {
+    opacity: 1;
 }
 
 #dynamic-orders-root .progressbar-interactive .progress-step-retry-icon {
@@ -278,7 +297,8 @@
     opacity: 1;
 }
 
-#dynamic-orders-root .progressbar-interactive li.is-loading .progress-step-mark {
+#dynamic-orders-root .progressbar-interactive li.is-loading .progress-step-mark,
+#dynamic-orders-root .progressbar-interactive li.is-loading .progress-step-disabled-icon {
     opacity: 0;
 }
 
@@ -314,6 +334,7 @@
 
 @media (prefers-reduced-motion: reduce) {
     #dynamic-orders-root .progressbar-interactive .progress-step-mark,
+    #dynamic-orders-root .progressbar-interactive .progress-step-disabled-icon,
     #dynamic-orders-root .progressbar-interactive .progress-step-retry-icon,
     #dynamic-orders-root .progressbar-interactive li:before,
     #dynamic-orders-root .progressbar-interactive li:after {
