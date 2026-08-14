@@ -146,6 +146,7 @@ function set_progress_step_loading(stepEl)
     clear_progress_step_preview(stepEl);
     stepEl.classList.add("is-loading");
     stepEl.classList.remove("is-error");
+    stepEl.removeAttribute("aria-label");
     stepEl.setAttribute("aria-busy", "true");
 }
 
@@ -161,6 +162,11 @@ function clear_progress_step_loading(stepEl, isError)
     stepEl.classList.remove("is-loading");
     stepEl.removeAttribute("aria-busy");
     stepEl.classList.toggle("is-error", Boolean(isError));
+    if (isError) {
+        stepEl.setAttribute("aria-label", "Опитай отново");
+    } else {
+        stepEl.removeAttribute("aria-label");
+    }
 }
 
 /**
@@ -264,7 +270,7 @@ function handle_progress_step_click(event)
         return;
     }
 
-    if (!event.target.closest(".progress-step-hit") && !event.target.closest(".progress-step-retry")) {
+    if (!event.target.closest(".progress-step-hit")) {
         return;
     }
 

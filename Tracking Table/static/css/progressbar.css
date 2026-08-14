@@ -213,9 +213,17 @@
     display: none;
 }
 
-#dynamic-orders-root .progressbar-interactive .progress-step-retry {
-    pointer-events: auto;
-    cursor: pointer;
+#dynamic-orders-root .progressbar-interactive .progress-step-retry-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    color: #dc3545;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
 }
 
 #dynamic-orders-root .progressbar-interactive li[data-progress-step].is-loading {
@@ -241,14 +249,6 @@
     z-index: 3;
     color: #6c757d;
     pointer-events: none;
-}
-
-#dynamic-orders-root .progressbar-interactive .progress-step-retry {
-    display: none;
-    margin-top: 0.25rem;
-    font-size: 0.7rem;
-    line-height: 1.2;
-    white-space: nowrap;
 }
 
 @media (hover: hover) {
@@ -300,12 +300,21 @@
     border-color: #dc3545;
 }
 
-#dynamic-orders-root .progressbar-interactive li.is-error .progress-step-retry {
-    display: inline-block;
+#dynamic-orders-root .progressbar-interactive li.is-error .progress-step-mark {
+    opacity: 0;
+}
+
+#dynamic-orders-root .progressbar-interactive li.is-error .progress-step-retry-icon {
+    opacity: 1;
+}
+
+#dynamic-orders-root .progressbar-interactive li.is-loading .progress-step-retry-icon {
+    opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
     #dynamic-orders-root .progressbar-interactive .progress-step-mark,
+    #dynamic-orders-root .progressbar-interactive .progress-step-retry-icon,
     #dynamic-orders-root .progressbar-interactive li:before,
     #dynamic-orders-root .progressbar-interactive li:after {
         transition: none;

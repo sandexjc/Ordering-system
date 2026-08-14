@@ -25,6 +25,9 @@ function sync_progress_step(elementId, isActive)
 		return;
 	}
 	el.classList.toggle("active", isActive === true);
+	el.classList.remove("is-error", "is-loading", "is-preview", "is-preview-off");
+	el.removeAttribute("aria-busy");
+	el.removeAttribute("aria-label");
 	if (el.hasAttribute("data-active")) {
 		el.dataset.active = isActive === true ? "1" : "0";
 	}
