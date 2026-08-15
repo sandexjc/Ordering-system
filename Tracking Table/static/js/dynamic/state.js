@@ -36,6 +36,16 @@ let ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
 /** Bumped when the tab hides so in-flight heartbeats cannot move `since`. */
 let ordersSyncGeneration = 0;
 let ordersSyncAbort = null;
+/** Bumped at the start of each heartbeat tick so a superseded poll cannot update status. */
+let ordersSyncTickId = 0;
+/** True while a sync fetch has started and has not yet returned (or been aborted). */
+let ordersSyncAwaitingResponse = false;
+/** True when the current tick received at least one successful HTTP response. */
+let ordersSyncFetchSucceededThisTick = false;
+/** When the next heartbeat / reconnect attempt is scheduled. */
+let ordersSyncNextTickAt = 0;
+/** Optimistic until the first missed heartbeat; page load already talked to the server. */
+let isServerConnected = true;
 const recentLocalOrderMutations = window.recentLocalOrderMutations || new Map();
 window.recentLocalOrderMutations = recentLocalOrderMutations;
 const ordersDetailsInFlight = window.ordersDetailsInFlight || new Set();

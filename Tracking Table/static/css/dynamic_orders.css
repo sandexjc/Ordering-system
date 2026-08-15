@@ -12,6 +12,7 @@
  *   - main/templates/layout/content.html             (#visible-items-filters)
  *   - table/.../table_header.html, vitrine/.../table_header.html  (.th-sortable)
  *   - static/js/dynamic/*.js
+ *   - main/templates/dynamic/components/connection_toast.html
  */
 
 /* =============================================================================
@@ -242,4 +243,138 @@ mark.search-highlight
 #dynamic-orders-root tr.visibleRows.is-sync-highlight
 {
 	background-color: #efe6fb;
+}
+
+/* =============================================================================
+   Server connection toast (heartbeat / live sync)
+   ============================================================================= */
+
+#server-connection-toast-container
+{
+	z-index: 1090;
+	bottom: 3.5rem;
+}
+
+.server-connection-toast
+{
+	width: 22rem;
+	max-width: calc(100vw - 1.5rem);
+	color: #1a1a1a;
+	background: #fff;
+	border: 1px solid #cfcfd2;
+	border-left: 3px solid #c62828;
+	border-radius: 4px;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.12);
+	font-size: 0.8125rem;
+	line-height: 1.35;
+}
+
+.server-connection-toast--restored
+{
+	border-left-color: #2e7d32;
+}
+
+.server-connection-toast .toast-header
+{
+	padding: 0.55rem 0.75rem;
+	color: #1a1a1a;
+	background: #fff;
+	border-bottom: 1px solid #e6e6e8;
+}
+
+.server-connection-toast .toast-header strong
+{
+	font-size: 0.8125rem;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.server-connection-toast .toast-header .btn-close
+{
+	width: 0.6rem;
+	height: 0.6rem;
+	margin: 0;
+	padding: 0.45rem;
+	opacity: 0.55;
+}
+
+.server-connection-toast .toast-body
+{
+	padding: 0.7rem 0.75rem 0.8rem;
+	color: #3a3a3d;
+}
+
+#server-connection-toast.is-awaiting-response #server-connection-toast-wait
+{
+	display: none;
+}
+
+.server-connection-toast-wait
+{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+}
+
+.server-connection-toast-retry
+{
+	flex: 0 0 auto;
+	padding: 0.2rem 0.55rem;
+	color: #1a1a1a;
+	background: #fff;
+	border: 1px solid #cfcfd2;
+	border-radius: 3px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	line-height: 1.2;
+	letter-spacing: -0.01em;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.server-connection-toast-retry:hover:not(:disabled)
+{
+	color: #9b1c1c;
+	border-color: #c62828;
+}
+
+.server-connection-toast-retry:disabled
+{
+	opacity: 0.45;
+}
+
+.server-connection-toast-pending
+{
+	display: none;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+#server-connection-toast.is-awaiting-response .server-connection-toast-pending
+{
+	display: flex;
+}
+
+.server-connection-toast-pending .spinner-border
+{
+	width: 0.85rem;
+	height: 0.85rem;
+	border-width: 0.12em;
+	color: #c62828;
+}
+
+#server-connection-toast-countdown
+{
+	display: inline-block;
+	min-width: 1.5rem;
+	padding: 0.05rem 0.4rem;
+	margin: 0 0.1rem;
+	color: #9b1c1c;
+	background: #f8e8e8;
+	border: 1px solid #edc8c8;
+	border-radius: 3px;
+	font-variant-numeric: tabular-nums;
+	font-weight: 700;
+	text-align: center;
 }

@@ -40,6 +40,7 @@
             {% include "dynamic/components/vitrine_shell.html" %}
         </template>
     </div>
+    {% include "dynamic/components/connection_toast.html" %}
 {% endblock %}
 
 {% block vitrine_scripts %}
@@ -50,6 +51,7 @@
     {{ block.super }}
     {# Dynamic orders page modules (load order matters for shared state) #}
     <script type="text/javascript" src="{% static 'js/dynamic/state.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dynamic/connection.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dynamic/filters.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dynamic/search.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dynamic/cache.js' %}"></script>

@@ -8,6 +8,7 @@
  *
  * Depends on (load order):
  *   - dynamic/state.js
+ *   - dynamic/connection.js → setServerConnected, hideServerConnectionToast, refreshServerConnectionToast, setServerConnectionToastPending
  *   - dynamic/filters.js → getFiltersForView, getOrdersEndpointForView, updateVisibleItemsCounter
  *   - dynamic/search.js  → getSearchForView, highlightSearchInOrders
  *   - dynamic/cache.js   → updateViewCache, captureLiveRowsHtml, isHiddenRowVisuallyOpen
@@ -705,18 +706,34 @@ async function pollOrdersSyncForView(viewName)
         return;
     }
     const syncGeneration = ordersSyncGeneration;
-    const response = await fetch(url, {
-        headers: {
-            "X-Requested-With": "XMLHttpRequest",
-        },
-        signal: ordersSyncAbort ? ordersSyncAbort.signal : undefined,
-    });
+    ordersSyncAwaitingResponse = true;
+    if (!isServerConnected && typeof setServerConnectionToastPending === "function") {
+        setServerConnectionToastPending(true);
+    }
+    let response;
+    try {
+        response = await fetch(url, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            signal: ordersSyncAbort ? ordersSyncAbort.signal : undefined,
+        });
+    } catch (error) {
+        if (syncGeneration === ordersSyncGeneration) {
+            ordersSyncAwaitingResponse = false;
+        }
+        throw error;
+    }
+    if (syncGeneration === ordersSyncGeneration) {
+        ordersSyncAwaitingResponse = false;
+    }
     if (syncGeneration !== ordersSyncGeneration || document.visibilityState !== "visible") {
         return;
     }
     if (!response.ok) {
         throw new Error("HTTP " + response.status + " " + response.statusText);
     }
+    ordersSyncFetchSucceededThisTick = true;
     const payload = await response.json();
     if (syncGeneration !== ordersSyncGeneration || document.visibilityState !== "visible") {
         return;
@@ -755,11 +772,55 @@ function scheduleOrdersSync(delayMs)
     if (ordersSyncTimer) {
         window.clearTimeout(ordersSyncTimer);
     }
+    ordersSyncNextTickAt = Date.now() + delayMs;
     ordersSyncTimer = window.setTimeout(runOrdersSyncTick, delayMs);
+    if (typeof refreshServerConnectionToast === "function") {
+        refreshServerConnectionToast();
+    }
+}
+
+/**
+ * Drop an in-flight heartbeat without moving `since`.
+ *
+ * @returns {void}
+ */
+function abortOrdersSyncInFlight()
+{
+    ordersSyncGeneration += 1;
+    ordersSyncAwaitingResponse = false;
+    if (ordersSyncAbort) {
+        ordersSyncAbort.abort();
+    }
+    ordersSyncAbort = new AbortController();
+}
+
+/**
+ * Fire a reconnect poll immediately from the offline toast.
+ *
+ * @returns {void}
+ */
+function retryOrdersLiveSync()
+{
+    if (isServerConnected || ordersSyncAwaitingResponse) {
+        return;
+    }
+    if (document.visibilityState !== "visible") {
+        return;
+    }
+    ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
+    if (ordersSyncTimer) {
+        window.clearTimeout(ordersSyncTimer);
+        ordersSyncTimer = null;
+    }
+    runOrdersSyncTick();
 }
 
 /**
  * One poll tick; reschedules itself.
+ *
+ * A successful HTTP response means the client has a server connection.
+ * If the previous poll is still outstanding when this heartbeat fires,
+ * there was no response in time and the connection is down.
  *
  * @returns {Promise<void>}
  */
@@ -773,20 +834,61 @@ async function runOrdersSyncTick()
     if (document.visibilityState !== "visible") {
         return;
     }
+
+    const missedHeartbeat = ordersSyncAwaitingResponse;
+    if (missedHeartbeat) {
+        isServerConnected = false;
+        ordersSyncBackoffMs = Math.min(ordersSyncBackoffMs * 2, 32000);
+        abortOrdersSyncInFlight();
+    }
+
+    const tickId = ++ordersSyncTickId;
+    ordersSyncFetchSucceededThisTick = false;
+    scheduleOrdersSync(isServerConnected ? ORDERS_SYNC_INTERVAL_MS : ordersSyncBackoffMs);
+    if (!isServerConnected && typeof setServerConnected === "function") {
+        setServerConnected(false);
+        if (typeof setServerConnectionToastPending === "function") {
+            setServerConnectionToastPending(true);
+        }
+    }
+
     try {
         await pollOrdersSync();
-        ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
+        if (tickId !== ordersSyncTickId || document.visibilityState !== "visible") {
+            return;
+        }
+        if (ordersSyncFetchSucceededThisTick) {
+            ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
+            if (typeof setServerConnected === "function") {
+                setServerConnected(true);
+            } else {
+                isServerConnected = true;
+            }
+            scheduleOrdersSync(ORDERS_SYNC_INTERVAL_MS);
+        } else if (!isServerConnected && typeof setServerConnectionToastPending === "function") {
+            setServerConnectionToastPending(false);
+        }
     } catch (error) {
+        if (tickId !== ordersSyncTickId) {
+            return;
+        }
+        ordersSyncAwaitingResponse = false;
         if (error && error.name === "AbortError") {
             return;
         }
         console.error(error);
-        ordersSyncBackoffMs = Math.min(ordersSyncBackoffMs * 2, 32000);
+        if (!ordersSyncFetchSucceededThisTick) {
+            isServerConnected = false;
+            ordersSyncBackoffMs = Math.min(ordersSyncBackoffMs * 2, 32000);
+            if (document.visibilityState !== "visible") {
+                return;
+            }
+            scheduleOrdersSync(ordersSyncBackoffMs);
+            if (typeof setServerConnected === "function") {
+                setServerConnected(false);
+            }
+        }
     }
-    if (document.visibilityState !== "visible") {
-        return;
-    }
-    scheduleOrdersSync(ordersSyncBackoffMs);
 }
 
 /**
@@ -796,15 +898,16 @@ async function runOrdersSyncTick()
  */
 function pauseOrdersLiveSync()
 {
-    ordersSyncGeneration += 1;
+    ordersSyncTickId += 1;
     if (ordersSyncTimer) {
         window.clearTimeout(ordersSyncTimer);
         ordersSyncTimer = null;
     }
-    if (ordersSyncAbort) {
-        ordersSyncAbort.abort();
+    ordersSyncNextTickAt = 0;
+    abortOrdersSyncInFlight();
+    if (typeof hideServerConnectionToast === "function") {
+        hideServerConnectionToast();
     }
-    ordersSyncAbort = new AbortController();
 }
 
 /**

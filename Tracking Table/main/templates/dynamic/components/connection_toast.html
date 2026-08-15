@@ -1,0 +1,54 @@
+<div
+    id="server-connection-toast-container"
+    class="toast-container position-fixed bottom-0 end-0 p-3"
+>
+    <div
+        id="server-connection-toast"
+        class="toast server-connection-toast server-connection-toast--offline"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        data-bs-autohide="false"
+    >
+        <div class="toast-header">
+            <strong class="me-auto">Няма връзка със сървъра</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <div id="server-connection-toast-wait" class="server-connection-toast-wait">
+                <span>
+                    Следващият опит за връзка е след
+                    <span id="server-connection-toast-countdown">0</span> сек.
+                </span>
+                <button
+                    type="button"
+                    id="server-connection-toast-retry"
+                    class="server-connection-toast-retry"
+                >
+                    Опитай отново
+                </button>
+            </div>
+            <div id="server-connection-toast-pending" class="server-connection-toast-pending">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span>Изчакване на отговор...</span>
+            </div>
+        </div>
+    </div>
+    <div
+        id="server-connection-restored-toast"
+        class="toast server-connection-toast server-connection-toast--restored"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        data-bs-autohide="true"
+        data-bs-delay="8000"
+    >
+        <div class="toast-header">
+            <strong class="me-auto">Връзката е възстановена</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Синхронизацията със сървъра е активна отново.
+        </div>
+    </div>
+</div>
