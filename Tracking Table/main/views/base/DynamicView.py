@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime, time, timedelta, timezone as datetime_timezone
+from datetime import datetime, time, timezone as datetime_timezone
 from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
@@ -74,6 +74,7 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
             "orders_sync_interval_ms": settings.DJANGO_DYNAMIC_CONTENT__ORDERS_SYNC_INTERVAL_MS,
             "local_mutation_skip_ms": settings.DJANGO_DYNAMIC_CONTENT__LOCAL_MUTATION_SKIP_MS,
             "range_filter_debounce_ms": settings.DJANGO_DYNAMIC_CONTENT__RANGE_FILTER_DEBOUNCE_MS,
+            "sync_highlight_ms": settings.DJANGO_DYNAMIC_CONTENT__SYNC_HIGHLIGHT_MS,
         }
         return context
 
@@ -301,16 +302,16 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         )
 
     def get_sync_watermark(self):
-        """Server 'now' as UTC microseconds (avoids '+' in ISO query params).
+        """Server 'now' floored to UTC seconds, as microseconds.
 
-        This is the cursor the client sends back as `since`. It must advance on
-        every response — including empty heartbeats — so idle polls do not keep
-        re-querying the same Max(updated_at) window.
+        SQLite stores DateTime as second-precision strings. A fractional `since`
+        such as 12:00:04.800 misses a row stored as 12:00:04. Flooring matches
+        that storage so the query can be `updated_at >= since` with no lookback.
         """
         now = timezone.now()
         if timezone.is_naive(now):
             now = timezone.make_aware(now)
-        return str(int(now.timestamp() * 1_000_000))
+        return str(int(now.timestamp()) * 1_000_000)
 
     def parse_since(self):
         raw = (self.request.GET.get("since") or "").strip()
@@ -343,10 +344,6 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         since = self.parse_since()
         if since is None:
             return JsonResponse(self.empty_sync_payload(watermark))
-
-        # Overlap window: SQLite DateTime comparisons and same-second saves
-        # can miss rows with a strict `gt` against the previous watermark.
-        since = since - timedelta(seconds=2)
 
         changed = list(
             self.model.objects.all_with_deleted()

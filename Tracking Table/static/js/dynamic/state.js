@@ -33,6 +33,9 @@ const LOCAL_MUTATION_SKIP_MS = readDynamicContentInt("localMutationSkipMs", 6000
 let isOrdersListFetchInFlight = 0;
 let ordersSyncTimer = null;
 let ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
+/** Bumped when the tab hides so in-flight heartbeats cannot move `since`. */
+let ordersSyncGeneration = 0;
+let ordersSyncAbort = null;
 const recentLocalOrderMutations = window.recentLocalOrderMutations || new Map();
 window.recentLocalOrderMutations = recentLocalOrderMutations;
 const ordersDetailsInFlight = window.ordersDetailsInFlight || new Set();
@@ -53,4 +56,5 @@ const DEFAULT_ORDER_FILTERS = Object.freeze({
 });
 
 const RANGE_FILTER_DEBOUNCE_MS = readDynamicContentInt("rangeFilterDebounceMs", 300);
+const SYNC_HIGHLIGHT_MS = readDynamicContentInt("syncHighlightMs", 120000);
 let rangeFilterDebounceTimer = null;

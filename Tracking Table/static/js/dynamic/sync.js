@@ -363,7 +363,8 @@ function dropCachedOrderDetails(viewName, orderId)
 }
 
 /**
- * Fade purple in on a remote insert/update. Stays until the user focuses or opens the row.
+ * Fade purple in on a remote insert/update.
+ * Clears on focus / open / close, or after SYNC_HIGHLIGHT_MS (default 2 min).
  *
  * @param {HTMLElement} row - Summary row.
  * @returns {void}
@@ -378,6 +379,13 @@ function highlightSyncedRow(row)
         return;
     }
     row.classList.add("is-sync-highlight");
+    if (row._syncHighlightTimer) {
+        window.clearTimeout(row._syncHighlightTimer);
+    }
+    row._syncHighlightTimer = window.setTimeout(() => {
+        row._syncHighlightTimer = null;
+        clearSyncedRowHighlight(row);
+    }, SYNC_HIGHLIGHT_MS);
 }
 
 /**
@@ -390,6 +398,10 @@ function clearSyncedRowHighlight(row)
 {
     if (!row) {
         return;
+    }
+    if (row._syncHighlightTimer) {
+        window.clearTimeout(row._syncHighlightTimer);
+        row._syncHighlightTimer = null;
     }
     row.classList.remove("is-sync-highlight");
 }
@@ -692,15 +704,23 @@ async function pollOrdersSyncForView(viewName)
     if (!url) {
         return;
     }
+    const syncGeneration = ordersSyncGeneration;
     const response = await fetch(url, {
         headers: {
             "X-Requested-With": "XMLHttpRequest",
         },
+        signal: ordersSyncAbort ? ordersSyncAbort.signal : undefined,
     });
+    if (syncGeneration !== ordersSyncGeneration || document.visibilityState !== "visible") {
+        return;
+    }
     if (!response.ok) {
         throw new Error("HTTP " + response.status + " " + response.statusText);
     }
     const payload = await response.json();
+    if (syncGeneration !== ordersSyncGeneration || document.visibilityState !== "visible") {
+        return;
+    }
     await applySyncPayload(viewName, payload);
 }
 
@@ -757,10 +777,34 @@ async function runOrdersSyncTick()
         await pollOrdersSync();
         ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
     } catch (error) {
+        if (error && error.name === "AbortError") {
+            return;
+        }
         console.error(error);
         ordersSyncBackoffMs = Math.min(ordersSyncBackoffMs * 2, 32000);
     }
+    if (document.visibilityState !== "visible") {
+        return;
+    }
     scheduleOrdersSync(ordersSyncBackoffMs);
+}
+
+/**
+ * Stop the timer and drop in-flight heartbeats without moving `since`.
+ *
+ * @returns {void}
+ */
+function pauseOrdersLiveSync()
+{
+    ordersSyncGeneration += 1;
+    if (ordersSyncTimer) {
+        window.clearTimeout(ordersSyncTimer);
+        ordersSyncTimer = null;
+    }
+    if (ordersSyncAbort) {
+        ordersSyncAbort.abort();
+    }
+    ordersSyncAbort = new AbortController();
 }
 
 /**
@@ -778,6 +822,7 @@ function setupOrdersLiveSync()
         return;
     }
     window.__ordersLiveSyncStarted = true;
+    ordersSyncAbort = new AbortController();
 
     const clearHighlightFromEvent = (event) => {
         const row = event.target.closest("#dynamic-orders-root tr.visibleRows");
@@ -789,15 +834,12 @@ function setupOrdersLiveSync()
     root.addEventListener("pointerdown", clearHighlightFromEvent);
 
     document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") {
-            ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
-            runOrdersSyncTick();
+        if (document.visibilityState !== "visible") {
+            pauseOrdersLiveSync();
             return;
         }
-        if (ordersSyncTimer) {
-            window.clearTimeout(ordersSyncTimer);
-            ordersSyncTimer = null;
-        }
+        ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
+        runOrdersSyncTick();
     });
 
     scheduleOrdersSync(ORDERS_SYNC_INTERVAL_MS);
