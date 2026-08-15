@@ -18,10 +18,17 @@ let isLoadingMore = false;
 let ordersRenderGeneration = 0;
 let searchDebounceTimer = null;
 
-const SEARCH_MIN_LENGTH = 2;
-const SEARCH_DEBOUNCE_MS = 700;
-const ORDERS_SYNC_INTERVAL_MS = 4000;
-const LOCAL_MUTATION_SKIP_MS = 60000;
+function readDynamicContentInt(datasetKey, fallback)
+{
+    const root = document.getElementById("dynamic-orders-root");
+    const value = Number.parseInt(root && root.dataset[datasetKey], 10);
+    return Number.isFinite(value) ? value : fallback;
+}
+
+const SEARCH_MIN_LENGTH = readDynamicContentInt("searchMinLength", 2);
+const SEARCH_DEBOUNCE_MS = readDynamicContentInt("searchDebounceMs", 700);
+const ORDERS_SYNC_INTERVAL_MS = readDynamicContentInt("ordersSyncIntervalMs", 4000);
+const LOCAL_MUTATION_SKIP_MS = readDynamicContentInt("localMutationSkipMs", 60000);
 
 let isOrdersListFetchInFlight = 0;
 let ordersSyncTimer = null;
@@ -45,5 +52,5 @@ const DEFAULT_ORDER_FILTERS = Object.freeze({
     balanceMax: null,
 });
 
-const RANGE_FILTER_DEBOUNCE_MS = 300;
+const RANGE_FILTER_DEBOUNCE_MS = readDynamicContentInt("rangeFilterDebounceMs", 300);
 let rangeFilterDebounceTimer = null;

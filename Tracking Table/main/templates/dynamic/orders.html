@@ -15,6 +15,11 @@
     <div
         id="dynamic-orders-root"
         data-current-view="{{ current_dynamic_view }}"
+        data-search-min-length="{{ dynamic_content.search_min_length }}"
+        data-search-debounce-ms="{{ dynamic_content.search_debounce_ms }}"
+        data-orders-sync-interval-ms="{{ dynamic_content.orders_sync_interval_ms }}"
+        data-local-mutation-skip-ms="{{ dynamic_content.local_mutation_skip_ms }}"
+        data-range-filter-debounce-ms="{{ dynamic_content.range_filter_debounce_ms }}"
         data-vitrine-css-vitrines="{% static 'vitrine/css/vitrines.css' %}"
         data-vitrine-css-holes="{% static 'vitrine/css/holes_dots.css' %}"
         data-vitrine-css-modal="{% static 'vitrine/css/modal_progress.css' %}"

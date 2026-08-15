@@ -2,6 +2,7 @@ import base64
 from datetime import datetime, time, timedelta, timezone as datetime_timezone
 from decimal import Decimal, InvalidOperation
 
+from django.conf import settings
 from django.db.models import Max, Min, Q
 from django.http import JsonResponse
 from django.template.loader import render_to_string
@@ -67,6 +68,13 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         context["current_time"] = self.get_time_of_day()
         context["dynamic_mode"] = True
         context["current_dynamic_view"] = current_view
+        context["dynamic_content"] = {
+            "search_min_length": settings.DJANGO_DYNAMIC_CONTENT__SEARCH_MIN_LENGTH,
+            "search_debounce_ms": settings.DJANGO_DYNAMIC_CONTENT__SEARCH_DEBOUNCE_MS,
+            "orders_sync_interval_ms": settings.DJANGO_DYNAMIC_CONTENT__ORDERS_SYNC_INTERVAL_MS,
+            "local_mutation_skip_ms": settings.DJANGO_DYNAMIC_CONTENT__LOCAL_MUTATION_SKIP_MS,
+            "range_filter_debounce_ms": settings.DJANGO_DYNAMIC_CONTENT__RANGE_FILTER_DEBOUNCE_MS,
+        }
         return context
 
     def post(self, request, *args, **kwargs):
