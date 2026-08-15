@@ -227,6 +227,9 @@ function submit_progress_step(stepEl)
             if (typeof apply_progress_update_response === "function") {
                 apply_progress_update_response(result.data);
             }
+            if (typeof rememberLocalOrderMutation === "function") {
+                rememberLocalOrderMutation(get_progress_step_order_id(stepEl));
+            }
 
             const orderId = get_progress_step_order_id(stepEl);
             if (orderId && typeof cache_order_details === "function") {

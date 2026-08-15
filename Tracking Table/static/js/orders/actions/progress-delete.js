@@ -352,6 +352,9 @@ function setup_progress_delete_handlers()
 			btn.innerHTML = "Update";
 
 			apply_progress_update_response(result.data);
+			if (typeof rememberLocalOrderMutation === "function") {
+				rememberLocalOrderMutation(id);
+			}
 		})
 		.catch(err => {
 			console.error(err);
@@ -419,6 +422,9 @@ function setup_progress_delete_handlers()
 			}
 
 			remove_deleted_order_row(id);
+			if (typeof rememberLocalOrderMutation === "function") {
+				rememberLocalOrderMutation(id);
+			}
 		})
 		.catch(err => {
 			console.error(err);

@@ -77,8 +77,24 @@ function cache_order_details(order_id)
  */
 function get_order(order_id)
 {
+    const orderKey = String(order_id);
+    const inFlight = window.ordersDetailsInFlight;
+    if (inFlight) {
+        if (inFlight.has(orderKey)) {
+            return;
+        }
+        inFlight.add(orderKey);
+    }
+
     const hiddenRow = document.getElementById("hidden-row-" + order_id);
     const hiddenTable = document.getElementById("hidden-table-" + order_id);
+    const rowEl = document.getElementById(order_id);
+    if (!rowEl) {
+        if (inFlight) {
+            inFlight.delete(orderKey);
+        }
+        return;
+    }
 
     /** Hide fold button while loading; spinner lives inside the content area. */
     set_hidden_row_close_visible(order_id, false);
@@ -89,8 +105,7 @@ function get_order(order_id)
         onHiddenRowContentUpdated(hiddenRow);
     }
 
-    /** Get app specific resource address from element */
-    let url_resource = document.getElementById(order_id).getAttribute("data-app-url");
+    let url_resource = rowEl.getAttribute("data-app-url");
     let url = url_resource + order_id;
     // Dynamic page only: ViewOrder / ViewVitrine skip the progress modal.
     if (get_current_dynamic_view_name()) {
@@ -196,6 +211,11 @@ function get_order(order_id)
             onHiddenRowContentUpdated(document.getElementById("hidden-row-" + order_id));
 
             console.log(error);
+        })
+        .finally(() => {
+            if (inFlight) {
+                inFlight.delete(orderKey);
+            }
         });
 }
 

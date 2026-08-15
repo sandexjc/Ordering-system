@@ -229,3 +229,17 @@ mark.search-highlight
 		font-size: 0.9rem;
 	}
 }
+
+/* =============================================================================
+   Live-sync highlight (other users' inserts / updates)
+   ============================================================================= */
+
+#dynamic-orders-root tr.visibleRows
+{
+	transition: background-color 320ms ease;
+}
+
+#dynamic-orders-root tr.visibleRows.is-sync-highlight
+{
+	background-color: #efe6fb;
+}

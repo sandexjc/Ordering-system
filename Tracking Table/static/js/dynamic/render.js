@@ -277,6 +277,9 @@ function finalizeRenderedRows(viewName, generation, { restoreExpandedRows = true
             return;
         }
         restoreOpenRows(viewName);
+        if (typeof playPendingSyncHighlights === "function") {
+            playPendingSyncHighlights(viewName);
+        }
     });
 }
 

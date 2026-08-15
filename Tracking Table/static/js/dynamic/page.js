@@ -59,6 +59,9 @@ document.addEventListener("DOMContentLoaded", () => {
     setupDynamicSearch();
     syncSortHeaders(getFiltersForView(root.dataset.currentView || "table"));
     fetchAndRenderOrders({ viewName: root.dataset.currentView || "table" });
+    if (typeof setupOrdersLiveSync === "function") {
+        setupOrdersLiveSync();
+    }
 
     const navButtons = document.querySelectorAll("[data-dynamic-view]");
     navButtons.forEach((button) => {

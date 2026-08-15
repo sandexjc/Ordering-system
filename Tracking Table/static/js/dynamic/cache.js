@@ -276,6 +276,7 @@ function updateViewCache(viewName, patch) {
         scrollY: 0,
         filters: getDefaultOrderFilters(),
         searchQuery: "",
+        watermark: null,
     };
     viewOrdersCache.set(viewName, { ...previous, ...patch });
 }

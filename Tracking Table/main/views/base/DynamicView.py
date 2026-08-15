@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime, time
+from datetime import datetime, time, timedelta, timezone as datetime_timezone
 from decimal import Decimal, InvalidOperation
 
 from django.db.models import Max, Min, Q
@@ -41,6 +41,7 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
     allowed_sorts = ("asc", "desc")
     allowed_sort_by = ("order_id", "date", "balance")
     allowed_order_types = ("order", "offer")
+    sync_delta_limit = 50
     sort_field_map = {
         "order_id": "pk",
         "date": "created_date",
@@ -287,6 +288,97 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
                 "visible_items": len(page_rows),
                 "has_more": has_more,
                 "next_cursor": next_cursor,
+                "watermark": self.get_sync_watermark(),
+            }
+        )
+
+    def get_sync_watermark(self):
+        """Server 'now' as UTC microseconds (avoids '+' in ISO query params).
+
+        This is the cursor the client sends back as `since`. It must advance on
+        every response — including empty heartbeats — so idle polls do not keep
+        re-querying the same Max(updated_at) window.
+        """
+        now = timezone.now()
+        if timezone.is_naive(now):
+            now = timezone.make_aware(now)
+        return str(int(now.timestamp() * 1_000_000))
+
+    def parse_since(self):
+        raw = (self.request.GET.get("since") or "").strip()
+        if not raw:
+            return None
+        try:
+            micros = int(raw)
+            return datetime.fromtimestamp(micros / 1_000_000, tz=datetime_timezone.utc)
+        except (TypeError, ValueError, OSError, OverflowError):
+            pass
+        parsed = parse_datetime(raw)
+        if parsed is None:
+            return None
+        if timezone.is_naive(parsed):
+            parsed = timezone.make_aware(parsed)
+        return parsed
+
+    def empty_sync_payload(self, watermark, reload=False):
+        return {
+            "watermark": watermark,
+            "deleted_ids": [],
+            "created_ids": [],
+            "updated_ids": [],
+            "rows_html": "",
+            "reload": reload,
+        }
+
+    def render_sync_json_response(self):
+        watermark = self.get_sync_watermark()
+        since = self.parse_since()
+        if since is None:
+            return JsonResponse(self.empty_sync_payload(watermark))
+
+        # Overlap window: SQLite DateTime comparisons and same-second saves
+        # can miss rows with a strict `gt` against the previous watermark.
+        since = since - timedelta(seconds=2)
+
+        changed = list(
+            self.model.objects.all_with_deleted()
+            .filter(updated_at__gte=since)
+            .only("pk", "deleted_at", "created_at", "updated_at")
+        )
+        if len(changed) > self.sync_delta_limit:
+            return JsonResponse(self.empty_sync_payload(watermark, reload=True))
+        if not changed:
+            return JsonResponse(self.empty_sync_payload(watermark))
+
+        deleted_ids = [row.pk for row in changed if row.deleted_at is not None]
+        active_ids = [row.pk for row in changed if row.deleted_at is None]
+        created_at_by_id = {row.pk: row.created_at for row in changed}
+
+        matching_rows = []
+        if active_ids:
+            matching_rows = list(
+                self.get_filtered_queryset().filter(pk__in=active_ids).distinct()
+            )
+        matching_id_set = {row.pk for row in matching_rows}
+        deleted_ids.extend(pk for pk in active_ids if pk not in matching_id_set)
+
+        created_ids = []
+        updated_ids = []
+        for row in matching_rows:
+            created_at = created_at_by_id.get(row.pk)
+            if created_at is not None and created_at > since:
+                created_ids.append(row.pk)
+            else:
+                updated_ids.append(row.pk)
+
+        return JsonResponse(
+            {
+                "watermark": watermark,
+                "deleted_ids": deleted_ids,
+                "created_ids": created_ids,
+                "updated_ids": updated_ids,
+                "rows_html": self.render_rows_html(matching_rows) if matching_rows else "",
+                "reload": False,
             }
         )
 
@@ -294,5 +386,7 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         if self.model is not None and self.rows_template_name:
             if request.GET.get("bounds") == "1":
                 return self.render_bounds_json_response()
+            if request.GET.get("sync") == "1":
+                return self.render_sync_json_response()
             return self.render_rows_json_response()
         return super().get(request, *args, **kwargs)

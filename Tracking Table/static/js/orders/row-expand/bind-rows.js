@@ -59,8 +59,11 @@ function handle_orders() {
         e.preventDefault();
         e.stopPropagation();
         if (hiddenRow._isOpen) {
-          closeHiddenRow(hiddenRow, visibleRow);
-          focusClosedOrderRow(visibleRow);
+          const liveRow = typeof getLiveVisibleOrderRow === "function"
+            ? getLiveVisibleOrderRow(row_id, visibleRow)
+            : visibleRow;
+          closeHiddenRow(hiddenRow, liveRow);
+          focusClosedOrderRow(liveRow);
         }
       });
     }

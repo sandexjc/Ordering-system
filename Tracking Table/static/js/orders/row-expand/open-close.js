@@ -23,6 +23,7 @@
  * @returns {void}
  */
 function focusClosedOrderRow(visibleRow) {
+  visibleRow = getLiveVisibleOrderRow(visibleRow);
   if (!visibleRow) {
     return;
   }
@@ -38,6 +39,32 @@ function focusClosedOrderRow(visibleRow) {
 }
 
 /**
+ * Current summary row for an order id (sync may have replaced the original tr).
+ *
+ * @param {string|number|HTMLElement|null} rowIdOrRow - Order id or a summary row.
+ * @param {HTMLElement|null} [fallback] - Previous row reference.
+ * @returns {HTMLElement|null}
+ */
+function getLiveVisibleOrderRow(rowIdOrRow, fallback)
+{
+  if (rowIdOrRow && rowIdOrRow.nodeType === 1 && rowIdOrRow.classList.contains("visibleRows")) {
+    if (rowIdOrRow.isConnected) {
+      return rowIdOrRow;
+    }
+    rowIdOrRow = rowIdOrRow.getAttribute("data-row") || rowIdOrRow.id;
+  }
+  const rowId = rowIdOrRow != null && rowIdOrRow !== ""
+    ? String(rowIdOrRow)
+    : (fallback && (fallback.getAttribute("data-row") || fallback.id)) || "";
+  if (!rowId) {
+    return fallback && fallback.isConnected ? fallback : null;
+  }
+  return document.querySelector('tr.visibleRows[data-row="' + rowId + '"]')
+    || document.getElementById(rowId)
+    || (fallback && fallback.isConnected ? fallback : null);
+}
+
+/**
  * Smooth-expand a hidden detail row, mark selection, and fetch details on first open.
  *
  * @param {HTMLElement} hiddenRow - The `#hidden-row-{id}` element.
@@ -46,6 +73,11 @@ function focusClosedOrderRow(visibleRow) {
  * @returns {void}
  */
 function openHiddenRow(hiddenRow, row_id, visibleRow) {
+
+  visibleRow = getLiveVisibleOrderRow(row_id, visibleRow);
+  if (typeof clearSyncedRowHighlight === "function") {
+    clearSyncedRowHighlight(visibleRow);
+  }
 
   // cancel any pending transition handlers and lock current height (if any)
   _cancelPendingTransitionAndLockHeight(hiddenRow);
@@ -112,6 +144,12 @@ function openHiddenRow(hiddenRow, row_id, visibleRow) {
  * @returns {void}
  */
 function closeHiddenRow(hiddenRow, visibleRow) {
+
+  const rowId = hiddenRow.id.replace("hidden-row-", "");
+  visibleRow = getLiveVisibleOrderRow(rowId, visibleRow);
+  if (typeof clearSyncedRowHighlight === "function") {
+    clearSyncedRowHighlight(visibleRow);
+  }
 
   // Cancel prior handlers and lock current visual height (so transition starts from visible height)
   _cancelPendingTransitionAndLockHeight(hiddenRow);

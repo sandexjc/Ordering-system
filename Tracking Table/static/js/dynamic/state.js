@@ -20,6 +20,16 @@ let searchDebounceTimer = null;
 
 const SEARCH_MIN_LENGTH = 2;
 const SEARCH_DEBOUNCE_MS = 700;
+const ORDERS_SYNC_INTERVAL_MS = 4000;
+const LOCAL_MUTATION_SKIP_MS = 60000;
+
+let isOrdersListFetchInFlight = 0;
+let ordersSyncTimer = null;
+let ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
+const recentLocalOrderMutations = window.recentLocalOrderMutations || new Map();
+window.recentLocalOrderMutations = recentLocalOrderMutations;
+const ordersDetailsInFlight = window.ordersDetailsInFlight || new Set();
+window.ordersDetailsInFlight = ordersDetailsInFlight;
 
 /** Default list filters (newest by date, orders only, full id/balance range). */
 const DEFAULT_ORDER_FILTERS = Object.freeze({

@@ -354,7 +354,9 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
 
     teardownInfiniteScroll();
     isLoadingMore = false;
+    isOrdersListFetchInFlight += 1;
 
+    try {
     if (!forceRefresh) {
         const renderedFromCache = await renderCachedRowsIfAvailable(
             tableBody,
@@ -407,6 +409,7 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
             hasMore,
             nextCursor,
             orderDetails: previousCache?.orderDetails || {},
+            watermark: payload.watermark || previousCache?.watermark,
         });
 
         if (!isOrdersRenderCurrent(renderGeneration, resolvedView)) {
@@ -450,5 +453,8 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
                 { once: true }
             );
         }
+    }
+    } finally {
+        isOrdersListFetchInFlight = Math.max(0, isOrdersListFetchInFlight - 1);
     }
 }
