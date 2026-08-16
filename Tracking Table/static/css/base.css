@@ -16,7 +16,7 @@
  *   - table/.../order_table.html                (order-details, table-order-details)
  *   - static/js/orders/details/spinner.js, orders/row-expand/*, orders/details/fetch.js
  *       (order-spinner*, orderClicked, rowSelected, hidden-row-close)
- *   - static/js/orders/actions/progress-delete.js (visibleRows.is-deleting)
+ *   - static/js/orders/actions/progress-delete.js (visibleRows.is-deleting, ALERT-E-DEL-VIEW)
  *
  * Dynamic filter/search/sort styles live in dynamic_orders.css
  * (loaded from main/templates/dynamic/orders.html).
@@ -308,6 +308,26 @@ table.table-order-details thead tr th:not(:first-child) {
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity 180ms ease-out;
+}
+
+/* Delete modal error: ~25% smaller than default Bootstrap alert */
+.ALERT-E-DEL-VIEW
+{
+	width: 75%;
+	margin: 0.35rem auto 0;
+}
+
+.ALERT-E-DEL-VIEW .alert
+{
+	padding: 0.5rem 2rem 0.5rem 0.7rem;
+	margin-bottom: 0;
+	font-size: 0.8rem;
+	line-height: 1.2;
+}
+
+.ALERT-E-DEL-VIEW .alert .btn-close
+{
+	padding: 0.7rem 0.75rem;
 }
 
 /* =============================================================================

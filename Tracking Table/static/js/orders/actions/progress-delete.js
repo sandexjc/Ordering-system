@@ -376,6 +376,35 @@ function setup_progress_delete_handlers()
 		document.removeEventListener("click", window.deleteHandler);
 	}
 
+	const DELETE_ERROR_ALERT_MS = 10000;
+
+	function hide_delete_error_alert(errorAlert)
+	{
+		if (!errorAlert) {
+			return;
+		}
+		if (errorAlert._dismissTimeout) {
+			window.clearTimeout(errorAlert._dismissTimeout);
+			errorAlert._dismissTimeout = null;
+		}
+		errorAlert.style.display = "none";
+	}
+
+	function show_delete_error_alert(errorAlert)
+	{
+		if (!errorAlert) {
+			return;
+		}
+		if (errorAlert._dismissTimeout) {
+			window.clearTimeout(errorAlert._dismissTimeout);
+		}
+		errorAlert.style.display = "block";
+		errorAlert._dismissTimeout = window.setTimeout(function () {
+			errorAlert.style.display = "none";
+			errorAlert._dismissTimeout = null;
+		}, DELETE_ERROR_ALERT_MS);
+	}
+
 	/** Create a single handler function and store it globally */
 	window.deleteHandler = function(event) {
 		const btn = event.target.closest(".btn-delete");
@@ -393,27 +422,37 @@ function setup_progress_delete_handlers()
 			return;
 		}
 
+		const modal = btn.closest(".modal") || document.getElementById(`modal-delete-${id}`);
+		const errorAlert = modal && modal.querySelector(".ALERT-E-DEL-VIEW");
+		hide_delete_error_alert(errorAlert);
+
 		/** UI loading state */
 		btn.disabled = true;
 		const oldHtml = btn.innerHTML;
 		btn.innerHTML = `Loading... <span class="spinner-border spinner-border-sm"></span>`;
 
 		const formData = new FormData(form);
+		const controller = new AbortController();
+		const timeoutId = window.setTimeout(function () {
+			controller.abort();
+		}, 10000);
 
 		fetch(url, {
 			method: "POST",
 			credentials: "same-origin",
 			headers: { "X-CSRFToken": csrfToken },
-			body: formData
+			body: formData,
+			signal: controller.signal
 		})
 		.then(r => r.json().then(d => ({ ok: r.ok, data: d })))
 		.then(result => {
-			if (!result.ok || result.data.status !== "ok") {
-				throw new Error(result.data.message || "Deletion error");
+			if (!result.ok || !result.data || result.data.status !== "ok") {
+				const error = new Error((result.data && result.data.message) || "Deletion error");
+				error.userMessage = result.data && result.data.message;
+				throw error;
 			}
 
 			/** Close modal */
-			const modal = document.getElementById(`modal-delete-${id}`);
 			if (modal) {
 				const instance = bootstrap.Modal.getInstance(modal);
 				if (instance) {
@@ -428,10 +467,20 @@ function setup_progress_delete_handlers()
 		})
 		.catch(err => {
 			console.error(err);
-			alert("Error deleting item. Please try again.");
+
+			if (errorAlert) {
+				const msgEl = errorAlert.querySelector(".alertmsgdiv");
+				if (msgEl && err && err.userMessage) {
+					msgEl.textContent = err.userMessage;
+				}
+				show_delete_error_alert(errorAlert);
+			}
 
 			btn.disabled = false;
 			btn.innerHTML = oldHtml;
+		})
+		.finally(() => {
+			window.clearTimeout(timeoutId);
 		});
 	};
 

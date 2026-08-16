@@ -6,10 +6,8 @@
                     <h5 class="modal-title" id="staticBackdropLabel">Изтриване на поръчка №{{ object.id }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                {% include "common/components/alert.html" with type="danger" view="E-DEL" message="Възникна грешка при изтриването на поръчка" handler="ErrorAlertBtn" %}
                 <form id="Delete{{ object.id }}" class="deleteForms">
-
-                    {% include "common/components/alert.html" with type="success" message="Поръчка: №{{ object.id }} е изтрита успешно!" dismiss_id="SuccessAlert" %}
-                    {% include "common/components/alert.html" with type="danger" message="Възникна грешка при изтриването на поръчка №{{ object.id }}!" dismiss_id="ErrorAlert" %}
 
                     {% csrf_token %}
 
