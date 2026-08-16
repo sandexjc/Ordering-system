@@ -6,6 +6,7 @@
  * Loaded from:
  *   - common/templates/common/components/new_order.html  (create order)
  *   - table/templates/table/edit_order.html              (edit order; uses .new-order-form)
+ *   - main/templates/dynamic/orders.html                 (modal create/edit form)
  *
  * Used by:
  *   - Form elements with class .new-order-form

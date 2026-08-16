@@ -1,0 +1,17 @@
+<form
+	method="POST"
+	id="order-form-modal-form"
+	class="order-form-modal-form"
+	action="{{ form_action_url }}"
+	data-modal-title="{{ modal_title }}"
+	data-order-id="{{ current_order.pk|default:'' }}"
+>
+	{% csrf_token %}
+	{% include "table/components/order_form.html" %}
+
+	<div class="d-grid gap-2 col-8 col-md-4 mx-auto order-form-modal-save-wrap">
+		<button type="submit" class="btn btn-primary" id="order-form-modal-save">
+			{% if is_create %}Създай{% else %}Запази промените{% endif %}
+		</button>
+	</div>
+</form>

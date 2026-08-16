@@ -3,7 +3,7 @@ from .BaseForms import (
 )
 
 from .OrderForms import (
-    CreateOrderForm, EditOrderForm,
+    CreateOrderForm, EditOrderForm, OrderForm,
 )
 
 from .ItemsForms import (

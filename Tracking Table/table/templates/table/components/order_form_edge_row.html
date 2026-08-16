@@ -1,0 +1,22 @@
+<tr class="order-form-item-row">
+	{{ item.id }}
+	<td>{{ item.edge_type }}</td>
+	<td>{{ item.color_code }}</td>
+	<td>{{ item.quantity }}</td>
+	<td>
+		<div class="input-group input-group-sm">
+			{{ item.price }}<span class="input-group-text">{{ currency }}</span>
+		</div>
+	</td>
+	<td>
+		<div class="input-group input-group-sm">
+			{{ item.value }}<span class="input-group-text">{{ currency }}</span>
+		</div>
+	</td>
+	<td class="order-form-last-cell">
+		<div class="form-check form-switch" style="margin-left: 10px; margin-top: 5px;">
+			{{ item.visible }}
+		</div>
+		{% include "table/components/order_form_row_action.html" with item=item %}
+	</td>
+</tr>

@@ -1,0 +1,15 @@
+{% load static %}
+{% if 'DELETE' in item.fields %}
+	<span class="order-form-delete-field">{{ item.DELETE }}</span>
+{% endif %}
+<button
+	type="button"
+	class="order-form-row-action"
+	data-order-form-row-action
+	data-delete-src="{% static 'images/delete-can.png' %}"
+	data-restore-src="{% static 'images/refresh.png' %}"
+	title="Изтрий"
+	aria-label="Изтрий"
+>
+	<img src="{% static 'images/delete-can.png' %}" class="order-form-row-action-icon" alt="">
+</button>

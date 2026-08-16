@@ -6,6 +6,7 @@
  * Loaded from:
  *   - table/templates/table/edit_order.html
  *   - vitrine/templates/vitrine/edit_vitrine.html
+ *   - main/templates/dynamic/orders.html  (modal create/edit form tables)
  *
  * Used by:
  *   - edit_vitrine.html          (.edit-order-form, .frame-table, .table-min-width)

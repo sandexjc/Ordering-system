@@ -6,3 +6,4 @@ from .UpdateOrderView import UpdateOrder
 from .OrderHistoryView import OrderHistory
 from .OrderDetailsView import ViewOrder
 from .UpdateProgressStepView import UpdateProgressStep
+from .OrderFormModalView import OrderFormModal

@@ -1,0 +1,14 @@
+<div class="modal fade" id="order-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="order-form-modal-title" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-scrollable order-form-modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="order-form-modal-title">Нова заявка</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			{% include "common/components/alert.html" with type="success" view="S-ORD" message="Промените са запазени успешно!" handler="SuccessAlertBtn" %}
+			{% include "common/components/alert.html" with type="danger" view="E-ORD" message="Възникна грешка!" handler="ErrorAlertBtn" %}
+			<div class="modal-body" id="order-form-modal-body">
+			</div>
+		</div>
+	</div>
+</div>

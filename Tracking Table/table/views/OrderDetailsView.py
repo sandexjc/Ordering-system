@@ -73,6 +73,7 @@ class ViewOrder(DynamicDetailsModeMixin, LoginRequiredMixin, TemplateView):
         
         # Order toolbar urls and targets
         edit_url = reverse("table:editOrder", kwargs={"pk": order.id})
+        order_form_url = reverse("table:orderFormEdit", kwargs={"pk": order.id})
         print_url = reverse("table:printOrder", kwargs={"pk": order.id})
         delete_target = f"modal-delete-{order.id}"
         history_target = f"history-tab-{order.id}"
@@ -88,6 +89,7 @@ class ViewOrder(DynamicDetailsModeMixin, LoginRequiredMixin, TemplateView):
 
             # Toolbar
             "toolbar_edit_url": edit_url,
+            "toolbar_order_form_url": order_form_url if self.is_dynamic_mode() else "",
             "toolbar_print_url": print_url,
             "toolbar_delete_target": delete_target,
             "toolbar_history_target": history_target,

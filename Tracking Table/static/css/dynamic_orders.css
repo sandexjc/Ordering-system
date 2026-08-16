@@ -378,3 +378,241 @@ mark.search-highlight
 	font-weight: 700;
 	text-align: center;
 }
+
+/* =============================================================================
+   Create / edit order form modal
+   ============================================================================= */
+
+#order-form-modal .order-form-modal-dialog
+{
+	max-width: min(96vw, 1540px);
+}
+
+#order-form-modal .modal-body
+{
+	overflow-x: auto;
+}
+
+#order-form-modal .ALERT-S-ORD-VIEW,
+#order-form-modal .ALERT-E-ORD-VIEW
+{
+	margin: 0.75rem 1rem 0;
+}
+
+#order-form-modal .order-form-modal-form
+{
+	padding: 0.25rem 0.15rem 0.5rem;
+}
+
+#order-form-modal .order-form-modal-save-wrap
+{
+	margin-top: 1rem;
+}
+
+#order-form-modal .order-form-modal-form > .row
+{
+	flex-wrap: wrap;
+}
+
+#order-form-modal .order-form-modal-form > .row > .col
+{
+	flex: 1 1 0;
+	max-width: 100%;
+	min-width: 0;
+}
+
+@media (max-width: 1459.98px)
+{
+	#order-form-modal .order-form-modal-form > .row > .col
+	{
+		flex: 0 0 100%;
+	}
+}
+
+#order-form-modal .table-min-width
+{
+	min-width: 0;
+	width: 100%;
+}
+
+#order-form-modal .plate-table th:nth-child(1),
+#order-form-modal .plate-table td:nth-child(1)
+{
+	min-width: 5.5rem;
+}
+
+#order-form-modal .plate-table th:nth-child(2),
+#order-form-modal .plate-table td:nth-child(2)
+{
+	min-width: 3.5rem;
+}
+
+#order-form-modal .plate-table th:nth-child(3),
+#order-form-modal .plate-table td:nth-child(3)
+{
+	min-width: 3.5rem;
+}
+
+#order-form-modal .plate-table th:nth-child(4),
+#order-form-modal .plate-table td:nth-child(4)
+{
+	min-width: 3rem;
+}
+
+#order-form-modal .plate-table th:nth-child(5),
+#order-form-modal .plate-table td:nth-child(5)
+{
+	min-width: 5rem;
+}
+
+#order-form-modal .plate-table th:nth-child(6),
+#order-form-modal .plate-table td:nth-child(6)
+{
+	min-width: 5rem;
+}
+
+#order-form-modal .order-form-formset
+{
+	padding-right: 2.6rem;
+	overflow: visible;
+}
+
+#order-form-modal .order-form-formset table
+{
+	overflow: visible;
+}
+
+#order-form-modal .order-form-last-cell
+{
+	position: relative;
+	overflow: visible;
+}
+
+#order-form-modal .order-form-last-cell::after
+{
+	content: "";
+	position: absolute;
+	left: 100%;
+	top: -0.4rem;
+	bottom: -0.4rem;
+	width: 2.6rem;
+}
+
+#order-form-modal .order-form-delete-field
+{
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+}
+
+#order-form-modal .order-form-row-action
+{
+	position: absolute;
+	left: 100%;
+	top: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.9rem;
+	height: 1.9rem;
+	padding: 0.2rem;
+	margin-left: 0.15rem;
+	transform: translateY(-50%);
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+	opacity: 0;
+	pointer-events: none;
+	z-index: 2;
+	transition: opacity 0.12s ease, pointer-events 0s linear 0.4s;
+}
+
+#order-form-modal .order-form-item-row:hover .order-form-row-action,
+#order-form-modal .order-form-item-row.is-pending-delete:hover .order-form-row-action
+{
+	opacity: 1;
+	pointer-events: auto;
+	transition: opacity 0.08s ease, pointer-events 0s linear 0s;
+}
+
+#order-form-modal .order-form-row-action-icon
+{
+	width: 19px;
+	height: 19px;
+}
+
+#order-form-modal .order-form-item-row.is-pending-delete td
+{
+	opacity: 0.4;
+	transition: opacity 180ms ease;
+}
+
+#order-form-modal .order-form-item-row.is-pending-delete td.order-form-last-cell
+{
+	opacity: 1;
+}
+
+#order-form-modal .order-form-item-row.is-pending-delete td.order-form-last-cell > .input-group,
+#order-form-modal .order-form-item-row.is-pending-delete td.order-form-last-cell > .form-check
+{
+	opacity: 0.4;
+}
+
+#order-form-modal .order-form-item-row.is-pending-delete input,
+#order-form-modal .order-form-item-row.is-pending-delete select,
+#order-form-modal .order-form-item-row.is-pending-delete textarea
+{
+	pointer-events: none;
+}
+
+#order-form-modal .cutting-table th:nth-child(1),
+#order-form-modal .cutting-table td:nth-child(1)
+{
+	min-width: 5rem;
+}
+
+#order-form-modal .cutting-table th:nth-child(2),
+#order-form-modal .cutting-table td:nth-child(2)
+{
+	min-width: 3rem;
+}
+
+#order-form-modal .cutting-table th:nth-child(3),
+#order-form-modal .cutting-table td:nth-child(3)
+{
+	min-width: 5rem;
+}
+
+#order-form-modal .cutting-table th:nth-child(4),
+#order-form-modal .cutting-table td:nth-child(4)
+{
+	min-width: 5rem;
+}
+
+#order-form-modal .order-form-add-row td
+{
+	padding-top: 0.2rem;
+	padding-bottom: 0.35rem;
+	border-bottom: 0;
+}
+
+#order-form-modal .order-form-add-row-inner
+{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#order-form-modal .order-form-add-row-btn
+{
+	padding: 0.2rem 0.5rem;
+	line-height: 1;
+}
+
+#order-form-modal .order-form-add-icon
+{
+	width: 19px;
+	height: 19px;
+}

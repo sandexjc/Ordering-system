@@ -99,6 +99,14 @@ function get_order(order_id)
     /** Hide fold button while loading; spinner lives inside the content area. */
     set_hidden_row_close_visible(order_id, false);
     if (hiddenTable) {
+        const previousView = document.getElementById("order-view-" + order_id);
+        if (previousView) {
+            previousView.remove();
+        }
+        const previousError = document.getElementById("order-error-" + order_id);
+        if (previousError) {
+            previousError.remove();
+        }
         hiddenTable.appendChild(add_spinner(order_id));
     }
     if (typeof onHiddenRowContentUpdated === "function") {

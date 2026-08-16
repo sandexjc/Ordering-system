@@ -1,0 +1,16 @@
+{% load static %}
+<tr class="order-form-add-row">
+	<td colspan="{{ colspan }}">
+		<div class="order-form-add-row-inner">
+			<button
+				type="button"
+				class="btn btn-sm btn-outline-secondary order-form-add-row-btn"
+				data-add-formset-row
+				title="Добави ред"
+				aria-label="Добави ред"
+			>
+				<img src="{% static 'images/add.png' %}" class="order-form-add-icon" alt="">
+			</button>
+		</div>
+	</td>
+</tr>
