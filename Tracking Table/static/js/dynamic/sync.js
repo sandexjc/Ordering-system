@@ -8,6 +8,7 @@
  *
  * Depends on (load order):
  *   - dynamic/state.js
+ *   - dynamic/session.js → redirectToLoginIfUnauthenticated
  *   - dynamic/connection.js → setServerConnected, hideServerConnectionToast, refreshServerConnectionToast, setServerConnectionToastPending
  *   - dynamic/filters.js → getFiltersForView, getOrdersEndpointForView, updateVisibleItemsCounter
  *   - dynamic/search.js  → getSearchForView, highlightSearchInOrders
@@ -606,6 +607,10 @@ async function refetchOrdersIntoCache(viewName)
             "X-Requested-With": "XMLHttpRequest",
         },
     });
+    if (typeof redirectToLoginIfUnauthenticated === "function"
+        && redirectToLoginIfUnauthenticated(response)) {
+        return;
+    }
     if (!response.ok) {
         throw new Error("HTTP " + response.status + " " + response.statusText);
     }
@@ -730,11 +735,15 @@ async function pollOrdersSyncForView(viewName)
     if (syncGeneration !== ordersSyncGeneration || document.visibilityState !== "visible") {
         return;
     }
+    if (typeof redirectToLoginIfUnauthenticated === "function"
+        && redirectToLoginIfUnauthenticated(response)) {
+        return;
+    }
     if (!response.ok) {
         throw new Error("HTTP " + response.status + " " + response.statusText);
     }
-    ordersSyncFetchSucceededThisTick = true;
     const payload = await response.json();
+    ordersSyncFetchSucceededThisTick = true;
     if (syncGeneration !== ordersSyncGeneration || document.visibilityState !== "visible") {
         return;
     }

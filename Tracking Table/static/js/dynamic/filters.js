@@ -8,6 +8,7 @@
  *
  * Depends on (load order):
  *   - dynamic/state.js
+ *   - dynamic/session.js → redirectToLoginIfUnauthenticated
  * Runtime depends on:
  *   - dynamic/fetch.js  → beginOrdersRender, fetchAndRenderOrders, getLiveOrdersBody
  *   - dynamic/search.js → getSearchForView, isSearchActive
@@ -237,6 +238,10 @@ async function ensureFilterBounds(viewName) {
         const response = await fetch(url.toString(), {
             headers: { "X-Requested-With": "XMLHttpRequest" },
         });
+        if (typeof redirectToLoginIfUnauthenticated === "function"
+            && redirectToLoginIfUnauthenticated(response)) {
+            return null;
+        }
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }

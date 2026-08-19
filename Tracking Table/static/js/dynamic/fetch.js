@@ -8,6 +8,7 @@
  *
  * Depends on (load order):
  *   - dynamic/state.js
+ *   - dynamic/session.js → redirectToLoginIfUnauthenticated
  *   - dynamic/filters.js
  *   - dynamic/search.js
  *   - dynamic/cache.js
@@ -220,6 +221,10 @@ async function loadMoreOrders(viewName, generation) {
                 "X-Requested-With": "XMLHttpRequest",
             },
         });
+        if (typeof redirectToLoginIfUnauthenticated === "function"
+            && redirectToLoginIfUnauthenticated(response)) {
+            return;
+        }
         if (!response.ok) {
             throw new Error(`HTTP ${response.status} ${response.statusText}`);
         }
@@ -391,6 +396,10 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
                 "X-Requested-With": "XMLHttpRequest",
             },
         });
+        if (typeof redirectToLoginIfUnauthenticated === "function"
+            && redirectToLoginIfUnauthenticated(response)) {
+            return;
+        }
         if (!response.ok) {
             throw new Error(`HTTP ${response.status} ${response.statusText}`);
         }
