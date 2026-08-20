@@ -1,2 +1,3 @@
 from .CreateVitrineForm import CreateVitrineForm
 from .EditVitrineForm import EditVitrineForm
+from .VitrineOrderForm import VitrineOrderForm

@@ -6,6 +6,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/dynamic_orders.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/new_order_form.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/edit_order.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/format_table.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'vitrine/css/manual_seal_toggle.css' %}">
     {% if current_dynamic_view == "vitrine" %}
         <link id="dynamic-vitrine-css-vitrines" rel="stylesheet" type="text/css" href="{% static 'vitrine/css/vitrines.css' %}">
         <link id="dynamic-vitrine-css-holes" rel="stylesheet" type="text/css" href="{% static 'vitrine/css/holes_dots.css' %}">
@@ -65,6 +67,7 @@
     <script type="text/javascript" src="{% static 'js/dynamic/page.js' %}"></script>
     {# Click-to-toggle progress steps (dynamic table / vitrine; static boards use the modal) #}
     <script type="text/javascript" src="{% static 'js/orders/actions/progress-step.js' %}"></script>
-    {# Table create/edit order form modal (dynamic table view) #}
+    {# Table / vitrine create/edit order form modal #}
+    <script type="text/javascript" src="{% static 'vitrine/js/manual_seal_toggle.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/orders/actions/order-form-modal.js' %}"></script>
 {% endblock %}

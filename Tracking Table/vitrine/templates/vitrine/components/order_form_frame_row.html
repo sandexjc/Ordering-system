@@ -1,0 +1,20 @@
+<tr class="order-form-item-row">
+	{{ item.id }}
+	<td>{{ item.profile_type }}</td>
+	<td>{{ item.length }}</td>
+	<td>{{ item.width }}</td>
+	<td>{{ item.quantity }}</td>
+	{% if feature_auto_seal_enabled %}
+		<td class="order-form-checkbox-cell">
+			<div class="form-check order-form-checkbox mb-0">
+				{{ item.auto_calculate_seal }}
+			</div>
+		</td>
+	{% endif %}
+	<td>{{ item.holes_count }}</td>
+	<td>{{ item.holes_position }}</td>
+	<td class="order-form-last-cell">
+		{{ item.glass_type }}
+		{% include "vitrine/components/order_form_row_action.html" with item=item %}
+	</td>
+</tr>

@@ -572,7 +572,10 @@ mark.search-highlight
 }
 
 #order-form-modal .order-form-item-row.is-pending-delete td.order-form-last-cell > .input-group,
-#order-form-modal .order-form-item-row.is-pending-delete td.order-form-last-cell > .form-check
+#order-form-modal .order-form-item-row.is-pending-delete td.order-form-last-cell > .form-check,
+#order-form-modal .order-form-item-row.is-pending-delete td.order-form-last-cell > input,
+#order-form-modal .order-form-item-row.is-pending-delete td.order-form-last-cell > select,
+#order-form-modal .order-form-item-row.is-pending-delete td.order-form-last-cell > textarea
 {
 	opacity: 0.4;
 }

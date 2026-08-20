@@ -1,8 +1,10 @@
-(function () {
-    const manualSealCheckbox = document.getElementById("id_vitrine_manual_seal");
-    const manualSealTable = document.getElementById("manual-seal-table-wrapper");
-    const autoModeRadio = document.getElementById("manual-seal-auto-mode");
-    const customModeRadio = document.getElementById("manual-seal-custom-mode");
+function setupManualSealToggle(root)
+{
+    const scope = root || document;
+    const manualSealCheckbox = scope.querySelector("#id_vitrine_manual_seal");
+    const manualSealTable = scope.querySelector("#manual-seal-table-wrapper");
+    const autoModeRadio = scope.querySelector("#manual-seal-auto-mode");
+    const customModeRadio = scope.querySelector("#manual-seal-custom-mode");
 
     if (!manualSealCheckbox || !manualSealTable || !autoModeRadio || !customModeRadio) {
         return;
@@ -41,4 +43,8 @@
     manualSealCheckbox.addEventListener("change", toggleManualSealTable);
     syncRadiosWithCheckbox();
     toggleManualSealTable();
-})();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    setupManualSealToggle(document);
+});

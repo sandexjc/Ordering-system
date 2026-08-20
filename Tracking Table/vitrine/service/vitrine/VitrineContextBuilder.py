@@ -86,8 +86,28 @@ class VitrineContextBuilder:
     # --- Public API --- #
 
     @classmethod
+    def empty_context(cls) -> dict:
+        return cls._format_context({
+            "black_profile_len": 0,
+            "matte_profile_len": 0,
+            "inox_profile_len": 0,
+            "black_profile_total": 0,
+            "matte_profile_total": 0,
+            "inox_profile_total": 0,
+            "white_seal": 0,
+            "black_seal": 0,
+            "white_seal_total": 0,
+            "black_seal_total": 0,
+            "total_frames_count": 0,
+            "additional_holes": 0,
+            "additional_total": 0,
+        })
+
+    @classmethod
     def build_context(cls, vitrine) -> dict:
 
         # Build context
+        if vitrine is None or not getattr(vitrine, "pk", None):
+            return cls.empty_context()
         context = cls._build_base_context(vitrine)
         return cls._format_context(context)

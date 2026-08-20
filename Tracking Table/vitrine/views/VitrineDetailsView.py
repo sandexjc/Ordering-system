@@ -54,6 +54,7 @@ class ViewVitrine(DynamicDetailsModeMixin, LoginRequiredMixin, TemplateView):
 
         # Order toolbar urls and targets
         edit_url = reverse("vitrine:edit_vitrine", kwargs={"pk": vitrine.id})
+        order_form_url = reverse("vitrine:orderFormEdit", kwargs={"pk": vitrine.id})
         print_url = reverse("vitrine:print_vitrine", kwargs={"pk": vitrine.id})
         delete_target = f"modal-delete-{vitrine.id}"
         refresh_option = True
@@ -66,6 +67,7 @@ class ViewVitrine(DynamicDetailsModeMixin, LoginRequiredMixin, TemplateView):
 
             # Toolbar
             "toolbar_edit_url": edit_url,
+            "toolbar_order_form_url": order_form_url if self.is_dynamic_mode() else "",
             "toolbar_print_url": print_url,
             "toolbar_delete_target": delete_target,
             "toolbar_refresh_option": refresh_option,

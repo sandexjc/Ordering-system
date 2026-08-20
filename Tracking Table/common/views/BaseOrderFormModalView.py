@@ -113,7 +113,12 @@ class BaseOrderFormModalView(DynamicFeatureFlagRequiredMixin, LoginRequiredMixin
             "is_create": not bool(self.object and self.object.pk),
         }
         context.update(formsets)
+        context.update(self.get_extra_form_context())
         return context
+
+    def get_extra_form_context(self):
+        # App-specific template context (feature flags, computed totals, ...).
+        return {}
 
     def render_form_html(self, form, note_form, formsets):
         return render_to_string(

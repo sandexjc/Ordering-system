@@ -32,6 +32,6 @@ PaymentFormSet = inlineformset_factory(
     model=Payment,
     formset=VitrineFormSet,
     form=AddPaymentForm,
-    extra=1,
+    extra=3,
     can_delete_extra=False,
 )

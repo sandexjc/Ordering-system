@@ -1,7 +1,7 @@
 /*
  * orders/actions/order-form-modal.js
  * ----------------------------------
- * Dynamic table create/edit order form modal: open, add-row, AJAX save,
+ * Dynamic table/vitrine create/edit order form modal: open, add-row, AJAX save,
  * 10s alerts, and live-list patch after success.
  *
  * Loaded from:
@@ -167,6 +167,9 @@ function setOrderFormModalBody(html)
 	}
 	parts.body.innerHTML = html || "";
 	syncOrderFormModalTitle(parts.body.querySelector("#order-form-modal-form"), parts.title);
+	if (typeof setupManualSealToggle === "function") {
+		setupManualSealToggle(parts.body);
+	}
 }
 
 /**
@@ -247,6 +250,12 @@ function isEmptyOrderFormRow(row)
 			continue;
 		}
 		const value = String(el.value || "").trim();
+		if (name.endsWith("-quantity") && row.querySelector('input[name$="-length"]')) {
+			if (value === "" || value === "0" || value === "1") {
+				continue;
+			}
+			return false;
+		}
 		if (value !== "" && value !== "0" && value !== "0.0" && value !== "0.00") {
 			return false;
 		}
@@ -417,7 +426,8 @@ function prepareOrderFormsetsForSubmit(form)
  */
 function applyOrderFormLiveRow(orderId, rowsHtml)
 {
-	const viewName = "table";
+	const root = document.getElementById("dynamic-orders-root");
+	const viewName = root && root.dataset.currentView ? root.dataset.currentView : "table";
 	if (typeof rememberLocalOrderMutation === "function") {
 		rememberLocalOrderMutation(orderId);
 	}
@@ -643,11 +653,17 @@ function setupOrderFormModal()
 		const addLink = event.target.closest("#dynamic-new-order-link");
 		if (addLink) {
 			const root = document.getElementById("dynamic-orders-root");
-			if (!root || root.dataset.currentView !== "table") {
+			const currentView = root && root.dataset.currentView;
+			if (currentView === "table") {
+				event.preventDefault();
+				openOrderFormModal(addLink.dataset.tableFormUrl);
 				return;
 			}
-			event.preventDefault();
-			openOrderFormModal(addLink.dataset.tableFormUrl);
+			if (currentView === "vitrine") {
+				event.preventDefault();
+				openOrderFormModal(addLink.dataset.vitrineFormUrl);
+				return;
+			}
 			return;
 		}
 

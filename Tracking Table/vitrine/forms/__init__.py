@@ -6,6 +6,7 @@ from .BaseForms import (
 from .VitrineForms import (
     CreateVitrineForm,
     EditVitrineForm,
+    VitrineOrderForm,
 )
 
 from .ItemsForms import (

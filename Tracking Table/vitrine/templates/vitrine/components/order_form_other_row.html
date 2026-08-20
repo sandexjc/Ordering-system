@@ -1,0 +1,16 @@
+<tr class="order-form-item-row">
+	{{ item.id }}
+	<td>{{ item.description }}</td>
+	<td>{{ item.quantity }}</td>
+	<td>
+		<div class="input-group input-group-sm">
+			{{ item.price }}<span class="input-group-text">{{ currency }}</span>
+		</div>
+	</td>
+	<td class="order-form-last-cell">
+		<div class="input-group input-group-sm">
+			{{ item.value }}<span class="input-group-text">{{ currency }}</span>
+		</div>
+		{% include "vitrine/components/order_form_row_action.html" with item=item %}
+	</td>
+</tr>
