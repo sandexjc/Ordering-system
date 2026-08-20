@@ -58,6 +58,23 @@ function buildOrderFormLoadingHtml()
 }
 
 /**
+ * Error + retry markup shown when the form fragment fails to load.
+ *
+ * @returns {string}
+ */
+function buildOrderFormLoadErrorHtml()
+{
+	return `
+		<div class="text-center py-5">
+			<h6 class="text-danger mb-3">Възникна грешка при зареждане на формата</h6>
+			<button type="button" class="btn btn-sm btn-outline-primary" data-order-form-retry>
+				Опитай отново
+			</button>
+		</div>
+	`;
+}
+
+/**
  * Hide a modal alert and clear its dismiss timer.
  *
  * @param {HTMLElement|null} alertEl - Alert wrapper.
@@ -456,8 +473,12 @@ function applyOrderFormLiveRow(orderId, rowsHtml)
 function loadOrderFormIntoModal(url)
 {
 	const parts = getOrderFormModalParts();
-	if (!parts.body) {
+	if (!parts.body || !url) {
 		return;
+	}
+
+	if (parts.modal) {
+		parts.modal.dataset.orderFormUrl = url;
 	}
 
 	hideOrderFormAlert(parts.successAlert);
@@ -480,8 +501,7 @@ function loadOrderFormIntoModal(url)
 		})
 		.catch(function (err) {
 			console.error(err);
-			parts.body.innerHTML = "";
-			showOrderFormAlert(parts.errorAlert, "Възникна грешка при зареждане на формата");
+			parts.body.innerHTML = buildOrderFormLoadErrorHtml();
 		});
 }
 
@@ -639,6 +659,13 @@ function setupOrderFormModal()
 	});
 
 	parts.modal.addEventListener("click", function (event) {
+		const retryBtn = event.target.closest("[data-order-form-retry]");
+		if (retryBtn) {
+			event.preventDefault();
+			loadOrderFormIntoModal(parts.modal.dataset.orderFormUrl);
+			return;
+		}
+
 		const rowActionBtn = event.target.closest("[data-order-form-row-action]");
 		if (rowActionBtn) {
 			event.preventDefault();
@@ -681,6 +708,7 @@ function setupOrderFormModal()
 		if (parts.title) {
 			parts.title.textContent = ORDER_FORM_TITLE_CREATE;
 		}
+		delete parts.modal.dataset.orderFormUrl;
 	});
 }
 

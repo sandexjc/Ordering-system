@@ -13,8 +13,8 @@
 			{{ item.value }}<span class="input-group-text">{{ currency }}</span>
 		</div>
 	</td>
-	<td class="order-form-last-cell">
-		<div class="form-check form-switch" style="margin-left: 10px; margin-top: 5px;">
+	<td class="order-form-last-cell order-form-checkbox-cell">
+		<div class="form-check order-form-checkbox mb-0">
 			{{ item.visible }}
 		</div>
 		{% include "table/components/order_form_row_action.html" with item=item %}

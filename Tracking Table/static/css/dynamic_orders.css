@@ -385,7 +385,8 @@ mark.search-highlight
 
 #order-form-modal .order-form-modal-dialog
 {
-	max-width: min(96vw, 1540px);
+	width: 80%;
+	max-width: none;
 }
 
 #order-form-modal .modal-body
@@ -416,17 +417,9 @@ mark.search-highlight
 
 #order-form-modal .order-form-modal-form > .row > .col
 {
-	flex: 1 1 0;
+	flex: 1 0 42rem;
+	width: auto;
 	max-width: 100%;
-	min-width: 0;
-}
-
-@media (max-width: 1459.98px)
-{
-	#order-form-modal .order-form-modal-form > .row > .col
-	{
-		flex: 0 0 100%;
-	}
 }
 
 #order-form-modal .table-min-width
@@ -486,6 +479,30 @@ mark.search-highlight
 {
 	position: relative;
 	overflow: visible;
+}
+
+#order-form-modal .order-form-checkbox-cell
+{
+	position: relative;
+}
+
+#order-form-modal .order-form-checkbox
+{
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0;
+	padding: 0;
+	min-height: 0;
+}
+
+#order-form-modal .order-form-checkbox .form-check-input
+{
+	width: 80%;
+	height: 90%;
+	margin: 0;
 }
 
 #order-form-modal .order-form-last-cell::after
