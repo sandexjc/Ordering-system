@@ -68,3 +68,8 @@ const DEFAULT_ORDER_FILTERS = Object.freeze({
 const RANGE_FILTER_DEBOUNCE_MS = readDynamicContentInt("rangeFilterDebounceMs", 300);
 const SYNC_HIGHLIGHT_MS = readDynamicContentInt("syncHighlightMs", 120000);
 let rangeFilterDebounceTimer = null;
+
+/** True while the table summarize card is open (row click selects instead of expanding). */
+let isSummarizeMode = false;
+const summarizeSelectedIds = window.summarizeSelectedIds || new Set();
+window.summarizeSelectedIds = summarizeSelectedIds;

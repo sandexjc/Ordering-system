@@ -225,6 +225,7 @@ function summarySyncSignature(row)
         .filter((name) => (
             name !== "is-sync-highlight"
             && name !== "rowSelected"
+            && name !== "summarize-selected"
             && name !== "is-deleting"
         ))
         .sort()
@@ -442,6 +443,9 @@ function afterLiveSyncDomPatch(viewName)
     if (typeof syncFrameHeights === "function") {
         syncFrameHeights();
     }
+    if (typeof restoreSummarizeSelection === "function") {
+        restoreSummarizeSelection();
+    }
 }
 
 /**
@@ -485,10 +489,15 @@ function replaceSummaryRow(tbody, pair, { highlight = true } = {})
         return null;
     }
     const wasSelected = existing.classList.contains("rowSelected");
+    const wasSummarizeSelected = existing.classList.contains("summarize-selected")
+        || (typeof summarizeSelectedIds !== "undefined" && summarizeSelectedIds.has(String(pair.id)));
     const wasHighlighted = existing.classList.contains("is-sync-highlight");
     existing.replaceWith(pair.summary);
     if (wasSelected) {
         pair.summary.classList.add("rowSelected");
+    }
+    if (wasSummarizeSelected) {
+        pair.summary.classList.add("summarize-selected");
     }
     if (highlight) {
         highlightSyncedRow(pair.summary);

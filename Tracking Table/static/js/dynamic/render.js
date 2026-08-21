@@ -267,7 +267,13 @@ function finalizeRenderedRows(viewName, generation, { restoreExpandedRows = true
     if (typeof syncFrameHeights === "function") {
         syncFrameHeights();
     }
-    if (!restoreExpandedRows) {
+    if (typeof restoreSummarizeSelection === "function") {
+        restoreSummarizeSelection();
+    }
+    if (!restoreExpandedRows || (typeof isSummarizeMode !== "undefined" && isSummarizeMode)) {
+        if (typeof playPendingSyncHighlights === "function") {
+            playPendingSyncHighlights(viewName);
+        }
         return;
     }
     restoreCachedOrderDetails(viewName);

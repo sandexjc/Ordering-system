@@ -25,6 +25,7 @@
         data-local-mutation-skip-ms="{{ dynamic_content.local_mutation_skip_ms }}"
         data-range-filter-debounce-ms="{{ dynamic_content.range_filter_debounce_ms }}"
         data-sync-highlight-ms="{{ dynamic_content.sync_highlight_ms }}"
+        {% if feature_summarize_content_enabled %}data-summarize-enabled="1"{% endif %}
         data-vitrine-css-vitrines="{% static 'vitrine/css/vitrines.css' %}"
         data-vitrine-css-holes="{% static 'vitrine/css/holes_dots.css' %}"
         data-vitrine-css-modal="{% static 'vitrine/css/modal_progress.css' %}"
@@ -59,6 +60,7 @@
     <script type="text/javascript" src="{% static 'js/dynamic/session.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dynamic/connection.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dynamic/filters.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dynamic/summarize.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dynamic/search.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dynamic/cache.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dynamic/render.js' %}"></script>

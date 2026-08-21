@@ -31,6 +31,9 @@ function switchDynamicView(viewName) {
     root.dataset.currentView = viewName;
     updateDynamicNavigation(viewName);
     updateNewOrderLink(viewName);
+    if (typeof syncSummarizeButtonVisibility === "function") {
+        syncSummarizeButtonVisibility(viewName);
+    }
     updateVisibleItemsCounter(0, viewName);
     ensureVitrineStylesIfNeeded(viewName);
 
@@ -55,6 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     ensureVitrineStylesIfNeeded(root.dataset.currentView);
     setupDynamicFilters();
+    if (typeof setupDynamicSummarize === "function") {
+        setupDynamicSummarize();
+    }
     setupTableSortHeaders();
     setupDynamicSearch();
     syncSortHeaders(getFiltersForView(root.dataset.currentView || "table"));

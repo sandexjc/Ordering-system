@@ -527,6 +527,9 @@ function updateVisibleFiltersSummary(filters, viewName = null) {
     const searchQuery = getSearchForView(resolvedView);
     const parts = [];
 
+    if (typeof isSummarizeMode !== "undefined" && isSummarizeMode) {
+        parts.push("режим селектиране");
+    }
     if (filtersAreActive(current, resolvedView)) {
         parts.push(buildVisibleFiltersSummary(current, resolvedView));
     }

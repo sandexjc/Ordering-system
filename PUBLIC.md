@@ -62,6 +62,10 @@ Common options:
 - `--frame-id` / `--vitrine-id` to target specific records
 - `--batch-size` to control processing chunk size
 
+## Summarize selected orders
+
+When `DJANGO_FEATURES__SUMMARIZE_CONTENT=true`, the dynamic table board shows a summarize card: select orders to total unique clients, plates by material, edges by type, and remaining balance. The control is hidden on the vitrine board.
+
 ## Demo data commands (beta / local only)
 
 For local testing only (requires `pip install faker` for seeding):

@@ -8,6 +8,7 @@
  *
  * Depends on (runtime):
  *   - orders/row-expand/open-close.js → openHiddenRow, closeHiddenRow, focusClosedOrderRow
+ *   - js/dynamic/summarize.js → toggleSummarizeRowSelection (dynamic page only)
  *
  * Used by:
  *   - core/boot.js
@@ -45,11 +46,19 @@ function handle_orders() {
     hiddenRow._isAnimating = false;
     hiddenRow._pendingTransitionHandler = null;
 
-    visibleRow.addEventListener("click", function () {
-      if (!hiddenRow._isOpen) {
-        openHiddenRow(hiddenRow, row_id, visibleRow);
+    visibleRow.addEventListener("click", function onVisibleOrderRowClick() {
+      if (typeof isSummarizeMode !== "undefined" && isSummarizeMode) {
+        if (typeof toggleSummarizeRowSelection === "function") {
+          toggleSummarizeRowSelection(visibleRow);
+        }
+        return;
+      }
+
+      const liveHidden = document.getElementById("hidden-row-" + row_id) || hiddenRow;
+      if (!liveHidden._isOpen) {
+        openHiddenRow(liveHidden, row_id, visibleRow);
       } else {
-        closeHiddenRow(hiddenRow, visibleRow);
+        closeHiddenRow(liveHidden, visibleRow);
       }
     });
 

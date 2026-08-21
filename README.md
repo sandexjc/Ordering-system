@@ -116,6 +116,7 @@ Optional variables supported in settings include:
 - `DJANGO_FEATURES__AUTO_SEAL_SELECT`
 - `DJANGO_FEATURES__MANUAL_SEAL`
 - `DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING`
+- `DJANGO_FEATURES__SUMMARIZE_CONTENT`
 - `DJANGO_DYNAMIC_CONTENT__SEARCH_MIN_LENGTH`
 - `DJANGO_DYNAMIC_CONTENT__SEARCH_DEBOUNCE_MS`
 - `DJANGO_DYNAMIC_CONTENT__ORDERS_SYNC_INTERVAL_MS`
@@ -272,6 +273,18 @@ The vitrine seal flow is controlled by two feature flags:
 
 If `DJANGO_FEATURES__MANUAL_SEAL` is disabled, the system always uses seal objects for totals and the manual UI is hidden.
 
+## Summarize selected orders (dynamic table)
+
+When `DJANGO_FEATURES__SUMMARIZE_CONTENT=true` on the dynamic board (table view):
+
+- A summarize toolbar button folds/unfolds a totals card.
+- Opening the card closes the filter card and any expanded order details.
+- Row clicks toggle selection instead of unfolding details.
+- The card shows selected-order count, unique clients, plate totals grouped by material, edge totals grouped by type, and summed balance.
+- Folding the card restores expand-on-click and clears the selection.
+
+Vitrine summarize is not included yet.
+
 ## Frontend static JS map (`Tracking Table/static/js`)
 
 Shared client scripts live under `Tracking Table/static/js`, grouped by concern. **Public global function names are stable** across files so template `onclick` handlers and cross-file callers keep working.
@@ -303,11 +316,15 @@ static/js/
       history.js
   dynamic/
     state.js
+    session.js
+    connection.js
     filters.js
+    summarize.js
     search.js
     cache.js
     render.js
     fetch.js
+    sync.js
     page.js
 ```
 
@@ -326,13 +343,17 @@ static/js/
 **`main/templates/dynamic/orders.html`** (after `{{ block.super }}`)
 
 1. `dynamic/state.js`
-2. `dynamic/filters.js`
-3. `dynamic/search.js`
-4. `dynamic/cache.js`
-5. `dynamic/render.js`
-6. `dynamic/fetch.js`
-7. `dynamic/page.js`
-8. `orders/actions/progress-step.js` (dynamic table / vitrine click-to-toggle; not loaded on static boards)
+2. `dynamic/session.js`
+3. `dynamic/connection.js`
+4. `dynamic/filters.js`
+5. `dynamic/summarize.js`
+6. `dynamic/search.js`
+7. `dynamic/cache.js`
+8. `dynamic/render.js`
+9. `dynamic/fetch.js`
+10. `dynamic/sync.js`
+11. `dynamic/page.js`
+12. `orders/actions/progress-step.js` (dynamic table / vitrine click-to-toggle; not loaded on static boards)
 
 **Login**
 
@@ -358,6 +379,7 @@ static/js/
 | `orders/actions/history.js` | `handle_orders_history` |
 | `dynamic/state.js` | shared cache / timers / constants |
 | `dynamic/filters.js` | filters, sort, ranges, counter summary |
+| `dynamic/summarize.js` | table summarize card, row selection, totals |
 | `dynamic/search.js` | search UI + highlight |
 | `dynamic/cache.js` | open-row / scroll / details restore, `updateViewCache` |
 | `dynamic/render.js` | builders, fade, shell/nav, `setupRenderedRows` |

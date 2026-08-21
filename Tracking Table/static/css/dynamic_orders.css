@@ -8,6 +8,7 @@
  *
  * Used by:
  *   - main/templates/components/dynamic_filter_form.html
+ *   - main/templates/components/dynamic_summarize_card.html
  *   - main/templates/components/toolbar.html          (dynamic-search*)
  *   - main/templates/layout/content.html             (#visible-items-filters)
  *   - table/.../table_header.html, vitrine/.../table_header.html  (.th-sortable)
@@ -50,6 +51,61 @@
 	color: #dc3545;
 	font-size: 70%;
 	font-weight: bold;
+}
+
+/* =============================================================================
+   Summarize card
+   ============================================================================= */
+
+.dynamic-summarize-table
+{
+	margin-bottom: 0;
+}
+
+.dynamic-summarize-table th,
+.dynamic-summarize-table td
+{
+	vertical-align: top;
+}
+
+.dynamic-summarize-table td
+{
+	min-width: 7rem;
+}
+
+.dynamic-summarize-table tfoot th,
+.dynamic-summarize-table tfoot td
+{
+	font-weight: 700;
+	background-color: #f8f9fa;
+}
+
+.dynamic-summarize-select-all
+{
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	cursor: pointer;
+	user-select: none;
+	font-weight: 700;
+}
+
+.dynamic-summarize-select-all .form-check-input
+{
+	margin-top: 0;
+	cursor: pointer;
+}
+
+#dynamic-orders-root.summarize-mode .visibleRows
+{
+	cursor: pointer;
+}
+
+#dynamic-summarize-toggle[aria-expanded="true"]
+{
+	color: #fff;
+	background-color: #0d6efd;
+	border-color: #0d6efd;
 }
 
 /* =============================================================================

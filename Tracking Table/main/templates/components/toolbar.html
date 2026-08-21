@@ -22,6 +22,7 @@
                     <button
                         class="btn btn-outline-primary position-relative"
                         type="button"
+                        id="dynamic-filter-toggle"
                         data-bs-toggle="collapse"
                         data-bs-target="#collapseExample"
                         aria-expanded="false"
@@ -33,6 +34,21 @@
                             class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle d-none"
                         ></span>
                     </button>
+                    {% if feature_summarize_content_enabled %}
+                    <button
+                        class="btn btn-outline-primary{% if current_dynamic_view != 'table' %} d-none{% endif %}"
+                        type="button"
+                        id="dynamic-summarize-toggle"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#dynamic-summarize-collapse"
+                        aria-expanded="false"
+                        aria-controls="dynamic-summarize-collapse"
+                        aria-label="Обобщение"
+                        title="Обобщение"
+                    >
+                        <img src="{% static 'images/summarize.png' %}" class="tableIcons" alt="">
+                    </button>
+                    {% endif %}
                 {% elif nav_select == "vitrine" %}
                     <a class="btn btn-outline-primary" href="{% url 'vitrine:new_vitrine' %}">
                         <img src="{% static 'images/add.png' %}" class="tableIcons">
@@ -101,6 +117,9 @@
 
     {% if dynamic_mode %}
         {% include "components/dynamic_filter_form.html" %}
+        {% if feature_summarize_content_enabled %}
+            {% include "components/dynamic_summarize_card.html" %}
+        {% endif %}
     {% else %}
         <!-- Filter Form -->
         {% include "components/filter_form.html" %}

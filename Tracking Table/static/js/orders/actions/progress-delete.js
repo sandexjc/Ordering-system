@@ -259,6 +259,13 @@ function remove_deleted_order_row(id)
 			el && el.remove();
 		});
 		sync_deleted_order_cache(id);
+		if (typeof summarizeSelectedIds !== "undefined") {
+			summarizeSelectedIds.delete(String(id));
+			if (typeof isSummarizeMode !== "undefined" && isSummarizeMode
+				&& typeof refreshSummarizeTotals === "function") {
+				refreshSummarizeTotals();
+			}
+		}
 	};
 
 	let remaining = 1;

@@ -68,6 +68,7 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         context["current_time"] = self.get_time_of_day()
         context["dynamic_mode"] = True
         context["current_dynamic_view"] = current_view
+        context["feature_summarize_content_enabled"] = settings.DJANGO_FEATURES__SUMMARIZE_CONTENT
         context["dynamic_content"] = {
             "search_min_length": settings.DJANGO_DYNAMIC_CONTENT__SEARCH_MIN_LENGTH,
             "search_debounce_ms": settings.DJANGO_DYNAMIC_CONTENT__SEARCH_DEBOUNCE_MS,

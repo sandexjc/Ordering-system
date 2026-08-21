@@ -303,6 +303,18 @@ table.table-order-details thead tr th:not(:first-child) {
 	background-color: #d2d2d2;
 }
 
+#dynamic-orders-root .visibleRows.summarize-selected
+{
+	background-blend-mode: multiply;
+	background-color: #d8f3dc;
+	box-shadow: inset 4px 0 0 #2d6a4f;
+}
+
+#dynamic-orders-root .offer-row.summarize-selected
+{
+	background-color: #b7e4c7;
+}
+
 .visibleRows.is-deleting
 {
 	opacity: 0;
