@@ -125,14 +125,18 @@ function formatSummarizeBalance(value) {
 }
 
 /**
- * Sorted "label — qty" lines from a Map.
+ * Sorted "label — qty unit" lines from a Map.
  * @param {Map<string, number>} grouped
+ * @param {string} [unit]
  * @returns {string[]}
  */
-function groupedQuantityLines(grouped) {
+function groupedQuantityLines(grouped, unit) {
     return Array.from(grouped.entries())
         .sort((left, right) => left[0].localeCompare(right[0], "bg"))
-        .map(([label, quantity]) => `${label} — ${formatSummarizeQuantity(quantity)}`);
+        .map(([label, quantity]) => {
+            const qty = formatSummarizeQuantity(quantity);
+            return unit ? `${label} — ${qty} ${unit}` : `${label} — ${qty}`;
+        });
 }
 
 /**
@@ -176,163 +180,98 @@ function closeAllOpenOrderRows() {
 }
 
 /**
- * Reset the totals table to empty-selection values.
+ * Selected live rows in a stable order (numeric id).
+ * @returns {HTMLElement[]}
+ */
+function getSelectedSummarizeRows() {
+    const rows = [];
+    summarizeSelectedIds.forEach((orderId) => {
+        const row = document.querySelector('tr.visibleRows[data-row="' + orderId + '"]');
+        if (row) {
+            rows.push(row);
+        }
+    });
+    rows.sort((left, right) => {
+        const leftId = Number(left.getAttribute("data-row") || left.id);
+        const rightId = Number(right.getAttribute("data-row") || right.id);
+        return leftId - rightId;
+    });
+    return rows;
+}
+
+/**
+ * Reset both summarize tables to empty-selection values.
  * @returns {void}
  */
 function resetSummarizeTable() {
-    const countEl = document.getElementById("summarize-count");
-    const clientsEl = document.getElementById("summarize-clients");
-    const platesEl = document.getElementById("summarize-plates");
-    const edgesEl = document.getElementById("summarize-edges");
-    const platesTotalEl = document.getElementById("summarize-plates-total");
-    const edgesTotalEl = document.getElementById("summarize-edges-total");
-    const balanceEl = document.getElementById("summarize-balance");
-    if (countEl) {
-        countEl.textContent = "0";
-    }
-    if (clientsEl) {
-        clientsEl.textContent = "";
-    }
-    if (platesEl) {
-        platesEl.textContent = "";
-    }
-    if (edgesEl) {
-        edgesEl.textContent = "";
-    }
-    if (platesTotalEl) {
-        platesTotalEl.textContent = "0";
-    }
-    if (edgesTotalEl) {
-        edgesTotalEl.textContent = "0";
-    }
-    if (balanceEl) {
-        balanceEl.textContent = "0.00";
-    }
-    syncSummarizeSelectAllControl();
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.textContent = value;
+        }
+    };
+    setText("summarize-count", "0 бр");
+    setText("summarize-clients-count", "0 бр");
+    setText("summarize-plates-total", "0 бр");
+    setText("summarize-edges-total", "0 лм");
+    setText("summarize-weight-total", "");
+    setText("summarize-balance", "0.00 €");
+    setText("summarize-order-ids", "");
+    setText("summarize-clients", "");
+    setText("summarize-plates", "");
+    setText("summarize-edges", "");
+    setText("summarize-weights", "");
+    setText("summarize-balances", "");
+    hideBootstrapCollapse(document.getElementById("dynamic-summarize-groups"));
 }
 
 /**
  * @param {Map<string, number>} grouped
+ * @param {string} [unit]
  * @returns {string}
  */
-function buildGroupedLinesHtml(grouped) {
+function buildGroupedLinesHtml(grouped, unit) {
     if (!grouped.size) {
         return "";
     }
-    return summarizeHtmlLines(groupedQuantityLines(grouped));
+    return summarizeHtmlLines(groupedQuantityLines(grouped, unit));
 }
 
 /**
- * Currently loaded table order rows (infinite-scroll window).
- * @returns {HTMLElement[]}
- */
-function getLiveVisibleOrderRows() {
-    const tbody = typeof getLiveOrdersBody === "function"
-        ? getLiveOrdersBody("table")
-        : document.getElementById("dynamic-orders-body");
-    if (!tbody) {
-        return [];
-    }
-    return Array.from(tbody.querySelectorAll("tr.visibleRows"));
-}
-
-/**
- * Keep the header checkbox in sync with the current selection.
- * @returns {void}
- */
-function syncSummarizeSelectAllControl() {
-    const checkbox = document.getElementById("summarize-select-all");
-    if (!checkbox) {
-        return;
-    }
-    const rows = getLiveVisibleOrderRows();
-    let selectedCount = 0;
-    rows.forEach((row) => {
-        const orderId = String(row.getAttribute("data-row") || row.id || "");
-        if (orderId && summarizeSelectedIds.has(orderId)) {
-            selectedCount += 1;
-        }
-    });
-    const allSelected = rows.length > 0 && selectedCount === rows.length;
-    checkbox.checked = allSelected;
-    checkbox.indeterminate = selectedCount > 0 && !allSelected;
-}
-
-/**
- * Select every currently loaded order row.
- * @returns {void}
- */
-function selectAllVisibleOrders() {
-    getLiveVisibleOrderRows().forEach((row) => {
-        const orderId = String(row.getAttribute("data-row") || row.id || "");
-        if (!orderId) {
-            return;
-        }
-        summarizeSelectedIds.add(orderId);
-        row.classList.add("summarize-selected");
-    });
-    refreshSummarizeTotals();
-}
-
-/**
- * Clear the summarize selection.
- * @returns {void}
- */
-function deselectAllOrders() {
-    summarizeSelectedIds.clear();
-    document.querySelectorAll("tr.visibleRows.summarize-selected").forEach((row) => {
-        row.classList.remove("summarize-selected");
-    });
-    refreshSummarizeTotals();
-}
-
-/**
- * Header checkbox: select all loaded rows, or deselect all when already complete.
- * @returns {void}
- */
-function handleSummarizeSelectAllChange() {
-    const checkbox = document.getElementById("summarize-select-all");
-    if (!checkbox) {
-        return;
-    }
-    if (checkbox.checked) {
-        selectAllVisibleOrders();
-        return;
-    }
-    deselectAllOrders();
-}
-
-/**
- * Recompute the totals table from currently selected live rows.
+ * Recompute both summarize tables from currently selected live rows.
  * @returns {void}
  */
 function refreshSummarizeTotals() {
     const countEl = document.getElementById("summarize-count");
-    const clientsEl = document.getElementById("summarize-clients");
-    const platesEl = document.getElementById("summarize-plates");
-    const edgesEl = document.getElementById("summarize-edges");
+    const clientsCountEl = document.getElementById("summarize-clients-count");
     const platesTotalEl = document.getElementById("summarize-plates-total");
     const edgesTotalEl = document.getElementById("summarize-edges-total");
     const balanceEl = document.getElementById("summarize-balance");
-    if (!countEl || !clientsEl || !platesEl || !edgesEl
-        || !platesTotalEl || !edgesTotalEl || !balanceEl) {
+    const orderIdsEl = document.getElementById("summarize-order-ids");
+    const clientsEl = document.getElementById("summarize-clients");
+    const platesEl = document.getElementById("summarize-plates");
+    const edgesEl = document.getElementById("summarize-edges");
+    const balancesEl = document.getElementById("summarize-balances");
+    if (!countEl || !clientsCountEl || !platesTotalEl || !edgesTotalEl || !balanceEl
+        || !orderIdsEl || !clientsEl || !platesEl || !edgesEl || !balancesEl) {
         return;
     }
 
+    const selectedRows = getSelectedSummarizeRows();
+    const orderIds = [];
+    const balances = [];
     const clients = new Set();
     const plates = new Map();
     const edges = new Map();
     let platesTotal = 0;
     let edgesTotal = 0;
     let balanceTotal = 0;
-    let liveCount = 0;
 
-    summarizeSelectedIds.forEach((orderId) => {
-        const row = document.querySelector('tr.visibleRows[data-row="' + orderId + '"]');
-        if (!row) {
-            return;
+    selectedRows.forEach((row) => {
+        const orderId = String(row.getAttribute("data-row") || row.id || "");
+        if (orderId) {
+            orderIds.push(orderId);
         }
-        liveCount += 1;
 
         const clientName = getOrderClientName(row);
         if (clientName) {
@@ -358,21 +297,24 @@ function refreshSummarizeTotals() {
         });
 
         const balance = Number(row.getAttribute("data-sort-balance"));
-        if (Number.isFinite(balance)) {
-            balanceTotal += balance;
-        }
+        const safeBalance = Number.isFinite(balance) ? balance : 0;
+        balances.push(`${formatSummarizeBalance(safeBalance)} €`);
+        balanceTotal += safeBalance;
     });
 
-    countEl.textContent = String(liveCount);
+    countEl.textContent = `${selectedRows.length} бр`;
+    clientsCountEl.textContent = `${clients.size} бр`;
+    platesTotalEl.textContent = `${formatSummarizeQuantity(platesTotal)} бр`;
+    edgesTotalEl.textContent = `${formatSummarizeQuantity(edgesTotal)} лм`;
+    balanceEl.textContent = `${formatSummarizeBalance(balanceTotal)} €`;
+
+    orderIdsEl.innerHTML = summarizeHtmlLines(orderIds);
     clientsEl.innerHTML = summarizeHtmlLines(Array.from(clients).sort((left, right) => (
         left.localeCompare(right, "bg")
     )));
-    platesEl.innerHTML = buildGroupedLinesHtml(plates);
-    edgesEl.innerHTML = buildGroupedLinesHtml(edges);
-    platesTotalEl.textContent = formatSummarizeQuantity(platesTotal);
-    edgesTotalEl.textContent = formatSummarizeQuantity(edgesTotal);
-    balanceEl.textContent = formatSummarizeBalance(balanceTotal);
-    syncSummarizeSelectAllControl();
+    platesEl.innerHTML = buildGroupedLinesHtml(plates, "бр");
+    edgesEl.innerHTML = buildGroupedLinesHtml(edges, "лм");
+    balancesEl.innerHTML = summarizeHtmlLines(balances);
 }
 
 /**
@@ -507,11 +449,17 @@ function setupDynamicSummarize() {
     }
     summarizeRoot.dataset.summarizeBound = "1";
 
-    summarizeRoot.addEventListener("show.bs.collapse", () => {
+    summarizeRoot.addEventListener("show.bs.collapse", (event) => {
+        if (event.target !== summarizeRoot) {
+            return;
+        }
         hideBootstrapCollapse(getFilterCollapseEl());
         enterSummarizeMode();
     });
-    summarizeRoot.addEventListener("hide.bs.collapse", () => {
+    summarizeRoot.addEventListener("hide.bs.collapse", (event) => {
+        if (event.target !== summarizeRoot) {
+            return;
+        }
         exitSummarizeMode();
     });
 
@@ -524,9 +472,4 @@ function setupDynamicSummarize() {
 
     const root = document.getElementById("dynamic-orders-root");
     syncSummarizeButtonVisibility(root?.dataset.currentView || "table");
-
-    const selectAll = document.getElementById("summarize-select-all");
-    if (selectAll) {
-        selectAll.addEventListener("change", handleSummarizeSelectAllChange);
-    }
 }

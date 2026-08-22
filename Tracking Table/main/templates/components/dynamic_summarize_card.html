@@ -1,46 +1,70 @@
 <div class="collapse" id="dynamic-summarize-collapse" style="margin-top: 20px;">
     <div class="card dynamic-filter-card dynamic-summarize-card">
         <div class="card-body dynamic-filter-card-body">
+            <h6 class="text-center mb-3 dynamic-summarize-title">Обобщена информация</h6>
             <div class="table-responsive">
                 <table class="table table-bordered table-sm mb-0 dynamic-summarize-table">
                     <thead>
                         <tr>
-                            <th scope="col">
-                                <label class="dynamic-summarize-select-all mb-0" for="summarize-select-all">
-                                    <input
-                                        type="checkbox"
-                                        class="form-check-input"
-                                        id="summarize-select-all"
-                                        title="Избери всички заредени поръчки"
-                                    >
-                                    Избрани поръчки
-                                </label>
-                            </th>
+                            <th scope="col">Поръчки</th>
                             <th scope="col">Клиенти</th>
                             <th scope="col">Плочи</th>
                             <th scope="col">Кант</th>
+                            <th scope="col">Тегло</th>
                             <th scope="col">Баланс</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td id="summarize-count">0</td>
-                            <td id="summarize-clients"></td>
-                            <td id="summarize-plates"></td>
-                            <td id="summarize-edges"></td>
-                            <td></td>
+                            <td id="summarize-count">0 бр</td>
+                            <td id="summarize-clients-count">0 бр</td>
+                            <td id="summarize-plates-total">0 бр</td>
+                            <td id="summarize-edges-total">0 лм</td>
+                            <td id="summarize-weight-total"></td>
+                            <td id="summarize-balance">0.00 €</td>
                         </tr>
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <th scope="row">Общо</th>
-                            <td></td>
-                            <td id="summarize-plates-total">0</td>
-                            <td id="summarize-edges-total">0</td>
-                            <td id="summarize-balance">0.00</td>
-                        </tr>
-                    </tfoot>
                 </table>
+            </div>
+
+            <button
+                type="button"
+                class="dynamic-summarize-groups-toggle"
+                id="dynamic-summarize-groups-toggle"
+                data-bs-toggle="collapse"
+                data-bs-target="#dynamic-summarize-groups"
+                aria-expanded="false"
+                aria-controls="dynamic-summarize-groups"
+            >
+                <span class="dynamic-summarize-groups-label">повече информация</span>
+                <span class="dynamic-summarize-groups-arrow" aria-hidden="true"></span>
+            </button>
+
+            <div class="collapse" id="dynamic-summarize-groups">
+                <div class="table-responsive mt-2">
+                    <table class="table table-bordered table-sm mb-0 dynamic-summarize-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Поръчки</th>
+                                <th scope="col">Клиенти</th>
+                                <th scope="col">Плочи</th>
+                                <th scope="col">Кант</th>
+                                <th scope="col">тегло</th>
+                                <th scope="col">Баланс</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="summarize-order-ids"></td>
+                                <td id="summarize-clients"></td>
+                                <td id="summarize-plates"></td>
+                                <td id="summarize-edges"></td>
+                                <td id="summarize-weights"></td>
+                                <td id="summarize-balances"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

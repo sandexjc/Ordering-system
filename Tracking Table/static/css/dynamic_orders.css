@@ -73,27 +73,63 @@
 	min-width: 7rem;
 }
 
-.dynamic-summarize-table tfoot th,
-.dynamic-summarize-table tfoot td
+.dynamic-summarize-groups-toggle
 {
-	font-weight: 700;
-	background-color: #f8f9fa;
-}
-
-.dynamic-summarize-select-all
-{
-	display: inline-flex;
+	display: flex;
+	flex-direction: column;
 	align-items: center;
-	gap: 0.4rem;
+	justify-content: center;
+	width: calc(100% + 10rem);
+	margin: 0.75rem -5rem 0;
+	padding: 0.45rem 0;
+	border: none;
+	background: transparent;
 	cursor: pointer;
-	user-select: none;
-	font-weight: 700;
+	color: #6c757d;
+	line-height: 1.2;
+	transition: background 0.15s ease, color 0.15s ease;
 }
 
-.dynamic-summarize-select-all .form-check-input
+.dynamic-summarize-groups-toggle:hover,
+.dynamic-summarize-groups-toggle:focus-visible
 {
-	margin-top: 0;
-	cursor: pointer;
+	background: linear-gradient(
+		to right,
+		transparent 0%,
+		rgba(0, 0, 0, 0.08) 20%,
+		rgba(0, 0, 0, 0.08) 80%,
+		transparent 100%
+	);
+	color: #212529;
+	outline: none;
+}
+
+.dynamic-summarize-groups-label
+{
+	font-size: 0.8rem;
+	font-weight: 600;
+	margin-bottom: 0.2rem;
+}
+
+.dynamic-summarize-groups-arrow
+{
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-left: 7px solid transparent;
+	border-right: 7px solid transparent;
+	border-top: 8px solid currentColor;
+}
+
+.dynamic-summarize-groups-toggle[aria-expanded="true"] .dynamic-summarize-groups-arrow
+{
+	border-top: none;
+	border-bottom: 8px solid currentColor;
+}
+
+.dynamic-summarize-title
+{
+	font-weight: 700;
 }
 
 #dynamic-orders-root.summarize-mode .visibleRows
