@@ -538,14 +538,15 @@ function applyDeletedOrder(viewName, tbody, orderId, isLive)
  * @param {boolean} isLive - Whether this tbody is on screen.
  * @param {boolean} hasMore - Infinite-scroll has more pages.
  * @param {Object} filters - Active filters.
+ * @param {boolean} [forceReplace=false] - Replace even when the client stamped a newer updated_at (local save).
  * @returns {void}
  */
-function applyRowPair(viewName, tbody, pair, isLive, hasMore, filters)
+function applyRowPair(viewName, tbody, pair, isLive, hasMore, filters, forceReplace)
 {
     const localEcho = isLive && isRecentLocalOrderMutation(pair.id);
     const existing = tbody.querySelector('tr.visibleRows[data-row="' + pair.id + '"]');
     if (existing) {
-        if (!shouldReplaceSummary(existing, pair.summary)) {
+        if (!forceReplace && !shouldReplaceSummary(existing, pair.summary)) {
             const incomingAt = pair.summary.getAttribute("data-updated-at");
             if (incomingAt) {
                 existing.setAttribute("data-updated-at", incomingAt);

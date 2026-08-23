@@ -460,7 +460,12 @@ function applyOrderFormLiveRow(orderId, rowsHtml)
 		: null;
 	const hasMore = Boolean(cacheEntry && cacheEntry.hasMore);
 
-	applyRowPair(viewName, tbody, pair, true, hasMore, filters);
+	/*
+	 * Force replace: rememberLocalOrderMutation stamps Date.now() on the live row,
+     * which is newer than the server updated_at and would otherwise skip the patch.
+	 */
+    applyRowPair(viewName, tbody, pair, true, hasMore, filters, true);
+
 	if (typeof rememberLocalOrderMutation === "function") {
 		rememberLocalOrderMutation(orderId);
 	}
