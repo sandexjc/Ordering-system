@@ -1,5 +1,5 @@
 {% load static %}
-{% if 'DELETE' in item.fields %}
+{% if item.fields.DELETE %}
 	<span class="order-form-delete-field">{{ item.DELETE }}</span>
 {% endif %}
 <button

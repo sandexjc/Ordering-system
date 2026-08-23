@@ -214,7 +214,8 @@ function addOrderFormsetRow(formsetRoot)
 }
 
 /**
- * True when a formset row has a saved instance id.
+ * True when a formset row has a saved instance id, or a DELETE field
+ * (initial/saved forms; extra empty rows omit DELETE).
  *
  * @param {HTMLElement} row - Item row.
  * @returns {boolean}
@@ -222,7 +223,10 @@ function addOrderFormsetRow(formsetRoot)
 function isSavedOrderFormRow(row)
 {
 	const idInput = row.querySelector('input[type="hidden"][name$="-id"]');
-	return Boolean(idInput && String(idInput.value || "").trim());
+	if (idInput && String(idInput.value || "").trim()) {
+		return true;
+	}
+	return Boolean(row.querySelector('input[name$="-DELETE"]'));
 }
 
 /**
@@ -247,6 +251,9 @@ function isEmptyOrderFormRow(row)
 			continue;
 		}
 		if (el.tagName === "SELECT") {
+			if (el.selectedIndex > 0) {
+				return false;
+			}
 			continue;
 		}
 		const value = String(el.value || "").trim();

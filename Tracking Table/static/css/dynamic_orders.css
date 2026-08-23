@@ -475,10 +475,12 @@ mark.search-highlight
    Create / edit order form modal
    ============================================================================= */
 
-#order-form-modal .order-form-modal-dialog
+#order-form-modal.modal .modal-dialog.order-form-modal-dialog
 {
 	width: 80%;
-	max-width: none;
+	max-width: 80%;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 #order-form-modal .modal-body
@@ -639,7 +641,7 @@ mark.search-highlight
 }
 
 #order-form-modal .order-form-item-row:hover .order-form-row-action,
-#order-form-modal .order-form-item-row.is-pending-delete:hover .order-form-row-action
+#order-form-modal .order-form-item-row.is-pending-delete .order-form-row-action
 {
 	opacity: 1;
 	pointer-events: auto;
