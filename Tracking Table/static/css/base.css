@@ -248,6 +248,12 @@ table.table-order-details thead tr th:not(:first-child) {
 	text-align: left;
 }
 
+/** Stacked line items in order / vitrine list rows (plates, edges, frames, notes) */
+.visibleRows > td > div + div
+{
+	margin-top: 0.35rem;
+}
+
 /** Cells with no padding used for structure */
 .table > :not(caption) > * > td.no-padding-cell {
 	padding: 0 !important;
