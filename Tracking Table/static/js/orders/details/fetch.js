@@ -9,7 +9,8 @@
  * Depends on (runtime):
  *   - orders/details/spinner.js
  *   - orders/details/error.js
- *   - orders/row-expand/transitions.js → onHiddenRowContentUpdated
+ *   - orders/row-expand/transitions.js → onHiddenRowContentUpdated,
+ *     _cancelPendingTransitionAndLockHeight
  *   - orders/actions/properties.js    → handle_orders_properties
  *   - orders/actions/history.js       → handle_orders_history
  *
@@ -68,9 +69,52 @@ function cache_order_details(order_id)
 }
 
 /**
+ * Lock an already-expanded row to its current pixel height so replacing
+ * inner HTML with a spinner does not collapse the window.
+ *
+ * @param {HTMLElement|null} hiddenRow - The `.hiddenRows` element.
+ * @param {HTMLElement|null} hiddenTable - The `#hidden-table-{id}` container.
+ * @returns {void}
+ */
+function preserveHiddenRowSizeDuringReload(hiddenRow, hiddenTable)
+{
+    if (!hiddenRow || !hiddenTable) {
+        return;
+    }
+    if (typeof _cancelPendingTransitionAndLockHeight === "function") {
+        _cancelPendingTransitionAndLockHeight(hiddenRow);
+    }
+    const rowHeight = hiddenRow.getBoundingClientRect().height;
+    if (rowHeight > 0) {
+        hiddenRow.style.height = rowHeight + "px";
+        hiddenTable.style.minHeight = rowHeight + "px";
+    }
+    hiddenTable.classList.add("is-preserving-size");
+}
+
+/**
+ * Drop the reload size-lock so the row can resize to newly inserted content.
+ *
+ * @param {HTMLElement|null} hiddenTable - The `#hidden-table-{id}` container.
+ * @returns {void}
+ */
+function clearHiddenRowSizePreservation(hiddenTable)
+{
+    if (!hiddenTable) {
+        return;
+    }
+    hiddenTable.classList.remove("is-preserving-size");
+    hiddenTable.style.minHeight = "";
+}
+
+/**
  * Fetch order/vitrine detail HTML and inject progress modal, delete modal,
  * history offcanvas, and the in-row order view. Shows spinner while loading;
  * on failure shows create_order_error UI.
+ *
+ * Initial open: spinner in a compact row, then expand when content arrives.
+ * Reload (content already shown): keep the current window size and center
+ * the spinner until the new content arrives, then resize.
  *
  * @param {string|number} order_id - Order / vitrine id (element id + fetch URL suffix).
  * @returns {void}
@@ -96,20 +140,26 @@ function get_order(order_id)
         return;
     }
 
+    const previousView = hiddenTable && document.getElementById("order-view-" + order_id);
+    const previousError = hiddenTable && document.getElementById("order-error-" + order_id);
+    const isReload = Boolean(previousView);
+
+    if (isReload) {
+        preserveHiddenRowSizeDuringReload(hiddenRow, hiddenTable);
+    }
+
     /** Hide fold button while loading; spinner lives inside the content area. */
     set_hidden_row_close_visible(order_id, false);
     if (hiddenTable) {
-        const previousView = document.getElementById("order-view-" + order_id);
         if (previousView) {
             previousView.remove();
         }
-        const previousError = document.getElementById("order-error-" + order_id);
         if (previousError) {
             previousError.remove();
         }
         hiddenTable.appendChild(add_spinner(order_id));
     }
-    if (typeof onHiddenRowContentUpdated === "function") {
+    if (!isReload && typeof onHiddenRowContentUpdated === "function") {
         onHiddenRowContentUpdated(hiddenRow);
     }
 
@@ -133,8 +183,9 @@ function get_order(order_id)
             let parser = new DOMParser();
             let newHtml = parser.parseFromString(html, 'text/html');
 
-            /** Remove loading indication */
+            /** Remove loading indication and unlock preserved reload size */
             remove_spinner(order_id);
+            clearHiddenRowSizePreservation(hiddenTable);
 
             /*
              * Load progress tracking form
@@ -205,8 +256,9 @@ function get_order(order_id)
         })
         .catch((error) => {
 
-            /** Remove loading indication */
+            /** Remove loading indication and unlock preserved reload size */
             remove_spinner(order_id);
+            clearHiddenRowSizePreservation(hiddenTable);
 
             /** Show fallback message in placeholder */
             let errorHiddenTable = document.getElementById("hidden-table-" + order_id);
@@ -228,30 +280,12 @@ function get_order(order_id)
 }
 
 /**
- * Clear error/order-view fragments and re-fetch order details.
+ * Re-fetch order details (refresh button / error retry).
+ * `get_order` detects an already-open view and preserves window size.
  *
  * @param {string|number} order_id - Order / vitrine id to reload.
  * @returns {void}
  */
 function retry_order(order_id) {
-    let hiddenTable = document.getElementById("hidden-table-" + order_id);
-    if (hiddenTable) {
-
-        /** Remove error view if any */
-        let error_view = document.getElementById("order-error-" + order_id);
-        if (error_view)
-        {
-            document.getElementById("order-error-" + order_id).remove();
-        }
-
-        /** Remove previos order table */
-        let order_view = document.getElementById("order-view-" + order_id);
-        if (order_view)
-        {
-            document.getElementById("order-view-" + order_id).remove();
-        }
-
-    }
-    set_hidden_row_close_visible(order_id, false);
     get_order(order_id);
 }

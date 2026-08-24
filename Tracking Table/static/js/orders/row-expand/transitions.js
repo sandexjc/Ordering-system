@@ -61,7 +61,9 @@ function _onRowHeightTransitionEnd(hiddenRow, handler)
 
 /**
  * After async content is inserted into an open hidden row, re-animate height
- * from the current size to the new scrollHeight. No-op if the row is closing or hidden.
+ * from the current visual size to the new content height. No-op if the row is
+ * closing or hidden. Measures with height:auto so a locked (reload) size can
+ * shrink as well as grow.
  *
  * @param {HTMLElement|null} hiddenRow - The `.hiddenRows` element whose content changed.
  * @returns {void}
@@ -80,15 +82,23 @@ function onHiddenRowContentUpdated(hiddenRow) {
   // If an animation is currently pending, lock current computed height and proceed
   _cancelPendingTransitionAndLockHeight(hiddenRow);
 
-  // Lock current height (visual)
-  const currentHeight = hiddenRow.scrollHeight;
-  hiddenRow.style.height = currentHeight + "px";
+  const currentHeight = hiddenRow.getBoundingClientRect().height;
 
-  // Force reflow
-  hiddenRow.getBoundingClientRect();
-
-  // compute new height after content inserted
+  // scrollHeight on a locked px height reports the lock, not shorter content
+  hiddenRow.style.transition = "none";
+  hiddenRow.style.height = "auto";
   const newHeight = hiddenRow.scrollHeight;
+  hiddenRow.style.height = currentHeight + "px";
+  hiddenRow.getBoundingClientRect();
+  hiddenRow.style.transition = "";
+
+  if (Math.abs(currentHeight - newHeight) < 1) {
+    hiddenRow.style.height = "auto";
+    hiddenRow._isAnimating = false;
+    return;
+  }
+
+  hiddenRow.getBoundingClientRect();
 
   hiddenRow._isAnimating = true;
   _onRowHeightTransitionEnd(hiddenRow, function () {
