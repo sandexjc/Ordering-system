@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django.urls import reverse
@@ -94,6 +95,7 @@ class ViewOrder(DynamicDetailsModeMixin, LoginRequiredMixin, TemplateView):
             "toolbar_delete_target": delete_target,
             "toolbar_history_target": history_target,
             "toolbar_refresh_option": refresh_option,
+            "feature_order_weight_enabled": settings.DJANGO_FEATURES__ORDER_WEIGHT,
         })
 
         dynamic_mode = self.add_dynamic_progress_context(context, order.id)

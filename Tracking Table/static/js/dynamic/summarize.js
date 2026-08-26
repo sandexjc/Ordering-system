@@ -27,6 +27,14 @@ function isSummarizeFeatureEnabled() {
 }
 
 /**
+ * @returns {boolean}
+ */
+function isOrderWeightFeatureEnabled() {
+    const root = document.getElementById("dynamic-orders-root");
+    return Boolean(root && root.dataset.orderWeightEnabled === "1");
+}
+
+/**
  * @returns {HTMLElement|null}
  */
 function getSummarizeCollapseEl() {
@@ -125,6 +133,17 @@ function formatSummarizeBalance(value) {
 }
 
 /**
+ * @param {number} value
+ * @returns {string}
+ */
+function formatSummarizeWeight(value) {
+    if (!Number.isFinite(value)) {
+        return "0 кг";
+    }
+    return `${Math.round(value)} кг`;
+}
+
+/**
  * Sorted "label — qty unit" lines from a Map.
  * @param {Map<string, number>} grouped
  * @param {string} [unit]
@@ -214,13 +233,15 @@ function resetSummarizeTable() {
     setText("summarize-clients-count", "0 бр");
     setText("summarize-plates-total", "0 бр");
     setText("summarize-edges-total", "0 лм");
-    setText("summarize-weight-total", "");
+    if (isOrderWeightFeatureEnabled()) {
+        setText("summarize-weight-total", "0 кг");
+        setText("summarize-weights", "");
+    }
     setText("summarize-balance", "0.00 €");
     setText("summarize-order-ids", "");
     setText("summarize-clients", "");
     setText("summarize-plates", "");
     setText("summarize-edges", "");
-    setText("summarize-weights", "");
     setText("summarize-balances", "");
     hideBootstrapCollapse(document.getElementById("dynamic-summarize-groups"));
 }
@@ -252,20 +273,28 @@ function refreshSummarizeTotals() {
     const platesEl = document.getElementById("summarize-plates");
     const edgesEl = document.getElementById("summarize-edges");
     const balancesEl = document.getElementById("summarize-balances");
+    const weightTotalEl = document.getElementById("summarize-weight-total");
+    const weightsEl = document.getElementById("summarize-weights");
+    const weightEnabled = isOrderWeightFeatureEnabled();
     if (!countEl || !clientsCountEl || !platesTotalEl || !edgesTotalEl || !balanceEl
         || !orderIdsEl || !clientsEl || !platesEl || !edgesEl || !balancesEl) {
+        return;
+    }
+    if (weightEnabled && (!weightTotalEl || !weightsEl)) {
         return;
     }
 
     const selectedRows = getSelectedSummarizeRows();
     const orderIds = [];
     const balances = [];
+    const weights = [];
     const clients = new Set();
     const plates = new Map();
     const edges = new Map();
     let platesTotal = 0;
     let edgesTotal = 0;
     let balanceTotal = 0;
+    let weightTotal = 0;
 
     selectedRows.forEach((row) => {
         const orderId = String(row.getAttribute("data-row") || row.id || "");
@@ -300,6 +329,13 @@ function refreshSummarizeTotals() {
         const safeBalance = Number.isFinite(balance) ? balance : 0;
         balances.push(`${formatSummarizeBalance(safeBalance)} €`);
         balanceTotal += safeBalance;
+
+        if (weightEnabled) {
+            const weight = Number(row.getAttribute("data-weight"));
+            const safeWeight = Number.isFinite(weight) ? weight : 0;
+            weights.push(formatSummarizeWeight(safeWeight));
+            weightTotal += safeWeight;
+        }
     });
 
     countEl.textContent = `${selectedRows.length} бр`;
@@ -307,6 +343,9 @@ function refreshSummarizeTotals() {
     platesTotalEl.textContent = `${formatSummarizeQuantity(platesTotal)} бр`;
     edgesTotalEl.textContent = `${formatSummarizeQuantity(edgesTotal)} лм`;
     balanceEl.textContent = `${formatSummarizeBalance(balanceTotal)} €`;
+    if (weightEnabled) {
+        weightTotalEl.textContent = formatSummarizeWeight(weightTotal);
+    }
 
     orderIdsEl.innerHTML = summarizeHtmlLines(orderIds);
     clientsEl.innerHTML = summarizeHtmlLines(Array.from(clients).sort((left, right) => (
@@ -315,6 +354,9 @@ function refreshSummarizeTotals() {
     platesEl.innerHTML = buildGroupedLinesHtml(plates, "бр");
     edgesEl.innerHTML = buildGroupedLinesHtml(edges, "лм");
     balancesEl.innerHTML = summarizeHtmlLines(balances);
+    if (weightEnabled) {
+        weightsEl.innerHTML = summarizeHtmlLines(weights);
+    }
 }
 
 /**

@@ -26,6 +26,7 @@
         data-range-filter-debounce-ms="{{ dynamic_content.range_filter_debounce_ms }}"
         data-sync-highlight-ms="{{ dynamic_content.sync_highlight_ms }}"
         {% if feature_summarize_content_enabled %}data-summarize-enabled="1"{% endif %}
+        {% if feature_order_weight_enabled %}data-order-weight-enabled="1"{% endif %}
         data-vitrine-css-vitrines="{% static 'vitrine/css/vitrines.css' %}"
         data-vitrine-css-holes="{% static 'vitrine/css/holes_dots.css' %}"
         data-vitrine-css-modal="{% static 'vitrine/css/modal_progress.css' %}"

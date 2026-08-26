@@ -10,7 +10,9 @@
                             <th scope="col">Клиенти</th>
                             <th scope="col">Плочи</th>
                             <th scope="col">Кант</th>
-                            <th scope="col">Тегло</th>
+                            {% if feature_order_weight_enabled %}
+                                <th scope="col">Тегло</th>
+                            {% endif %}
                             <th scope="col">Баланс</th>
                         </tr>
                     </thead>
@@ -20,7 +22,9 @@
                             <td id="summarize-clients-count">0 бр</td>
                             <td id="summarize-plates-total">0 бр</td>
                             <td id="summarize-edges-total">0 лм</td>
-                            <td id="summarize-weight-total"></td>
+                            {% if feature_order_weight_enabled %}
+                                <td id="summarize-weight-total">0 кг</td>
+                            {% endif %}
                             <td id="summarize-balance">0.00 €</td>
                         </tr>
                     </tbody>
@@ -49,7 +53,9 @@
                                 <th scope="col">Клиенти</th>
                                 <th scope="col">Плочи</th>
                                 <th scope="col">Кант</th>
-                                <th scope="col">тегло</th>
+                                {% if feature_order_weight_enabled %}
+                                    <th scope="col">тегло</th>
+                                {% endif %}
                                 <th scope="col">Баланс</th>
                             </tr>
                         </thead>
@@ -59,7 +65,9 @@
                                 <td id="summarize-clients"></td>
                                 <td id="summarize-plates"></td>
                                 <td id="summarize-edges"></td>
-                                <td id="summarize-weights"></td>
+                                {% if feature_order_weight_enabled %}
+                                    <td id="summarize-weights"></td>
+                                {% endif %}
                                 <td id="summarize-balances"></td>
                             </tr>
                         </tbody>

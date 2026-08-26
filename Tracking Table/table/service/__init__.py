@@ -1,5 +1,6 @@
 from .table import (
     OrderTotals,
+    OrderWeight,
 )
 
 from .workflow import (

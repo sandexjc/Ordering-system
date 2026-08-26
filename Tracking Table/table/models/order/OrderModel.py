@@ -32,6 +32,12 @@ class Order(TableOrder, BaseOrder):
     order_taken = models.BooleanField(default=False)
     order_type = models.CharField(max_length=10, choices=order_type_choices, default="offer")
 
+    --- Table Order fields ---
+
+    plates_total, edge_total, cutting_total, edging_total, others_total
+    weight = models.IntegerField(default=0)
+    invoice = models.BooleanField(default=False)
+
     """
 
     id = models.BigAutoField(primary_key=True)
@@ -41,6 +47,7 @@ class Order(TableOrder, BaseOrder):
     cutting_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     edging_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
     others_total = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    weight = models.IntegerField(default=0)
 
     invoice = models.BooleanField(default=False)
 

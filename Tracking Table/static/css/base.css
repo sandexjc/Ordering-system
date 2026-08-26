@@ -13,6 +13,7 @@
  *   - table/.../order_row.html, vitrine/.../vitrine_row.html
  *       (hiddenRows, hidden-table, hidden-row-close, orderTaken, normalOrder, offer-row, fixed-min-width)
  *   - common/.../order_toolbar.html             (hidden-buttons, tableIcons)
+ *   - table/.../order_details.html              (order-weight-estimate)
  *   - table/.../order_table.html                (order-details, table-order-details)
  *   - static/js/orders/details/spinner.js, orders/row-expand/*, orders/details/fetch.js
  *       (order-spinner*, orderClicked, rowSelected, hidden-row-close)
@@ -232,6 +233,16 @@ table.table-order-details thead tr th:not(:first-child) {
 	margin-right: auto;
 	padding-bottom: 20px;
 	text-align: center;
+}
+
+.order-weight-estimate
+{
+	width: 90%;
+	margin: 0 auto 8px auto;
+	padding: 0;
+	color: #495057;
+	font-size: 0.9rem;
+	text-align: right;
 }
 
 /* =============================================================================
