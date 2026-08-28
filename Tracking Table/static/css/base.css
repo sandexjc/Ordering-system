@@ -13,8 +13,7 @@
  *   - table/.../order_row.html, vitrine/.../vitrine_row.html
  *       (hiddenRows, hidden-table, hidden-row-close, orderTaken, normalOrder, offer-row, fixed-min-width)
  *   - common/.../order_toolbar.html             (hidden-buttons, tableIcons)
- *   - table/.../order_details.html              (order-weight-estimate)
- *   - table/.../order_table.html                (order-details, table-order-details)
+ *   - table/.../order_table.html                (order-details, table-order-details, order-weight-estimate)
  *   - static/js/orders/details/spinner.js, orders/row-expand/*, orders/details/fetch.js
  *       (order-spinner*, orderClicked, rowSelected, hidden-row-close)
  *   - static/js/orders/actions/progress-delete.js (visibleRows.is-deleting, ALERT-E-DEL-VIEW)
@@ -225,6 +224,11 @@ table.table-order-details thead tr th:not(:first-child) {
 	text-align: center;
 }
 
+.table-order-details td.order-weight-estimate
+{
+	color: #000;
+}
+
 .hidden-buttons
 {
 	position: relative;
@@ -233,16 +237,6 @@ table.table-order-details thead tr th:not(:first-child) {
 	margin-right: auto;
 	padding-bottom: 20px;
 	text-align: center;
-}
-
-.order-weight-estimate
-{
-	width: 90%;
-	margin: 0 auto 8px auto;
-	padding: 0;
-	color: #495057;
-	font-size: 0.9rem;
-	text-align: right;
 }
 
 /* =============================================================================

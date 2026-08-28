@@ -16,10 +16,6 @@
     {# ORDER ITEMS PROGRESS TABLE #}
     {% include "table/order_table.html" with order=order %}
 
-    {% if feature_order_weight_enabled %}
-        <p class="order-weight-estimate">Приблизително тегло на поръчката - {{ order.weight }} кг</p>
-    {% endif %}
-
     {# ORDER TOOLBAR #}
     {% include "common/components/order_toolbar.html" with object=order %}
 </div>

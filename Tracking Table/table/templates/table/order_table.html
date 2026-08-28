@@ -74,6 +74,13 @@
                     </td>
                 </tr>
             {% endif %}
+
+            {% if feature_order_weight_enabled %}
+                <tr class="order-progress-item-row">
+                    <td class="order-weight-estimate">Приблизително тегло на поръчката - {{ order.weight }} кг</td>
+                    <td colspan="4"></td>
+                </tr>
+            {% endif %}
         </tbody>
     </table>
 </div>
