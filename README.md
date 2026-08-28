@@ -117,6 +117,7 @@ Optional variables supported in settings include:
 - `DJANGO_FEATURES__MANUAL_SEAL`
 - `DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING`
 - `DJANGO_FEATURES__SUMMARIZE_CONTENT`
+- `DJANGO_FEATURES__ORDER_WEIGHT`
 - `DJANGO_DYNAMIC_CONTENT__SEARCH_MIN_LENGTH`
 - `DJANGO_DYNAMIC_CONTENT__SEARCH_DEBOUNCE_MS`
 - `DJANGO_DYNAMIC_CONTENT__ORDERS_SYNC_INTERVAL_MS`
@@ -284,6 +285,20 @@ When `DJANGO_FEATURES__SUMMARIZE_CONTENT=true` on the dynamic board (table view)
 - Folding the card restores expand-on-click and clears the selection.
 
 Vitrine summarize is not included yet.
+
+## Table order weight
+
+When `DJANGO_FEATURES__ORDER_WEIGHT=true`, table orders store an approximate weight (integer kg) from active plates and edges. The value is shown in the expanded order-details table and in the summarize card.
+
+Weight is recalculated on plate/edge save and delete while the flag is on. Existing orders can be backfilled with:
+
+```bash
+python manage.py recalculate_order_weights --all
+python manage.py recalculate_order_weights --order-id 605
+python manage.py recalculate_order_weights --all --dry-run
+```
+
+The command does not require the feature flag. Use `--all` or `--order-id` (not both). `--dry-run` prints the old and new values without writing.
 
 ## Frontend static JS map (`Tracking Table/static/js`)
 

@@ -7,15 +7,15 @@ from table.service import OrderWeight
 class Command(BaseCommand):
     help = (
         "Recalculate stored approximate weight for table orders from active "
-        "plates and edges. Run after adding the Order.weight field migration. "
-        "Does not require DJANGO_FEATURES__ORDER_WEIGHT."
+        "plates and edges. Requires --all or --order-id. Does not require "
+        "DJANGO_FEATURES__ORDER_WEIGHT."
     )
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--dry-run",
+            "--all",
             action="store_true",
-            help="Print calculated weights without writing to the database.",
+            help="Recalculate weight for every active table order.",
         )
         parser.add_argument(
             "--order-id",
@@ -23,11 +23,23 @@ class Command(BaseCommand):
             nargs="+",
             help="Recalculate only specific order IDs.",
         )
+        parser.add_argument(
+            "--dry-run",
+            action="store_true",
+            help="Print calculated weights without writing to the database.",
+        )
 
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
-        queryset = Order.objects.all().order_by("pk")
+        process_all = options["all"]
         order_ids = options.get("order_id")
+
+        if process_all and order_ids:
+            raise CommandError("Use either --all or --order-id, not both.")
+        if not process_all and not order_ids:
+            raise CommandError("Pass --all or --order-id.")
+
+        queryset = Order.objects.all().order_by("pk")
         if order_ids:
             queryset = queryset.filter(pk__in=order_ids)
 

@@ -66,6 +66,16 @@ Common options:
 
 When `DJANGO_FEATURES__SUMMARIZE_CONTENT=true`, the dynamic table board shows a summarize card: select orders to total unique clients, plates by material, edges by type, and remaining balance. The control is hidden on the vitrine board.
 
+## Table order weight
+
+When `DJANGO_FEATURES__ORDER_WEIGHT=true`, table orders show an approximate weight in the order details pane and in summarize. Recalculate stored weights with:
+
+- `python manage.py recalculate_order_weights --all`
+- `python manage.py recalculate_order_weights --order-id <id ...>`
+- `--dry-run` to preview without DB writes
+
+The command does not require the feature flag.
+
 ## Demo data commands (beta / local only)
 
 For local testing only (requires `pip install faker` for seeding):
