@@ -14,24 +14,25 @@
 		    	<th scope="col">Display Name</th>
 		      	<th scope="col">First Name</th>
 		      	<th scope="col">Last Name</th>
-		      	<th scope="col">Group</th>
-		      	<th scope="col">IS_ACTIVE</th>
+		      	<th scope="col">Email</th>
+		      	<th scope="col">Role</th>
+		      	<th scope="col">Active</th>
 		      	<th scope="col">Last login</th>
-		      	<th scope="col">Created_date</th>
+		      	<th scope="col">Created</th>
 		    </tr>
 		</thead>
 
 		<tbody>
-			{% for user in user_list %}
+			{% for listed_user in user_list %}
 	 		<tr>
-	 			 <td>{{user}}</td>
-			     <td>{{user.first_name}}</td>
-			     <td>{{user.last_name}}</td>
-
-			     <td>{{user.groups}}</td>
-			     <td>{{user.is_active}}</td>
-			     <td>{{user.last_login}}</td>
-			     <td>{{user.date_joined}}</td>
+	 			 <td>{{ listed_user }}</td>
+			     <td>{{ listed_user.first_name }}</td>
+			     <td>{{ listed_user.last_name }}</td>
+			     <td>{{ listed_user.email }}</td>
+			     <td>{{ listed_user.role }}</td>
+			     <td>{{ listed_user.is_active }}</td>
+			     <td>{{ listed_user.last_login }}</td>
+			     <td>{{ listed_user.date_joined }}</td>
 		    </tr>
 		    {% endfor %}
 		</tbody>

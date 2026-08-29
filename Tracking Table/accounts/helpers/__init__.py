@@ -1,0 +1,8 @@
+from .constants import (
+    USER_ROLE_ADMIN,
+    USER_ROLE_CHOICES,
+    USER_ROLE_EXTERNAL,
+    USER_ROLE_STORE,
+    USER_ROLE_WAREHOUSE,
+    USER_ROLES,
+)

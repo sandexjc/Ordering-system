@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-<title>TTable Create User</title>
+<title>TTable Създай потребител</title>
 {% endblock %}
 
 {% block links %}
@@ -13,13 +13,15 @@
 {% block content %}
 <div class="container-fluid shadow-lg create-user-page">
 	<h1 class="create-user-header">
-		Create User
+		Създай потребител
 	</h1>
 	<div class="create-user-form">
 		<form method="post">
 			{% csrf_token %}
-			{% bootstrap_form form %}
-			<input type="submit" class="btn btn-primary" value="Create">
+			{% bootstrap_form form required_css_class="field-required" %}
+			<div class="create-user-submit">
+				<input type="submit" class="btn btn-primary" value="Създай">
+			</div>
 		</form>
 	</div>
 </div>

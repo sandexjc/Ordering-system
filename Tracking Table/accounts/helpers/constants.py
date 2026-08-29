@@ -12,4 +12,9 @@ USER_ROLES = (
     USER_ROLE_EXTERNAL,
 )
 
-USER_ROLE_CHOICES = tuple((name, name) for name in USER_ROLES)
+USER_ROLE_CHOICES = (
+    (USER_ROLE_ADMIN, "Администратор"),
+    (USER_ROLE_STORE, "Магазин"),
+    (USER_ROLE_WAREHOUSE, "Склад"),
+    (USER_ROLE_EXTERNAL, "Външен потребител"),
+)

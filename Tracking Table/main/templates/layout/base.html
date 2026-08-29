@@ -21,6 +21,7 @@
 					<img src="{% static 'images/favico.png' %}" style="width: 30px; height: 30px; margin-bottom: 2px;">
 				</a>
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+					{% if is_app_admin %}
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 							<img src="{% static 'images/user-group.png' %}" style="width: 28px; height: 28px;">
@@ -32,6 +33,7 @@
 							<li><a class="dropdown-item" href="#">Delete User</a></li>
 						</ul>
 					</li>
+					{% endif %}
 				</ul>
 				<span class="navbar-text">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">

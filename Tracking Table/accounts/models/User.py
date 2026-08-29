@@ -1,7 +1,7 @@
 from django.contrib import auth
 from django.db import models
 
-from accounts.constants import USER_ROLE_CHOICES, USER_ROLE_STORE
+from accounts.helpers.constants import USER_ROLE_CHOICES, USER_ROLE_STORE
 
 
 class User(auth.models.User, auth.models.PermissionsMixin):
