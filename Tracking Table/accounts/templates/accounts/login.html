@@ -16,6 +16,13 @@
 				<h2 class="login-header">
 					Login
 				</h2>
+				{% if messages %}
+					{% for msg in messages %}
+						<div class="alert {% if msg.tags == 'error' %}alert-danger{% else %}alert-{{ msg.tags }}{% endif %}">
+							{{ msg }}
+						</div>
+					{% endfor %}
+				{% endif %}
 				<form method="post" class="login-form">
 					{% csrf_token %}
 					{% bootstrap_form form %}

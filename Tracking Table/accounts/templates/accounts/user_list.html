@@ -3,6 +3,7 @@
 
 <div class="container">
 	<h1>View Users</h1>
+	{% include "common/components/alert.html" %}
 </div>
 
 <div class="container">
@@ -19,6 +20,7 @@
 		      	<th scope="col">Active</th>
 		      	<th scope="col">Last login</th>
 		      	<th scope="col">Created</th>
+		      	<th scope="col"></th>
 		    </tr>
 		</thead>
 
@@ -33,6 +35,14 @@
 			     <td>{{ listed_user.is_active }}</td>
 			     <td>{{ listed_user.last_login }}</td>
 			     <td>{{ listed_user.date_joined }}</td>
+			     <td>
+			     	<form method="post" action="{% url 'accounts:send-set-password-email' listed_user.pk %}">
+			     		{% csrf_token %}
+			     		<button type="submit" class="btn btn-sm btn-outline-primary">
+			     			Изпрати връзка за парола
+			     		</button>
+			     	</form>
+			     </td>
 		    </tr>
 		    {% endfor %}
 		</tbody>

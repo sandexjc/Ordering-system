@@ -146,6 +146,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Email settings
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env_str("DJANGO_EMAIL_HOST", required=not DEBUG)
+EMAIL_PORT = env_int("DJANGO_EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env_str("DJANGO_EMAIL_HOST_USER", required=not DEBUG)
+EMAIL_HOST_PASSWORD = env_str("DJANGO_EMAIL_HOST_PASSWORD", required=not DEBUG)
+EMAIL_USE_SSL = env_bool("DJANGO_EMAIL_USE_SSL", default=False)
+EMAIL_USE_TLS = env_bool("DJANGO_EMAIL_USE_TLS", default=not EMAIL_USE_SSL)
+EMAIL_FROM_ADDRESS = env_str("DJANGO_EMAIL_FROM_ADDRESS", default="webmaster@localhost", required=not DEBUG)
+PASSWORD_RESET_TIMEOUT = 60 * 60
+
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Sofia'
