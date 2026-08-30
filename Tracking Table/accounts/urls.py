@@ -6,16 +6,18 @@ app_name = 'accounts'
 urlpatterns = [
     path('login/', views.Login.as_view(), name='login'),
     path('logout/', views.Logout.as_view(), name='logout'),
+    path('profile/', views.Profile.as_view(), name='profile'),
+    path('change-password/', views.ChangePassword.as_view(), name='change-password'),
     path('create-user/', views.CreateUser.as_view(), name='create-user'),
     path('view-users/', views.ViewUsers.as_view(), name='view-users'),
     path(
         'view-users/<int:pk>/send-set-password-email/',
-        views.SendSetPasswordEmail.as_view(),
+        views.AdminPasswordResetEmail.as_view(),
         name='send-set-password-email',
     ),
     path(
         'set-password/<uidb64>/<token>/',
-        views.SetPassword.as_view(),
+        views.SetNewPassword.as_view(),
         name='set-password',
     ),
 ]

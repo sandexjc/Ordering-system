@@ -1,0 +1,35 @@
+{% extends 'layout/base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title %}
+<title>TTable Профил</title>
+{% endblock %}
+
+{% block links %}
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid shadow-lg profile-page">
+	<h1 class="profile-header">
+		Профил
+	</h1>
+	<p class="profile-username">
+		Потребителско име: <strong>{{ user.username }}</strong>
+	</p>
+	<div class="profile-form">
+		<form method="post" action="{% url 'accounts:profile' %}">
+			{% csrf_token %}
+			{% bootstrap_form profile_form required_css_class="field-required" %}
+			<div class="profile-submit">
+				<input type="submit" class="btn btn-primary" value="Запази">
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{% static 'accounts/js/profile.js' %}"></script>
+{% endblock %}

@@ -6,6 +6,12 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from accounts.helpers.set_password_token_generator import SET_PASSWORD_TOKEN_GENERATOR
+from accounts.models.User import User as AccountsUser
+
+ACTIVATION_EMAIL_SUBJECT = "Активиране на потребителски акаунт"
+ACTIVATION_EMAIL_TEMPLATE = "accounts/email/set_password.txt"
+CHANGE_PASSWORD_EMAIL_SUBJECT = "Смяна на парола"
+CHANGE_PASSWORD_EMAIL_TEMPLATE = "accounts/email/change_password.txt"
 
 
 class SetPasswordEmailMessage(EmailMessage):
@@ -26,24 +32,37 @@ class SetPasswordEmailMessage(EmailMessage):
         return msg
 
 
-def send_set_password_email(request, user):
+def send_set_password_email(
+    request,
+    user,
+    *,
+    subject=ACTIVATION_EMAIL_SUBJECT,
+    email_template=ACTIVATION_EMAIL_TEMPLATE,
+):
     if not user.email:
         return False
 
-    user.password_reset_version += 1
-    user.save(update_fields=["password_reset_version"])
+    accounts_user = (
+        user
+        if isinstance(user, AccountsUser)
+        else AccountsUser.objects.filter(pk=user.pk).first()
+    )
+    token_user = accounts_user or user
+    if accounts_user is not None:
+        accounts_user.password_reset_version += 1
+        accounts_user.save(update_fields=["password_reset_version"])
+        token_user = accounts_user
 
-    uid = urlsafe_base64_encode(force_bytes(user.pk))
-    token = SET_PASSWORD_TOKEN_GENERATOR.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(token_user.pk))
+    token = SET_PASSWORD_TOKEN_GENERATOR.make_token(token_user)
     path = reverse(
         "accounts:set-password",
         kwargs={"uidb64": uid, "token": token},
     )
     set_password_url = request.build_absolute_uri(path)
-    display_name = user.first_name or user.username
-    subject = "Активиране на потребителски акаунт"
+    display_name = token_user.first_name or token_user.username
     body = render_to_string(
-        "accounts/email/set_password.txt",
+        email_template,
         {
             "display_name": display_name,
             "email_from_address": settings.EMAIL_FROM_ADDRESS,
@@ -55,7 +74,7 @@ def send_set_password_email(request, user):
         subject,
         body,
         settings.EMAIL_FROM_ADDRESS,
-        [user.email],
+        [token_user.email],
     )
     email.send(fail_silently=False)
     return True

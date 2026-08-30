@@ -6,15 +6,15 @@ from accounts.forms import UserSetPasswordForm
 from accounts.helpers.set_password_token_generator import SET_PASSWORD_TOKEN_GENERATOR
 
 
-class SetPassword(PasswordResetConfirmView):
+class SetNewPassword(PasswordResetConfirmView):
 
     """
 
     Hierarchy:
-    PasswordResetConfirmView -> SetPassword
+    PasswordResetConfirmView -> SetNewPassword
 
     Public page for the emailed one-time set-password link.
-    There is no self-serve request form; only an Admin can send the email.
+    There is no self-serve request form on login.
 
     """
 

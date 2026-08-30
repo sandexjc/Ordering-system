@@ -117,6 +117,14 @@ body
 	height: 40px;
 }
 
+.dropdown-logout-icon
+{
+	width: 1rem;
+	height: 1rem;
+	margin-left: 0.4rem;
+	vertical-align: -0.15em;
+}
+
 /* =============================================================================
    Expandable order rows (list view)
    ============================================================================= */

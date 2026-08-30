@@ -18,8 +18,9 @@
 				</h2>
 				{% if messages %}
 					{% for msg in messages %}
-						<div class="alert {% if msg.tags == 'error' %}alert-danger{% else %}alert-{{ msg.tags }}{% endif %}">
+						<div class="alert {% if msg.tags == 'error' %}alert-danger{% else %}alert-{{ msg.tags }}{% endif %} alert-dismissible fade show auto-dismiss-alert" role="alert">
 							{{ msg }}
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 						</div>
 					{% endfor %}
 				{% endif %}
@@ -37,6 +38,7 @@
 		<script type="text/javascript" src="{% static 'jquery/jquery-3.7.1.min.js' %}"></script>
 		<script type="text/javascript" src="{% static 'bootstrap/5.1.3/js/bootstrap.bundle.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/core/viewport.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/core/auto-dismiss-alerts.js' %}"></script>
 		<script type="text/javascript" src="{% static 'accounts/js/login-base.js' %}"></script>
 	</body>
 </html>

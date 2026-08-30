@@ -7,15 +7,15 @@ from accounts.mixins import AdminRequiredMixin
 from accounts.models import User
 
 
-class SendSetPasswordEmail(AdminRequiredMixin, View):
+class AdminPasswordResetEmail(AdminRequiredMixin, View):
 
     """
 
     Hierarchy:
-    AdminRequiredMixin -> SendSetPasswordEmail
-    View -> SendSetPasswordEmail
+    AdminRequiredMixin -> AdminPasswordResetEmail
+    View -> AdminPasswordResetEmail
 
-    Admin-only resend of the set-password email. POST only.
+    Admin-only send of the set-password email to another user. POST only.
 
     """
 
