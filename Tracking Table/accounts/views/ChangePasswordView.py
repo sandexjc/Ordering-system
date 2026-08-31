@@ -1,5 +1,5 @@
-from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
@@ -36,20 +36,11 @@ class ChangePassword(LoginRequiredMixin, TemplateView):
                 email_template=CHANGE_PASSWORD_EMAIL_TEMPLATE,
             )
         except Exception:
-            messages.error(
-                request,
-                "Имейлът за смяна на парола не беше изпратен.",
-            )
-            return redirect("accounts:change-password")
+            return self._respond(request, False)
 
-        if sent:
-            messages.success(
-                request,
-                "Изпратен е имейл за смяна на парола.",
-            )
-        else:
-            messages.error(
-                request,
-                "Профилът няма имейл адрес.",
-            )
+        return self._respond(request, sent)
+
+    def _respond(self, request, sent):
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"ok": bool(sent)})
         return redirect("accounts:change-password")

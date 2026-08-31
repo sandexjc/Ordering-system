@@ -1,0 +1,43 @@
+.user-list-page
+{
+    width: 90%;
+    min-width: 32rem;
+    margin-top: 3rem;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 1rem;
+}
+
+.user-list-header
+{
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+.user-list-table
+{
+    overflow-x: auto;
+}
+
+.user-list-table th:last-child,
+.user-list-table td:last-child
+{
+    width: 16rem;
+    min-width: 16rem;
+}
+
+.user-list-table td:last-child .send-password-email-form
+{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 0;
+}
+
+.user-list-table td:last-child .btn
+{
+    width: 80%;
+    min-width: 0;
+}

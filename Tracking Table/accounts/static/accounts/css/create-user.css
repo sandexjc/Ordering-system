@@ -17,7 +17,7 @@
 
 .create-user-form .field-required > label::after
 {
-    content: " •";
+    content: " *";
     color: #dc3545;
 }
 

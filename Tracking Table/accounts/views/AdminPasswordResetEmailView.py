@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 
@@ -26,12 +27,13 @@ class AdminPasswordResetEmail(AdminRequiredMixin, View):
         try:
             sent = send_set_password_email(request, user)
         except Exception:
-            messages.error(
-                request,
-                "Имейлът за задаване на парола не беше изпратен.",
-            )
-            return redirect("accounts:view-users")
+            return self._respond(request, False)
 
+        return self._respond(request, sent)
+
+    def _respond(self, request, sent):
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"ok": bool(sent)})
         if sent:
             messages.success(
                 request,
@@ -40,6 +42,6 @@ class AdminPasswordResetEmail(AdminRequiredMixin, View):
         else:
             messages.error(
                 request,
-                "Потребителят няма имейл адрес.",
+                "Имейлът за задаване на парола не беше изпратен.",
             )
         return redirect("accounts:view-users")

@@ -1,53 +1,63 @@
 {% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>TTable Преглед на потребители</title>
+{% endblock %}
+
+{% block links %}
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/user-list.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/send-password-email-button.css' %}">
+{% endblock %}
+
 {% block content %}
-
-<div class="container">
-	<h1>View Users</h1>
+<div class="container-fluid shadow-lg user-list-page">
+	<h1 class="user-list-header">
+		Преглед на потребители
+	</h1>
+	<div class="user-list-table">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Потребителско име</th>
+					<th scope="col">Име</th>
+					<th scope="col">Фамилия</th>
+					<th scope="col">Имейл</th>
+					<th scope="col">Група</th>
+					<th scope="col">Активен</th>
+					<th scope="col">Последен вход</th>
+					<th scope="col">Създаден</th>
+					<th scope="col"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for listed_user in user_list %}
+				<tr>
+					<td>{{ listed_user.username }}</td>
+					<td>{{ listed_user.first_name }}</td>
+					<td>{{ listed_user.last_name }}</td>
+					<td>{{ listed_user.email }}</td>
+					<td>{{ listed_user.get_role_display }}</td>
+					<td>{{ listed_user.is_active }}</td>
+					<td>{{ listed_user.last_login|date:"d/m/Y H:i"|default:"—" }}</td>
+					<td>{{ listed_user.date_joined|date:"d/m/Y H:i" }}</td>
+					<td>
+						<form method="post" action="{% url 'accounts:send-set-password-email' listed_user.pk %}" class="send-password-email-form">
+							{% csrf_token %}
+							<button type="submit" class="btn btn-sm btn-primary">
+								Изпрати имейл за парола
+							</button>
+						</form>
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 </div>
+{% endblock %}
 
-<div class="container">
-
-	<table class="table table-hover">
-
-		<thead>
-		    <tr>
-		    	<th scope="col">Display Name</th>
-		      	<th scope="col">First Name</th>
-		      	<th scope="col">Last Name</th>
-		      	<th scope="col">Email</th>
-		      	<th scope="col">Role</th>
-		      	<th scope="col">Active</th>
-		      	<th scope="col">Last login</th>
-		      	<th scope="col">Created</th>
-		      	<th scope="col"></th>
-		    </tr>
-		</thead>
-
-		<tbody>
-			{% for listed_user in user_list %}
-	 		<tr>
-	 			 <td>{{ listed_user }}</td>
-			     <td>{{ listed_user.first_name }}</td>
-			     <td>{{ listed_user.last_name }}</td>
-			     <td>{{ listed_user.email }}</td>
-			     <td>{{ listed_user.role }}</td>
-			     <td>{{ listed_user.is_active }}</td>
-			     <td>{{ listed_user.last_login }}</td>
-			     <td>{{ listed_user.date_joined }}</td>
-			     <td>
-			     	<form method="post" action="{% url 'accounts:send-set-password-email' listed_user.pk %}">
-			     		{% csrf_token %}
-			     		<button type="submit" class="btn btn-sm btn-outline-primary">
-			     			Изпрати връзка за парола
-			     		</button>
-			     	</form>
-			     </td>
-		    </tr>
-		    {% endfor %}
-		</tbody>
-
-	</table>
-	
-</div>
-
+{% block scripts %}
+<script type="text/javascript" src="{% static 'accounts/js/send-password-email-button.js' %}"></script>
+<script type="text/javascript" src="{% static 'accounts/js/user-list.js' %}"></script>
 {% endblock %}
