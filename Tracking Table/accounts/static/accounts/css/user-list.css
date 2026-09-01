@@ -21,25 +21,34 @@
     overflow-x: auto;
 }
 
-.user-list-action-cell
+.user-list-table .table th
 {
-    width: 16rem;
-    min-width: 16rem;
+    vertical-align: bottom;
+    white-space: nowrap;
 }
 
-.user-list-action-cell .send-password-email-form,
+.user-list-action-cell
+{
+    width: 1%;
+    min-width: 12rem;
+    max-width: 15rem;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
 .user-list-action-cell .btn
 {
     display: flex;
     justify-content: center;
+    align-items: center;
+    min-width: 12rem;
+    max-width: 15rem;
     width: 100%;
-    margin: 0;
+    gap: 0.5rem;
+    transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease, opacity 0.2s ease;
 }
 
-.user-list-action-cell .btn
+.user-list-action-cell .btn.is-switching
 {
-    width: 80%;
-    min-width: 0;
-    margin-left: auto;
-    margin-right: auto;
+    opacity: 0.55;
 }

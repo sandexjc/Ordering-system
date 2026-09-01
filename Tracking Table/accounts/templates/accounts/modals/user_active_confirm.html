@@ -1,0 +1,35 @@
+<div class="modal fade" id="user-active-confirm-{{ listed_user.pk }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+	<div class="modal-dialog modal-sm fixed-min-width">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Потвърждение</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form method="post" action="{% url 'accounts:set-user-active' listed_user.pk %}" class="user-active-form" data-status-button="user-active-status-{{ listed_user.pk }}" data-username="{{ listed_user.username }}">
+				{% csrf_token %}
+				{% if listed_user.is_active %}
+				<input type="hidden" name="activate" value="0">
+				{% else %}
+				<input type="hidden" name="activate" value="1">
+				{% endif %}
+				<div class="modal-body" style="text-align: center;">
+					<h5 class="user-active-confirm-text">
+						{% if listed_user.is_active %}
+						Сигурни ли сте, че искате да деактивирате този потребител: <strong>{{ listed_user.username }}</strong>?
+						{% else %}
+						Сигурни ли сте, че искате да активирате този потребител: <strong>{{ listed_user.username }}</strong>?
+						{% endif %}
+					</h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
+					{% if listed_user.is_active %}
+					<button type="submit" class="btn btn-danger">Деактивирай</button>
+					{% else %}
+					<button type="submit" class="btn btn-primary">Активирай</button>
+					{% endif %}
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

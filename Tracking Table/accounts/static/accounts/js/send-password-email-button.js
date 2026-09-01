@@ -9,10 +9,18 @@ function bind_send_password_email_form(form)
 {
     form.addEventListener("submit", function (event) {
         event.preventDefault();
-        const button = form.querySelector("button[type=submit]");
+        const status_button_id = form.getAttribute("data-status-button");
+        const button = (status_button_id && document.getElementById(status_button_id))
+            || form.querySelector("button[type=submit]");
         if (!button || button.disabled)
         {
             return;
+        }
+        const modal = form.closest(".modal");
+        if (modal && window.bootstrap && bootstrap.Modal)
+        {
+            const modal_instance = bootstrap.Modal.getInstance(modal) || bootstrap.Modal.getOrCreateInstance(modal);
+            modal_instance.hide();
         }
         const original_html = button.getAttribute("data-original-html") || button.innerHTML;
         button.setAttribute("data-original-html", original_html);
