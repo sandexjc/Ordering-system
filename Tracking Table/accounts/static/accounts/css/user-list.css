@@ -21,6 +21,38 @@
     overflow-x: auto;
 }
 
+.user-list-table.is-email-collapsed .user-list-email-col
+{
+    width: 8rem;
+    max-width: 8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-list-email-toggle
+{
+    border: 0;
+    background: none;
+    padding: 0;
+    font: inherit;
+    font-weight: inherit;
+    color: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.user-list-email-toggle::after
+{
+    content: " ▸";
+    font-weight: normal;
+}
+
+.user-list-table:not(.is-email-collapsed) .user-list-email-toggle::after
+{
+    content: " ▾";
+}
+
 .user-list-table .table th
 {
     vertical-align: bottom;
@@ -49,6 +81,50 @@
 }
 
 .user-list-action-cell .btn.is-switching
+{
+    opacity: 0.55;
+}
+
+.user-list-role-cell
+{
+    width: 9.6rem;
+    min-width: 9.6rem;
+    max-width: 9.6rem;
+    vertical-align: middle;
+}
+
+.user-role-status
+{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    max-width: 9.6rem;
+}
+
+.user-role-status .user-role-select
+{
+    width: 9.6rem;
+    min-width: 9.6rem;
+    max-width: 9.6rem;
+    box-sizing: border-box;
+}
+
+.user-role-feedback
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    max-width: 9.6rem;
+    min-height: 2rem;
+    width: 100%;
+    gap: 0.5rem;
+    transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease, opacity 0.2s ease;
+}
+
+.user-role-feedback.is-switching
 {
     opacity: 0.55;
 }

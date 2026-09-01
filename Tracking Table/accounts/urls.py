@@ -16,6 +16,11 @@ urlpatterns = [
         name='set-user-active',
     ),
     path(
+        'view-users/<int:pk>/set-role/',
+        views.SetUserRole.as_view(),
+        name='set-user-role',
+    ),
+    path(
         'view-users/<int:pk>/send-set-password-email/',
         views.AdminPasswordResetEmail.as_view(),
         name='send-set-password-email',

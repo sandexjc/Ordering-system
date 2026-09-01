@@ -12,6 +12,27 @@ set_viewport_scale(viewport_width, MIN_VIEWPORT_WIDTH);
 
 document.querySelectorAll(".send-password-email-form").forEach(bind_send_password_email_form);
 document.querySelectorAll(".user-active-form").forEach(bind_user_active_form);
+bind_user_role_change();
+bind_user_list_email_column();
+
+/**
+ * Collapse / expand the email column from the header control.
+ *
+ * @returns {void}
+ */
+function bind_user_list_email_column()
+{
+    const table = document.querySelector(".user-list-table");
+    const toggle = document.querySelector(".user-list-email-toggle");
+    if (!table || !toggle)
+    {
+        return;
+    }
+    toggle.addEventListener("click", function () {
+        const collapsed = table.classList.toggle("is-email-collapsed");
+        toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    });
+}
 
 /**
  * Confirm activate / deactivate over AJAX.
@@ -156,4 +177,188 @@ function restore_user_active_button(button)
     button.classList.remove("btn-success", "btn-danger", "btn-primary");
     button.classList.add(button.getAttribute("data-restore-kind") === "danger" ? "btn-danger" : "btn-primary");
     button.innerHTML = button.getAttribute("data-restore-html") || "";
+}
+
+/**
+ * Role dropdown: confirm modal, then AJAX with spinner on the cell.
+ *
+ * @returns {void}
+ */
+function bind_user_role_change()
+{
+    const table = document.querySelector(".user-list-table");
+    const modal = document.getElementById("user-role-confirm-modal");
+    const form = document.getElementById("user-role-confirm-form");
+    if (!table || !modal || !form)
+    {
+        return;
+    }
+
+    let pending_select = null;
+    let submit_started = false;
+
+    table.addEventListener("change", function (event) {
+        const select = event.target.closest(".user-role-select");
+        if (!select || select.disabled)
+        {
+            return;
+        }
+        if (select.value === select.getAttribute("data-current-role"))
+        {
+            return;
+        }
+        pending_select = select;
+        submit_started = false;
+        form.action = select.getAttribute("data-url");
+        document.getElementById("user-role-confirm-role").value = select.value;
+        const confirm_text = form.querySelector(".user-role-confirm-text");
+        const username = select.getAttribute("data-username") || "";
+        const role_label = select.options[select.selectedIndex]
+            ? select.options[select.selectedIndex].text
+            : select.value;
+        confirm_text.replaceChildren(
+            document.createTextNode("Сигурни ли сте, че искате да промените групата на потребител "),
+            Object.assign(document.createElement("strong"), { textContent: username }),
+            document.createTextNode(" на "),
+            Object.assign(document.createElement("strong"), { textContent: role_label }),
+            document.createTextNode("?")
+        );
+        if (window.bootstrap && bootstrap.Modal)
+        {
+            bootstrap.Modal.getOrCreateInstance(modal).show();
+        }
+    });
+
+    modal.addEventListener("hidden.bs.modal", function () {
+        if (!submit_started && pending_select)
+        {
+            pending_select.value = pending_select.getAttribute("data-current-role");
+        }
+    });
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!pending_select)
+        {
+            return;
+        }
+        submit_started = true;
+        if (window.bootstrap && bootstrap.Modal)
+        {
+            const modal_instance = bootstrap.Modal.getInstance(modal) || bootstrap.Modal.getOrCreateInstance(modal);
+            modal_instance.hide();
+        }
+        const wrapper = pending_select.closest(".user-role-status");
+        const select = pending_select;
+        const new_role = form.querySelector("[name=role]").value;
+        set_user_role_busy(wrapper, select);
+        const csrf = form.querySelector("[name=csrfmiddlewaretoken]");
+        fetch(form.action, {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRFToken": csrf ? csrf.value : "",
+            },
+            body: new FormData(form),
+        })
+            .then(function (response) {
+                if (!response.ok)
+                {
+                    throw new Error("set-role failed");
+                }
+                return response.json();
+            })
+            .then(function (data) {
+                if (!data || !data.ok)
+                {
+                    throw new Error("set-role rejected");
+                }
+                set_user_role_result(wrapper, select, true, data.role || new_role);
+            })
+            .catch(function () {
+                set_user_role_result(wrapper, select, false, null);
+            });
+    });
+}
+
+/**
+ * @param {HTMLElement} wrapper
+ * @param {HTMLSelectElement} select
+ * @returns {void}
+ */
+function set_user_role_busy(wrapper, select)
+{
+    select.hidden = true;
+    select.disabled = true;
+    let feedback = wrapper.querySelector(".user-role-feedback");
+    if (!feedback)
+    {
+        feedback = document.createElement("span");
+        feedback.className = "user-role-feedback btn btn-sm btn-primary";
+        wrapper.appendChild(feedback);
+    }
+    feedback.hidden = false;
+    switch_send_password_email_state(feedback, function () {
+        feedback.classList.remove("btn-success", "btn-danger");
+        feedback.classList.add("btn-primary");
+        feedback.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    });
+}
+
+/**
+ * @param {HTMLElement} wrapper
+ * @param {HTMLSelectElement} select
+ * @param {boolean} ok
+ * @param {string|null} role
+ * @returns {void}
+ */
+function set_user_role_result(wrapper, select, ok, role)
+{
+    const feedback = wrapper.querySelector(".user-role-feedback");
+    if (!feedback)
+    {
+        restore_user_role_select(wrapper, select, ok, role);
+        return;
+    }
+    switch_send_password_email_state(feedback, function () {
+        feedback.classList.remove("btn-primary", "btn-success", "btn-danger");
+        feedback.classList.add(ok ? "btn-success" : "btn-danger");
+        feedback.innerHTML = ok ? SEND_PASSWORD_EMAIL_CHECK_ICON : SEND_PASSWORD_EMAIL_CROSS_ICON;
+    });
+    window.setTimeout(function () {
+        switch_send_password_email_state(feedback, function () {
+            restore_user_role_select(wrapper, select, ok, role);
+        });
+    }, ok ? 7000 : 5000);
+}
+
+/**
+ * @param {HTMLElement} wrapper
+ * @param {HTMLSelectElement} select
+ * @param {boolean} ok
+ * @param {string|null} role
+ * @returns {void}
+ */
+function restore_user_role_select(wrapper, select, ok, role)
+{
+    const feedback = wrapper.querySelector(".user-role-feedback");
+    if (feedback)
+    {
+        feedback.hidden = true;
+        feedback.innerHTML = "";
+        feedback.classList.remove("btn-success", "btn-danger");
+        feedback.classList.add("btn-primary");
+    }
+    if (ok && role)
+    {
+        select.setAttribute("data-current-role", role);
+        select.value = role;
+    }
+    else
+    {
+        select.value = select.getAttribute("data-current-role");
+    }
+    select.hidden = false;
+    select.disabled = false;
 }

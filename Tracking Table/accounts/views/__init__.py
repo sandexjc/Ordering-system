@@ -6,4 +6,5 @@ from .LogoutView import Logout
 from .ProfileView import Profile
 from .SetNewPasswordView import SetNewPassword
 from .SetUserActiveView import SetUserActive
+from .SetUserRoleView import SetUserRole
 from .ViewUsersView import ViewUsers
