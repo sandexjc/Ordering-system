@@ -21,14 +21,14 @@
     overflow-x: auto;
 }
 
-.user-list-table th:last-child,
-.user-list-table td:last-child
+.user-list-action-cell
 {
     width: 16rem;
     min-width: 16rem;
 }
 
-.user-list-table td:last-child .send-password-email-form
+.user-list-action-cell .send-password-email-form,
+.user-list-action-cell .btn
 {
     display: flex;
     justify-content: center;
@@ -36,8 +36,10 @@
     margin: 0;
 }
 
-.user-list-table td:last-child .btn
+.user-list-action-cell .btn
 {
     width: 80%;
     min-width: 0;
+    margin-left: auto;
+    margin-right: auto;
 }

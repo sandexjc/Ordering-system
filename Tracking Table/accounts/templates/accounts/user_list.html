@@ -28,6 +28,7 @@
 					<th scope="col">Последен вход</th>
 					<th scope="col">Създаден</th>
 					<th scope="col"></th>
+					<th scope="col"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -38,10 +39,10 @@
 					<td>{{ listed_user.last_name }}</td>
 					<td>{{ listed_user.email }}</td>
 					<td>{{ listed_user.get_role_display }}</td>
-					<td>{{ listed_user.is_active }}</td>
+					<td>{% if listed_user.is_active %}Да{% else %}Не{% endif %}</td>
 					<td>{{ listed_user.last_login|date:"d/m/Y H:i"|default:"—" }}</td>
 					<td>{{ listed_user.date_joined|date:"d/m/Y H:i" }}</td>
-					<td>
+					<td class="user-list-action-cell">
 						<form method="post" action="{% url 'accounts:send-set-password-email' listed_user.pk %}" class="send-password-email-form">
 							{% csrf_token %}
 							<button type="submit" class="btn btn-sm btn-primary">
@@ -49,12 +50,87 @@
 							</button>
 						</form>
 					</td>
+					<td class="user-list-action-cell">
+						{% if listed_user.is_active %}
+							{% if listed_user.deactivate_block %}
+							<button type="button" class="btn btn-sm btn-danger" disabled title="{{ listed_user.deactivate_block }}">
+								Деактивирай
+							</button>
+							{% else %}
+							<button type="button" class="btn btn-sm btn-danger"
+								data-bs-toggle="modal"
+								data-bs-target="#user-active-confirm-{{ listed_user.pk }}">
+								Деактивирай
+							</button>
+							{% endif %}
+						{% else %}
+							<button type="button" class="btn btn-sm btn-primary"
+								data-bs-toggle="modal"
+								data-bs-target="#user-active-confirm-{{ listed_user.pk }}">
+								Активирай
+							</button>
+						{% endif %}
+					</td>
 				</tr>
 				{% endfor %}
 			</tbody>
 		</table>
 	</div>
 </div>
+
+{% for listed_user in user_list %}
+	{% if listed_user.is_active %}
+		{% if not listed_user.deactivate_block %}
+<div class="modal fade" id="user-active-confirm-{{ listed_user.pk }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+	<div class="modal-dialog modal-sm fixed-min-width">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Потвърждение</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form method="post" action="{% url 'accounts:set-user-active' listed_user.pk %}">
+				{% csrf_token %}
+				<input type="hidden" name="activate" value="0">
+				<div class="modal-body" style="text-align: center;">
+					<h5>
+						Сигурни ли сте, че искате да деактивирате този потребител: <strong>{{ listed_user.username }}</strong>?
+					</h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
+					<button type="submit" class="btn btn-danger">Деактивирай</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+		{% endif %}
+	{% else %}
+<div class="modal fade" id="user-active-confirm-{{ listed_user.pk }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+	<div class="modal-dialog modal-sm fixed-min-width">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Потвърждение</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form method="post" action="{% url 'accounts:set-user-active' listed_user.pk %}">
+				{% csrf_token %}
+				<input type="hidden" name="activate" value="1">
+				<div class="modal-body" style="text-align: center;">
+					<h5>
+						Сигурни ли сте, че искате да активирате този потребител: <strong>{{ listed_user.username }}</strong>?
+					</h5>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
+					<button type="submit" class="btn btn-primary">Активирай</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+	{% endif %}
+{% endfor %}
 {% endblock %}
 
 {% block scripts %}

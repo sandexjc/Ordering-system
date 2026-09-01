@@ -5,4 +5,5 @@ from .LoginView import Login
 from .LogoutView import Logout
 from .ProfileView import Profile
 from .SetNewPasswordView import SetNewPassword
+from .SetUserActiveView import SetUserActive
 from .ViewUsersView import ViewUsers

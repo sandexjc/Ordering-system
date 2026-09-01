@@ -11,6 +11,11 @@ urlpatterns = [
     path('create-user/', views.CreateUser.as_view(), name='create-user'),
     path('view-users/', views.ViewUsers.as_view(), name='view-users'),
     path(
+        'view-users/<int:pk>/set-active/',
+        views.SetUserActive.as_view(),
+        name='set-user-active',
+    ),
+    path(
         'view-users/<int:pk>/send-set-password-email/',
         views.AdminPasswordResetEmail.as_view(),
         name='send-set-password-email',

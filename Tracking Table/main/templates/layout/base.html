@@ -30,7 +30,7 @@
 							<li><a class="dropdown-item" href="{% url 'accounts:view-users' %}">Преглед на потребители</a></li>
 							<li><hr class="dropdown-divider"></li>
 							<li><a class="dropdown-item" href="{% url 'accounts:create-user' %}">Създай потребител</a></li>
-							<li><a class="dropdown-item" href="#">Изтрий потребител</a></li>
+							<li><a class="dropdown-item" href="{% url 'accounts:view-users' %}">Изтрий потребител</a></li>
 						</ul>
 					</li>
 					{% endif %}
