@@ -12,6 +12,12 @@ class LoginForm(AuthenticationForm):
 
     """
 
+    error_messages = {
+        **AuthenticationForm.error_messages,
+        "invalid_login": "Грешно потребителско име или парола.",
+        "inactive": "Този акаунт е неактивен.",
+    }
+
     class Meta:
 
         fields = ("username", "password")
@@ -20,7 +26,7 @@ class LoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
-        self.fields["username"].label = "Username"
-        self.fields["password"].label = "Password"
-        self.fields["username"].widget.attrs["placeholder"] = "Type your username"
-        self.fields["password"].widget.attrs["placeholder"] = "Type your password"
+        self.fields["username"].label = "Потребителско име"
+        self.fields["password"].label = "Парола"
+        self.fields["username"].error_messages["required"] = "Това поле е задължително."
+        self.fields["password"].error_messages["required"] = "Това поле е задължително."

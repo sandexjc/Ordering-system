@@ -48,6 +48,33 @@ body
 	padding-bottom: 3rem;
 }
 
+.login-form-errors
+{
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+.login-form .form-control.is-valid,
+.login-form .form-control.is-invalid
+{
+	background-image: none;
+	border-color: #ced4da;
+	padding-right: 0.75rem;
+}
+
+.login-form .form-control.is-valid:focus,
+.login-form .form-control.is-invalid:focus
+{
+	border-color: #86b7fe;
+	box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.login-form .valid-feedback,
+.login-form .invalid-feedback
+{
+	display: none;
+}
+
 .login-button-div
 {
 	display: flex;

@@ -157,6 +157,15 @@ EMAIL_USE_TLS = env_bool("DJANGO_EMAIL_USE_TLS", default=not EMAIL_USE_SSL)
 EMAIL_FROM_ADDRESS = env_str("DJANGO_EMAIL_FROM_ADDRESS", default="webmaster@localhost", required=not DEBUG)
 PASSWORD_RESET_TIMEOUT = 60 * 60
 
+# Auth URLs (named routes). LoginRequiredMixin uses LOGIN_URL.
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "accounts:login"
+
+# Failed logins per client IP (Django cache). Window is seconds.
+LOGIN_RATE_LIMIT_ATTEMPTS = env_int("DJANGO_LOGIN_RATE_LIMIT_ATTEMPTS", default=5)
+LOGIN_RATE_LIMIT_WINDOW = env_int("DJANGO_LOGIN_RATE_LIMIT_WINDOW", default=900)
+
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Sofia'
@@ -165,4 +174,3 @@ USE_TZ = True
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGOUT_REDIRECT_URL = 'accounts/login/'

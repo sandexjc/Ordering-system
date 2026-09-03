@@ -11,5 +11,3 @@ class Logout(LoginRequiredMixin, DjangoLogoutView):
     LogoutView -> Logout
 
     """
-
-    next_page = "home"
