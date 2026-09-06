@@ -9,6 +9,8 @@ from main.views import (
     DynamicView,
     DynamicTableOrdersData,
     DynamicVitrineOrdersData,
+    OfflinePage,
+    ServiceWorker,
     TableOrders,
     VitrineOrders,
 )
@@ -22,6 +24,8 @@ def home_redirect(request):
 urlpatterns = [
     # Site resources
     path("", home_redirect, name="home"),
+    path("offline/", OfflinePage.as_view(), name="offline"),
+    path("sw.js", ServiceWorker.as_view(), name="service-worker"),
     path("admin/", admin.site.urls),
     path("table/", TableOrders.as_view(), name="table"),
     path("vitrine/", VitrineOrders.as_view(), name="vitrine"),

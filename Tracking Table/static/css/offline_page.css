@@ -1,0 +1,185 @@
+/*
+ * offline_page.css
+ * ----------------
+ * Offline fallback page layout and icon animation.
+ *
+ * Loaded from:
+ *   - main/templates/components/offline.html
+ */
+
+html,
+body
+{
+	height: 100%;
+	width: 100%;
+	margin: 0;
+}
+
+body
+{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+	background-image: url("/static/images/city-background.png");
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: 100% 100%;
+	background-color: rgba(255, 255, 255, 0.7);
+	background-blend-mode: lighten;
+	color: #212529;
+}
+
+.offline-card
+{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	max-width: 22rem;
+	margin: 1.5rem;
+	padding: 2.5rem 2rem;
+	background-color: white;
+	border-radius: 1rem;
+	box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.12);
+	text-align: center;
+}
+
+.offline-icon
+{
+	position: relative;
+	width: 2.5rem;
+	height: 2.5rem;
+	margin-bottom: 1.25rem;
+}
+
+.offline-arc
+{
+	position: absolute;
+	border: 2px solid #6c757d;
+	border-radius: 50%;
+	border-bottom-color: transparent;
+	border-left-color: transparent;
+	transform: rotate(-45deg);
+	animation: offline-pulse 1.8s ease-in-out infinite;
+}
+
+.offline-arc--lg
+{
+	inset: 0;
+}
+
+.offline-arc--md
+{
+	inset: 0.4rem;
+	animation-delay: 0.15s;
+}
+
+.offline-arc--sm
+{
+	inset: 0.8rem;
+	animation-delay: 0.3s;
+}
+
+.offline-dot
+{
+	position: absolute;
+	left: 50%;
+	bottom: 0.05rem;
+	width: 0.38rem;
+	height: 0.38rem;
+	margin-left: -0.19rem;
+	background-color: #6c757d;
+	border-radius: 50%;
+	animation: offline-pulse 1.8s ease-in-out infinite;
+	animation-delay: 0.45s;
+}
+
+@keyframes offline-pulse
+{
+	0%,
+	100%
+	{
+		opacity: 0.35;
+	}
+	50%
+	{
+		opacity: 1;
+	}
+}
+
+.offline-title
+{
+	margin: 0 0 0.75rem;
+	font-size: 1.25rem;
+	font-weight: 700;
+}
+
+.offline-message
+{
+	margin: 0 0 1.5rem;
+	font-size: 0.95rem;
+	line-height: 1.45;
+	color: #495057;
+}
+
+.offline-refresh
+{
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 10rem;
+	min-height: 2.375rem;
+	padding: 0.5rem 1rem;
+	border: 0;
+	border-radius: 0.375rem;
+	background-color: #0d6efd;
+	color: white;
+	font-size: 1rem;
+	cursor: pointer;
+}
+
+.offline-refresh:hover
+{
+	background-color: #0b5ed7;
+}
+
+.offline-refresh:focus-visible
+{
+	outline: 0;
+	box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.offline-refresh:disabled
+{
+	cursor: wait;
+	opacity: 0.9;
+}
+
+.offline-refresh-spinner
+{
+	display: none;
+	width: 1rem;
+	height: 1rem;
+	border: 0.15em solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: offline-refresh-spin 0.75s linear infinite;
+}
+
+.offline-refresh.is-pending .offline-refresh-label
+{
+	display: none;
+}
+
+.offline-refresh.is-pending .offline-refresh-spinner
+{
+	display: inline-block;
+}
+
+@keyframes offline-refresh-spin
+{
+	to
+	{
+		transform: rotate(360deg);
+	}
+}

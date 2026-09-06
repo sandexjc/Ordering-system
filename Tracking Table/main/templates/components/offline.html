@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="bg">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>TTable</title>
+		<link rel="icon" type="image/x-icon" href="{% static 'images/favico.png' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'css/offline_page.css' %}">
+	</head>
+	<body>
+		<div class="offline-card">
+			<div class="offline-icon" aria-hidden="true">
+				<span class="offline-arc offline-arc--lg"></span>
+				<span class="offline-arc offline-arc--md"></span>
+				<span class="offline-arc offline-arc--sm"></span>
+				<span class="offline-dot"></span>
+			</div>
+			<h1 class="offline-title">Няма връзка със сървъра</h1>
+			<p class="offline-message">Сървърът не може да бъде достигнат в момента.</p>
+			<button type="button" class="offline-refresh" id="offline-refresh">
+				<span class="offline-refresh-label">Опитай отново</span>
+				<span class="offline-refresh-spinner" role="status" aria-hidden="true"></span>
+			</button>
+		</div>
+		<script type="text/javascript" src="{% static 'js/offline/offline.js' %}"></script>
+	</body>
+</html>
