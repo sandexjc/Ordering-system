@@ -4,7 +4,8 @@
  * Site-root service worker. Network-first for page navigations; on network
  * failure, serve the cached offline page. Does not intercept AJAX/fetch.
  * Stylesheets, scripts, and images that were precached with the offline page
- * are served from cache when the network fails.
+ * are served from cache when the network fails. Requests to /sw.js are
+ * excluded so the browser can run its own worker update checks.
  *
  * Served from:
  *   - /sw.js  (main.views.offline.ServiceWorker)
@@ -14,8 +15,8 @@
  *   - city-background.png
  *
  * The offline snapshot is stored once when the worker installs (first
- * successful visit, or when /sw.js itself changes). Static file hashing
- * busts CSS/JS URLs; CACHE_NAME is only the Cache Storage bucket.
+ * successful visit, or when a new /sw.js version installs). Static file
+ * hashing busts CSS/JS URLs; CACHE_NAME is only the Cache Storage bucket.
  */
 
 const CACHE_NAME = "ttable-offline";
@@ -136,6 +137,10 @@ self.addEventListener("fetch", function (event) {
     if (event.request.method !== "GET") {
         return;
     }
+    const path = new URL(event.request.url).pathname;
+    if (path === "/sw.js") {
+        return;
+    }
     if (event.request.mode === "navigate") {
         event.respondWith(
             fetch(event.request).catch(function () {
@@ -154,9 +159,12 @@ self.addEventListener("fetch", function (event) {
         return;
     }
     event.respondWith(
-        fetch(event.request).catch(function () {
-            return caches.match(event.request).then(function (cached) {
-                return cached || Promise.reject();
+        caches.match(event.request).then(function (cached) {
+            if (!cached) {
+                return fetch(event.request);
+            }
+            return fetch(event.request).catch(function () {
+                return cached;
             });
         })
     );
