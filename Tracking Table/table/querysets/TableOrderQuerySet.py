@@ -1,5 +1,3 @@
-from django.db.models import Q
-
 from common.db import unicode_contains
 from common.querysets import BaseOrderQuerySet
 
@@ -33,9 +31,8 @@ class TableOrderQuerySet(BaseOrderQuerySet):
         return self.filter(
             unicode_contains("owner", term)
             | unicode_contains("telephone", term)
-            | Q(unicode_contains("plates__material", term), plates__deleted_at__isnull=True)
-            | Q(unicode_contains("edges__edge_type", term), edges__deleted_at__isnull=True)
-            | Q(unicode_contains("edges__color_code", term), edges__deleted_at__isnull=True)
-            | Q(unicode_contains("notes__content", term), notes__deleted_at__isnull=True)
-            | Q(unicode_contains("others__description", term), others__deleted_at__isnull=True)
-        ).distinct()
+            | self.related_text_exists("plates", term, "material")
+            | self.related_text_exists("edges", term, "edge_type", "color_code")
+            | self.related_text_exists("notes", term, "content")
+            | self.related_text_exists("others", term, "description")
+        )

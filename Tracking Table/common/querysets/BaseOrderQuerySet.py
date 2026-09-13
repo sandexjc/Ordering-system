@@ -1,3 +1,4 @@
+from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 
 from common.db import unicode_contains
@@ -31,6 +32,26 @@ class BaseOrderQuerySet(BaseQuerySet):
     # Client name based orers filtering
     def owner_contains(self, name):
         return self.filter(unicode_contains("owner", name))
+
+    def related_text_exists(self, related_name, term, *field_names):
+        """Match related rows with EXISTS instead of JOIN.
+
+        OR-search across several item tables must not JOIN them all at once;
+        that multiplies rows (orders × plates × edges × notes) and makes
+        UNICODE_LOWER scans unusable on large SQLite databases.
+        """
+        if not field_names:
+            raise ValueError("related_text_exists requires at least one field name.")
+        rel = self.model._meta.get_field(related_name)
+        match = Q()
+        for name in field_names:
+            match |= unicode_contains(name, term)
+        return Exists(
+            rel.related_model.objects.filter(
+                **{rel.field.name: OuterRef("pk")},
+                deleted_at__isnull=True,
+            ).filter(match)
+        )
 
     # Filter by one or more order types (order/offer). Empty → no rows.
     def of_types(self, *order_types):
