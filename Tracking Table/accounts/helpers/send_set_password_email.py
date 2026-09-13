@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import force_bytes
@@ -14,12 +14,12 @@ CHANGE_PASSWORD_EMAIL_SUBJECT = "Смяна на парола"
 CHANGE_PASSWORD_EMAIL_TEMPLATE = "accounts/email/change_password.txt"
 
 
-class SetPasswordEmailMessage(EmailMessage):
+class SetPasswordEmailMessage(EmailMultiAlternatives):
 
     """
 
     Hierarchy:
-    EmailMessage -> SetPasswordEmailMessage
+    EmailMultiAlternatives -> SetPasswordEmailMessage
 
     Django adds Message-ID automatically. That header is only for mail
     clients/servers; the set-password token does not use it.
@@ -61,20 +61,21 @@ def send_set_password_email(
     )
     set_password_url = request.build_absolute_uri(path)
     display_name = token_user.first_name or token_user.username
-    body = render_to_string(
-        email_template,
-        {
-            "display_name": display_name,
-            "email_from_address": settings.EMAIL_FROM_ADDRESS,
-            "set_password_url": set_password_url,
-            "link_valid_minutes": settings.PASSWORD_RESET_TIMEOUT // 60,
-        },
-    )
+    context = {
+        "display_name": display_name,
+        "username": token_user.username,
+        "email_from_address": settings.EMAIL_FROM_ADDRESS,
+        "set_password_url": set_password_url,
+        "link_valid_minutes": settings.PASSWORD_RESET_TIMEOUT // 60,
+    }
+    body = render_to_string(email_template, context)
+    html_body = render_to_string(email_template.replace(".txt", ".html"), context)
     email = SetPasswordEmailMessage(
         subject,
         body,
         settings.EMAIL_FROM_ADDRESS,
         [token_user.email],
     )
+    email.attach_alternative(html_body, "text/html")
     email.send(fail_silently=False)
     return True
