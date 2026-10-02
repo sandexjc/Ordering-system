@@ -493,6 +493,56 @@ mark.search-highlight
 	z-index: 1090;
 }
 
+#order-form-modal .modal-content
+{
+	position: relative;
+}
+
+#order-form-modal .order-form-unsaved
+{
+	position: absolute;
+	inset: 0;
+	z-index: 5;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: opacity 180ms ease, visibility 180ms ease;
+}
+
+#order-form-modal .order-form-unsaved.is-open
+{
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+}
+
+#order-form-modal .order-form-unsaved-backdrop
+{
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.3);
+}
+
+#order-form-modal .order-form-unsaved-dialog
+{
+	position: relative;
+	width: min(28rem, 100%);
+	z-index: 1;
+	opacity: 0;
+	transform: translateY(0.35rem);
+	transition: opacity 180ms ease, transform 180ms ease;
+}
+
+#order-form-modal .order-form-unsaved.is-open .order-form-unsaved-dialog
+{
+	opacity: 1;
+	transform: none;
+}
+
 #order-form-modal tr.is-dirty > td
 {
 	background-color: #fff8e5;

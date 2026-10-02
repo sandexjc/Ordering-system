@@ -45,6 +45,7 @@ On the dynamic board, table and vitrine orders are created and edited in one mod
 - In the main form, only the changed field is highlighted. Its label stays as it is.
 - A successful save clears those highlights and shows a short success message that includes the order number.
 - A failed save keeps the highlights and shows an error message.
+- Closing the window while changes are still unsaved opens a confirmation. It fades in and out, and says that those changes will be lost. You can stay and keep editing, or close and discard them.
 - The success message closes after 2 seconds. The error message closes after 10 seconds. Either can be closed immediately.
 
 ## Vitrine price management

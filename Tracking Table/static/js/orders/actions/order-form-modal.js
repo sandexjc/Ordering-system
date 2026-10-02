@@ -22,6 +22,7 @@ const ORDER_FORM_TOAST_ERROR_MS = 10000;
 const ORDER_FORM_TITLE_CREATE = "Нова заявка";
 const ORDER_FORM_TITLE_EDIT = "Редактиране";
 let activeOrderFormToast = null;
+let allowOrderFormClose = false;
 
 /**
  * True when the form URL is create (`/orderForm`), not edit (`/orderForm/<id>`).
@@ -245,6 +246,80 @@ function updateOrderFormDirtyState(form)
 	dirtyRows.forEach(function (row) {
 		row.classList.add("is-dirty");
 	});
+}
+
+/**
+ * True when a highlighted row or main-form field still differs from the saved values.
+ *
+ * @returns {boolean}
+ */
+function orderFormHasUnsavedChanges()
+{
+	const form = document.getElementById("order-form-modal-form");
+	return Boolean(form && form.querySelector(".is-dirty"));
+}
+
+/**
+ * Confirmation shown over the order form when close would drop unsaved edits.
+ *
+ * @returns {HTMLElement|null}
+ */
+function orderFormUnsavedDialog()
+{
+	return document.getElementById("order-form-unsaved-modal");
+}
+
+/**
+ * Hide the unsaved-changes confirmation.
+ *
+ * @returns {void}
+ */
+function hideOrderFormUnsavedDialog()
+{
+	const dialog = orderFormUnsavedDialog();
+	if (!dialog) {
+		return;
+	}
+	dialog.classList.remove("is-open");
+	dialog.setAttribute("aria-hidden", "true");
+}
+
+/**
+ * Show the unsaved-changes confirmation.
+ *
+ * @returns {void}
+ */
+function showOrderFormUnsavedDialog()
+{
+	const dialog = orderFormUnsavedDialog();
+	if (!dialog) {
+		return;
+	}
+	dialog.setAttribute("aria-hidden", "false");
+	window.requestAnimationFrame(function () {
+		dialog.classList.add("is-open");
+	});
+	const cancelBtn = dialog.querySelector(".modal-footer [data-order-form-unsaved-cancel]");
+	if (cancelBtn) {
+		cancelBtn.focus();
+	}
+}
+
+/**
+ * Close the order form without asking again.
+ *
+ * @returns {void}
+ */
+function closeOrderFormModal()
+{
+	const parts = getOrderFormModalParts();
+	if (!parts.modal || typeof bootstrap === "undefined") {
+		return;
+	}
+	allowOrderFormClose = true;
+	hideOrderFormUnsavedDialog();
+	const instance = bootstrap.Modal.getInstance(parts.modal) || bootstrap.Modal.getOrCreateInstance(parts.modal);
+	instance.hide();
 }
 
 /**
@@ -803,11 +878,8 @@ function submitOrderFormModal(form)
 				if (data.form_html) {
 					setOrderFormModalBody(data.form_html);
 				}
-			} else if (parts.modal) {
-				const instance = bootstrap.Modal.getInstance(parts.modal);
-				if (instance) {
-					instance.hide();
-				}
+			} else {
+				closeOrderFormModal();
 			}
 		})
 		.catch(function (err) {
@@ -911,7 +983,34 @@ function setupOrderFormModal()
 		submitOrderFormModal(form);
 	});
 
+	parts.modal.addEventListener("hide.bs.modal", function (event) {
+		if (allowOrderFormClose) {
+			allowOrderFormClose = false;
+			hideOrderFormUnsavedDialog();
+			return;
+		}
+		if (!orderFormHasUnsavedChanges()) {
+			return;
+		}
+		event.preventDefault();
+		showOrderFormUnsavedDialog();
+	});
+
+	const unsavedDialog = orderFormUnsavedDialog();
+	if (unsavedDialog) {
+		unsavedDialog.addEventListener("click", function (event) {
+			if (event.target.closest("[data-order-form-unsaved-cancel]")) {
+				hideOrderFormUnsavedDialog();
+				return;
+			}
+			if (event.target.closest("#order-form-unsaved-confirm")) {
+				closeOrderFormModal();
+			}
+		});
+	}
+
 	parts.modal.addEventListener("hidden.bs.modal", function () {
+		hideOrderFormUnsavedDialog();
 		if (parts.body) {
 			parts.body.innerHTML = "";
 		}

@@ -118,6 +118,12 @@ Table and vitrine share one create/edit modal on `/dynamic/` (`static/js/orders/
   - Decimal fields compare by numeric value, so `10` and `10.00` are not treated as a change.
   - A successful save clears the highlights.
   - A failed save keeps them, including when the server returns the form again with validation errors.
+  - A successful save still closes without asking.
+- **Unsaved-changes confirmation** (`main/templates/modals/edit_order_close_modal.html`, `#order-form-unsaved-modal`):
+  - Opens over the order form when the user closes it while a row or main-form field is still highlighted.
+  - Tells the user the unsaved changes will be lost (`Незапазените промени ще бъдат загубени.`).
+  - Fades in when it opens and fades out when it closes.
+  - Отказ keeps the form open. Затвори discards the unsaved edits and closes the order form.
 - **Feedback**:
   - The modal does not use success or error alerts.
   - A bottom-right toast reports the result.
