@@ -79,6 +79,28 @@ Vitrine progress POST endpoints:
 - `/vitrine/update_vitrine/<pk>` (`vitrine:update`) - static progress modal form POST
 - `/vitrine/update_progress/<pk>` (`vitrine:update_progress`) - dynamic click-to-toggle JSON POST
 
+## Vitrine price management page
+
+- **URL**: `/vitrine/price-settings/` (`vitrine:price-settings`)
+- **Access**: admin-only (`AdminRequiredMixin`); link is available in the admin dropdown (user-group icon).
+- **Scope**:
+  - Prices are edited in EUR and saved in `VitrinePriceConfig`.
+  - Changes affect only newly created vitrine orders.
+  - Existing orders keep their already stored snapshot prices.
+- **Creation-time pricing behavior**:
+  - On new order creation, `VitrinePriceSetter` reads current values from `VitrinePriceConfig`.
+  - If order currency is EUR, values are used as-is.
+  - If order currency is BGN, values are converted via `CurrencyOperations.to_bgn(...)`.
+- **Page UX**:
+  - Changed rows are highlighted before save.
+  - Save runs over AJAX with button state feedback:
+    - loading spinner while request is in-flight,
+    - green success state on success (then row highlights clear),
+    - red error state on failure (row highlights remain).
+  - Bottom-right toast messages:
+    - success toast auto-hides after 2s,
+    - error toast auto-hides after 10s or when replaced by a later success.
+
 ## Local setup
 
 ### 1) Create and activate a virtual environment

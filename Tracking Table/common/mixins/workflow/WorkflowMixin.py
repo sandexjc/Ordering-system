@@ -1,5 +1,6 @@
 from common.service import BaseWorkflow
 
+
 class WorkflowModelMixin:
 
     """

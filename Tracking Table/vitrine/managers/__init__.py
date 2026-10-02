@@ -1,3 +1,4 @@
 from .VitrineOrderManager import VitrineOrderManager
 from .VitrineItemManager import VitrineItemManager
 from .VitrineFrameItemManager import VitrineFrameItemManager
+from .VitrinePriceConfigManager import VitrinePriceConfigManager

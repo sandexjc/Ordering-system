@@ -11,4 +11,5 @@ from .items import (
 
 from .vitrine import (
     Vitrine,
+    VitrinePriceConfig,
 )

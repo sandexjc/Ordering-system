@@ -1,3 +1,4 @@
 from .VitrineOrderQuerySet import VitrineOrderQuerySet
 from .VitrineItemQuerySet import VitrineItemQuerySet
 from .VitrineFrameItemQuerySet import VitrineFrameItemQuerySet
+from .VitrinePriceConfigQuerySet import VitrinePriceConfigQuerySet

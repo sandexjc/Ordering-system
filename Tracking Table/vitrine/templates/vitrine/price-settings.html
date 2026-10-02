@@ -1,0 +1,65 @@
+{% extends 'layout/base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title %}
+<title>TTable Цени Витрини</title>
+{% endblock %}
+
+{% block links %}
+<link rel="stylesheet" type="text/css" href="{% static 'vitrine/css/price_settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid shadow-lg vitrine-price-settings-page">
+	<h1 class="vitrine-price-settings-header">
+		Цени за витрини
+	</h1>
+	<p class="vitrine-price-settings-text">
+		Промените се задават в <strong>EUR</strong> и важат само за нови поръчки.
+	</p>
+	<div class="vitrine-price-settings-form">
+		<form id="vitrine-price-settings-form" method="post" action="{% url 'vitrine:price-settings' %}" novalidate>
+			{% csrf_token %}
+
+			<div class="vitrine-price-settings-fields">
+				{% for field in price_form %}
+					<div class="mb-3 d-flex align-items-center gap-2 vitrine-price-settings-row">
+						<label class="form-label mb-0 vitrine-price-settings-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+						<span>-</span>
+						<div class="input-group">
+							{{ field }}
+							<span class="input-group-text">€</span>
+						</div>
+					</div>
+					{% if field.errors %}
+						<div class="text-danger small mb-2">{{ field.errors|striptags }}</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+
+			<div class="vitrine-price-settings-submit">
+				<button id="vitrine-price-settings-submit" type="submit" class="btn btn-primary">
+					<span class="btn-label">Запази</span>
+					<span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+					<span class="btn-icon btn-icon-success d-none" aria-hidden="true">&#10003;</span>
+					<span class="btn-icon btn-icon-error d-none" aria-hidden="true">&#10005;</span>
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+	<div id="vitrine-price-settings-toast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+		<div class="d-flex">
+			<div id="vitrine-price-settings-toast-body" class="toast-body"></div>
+			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{% static 'vitrine/js/price_settings.js' %}"></script>
+{% endblock %}

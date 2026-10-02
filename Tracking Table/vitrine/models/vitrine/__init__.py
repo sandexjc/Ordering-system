@@ -1,1 +1,2 @@
 from .VitrineModel import Vitrine
+from .VitrinePriceConfigModel import VitrinePriceConfig

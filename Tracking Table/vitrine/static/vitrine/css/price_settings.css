@@ -1,0 +1,75 @@
+.vitrine-price-settings-page {
+    width: 90%;
+    min-width: 32rem;
+    margin-top: 3rem;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 1rem;
+}
+
+.vitrine-price-settings-header {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.vitrine-price-settings-text {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.vitrine-price-settings-form .field-required > label::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.vitrine-price-settings-submit {
+    text-align: center;
+    padding-top: 1rem;
+}
+
+.vitrine-price-settings-fields {
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+.vitrine-price-settings-row {
+    flex-wrap: nowrap;
+}
+
+.vitrine-price-settings-label {
+    min-width: 14rem;
+    white-space: nowrap;
+    transition: color 180ms ease, font-weight 180ms ease;
+}
+
+.vitrine-price-settings-row.is-dirty .vitrine-price-settings-label {
+    color: #8a6d00;
+    font-weight: 600;
+}
+
+.vitrine-price-settings-row.is-dirty .form-control {
+    border-color: #ffcc66;
+    background-color: #fff8e5;
+}
+
+.vitrine-price-settings-row .form-control {
+    transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.vitrine-price-settings-submit .btn {
+    min-width: 8.5rem;
+}
+
+.vitrine-price-settings-submit .btn-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.vitrine-price-settings-submit .btn-icon-success {
+    color: #d1f7df;
+}
+
+.vitrine-price-settings-submit .btn-icon-error {
+    color: #ffd8d8;
+}

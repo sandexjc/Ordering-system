@@ -1,1 +1,1 @@
-from .WorkflowModelMixin import WorkflowModelMixin
+from .WorkflowMixin import WorkflowModelMixin

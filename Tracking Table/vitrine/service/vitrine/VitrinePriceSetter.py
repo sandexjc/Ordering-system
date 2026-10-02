@@ -1,4 +1,5 @@
 from decimal import Decimal
+from django.apps import apps
 from django.utils import timezone
 
 from common.service import CurrencyOperations
@@ -7,16 +8,15 @@ from common.service import CurrencyOperations
 class VitrinePriceSetter:
     """Service class responsible for setting vitrine prices on creation."""
 
-    # FIXME: move prices into a configurable model
-    CURRENT_PRICES = {
-        "black_profile_price": Decimal("15.50"),
-        "matte_profile_price": Decimal("13.30"),
-        "inox_profile_price": Decimal("13.30"),
-        "white_seal_price": Decimal("1.00"),
-        "black_seal_price": Decimal("1.00"),
-        "add_hole_price": Decimal("2.00"),
-        "manufacturing_price": Decimal("60.00"),
-    }
+    PRICE_FIELDS = (
+        "black_profile_price",
+        "matte_profile_price",
+        "inox_profile_price",
+        "white_seal_price",
+        "black_seal_price",
+        "add_hole_price",
+        "manufacturing_price",
+    )
 
     def __init__(self, vitrine):
         self.vitrine = vitrine
@@ -27,13 +27,19 @@ class VitrinePriceSetter:
             return
 
         currency = CurrencyOperations.get_currency(timezone.now().date())
+        price_config = self._get_price_config()
 
-        for field, price_bgn in self.CURRENT_PRICES.items():
-            final_price = self._convert_price(price_bgn, currency)
+        for field in self.PRICE_FIELDS:
+            final_price = self._convert_price(getattr(price_config, field), currency)
             setattr(self.vitrine, field, final_price)
 
     @staticmethod
-    def _convert_price(price_bgn: Decimal, currency: str) -> Decimal:
+    def _convert_price(price_eur: Decimal, currency: str) -> Decimal:
         if currency == "€":
-            return CurrencyOperations.to_eur(price_bgn)
-        return price_bgn
+            return price_eur
+        return CurrencyOperations.to_bgn(price_eur)
+
+    @staticmethod
+    def _get_price_config():
+        config_model = apps.get_model("vitrine", "VitrinePriceConfig")
+        return config_model.objects.get_current()

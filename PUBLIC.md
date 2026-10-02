@@ -37,6 +37,19 @@ The Ordering System helps teams manage the full order journey, from initial offe
 
 The system is intended for authenticated internal users and supports role-based operational usage through account login.
 
+## Vitrine price management
+
+Admins can manage default vitrine prices from a dedicated settings page:
+
+- URL: `/vitrine/price-settings/`
+- Navigation: admin dropdown (user-group icon)
+- Currency input: EUR
+
+Behavior:
+
+- Updated prices apply to newly created vitrine orders.
+- Existing vitrine orders keep their previously saved prices.
+
 ## Vitrine Seal Feature Operations
 
 For vitrine frames, auto-seal behavior is controlled by the feature flag:

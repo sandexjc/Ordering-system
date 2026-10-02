@@ -6,6 +6,7 @@ app_name = 'vitrine'
 urlpatterns = [
     path('create_vitrine/', views.CreateVitrine.as_view(), name='new_vitrine'),
     path('edit_vitrine/<int:pk>', views.EditVitrine.as_view(), name='edit_vitrine'),
+    path('price-settings/', views.VitrinePriceSettings.as_view(), name='price-settings'),
     path('orderForm', views.VitrineOrderFormModal.as_view(), name='orderForm'),
     path('orderForm/<int:pk>', views.VitrineOrderFormModal.as_view(), name='orderFormEdit'),
     path('view_vitrine/<int:pk>', views.ViewVitrine.as_view(), name='vitrine_view'),
