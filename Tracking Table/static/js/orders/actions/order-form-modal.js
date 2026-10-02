@@ -2,7 +2,7 @@
  * orders/actions/order-form-modal.js
  * ----------------------------------
  * Dynamic table/vitrine create/edit order form modal: open, add-row, AJAX save,
- * 10s alerts, and live-list patch after success.
+ * unsaved-row highlight, save toasts, and live-list patch after success.
  *
  * Loaded from:
  *   - main/templates/dynamic/orders.html
@@ -17,9 +17,11 @@
  *   - dynamic/cache.js → viewOrdersCache, captureLiveRowsHtml
  */
 
-const ORDER_FORM_ALERT_MS = 10000;
+const ORDER_FORM_TOAST_SUCCESS_MS = 2000;
+const ORDER_FORM_TOAST_ERROR_MS = 10000;
 const ORDER_FORM_TITLE_CREATE = "Нова заявка";
 const ORDER_FORM_TITLE_EDIT = "Редактиране";
+let activeOrderFormToast = null;
 
 /**
  * True when the form URL is create (`/orderForm`), not edit (`/orderForm/<id>`).
@@ -75,63 +77,230 @@ function buildOrderFormLoadErrorHtml()
 }
 
 /**
- * Hide a modal alert and clear its dismiss timer.
+ * Normalize a decimal-looking value the same way price settings does,
+ * so "10", "10.0", and "10,00" compare as one saved value.
  *
- * @param {HTMLElement|null} alertEl - Alert wrapper.
- * @returns {void}
+ * @param {string} value - Raw field text.
+ * @returns {string}
  */
-function hideOrderFormAlert(alertEl)
+function normalizeOrderFormDecimal(value)
 {
-	if (!alertEl) {
-		return;
+	const cleaned = String(value ?? "").trim().replace(",", ".");
+	if (cleaned === "") {
+		return "";
 	}
-	if (alertEl._dismissTimeout) {
-		window.clearTimeout(alertEl._dismissTimeout);
-		alertEl._dismissTimeout = null;
-	}
-	alertEl.style.display = "none";
+	const numeric = Number(cleaned);
+	return Number.isFinite(numeric) ? numeric.toFixed(2) : cleaned;
 }
 
 /**
- * Show a modal alert for 10s. Optional message replaces the default text.
+ * Comparable snapshot of one control.
  *
- * @param {HTMLElement|null} alertEl - Alert wrapper.
- * @param {string} [message] - Optional message text.
- * @returns {void}
+ * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} el - Form control.
+ * @returns {string}
  */
-function showOrderFormAlert(alertEl, message)
+function normalizeOrderFormValue(el)
 {
-	if (!alertEl) {
-		return;
+	if (el.type === "checkbox" || el.type === "radio") {
+		return el.checked ? "1" : "0";
 	}
-	const msgEl = alertEl.querySelector(".alertmsgdiv");
-	if (msgEl && message) {
-		msgEl.textContent = message;
+	const raw = String(el.value ?? "").trim();
+	if (/^-?\d+([.,]\d+)?$/.test(raw)) {
+		return normalizeOrderFormDecimal(raw);
 	}
-	if (alertEl._dismissTimeout) {
-		window.clearTimeout(alertEl._dismissTimeout);
-	}
-	alertEl.style.display = "block";
-	alertEl._dismissTimeout = window.setTimeout(function () {
-		alertEl.style.display = "none";
-		alertEl._dismissTimeout = null;
-	}, ORDER_FORM_ALERT_MS);
+	return raw;
 }
 
 /**
- * Modal root and its success/fail alert nodes.
+ * True for controls whose edits should highlight a row.
  *
- * @returns {{modal: HTMLElement|null, body: HTMLElement|null, title: HTMLElement|null, successAlert: HTMLElement|null, errorAlert: HTMLElement|null}}
+ * @param {HTMLElement} el - Candidate control.
+ * @returns {boolean}
+ */
+function isTrackableOrderFormField(el)
+{
+	const name = el.name || "";
+	if (!name || el.disabled || el.readOnly) {
+		return false;
+	}
+	if (el.type === "hidden" || el.type === "button" || el.type === "submit" || el.type === "file") {
+		return false;
+	}
+	if (name === "csrfmiddlewaretoken" || name === "manual-seal-mode") {
+		return false;
+	}
+	if (
+		name.endsWith("-TOTAL_FORMS")
+		|| name.endsWith("-INITIAL_FORMS")
+		|| name.endsWith("-MIN_NUM_FORMS")
+		|| name.endsWith("-MAX_NUM_FORMS")
+		|| name.endsWith("-id")
+	) {
+		return false;
+	}
+	return true;
+}
+
+/**
+ * Remember the loaded value of each tracked control under `root`.
+ *
+ * @param {ParentNode} root - Form or a newly added row.
+ * @returns {void}
+ */
+function snapshotOrderFormInitials(root)
+{
+	if (!root) {
+		return;
+	}
+	root.querySelectorAll("input, select, textarea").forEach(function (el) {
+		if (!isTrackableOrderFormField(el)) {
+			return;
+		}
+		el.dataset.initialValue = normalizeOrderFormValue(el);
+	});
+}
+
+/**
+ * Name → saved value map from a form that is about to be posted.
+ * Used to restore highlights when the server re-renders the form on error.
+ *
+ * @param {ParentNode} root - Form clone after submit preparation.
+ * @returns {Object<string, string>}
+ */
+function collectOrderFormInitials(root)
+{
+	const initials = {};
+	if (!root) {
+		return initials;
+	}
+	root.querySelectorAll("input, select, textarea").forEach(function (el) {
+		if (!isTrackableOrderFormField(el) || !el.name) {
+			return;
+		}
+		initials[el.name] = el.dataset.initialValue != null
+			? el.dataset.initialValue
+			: normalizeOrderFormValue(el);
+	});
+	return initials;
+}
+
+/**
+ * Put saved baselines back onto a re-rendered form, then refresh highlights.
+ *
+ * @param {ParentNode} root - Replacement form.
+ * @param {Object<string, string>} initials - Baselines keyed by field name.
+ * @returns {void}
+ */
+function applyOrderFormInitials(root, initials)
+{
+	if (!root) {
+		return;
+	}
+	const saved = initials || {};
+	root.querySelectorAll("input, select, textarea").forEach(function (el) {
+		if (!isTrackableOrderFormField(el)) {
+			return;
+		}
+		if (Object.prototype.hasOwnProperty.call(saved, el.name)) {
+			el.dataset.initialValue = saved[el.name];
+			return;
+		}
+		el.dataset.initialValue = normalizeOrderFormValue(el);
+	});
+	updateOrderFormDirtyState(root.closest("form") || root);
+}
+
+/**
+ * Highlight unsaved edits.
+ * Table lines highlight the whole row. Main-form fields highlight only the control, not its label.
+ *
+ * @param {ParentNode|null} form - Modal order form.
+ * @returns {void}
+ */
+function updateOrderFormDirtyState(form)
+{
+	if (!form) {
+		return;
+	}
+	const dirtyRows = new Set();
+	form.querySelectorAll("input, select, textarea").forEach(function (el) {
+		const row = el.closest("tr");
+		const changed = isTrackableOrderFormField(el)
+			&& el.dataset.initialValue != null
+			&& normalizeOrderFormValue(el) !== el.dataset.initialValue;
+		if (row) {
+			el.classList.remove("is-dirty");
+			if (changed) {
+				dirtyRows.add(row);
+			}
+			return;
+		}
+		el.classList.toggle("is-dirty", changed);
+	});
+	form.querySelectorAll("tr.is-dirty").forEach(function (row) {
+		if (!dirtyRows.has(row)) {
+			row.classList.remove("is-dirty");
+		}
+	});
+	dirtyRows.forEach(function (row) {
+		row.classList.add("is-dirty");
+	});
+}
+
+/**
+ * Success text, including the saved order number when the server returned one.
+ *
+ * @param {string|number|null|undefined} orderId - Saved order id.
+ * @returns {string}
+ */
+function orderFormSuccessMessage(orderId)
+{
+	if (orderId == null || String(orderId).trim() === "") {
+		return "Промените са запазени успешно.";
+	}
+	return "Промените по поръчка №" + String(orderId) + " са запазени успешно.";
+}
+
+/**
+ * Success toast hides after 2s. Error toast stays longer and can be closed.
+ *
+ * @param {string} message - Toast text.
+ * @param {"success"|"error"} type - Visual variant.
+ * @returns {void}
+ */
+function showOrderFormToast(message, type)
+{
+	const toastEl = document.getElementById("order-form-toast");
+	const toastBody = document.getElementById("order-form-toast-body");
+	if (!toastEl || !toastBody || typeof bootstrap === "undefined" || !bootstrap.Toast) {
+		return;
+	}
+
+	const existing = bootstrap.Toast.getInstance(toastEl);
+	if (existing) {
+		existing.dispose();
+	}
+	activeOrderFormToast = null;
+
+	const delay = type === "success" ? ORDER_FORM_TOAST_SUCCESS_MS : ORDER_FORM_TOAST_ERROR_MS;
+	toastEl.classList.remove("bg-success", "bg-danger");
+	toastEl.classList.add(type === "success" ? "bg-success" : "bg-danger");
+	toastBody.textContent = message;
+	activeOrderFormToast = new bootstrap.Toast(toastEl, { delay: delay, autohide: true });
+	activeOrderFormToast.show();
+}
+
+/**
+ * Modal root nodes.
+ *
+ * @returns {{modal: HTMLElement|null, body: HTMLElement|null, title: HTMLElement|null}}
  */
 function getOrderFormModalParts()
 {
-	const modal = document.getElementById("order-form-modal");
 	return {
-		modal: modal,
+		modal: document.getElementById("order-form-modal"),
 		body: document.getElementById("order-form-modal-body"),
 		title: document.getElementById("order-form-modal-title"),
-		successAlert: modal && modal.querySelector(".ALERT-S-ORD-VIEW"),
-		errorAlert: modal && modal.querySelector(".ALERT-E-ORD-VIEW"),
 	};
 }
 
@@ -157,16 +326,27 @@ function syncOrderFormModalTitle(form, titleEl)
  * Replace modal body HTML and sync the header title from the new form.
  *
  * @param {string} html - Form fragment HTML.
+ * @param {{initials?: Object<string, string>}} [options] - When `initials` is set, keep
+ *   unsaved highlights against that baseline (failed save). Otherwise snapshot the new form.
  * @returns {void}
  */
-function setOrderFormModalBody(html)
+function setOrderFormModalBody(html, options)
 {
 	const parts = getOrderFormModalParts();
 	if (!parts.body) {
 		return;
 	}
 	parts.body.innerHTML = html || "";
-	syncOrderFormModalTitle(parts.body.querySelector("#order-form-modal-form"), parts.title);
+	const form = parts.body.querySelector("#order-form-modal-form");
+	syncOrderFormModalTitle(form, parts.title);
+	if (form) {
+		if (options && options.initials) {
+			applyOrderFormInitials(form, options.initials);
+		} else {
+			snapshotOrderFormInitials(form);
+			updateOrderFormDirtyState(form);
+		}
+	}
 	if (typeof setupManualSealToggle === "function") {
 		setupManualSealToggle(parts.body);
 	}
@@ -211,6 +391,7 @@ function addOrderFormsetRow(formsetRoot)
 		tbody.appendChild(row);
 	}
 	totalInput.value = String(index + 1);
+	snapshotOrderFormInitials(row);
 }
 
 /**
@@ -343,6 +524,7 @@ function setOrderFormRowPendingDelete(row, pendingDelete)
 		deleteInput.checked = pendingDelete;
 	}
 	syncOrderFormRowAction(row, pendingDelete);
+	updateOrderFormDirtyState(row.closest("form"));
 }
 
 /**
@@ -503,8 +685,6 @@ function loadOrderFormIntoModal(url)
 		parts.modal.dataset.orderFormUrl = url;
 	}
 
-	hideOrderFormAlert(parts.successAlert);
-	hideOrderFormAlert(parts.errorAlert);
 	parts.body.innerHTML = buildOrderFormLoadingHtml();
 
 	fetch(url, {
@@ -548,8 +728,6 @@ function openOrderFormModal(url)
 			? ORDER_FORM_TITLE_CREATE
 			: ORDER_FORM_TITLE_EDIT;
 	}
-	hideOrderFormAlert(parts.successAlert);
-	hideOrderFormAlert(parts.errorAlert);
 	if (parts.body) {
 		parts.body.innerHTML = buildOrderFormLoadingHtml();
 	}
@@ -578,12 +756,10 @@ function submitOrderFormModal(form)
 		return;
 	}
 
-	hideOrderFormAlert(parts.successAlert);
-	hideOrderFormAlert(parts.errorAlert);
-
 	const wasCreate = !form.getAttribute("data-order-id");
 	const submitForm = cloneOrderFormWithValues(form);
 	prepareOrderFormsetsForSubmit(submitForm);
+	const postedInitials = collectOrderFormInitials(submitForm);
 
 	let oldHtml = "";
 	if (saveBtn) {
@@ -622,6 +798,7 @@ function submitOrderFormModal(form)
 			if (data.id != null && data.rows_html) {
 				applyOrderFormLiveRow(data.id, data.rows_html);
 			}
+			showOrderFormToast(orderFormSuccessMessage(data.id), "success");
 			if (wasCreate) {
 				if (data.form_html) {
 					setOrderFormModalBody(data.form_html);
@@ -637,20 +814,20 @@ function submitOrderFormModal(form)
 			window.clearTimeout(timeoutId);
 			console.error(err);
 			if (err && err.formHtml) {
-				setOrderFormModalBody(err.formHtml);
+				setOrderFormModalBody(err.formHtml, { initials: postedInitials });
 			} else if (saveBtn) {
 				saveBtn.disabled = false;
 				saveBtn.innerHTML = oldHtml;
 			}
-			showOrderFormAlert(
-				parts.errorAlert,
-				(err && err.userMessage) || "Възникна грешка!"
+			showOrderFormToast(
+				(err && err.userMessage) || "Възникна грешка!",
+				"error"
 			);
 		});
 }
 
 /**
- * Bind create/edit intercepts, add-row, submit, and alert dismiss.
+ * Bind create/edit intercepts, add-row, dirty tracking, and submit.
  *
  * @returns {void}
  */
@@ -708,13 +885,20 @@ function setupOrderFormModal()
 		if (addRowBtn) {
 			event.preventDefault();
 			addOrderFormsetRow(addRowBtn.closest("[data-formset]"));
-			return;
 		}
+	});
 
-		const closeBtn = event.target.closest(".ALERT-S-ORD-VIEW .btn-close, .ALERT-E-ORD-VIEW .btn-close");
-		if (closeBtn) {
-			event.preventDefault();
-			hideOrderFormAlert(closeBtn.closest(".ALERT-S-ORD-VIEW, .ALERT-E-ORD-VIEW"));
+	parts.modal.addEventListener("input", function (event) {
+		const form = event.target.closest("#order-form-modal-form");
+		if (form) {
+			updateOrderFormDirtyState(form);
+		}
+	});
+
+	parts.modal.addEventListener("change", function (event) {
+		const form = event.target.closest("#order-form-modal-form");
+		if (form) {
+			updateOrderFormDirtyState(form);
 		}
 	});
 
@@ -728,8 +912,6 @@ function setupOrderFormModal()
 	});
 
 	parts.modal.addEventListener("hidden.bs.modal", function () {
-		hideOrderFormAlert(parts.successAlert);
-		hideOrderFormAlert(parts.errorAlert);
 		if (parts.body) {
 			parts.body.innerHTML = "";
 		}

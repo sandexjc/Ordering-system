@@ -101,6 +101,30 @@ Vitrine progress POST endpoints:
     - success toast auto-hides after 2s,
     - error toast auto-hides after 10s or when replaced by a later success.
 
+## Dynamic create/edit order modal
+
+Table and vitrine share one create/edit modal on `/dynamic/` (`static/js/orders/actions/order-form-modal.js`).
+
+- **URLs**:
+  - `/table/orderForm` (`table:orderForm`) and `/table/orderForm/<pk>` (`table:orderFormEdit`)
+  - `/vitrine/orderForm` (`vitrine:orderForm`) and `/vitrine/orderForm/<pk>` (`vitrine:orderFormEdit`)
+- **After save**:
+  - Create stays open and reloads as the edit form.
+  - Edit closes the modal.
+  - The live orders list is patched from the save response in both cases.
+- **Unsaved row highlight**:
+  - A changed table row is highlighted until its fields match the last loaded or saved values.
+  - In the main form, only the changed field is highlighted. Its label stays unchanged.
+  - Decimal fields compare by numeric value, so `10` and `10.00` are not treated as a change.
+  - A successful save clears the highlights.
+  - A failed save keeps them, including when the server returns the form again with validation errors.
+- **Feedback**:
+  - The modal does not use success or error alerts.
+  - A bottom-right toast reports the result.
+  - The success toast names the saved order (`Промените по поръчка №… са запазени успешно.`) and auto-hides after 2s.
+  - The error toast auto-hides after 10s.
+  - Either toast can be dismissed with its close button.
+
 ## Local setup
 
 ### 1) Create and activate a virtual environment
@@ -347,6 +371,7 @@ static/js/
     actions/
       progress-delete.js
       progress-step.js     ← dynamic table / vitrine click-to-toggle (loaded from dynamic/orders.html)
+      order-form-modal.js  ← dynamic table / vitrine create/edit modal (loaded from dynamic/orders.html)
       edit-submit.js
       alerts.js
       properties.js      ← handle_orders_properties() orchestrator
@@ -391,6 +416,8 @@ static/js/
 10. `dynamic/sync.js`
 11. `dynamic/page.js`
 12. `orders/actions/progress-step.js` (dynamic table / vitrine click-to-toggle; not loaded on static boards)
+13. `vitrine/js/manual_seal_toggle.js`
+14. `orders/actions/order-form-modal.js` (dynamic table / vitrine create/edit modal; unsaved-row highlight and save toasts)
 
 **Login**
 
@@ -410,6 +437,7 @@ static/js/
 | `orders/details/fetch.js` | `get_current_dynamic_view_name`, `cache_order_details`, `get_order`, `retry_order` |
 | `orders/actions/progress-delete.js` | `setup_progress_delete_handlers`, `apply_progress_update_response`, `sync_progress_step`, `sync_vitrine_order_taken_enabled` |
 | `orders/actions/progress-step.js` | click/hover/retry handlers; POSTs one step to `table:update_progress` or `vitrine:update_progress` |
+| `orders/actions/order-form-modal.js` | dynamic create/edit modal: open, add-row, AJAX save, unsaved-row highlight, save toasts, live-list patch |
 | `orders/actions/edit-submit.js` | `setup_edit_submit_handlers` |
 | `orders/actions/alerts.js` | `setup_alert_handlers` |
 | `orders/actions/properties.js` | `handle_orders_properties` |

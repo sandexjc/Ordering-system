@@ -37,6 +37,16 @@ The Ordering System helps teams manage the full order journey, from initial offe
 
 The system is intended for authenticated internal users and supports role-based operational usage through account login.
 
+## Dynamic order editing
+
+On the dynamic board, table and vitrine orders are created and edited in one modal.
+
+- A table row you change is highlighted until the form is saved.
+- In the main form, only the changed field is highlighted. Its label stays as it is.
+- A successful save clears those highlights and shows a short success message that includes the order number.
+- A failed save keeps the highlights and shows an error message.
+- The success message closes after 2 seconds. The error message closes after 10 seconds. Either can be closed immediately.
+
 ## Vitrine price management
 
 Admins can manage default vitrine prices from a dedicated settings page:
