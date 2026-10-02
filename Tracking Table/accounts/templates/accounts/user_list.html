@@ -15,84 +15,105 @@
 	<h1 class="user-list-header">
 		Преглед на потребители
 	</h1>
-	<div class="user-list-table is-email-collapsed">
+	<div class="user-list-table">
 		<table class="table table-hover">
 			<thead>
 				<tr>
 					<th scope="col">Потребителско име</th>
 					<th scope="col">Име</th>
 					<th scope="col">Фамилия</th>
-					<th scope="col" class="user-list-email-col">
-						<button type="button" class="user-list-email-toggle" aria-expanded="false" title="Покажи или скрий имейла">
-							Имейл
-						</button>
-					</th>
-					<th scope="col" class="user-list-role-cell">Група</th>
+					<th scope="col" class="user-list-email-col">Имейл</th>
 					<th scope="col">Активен</th>
 					<th scope="col">Последен вход</th>
 					<th scope="col">Създаден</th>
-					<th scope="col" class="user-list-action-cell">Смяна на парола</th>
-					<th scope="col" class="user-list-action-cell">Активиране</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for listed_user in user_list %}
-				<tr>
+				<tr class="user-list-main-row" data-user-row-id="{{ listed_user.pk }}" aria-expanded="false">
 					<td>{{ listed_user.username }}</td>
 					<td>{{ listed_user.first_name }}</td>
 					<td>{{ listed_user.last_name }}</td>
 					<td class="user-list-email-col" title="{{ listed_user.email }}">{{ listed_user.email }}</td>
-					<td class="user-list-role-cell">
-						<div class="user-role-status" id="user-role-status-{{ listed_user.pk }}">
-							<select class="form-select form-select-sm user-role-select"
-								data-current-role="{{ listed_user.role }}"
-								data-username="{{ listed_user.username }}"
-								data-url="{% url 'accounts:set-user-role' listed_user.pk %}"
-								{% if listed_user.role_block %}disabled title="{{ listed_user.role_block }}"{% endif %}>
-								{% for role_value, role_label in role_choices %}
-								<option value="{{ role_value }}" {% if listed_user.role == role_value %}selected{% endif %}>{{ role_label }}</option>
-								{% endfor %}
-							</select>
-						</div>
-					</td>
-					<td class="user-list-active-cell">{% if listed_user.is_active %}Да{% else %}Не{% endif %}</td>
+					<td class="user-list-active-cell" id="user-list-active-cell-{{ listed_user.pk }}">{% if listed_user.is_active %}Да{% else %}Не{% endif %}</td>
 					<td>{{ listed_user.last_login|date:"d/m/Y H:i"|default:"—" }}</td>
 					<td>{{ listed_user.date_joined|date:"d/m/Y H:i" }}</td>
-					<td class="user-list-action-cell">
-						<button type="button" class="btn btn-sm btn-primary send-password-email-status"
-							id="send-password-email-status-{{ listed_user.pk }}"
-							data-bs-toggle="modal"
-							data-bs-target="#send-password-email-confirm-{{ listed_user.pk }}">
-							Изпрати имейл
-						</button>
-					</td>
-					<td class="user-list-action-cell">
-						{% if listed_user.is_active %}
-							{% if listed_user.deactivate_block %}
-							<button type="button" class="btn btn-sm btn-danger" disabled title="{{ listed_user.deactivate_block }}">
-								Деактивирай
-							</button>
-							{% else %}
-							<button type="button" class="btn btn-sm btn-danger user-active-status"
-								id="user-active-status-{{ listed_user.pk }}"
-								data-bs-toggle="modal"
-								data-bs-target="#user-active-confirm-{{ listed_user.pk }}">
-								Деактивирай
-							</button>
-							{% endif %}
-						{% else %}
-							<button type="button" class="btn btn-sm btn-primary user-active-status"
-								id="user-active-status-{{ listed_user.pk }}"
-								data-bs-toggle="modal"
-								data-bs-target="#user-active-confirm-{{ listed_user.pk }}">
-								Активирай
-							</button>
-						{% endif %}
+				</tr>
+				<tr class="user-list-helper-row" data-user-row-id="{{ listed_user.pk }}" aria-hidden="true">
+					<td colspan="7" class="no-padding-cell">
+						<div class="user-list-helper-inner" style="display:none;height:0;">
+							<table class="user-list-helper-actions-table">
+								<thead>
+									<tr>
+										<th scope="col">Група</th>
+										<th scope="col">Смяна на парола</th>
+										<th scope="col">Активиране</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>
+											<div class="user-role-status" id="user-role-status-{{ listed_user.pk }}">
+												<select class="form-select form-select-sm user-role-select"
+													data-current-role="{{ listed_user.role }}"
+													data-username="{{ listed_user.username }}"
+													data-url="{% url 'accounts:set-user-role' listed_user.pk %}"
+													{% if listed_user.role_block %}disabled title="{{ listed_user.role_block }}"{% endif %}>
+													{% for role_value, role_label in role_choices %}
+													<option value="{{ role_value }}" {% if listed_user.role == role_value %}selected{% endif %}>{{ role_label }}</option>
+													{% endfor %}
+												</select>
+											</div>
+										</td>
+										<td>
+											<button type="button" class="btn btn-sm btn-primary send-password-email-status"
+												id="send-password-email-status-{{ listed_user.pk }}"
+												data-bs-toggle="modal"
+												data-bs-target="#send-password-email-confirm-{{ listed_user.pk }}">
+												Изпрати имейл
+											</button>
+										</td>
+										<td>
+											{% if listed_user.is_active %}
+												{% if listed_user.deactivate_block %}
+												<button type="button" class="btn btn-sm btn-danger" disabled title="{{ listed_user.deactivate_block }}">
+													Деактивирай
+												</button>
+												{% else %}
+												<button type="button" class="btn btn-sm btn-danger user-active-status"
+													id="user-active-status-{{ listed_user.pk }}"
+													data-bs-toggle="modal"
+													data-bs-target="#user-active-confirm-{{ listed_user.pk }}">
+													Деактивирай
+												</button>
+												{% endif %}
+											{% else %}
+												<button type="button" class="btn btn-sm btn-primary user-active-status"
+													id="user-active-status-{{ listed_user.pk }}"
+													data-bs-toggle="modal"
+													data-bs-target="#user-active-confirm-{{ listed_user.pk }}">
+													Активирай
+												</button>
+											{% endif %}
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</td>
 				</tr>
 				{% endfor %}
 			</tbody>
 		</table>
+	</div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+	<div id="user-list-toast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+		<div class="d-flex">
+			<div id="user-list-toast-body" class="toast-body"></div>
+			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+		</div>
 	</div>
 </div>
 

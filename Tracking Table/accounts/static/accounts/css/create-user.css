@@ -26,3 +26,12 @@
     text-align: center;
     padding-top: 1rem;
 }
+
+.create-user-submit .btn
+{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-width: 7.5rem;
+}

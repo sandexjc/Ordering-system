@@ -1,3 +1,13 @@
+html
+{
+    scrollbar-gutter: stable;
+}
+
+body
+{
+    overflow-y: scroll;
+}
+
 .user-list-page
 {
     width: 90%;
@@ -18,39 +28,12 @@
 
 .user-list-table
 {
-    overflow-x: auto;
+    overflow-x: clip;
 }
 
-.user-list-table.is-email-collapsed .user-list-email-col
+.user-list-email-col
 {
-    width: 8rem;
-    max-width: 8rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.user-list-email-toggle
-{
-    border: 0;
-    background: none;
-    padding: 0;
-    font: inherit;
-    font-weight: inherit;
-    color: inherit;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.user-list-email-toggle::after
-{
-    content: " ▸";
-    font-weight: normal;
-}
-
-.user-list-table:not(.is-email-collapsed) .user-list-email-toggle::after
-{
-    content: " ▾";
 }
 
 .user-list-table .table th
@@ -59,38 +42,67 @@
     white-space: nowrap;
 }
 
-.user-list-action-cell
+.user-list-main-row
 {
-    width: 1%;
-    min-width: 12rem;
-    max-width: 15rem;
-    vertical-align: middle;
-    white-space: nowrap;
+    cursor: pointer;
 }
 
-.user-list-action-cell .btn
+.user-list-main-row > td
 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 12rem;
-    max-width: 15rem;
-    width: 100%;
-    gap: 0.5rem;
-    transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease, opacity 0.2s ease;
+    padding-top: 0.24rem !important;
+    padding-bottom: 0.24rem !important;
 }
 
-.user-list-action-cell .btn.is-switching
+.user-list-main-row > td:first-child
 {
-    opacity: 0.55;
+    position: relative;
+    padding-left: 1.2rem !important;
 }
 
-.user-list-role-cell
+.user-list-main-row > td:first-child::before
 {
-    width: 9.6rem;
-    min-width: 9.6rem;
-    max-width: 9.6rem;
-    vertical-align: middle;
+    content: "▸";
+    position: absolute;
+    left: 0.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.user-list-main-row.is-expanded > td:first-child::before
+{
+    transform: translateY(-50%) rotate(90deg);
+    color: #212529;
+}
+
+.user-list-helper-row
+{
+    background-color: #f7f7f7;
+}
+
+.user-list-helper-row > td
+{
+    border-top: 0;
+    border-bottom: 0;
+    padding: 0 !important;
+}
+
+.user-list-helper-inner
+{
+    overflow: hidden;
+    height: 0;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.16s ease;
+    box-sizing: border-box;
+    padding: 2.5rem 1rem;
+}
+
+.user-list-helper-inner.is-open
+{
+    display: block;
+    opacity: 1;
 }
 
 .user-role-status
@@ -99,14 +111,55 @@
     align-items: center;
     width: 100%;
     min-width: 0;
-    max-width: 9.6rem;
+}
+
+.user-list-helper-actions-table
+{
+    width: 100%;
+    max-width: 60%;
+    margin: 0 auto;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.user-list-helper-actions-table > :not(caption) > * > th,
+.user-list-helper-actions-table > :not(caption) > * > td
+{
+    text-align: left;
+    vertical-align: middle;
+    padding: 0.8rem 0.85rem;
+}
+
+.user-list-helper-actions-table thead th
+{
+    color: #495057;
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.user-list-helper-actions-table .btn
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    gap: 0.5rem;
+    transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease, opacity 0.2s ease;
+}
+
+.user-list-helper-actions-table .btn.is-switching
+{
+    opacity: 0.55;
 }
 
 .user-role-status .user-role-select
 {
-    width: 9.6rem;
-    min-width: 9.6rem;
-    max-width: 9.6rem;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     box-sizing: border-box;
 }
 
@@ -117,7 +170,7 @@
     align-items: center;
     width: 100%;
     min-width: 0;
-    max-width: 9.6rem;
+    max-width: 100%;
     min-height: 2rem;
     width: 100%;
     gap: 0.5rem;

@@ -43,10 +43,19 @@ function bind_send_password_email_form(form)
                 return response.json();
             })
             .then(function (data) {
-                set_send_password_email_result(button, Boolean(data && data.ok), original_html);
+                const ok = Boolean(data && data.ok);
+                set_send_password_email_result(button, ok, original_html);
+                if (typeof window.on_user_list_send_password_email_result === "function")
+                {
+                    window.on_user_list_send_password_email_result(form, ok);
+                }
             })
             .catch(function () {
                 set_send_password_email_result(button, false, original_html);
+                if (typeof window.on_user_list_send_password_email_result === "function")
+                {
+                    window.on_user_list_send_password_email_result(form, false);
+                }
             });
     });
 }
@@ -87,7 +96,7 @@ function set_send_password_email_result(button, ok, original_html)
             button.innerHTML = original_html;
             button.disabled = false;
         });
-    }, ok ? 7000 : 5000);
+    }, ok ? 2000 : 5000);
 }
 
 /**

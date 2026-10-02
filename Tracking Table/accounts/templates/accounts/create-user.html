@@ -16,13 +16,25 @@
 		Създай потребител
 	</h1>
 	<div class="create-user-form">
-		<form method="post">
+		<form method="post" id="create-user-form">
 			{% csrf_token %}
 			{% bootstrap_form form required_css_class="field-required" %}
 			<div class="create-user-submit">
-				<input type="submit" class="btn btn-primary" value="Създай">
+				<button type="submit" class="btn btn-primary" id="create-user-submit-btn">
+					<span class="btn-label">Създай</span>
+					<span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+				</button>
 			</div>
 		</form>
+	</div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+	<div id="create-user-toast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+		<div class="d-flex">
+			<div id="create-user-toast-body" class="toast-body"></div>
+			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+		</div>
 	</div>
 </div>
 {% endblock %}
