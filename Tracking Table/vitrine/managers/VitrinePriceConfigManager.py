@@ -25,6 +25,7 @@ class VitrinePriceConfigManager(BaseManager):
             black_profile_price=Decimal("7.92"),
             matte_profile_price=Decimal("6.80"),
             inox_profile_price=Decimal("6.80"),
+            gold_profile_price=Decimal("0"),
             white_seal_price=Decimal("0.51"),
             black_seal_price=Decimal("0.51"),
             add_hole_price=Decimal("1.02"),

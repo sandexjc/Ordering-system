@@ -46,6 +46,7 @@ class VitrineContextBuilder:
         black_profile_len = cls._profile_qty(frames, "Black")
         matte_profile_len = cls._profile_qty(frames, "Matte")
         inox_profile_len = cls._profile_qty(frames, "Inox")
+        gold_profile_len = cls._profile_qty(frames, "Gold")
 
         manual_seal_enabled = settings.DJANGO_FEATURES__MANUAL_SEAL
 
@@ -65,11 +66,13 @@ class VitrineContextBuilder:
             "black_profile_len": black_profile_len,
             "matte_profile_len": matte_profile_len,
             "inox_profile_len": inox_profile_len,
+            "gold_profile_len": gold_profile_len,
 
             # Profile totals
             "black_profile_total": black_profile_len * vitrine.black_profile_price,
             "matte_profile_total": matte_profile_len * vitrine.matte_profile_price,
             "inox_profile_total": inox_profile_len * vitrine.inox_profile_price,
+            "gold_profile_total": gold_profile_len * vitrine.gold_profile_price,
 
             # Seals
             "white_seal": white_seal_qty,
@@ -91,9 +94,11 @@ class VitrineContextBuilder:
             "black_profile_len": 0,
             "matte_profile_len": 0,
             "inox_profile_len": 0,
+            "gold_profile_len": 0,
             "black_profile_total": 0,
             "matte_profile_total": 0,
             "inox_profile_total": 0,
+            "gold_profile_total": 0,
             "white_seal": 0,
             "black_seal": 0,
             "white_seal_total": 0,

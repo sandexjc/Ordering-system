@@ -8,6 +8,7 @@ _PROFILE_PRICE_MAP = {
     "Black": "black_profile_price",
     "Matte": "matte_profile_price",
     "Inox": "inox_profile_price",
+    "Gold": "gold_profile_price",
 }
 
 _SEAL_PRICE_MAP = {
@@ -42,7 +43,7 @@ class FrameWorkflow(BaseVitrineItemWorkflow):
 
         # --- SEAL --- #
         if (not feature_auto_seal_enabled) or frame.auto_calculate_seal:
-            seal_type = frame.profile_type if frame.profile_type == "Black" else "White"
+            seal_type = "Black" if frame.profile_type in ("Black", "Gold") else "White"
             seal_quantity = (cls.frame_perimeter(frame) * frame.quantity).quantize(Decimal("0.1"))
             seal_price = getattr(vitrine, _SEAL_PRICE_MAP[seal_type])
             seal_value = cls.calculate_value(seal_quantity, seal_price)

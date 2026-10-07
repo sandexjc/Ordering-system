@@ -11,6 +11,7 @@ class VitrinePriceConfigForm(forms.ModelForm):
             "black_profile_price",
             "matte_profile_price",
             "inox_profile_price",
+            "gold_profile_price",
             "white_seal_price",
             "black_seal_price",
             "add_hole_price",
@@ -22,6 +23,7 @@ class VitrinePriceConfigForm(forms.ModelForm):
         self.fields["black_profile_price"].label = "Черен профил (л.м.)"
         self.fields["matte_profile_price"].label = "Матов профил (л.м.)"
         self.fields["inox_profile_price"].label = "Инокс профил (л.м.)"
+        self.fields["gold_profile_price"].label = "Златист профил (л.м.)"
         self.fields["white_seal_price"].label = "Бяло уплътнение (л.м.)"
         self.fields["black_seal_price"].label = "Черно уплътнение (л.м.)"
         self.fields["add_hole_price"].label = "Допълнителен отвор (1 бр.)"

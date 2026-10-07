@@ -30,6 +30,14 @@
                 <td>{{ inox_profile_total }} {{ currency }}</td>
             </tr>
         {% endif %}
+        {% if gold_profile_len != "0.00" %}
+            <tr>
+                <td class="indent-cell">Златист</td>
+                <td>{{ gold_profile_len }} л.м.</td>
+                <td>{{ current_order.gold_profile_price }} {{ currency }}</td>
+                <td>{{ gold_profile_total }} {{ currency }}</td>
+            </tr>
+        {% endif %}
         <tr>
             <td colspan="3"><strong>Общо</strong></td>
             <td><strong>{{ current_order.frames_total }} {{ currency }}</strong></td>

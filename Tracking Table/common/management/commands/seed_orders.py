@@ -233,6 +233,7 @@ class Command(BaseCommand):
             black_price = money(uniform(15, 40))
             matte_price = money(uniform(18, 45))
             inox_price = money(uniform(25, 60))
+            gold_price = money(uniform(25, 60))
 
             vitrine = Vitrine.objects.create(
                 owner=fake.name()[:50],
@@ -243,6 +244,7 @@ class Command(BaseCommand):
                 black_profile_price=black_price,
                 matte_profile_price=matte_price,
                 inox_profile_price=inox_price,
+                gold_profile_price=gold_price,
                 white_seal_price=money(uniform(2, 8)),
                 black_seal_price=money(uniform(2, 8)),
                 add_hole_price=add_hole_price,
@@ -256,10 +258,11 @@ class Command(BaseCommand):
                 "Black": black_price,
                 "Matte": matte_price,
                 "Inox": inox_price,
+                "Gold": gold_price,
             }
 
             for _ in range(randint(1, 3)):
-                profile_type = choice(["Black", "Matte", "Inox"])
+                profile_type = choice(["Black", "Matte", "Inox", "Gold"])
                 length = randint(400, 2500)
                 width = randint(300, 1800)
                 quantity = randint(1, 4)

@@ -12,6 +12,7 @@ class VitrinePriceSetter:
         "black_profile_price",
         "matte_profile_price",
         "inox_profile_price",
+        "gold_profile_price",
         "white_seal_price",
         "black_seal_price",
         "add_hole_price",

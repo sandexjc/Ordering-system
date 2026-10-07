@@ -37,6 +37,7 @@ class Frame(VitrineItem, BaseItem):
         ('Black', 'Черен'),
         ('Matte', 'Матов'),
         ('Inox', 'Инокс'),
+        ('Gold', 'Златист'),
     ]
 
     holes_positions = [
