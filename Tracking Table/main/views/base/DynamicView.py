@@ -36,7 +36,6 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
     allowed_views = ("table", "vitrine")
     model = None
     order_type = "order"
-    page_size = 50
     rows_template_name = None
     rows_context_name = "orders"
     rows_prefetch_related = ()
@@ -78,6 +77,8 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
             "local_mutation_skip_ms": settings.DJANGO_DYNAMIC_CONTENT__LOCAL_MUTATION_SKIP_MS,
             "range_filter_debounce_ms": settings.DJANGO_DYNAMIC_CONTENT__RANGE_FILTER_DEBOUNCE_MS,
             "sync_highlight_ms": settings.DJANGO_DYNAMIC_CONTENT__SYNC_HIGHLIGHT_MS,
+            "nof_orders_init_load": max(1, settings.DJANGO_DYNAMIC_CONTENT__NOF_ORDERS_INIT_LOAD),
+            "nof_orders_secondary_load": max(1, settings.DJANGO_DYNAMIC_CONTENT__NOF_ORDERS_SECONDARY_LOAD),
         }
         return context
 
@@ -85,10 +86,12 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         return self.render_to_response(self.get_context_data())
 
     def get_page_size(self):
+        initial = max(1, settings.DJANGO_DYNAMIC_CONTENT__NOF_ORDERS_INIT_LOAD)
+        secondary = max(1, settings.DJANGO_DYNAMIC_CONTENT__NOF_ORDERS_SECONDARY_LOAD)
         raw_limit = self.request.GET.get("limit")
         if raw_limit and raw_limit.isnumeric():
-            return max(1, min(int(raw_limit), 100))
-        return self.page_size
+            return max(1, min(int(raw_limit), max(initial, secondary)))
+        return initial
 
     def get_sort(self):
         sort = (self.request.GET.get("sort") or "desc").lower()

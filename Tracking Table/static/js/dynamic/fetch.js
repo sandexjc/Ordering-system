@@ -135,7 +135,8 @@ function setupInfiniteScroll(viewName, generation) {
  */
 function buildOrdersUrl(endpoint, cursor, viewName = null) {
     const url = new URL(endpoint, window.location.origin);
-    url.searchParams.set("limit", "50");
+    const pageLimit = cursor ? NOF_ORDERS_SECONDARY_LOAD : NOF_ORDERS_INIT_LOAD;
+    url.searchParams.set("limit", String(pageLimit));
 
     const root = document.getElementById("dynamic-orders-root");
     const resolvedView = viewName || root?.dataset.currentView || "table";

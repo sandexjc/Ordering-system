@@ -65,6 +65,8 @@ const DEFAULT_ORDER_FILTERS = Object.freeze({
     balanceMax: null,
 });
 
+const NOF_ORDERS_INIT_LOAD = readDynamicContentInt("nofOrdersInitLoad", 300);
+const NOF_ORDERS_SECONDARY_LOAD = readDynamicContentInt("nofOrdersSecondaryLoad", 50);
 const RANGE_FILTER_DEBOUNCE_MS = readDynamicContentInt("rangeFilterDebounceMs", 300);
 const SYNC_HIGHLIGHT_MS = readDynamicContentInt("syncHighlightMs", 120000);
 let rangeFilterDebounceTimer = null;
