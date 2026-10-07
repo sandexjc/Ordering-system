@@ -39,6 +39,7 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
     page_size = 50
     rows_template_name = None
     rows_context_name = "orders"
+    rows_prefetch_related = ()
     allowed_sorts = ("asc", "desc")
     allowed_sort_by = ("order_id", "date", "balance")
     allowed_order_types = ("order", "offer")
@@ -161,7 +162,7 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         return queryset.order_by(f"{prefix}{field}", f"{prefix}pk")
 
     def get_filtered_queryset(self):
-        queryset = self.model.objects.for_list()
+        queryset = self.model.objects.for_list(*self.rows_prefetch_related)
         queryset = queryset.of_types(*self.get_order_types())
 
         start_dt, end_dt = self.get_date_bounds()

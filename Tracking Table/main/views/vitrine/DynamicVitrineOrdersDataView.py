@@ -18,3 +18,4 @@ class DynamicVitrineOrdersData(DynamicView):
 
     model = Vitrine
     rows_template_name = "vitrine/components/table_rows.html"
+    rows_prefetch_related = ("frames", "others", "notes")

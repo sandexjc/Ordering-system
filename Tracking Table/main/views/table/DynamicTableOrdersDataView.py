@@ -18,3 +18,4 @@ class DynamicTableOrdersData(DynamicView):
 
     model = Order
     rows_template_name = "table/components/table_rows.html"
+    rows_prefetch_related = ("plates", "edges", "others", "notes")
