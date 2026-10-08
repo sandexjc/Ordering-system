@@ -269,6 +269,7 @@ async function loadMoreOrders(viewName, generation) {
         if (viewName === "vitrine" && typeof syncFrameHeights === "function") {
             syncFrameHeights();
         }
+        void liveBody.offsetHeight;
 
         const visibleItems = (cacheEntry.visibleItems || 0) + pageCount;
         updateViewCache(viewName, {

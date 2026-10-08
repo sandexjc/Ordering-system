@@ -14,6 +14,31 @@
  *   - dynamic/search.js → getSearchForView, isSearchActive
  */
 
+/** True when this deployment still allows vitrine offers.
+ * @returns {boolean}
+ */
+function vitrineOffersEnabled() {
+    const root = document.getElementById("dynamic-orders-root");
+    return root?.dataset.vitrineOffersEnabled === "1";
+}
+
+/** Hide the shared offer checkbox while the vitrine board has offers disabled.
+ * @param {*} viewName - Dynamic view key ("table" | "vitrine").
+ * @returns {void}
+ */
+function syncOfferFilterVisibility(viewName) {
+    const hide = viewName === "vitrine" && !vitrineOffersEnabled();
+    const offerCheckbox = document.getElementById("filter-type-offer");
+    const offerLabel = document.querySelector('label[for="filter-type-offer"]');
+    if (offerCheckbox) {
+        offerCheckbox.classList.toggle("d-none", hide);
+        offerCheckbox.disabled = hide;
+    }
+    if (offerLabel) {
+        offerLabel.classList.toggle("d-none", hide);
+    }
+}
+
 /** Update top counter text to match currently rendered rows.
  * @param {*} visibleItems - Number of currently visible list items.
  * @param {*} viewName - Dynamic view key ("table" | "vitrine").
@@ -103,10 +128,13 @@ function normalizeOrderFilters(filters) {
  */
 function getFiltersForView(viewName) {
     const cacheEntry = viewOrdersCache.get(viewName);
-    if (cacheEntry && cacheEntry.filters) {
-        return normalizeOrderFilters(cacheEntry.filters);
+    const filters = cacheEntry && cacheEntry.filters
+        ? normalizeOrderFilters(cacheEntry.filters)
+        : getDefaultOrderFilters();
+    if (viewName === "vitrine" && !vitrineOffersEnabled()) {
+        filters.includeOffer = false;
     }
-    return getDefaultOrderFilters();
+    return filters;
 }
 
 /** True when id/balance values differ from the full available bounds (or bounds unknown).
@@ -592,6 +620,7 @@ function syncFilterControls(filters, viewName = null) {
     if (offerCheckbox) {
         offerCheckbox.checked = Boolean(current.includeOffer);
     }
+    syncOfferFilterVisibility(resolvedView);
 
     const startDisplay = document.getElementById("filter-start-display");
     const endDisplay = document.getElementById("filter-end-display");

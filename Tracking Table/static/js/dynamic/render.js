@@ -137,9 +137,23 @@ function getShellMarkup(viewName) {
  * @param {*} href - Stylesheet URL.
  * @returns {void}
  */
+function stylesheetReady(link) {
+    if (link.sheet) {
+        return Promise.resolve();
+    }
+    return new Promise((resolve) => {
+        link.addEventListener("load", () => resolve(), { once: true });
+        link.addEventListener("error", () => resolve(), { once: true });
+    });
+}
+
 function ensureStylesheetLink(id, href) {
-    if (!href || document.getElementById(id)) {
-        return;
+    if (!href) {
+        return Promise.resolve();
+    }
+    const existing = document.getElementById(id);
+    if (existing) {
+        return stylesheetReady(existing);
     }
     const link = document.createElement("link");
     link.id = id;
@@ -147,6 +161,7 @@ function ensureStylesheetLink(id, href) {
     link.type = "text/css";
     link.href = href;
     document.head.appendChild(link);
+    return stylesheetReady(link);
 }
 
 /** Lazy-load vitrine CSS only when vitrine view is needed.
@@ -155,16 +170,99 @@ function ensureStylesheetLink(id, href) {
  */
 function ensureVitrineStylesIfNeeded(viewName) {
     if (viewName !== "vitrine") {
-        return;
+        return Promise.resolve();
     }
     const root = document.getElementById("dynamic-orders-root");
     if (!root) {
-        return;
+        return Promise.resolve();
     }
 
-    ensureStylesheetLink("dynamic-vitrine-css-vitrines", root.dataset.vitrineCssVitrines);
-    ensureStylesheetLink("dynamic-vitrine-css-holes", root.dataset.vitrineCssHoles);
-    ensureStylesheetLink("dynamic-vitrine-css-modal", root.dataset.vitrineCssModal);
+    return Promise.all([
+        ensureStylesheetLink("dynamic-vitrine-css-vitrines", root.dataset.vitrineCssVitrines),
+        ensureStylesheetLink("dynamic-vitrine-css-holes", root.dataset.vitrineCssHoles),
+        ensureStylesheetLink("dynamic-vitrine-css-modal", root.dataset.vitrineCssModal),
+    ]);
+}
+
+function waitForNextPaint() {
+    return new Promise((resolve) => {
+        window.requestAnimationFrame(() => resolve());
+    });
+}
+
+/** Cover the list while rows are inserted and laid out, so the fade starts on finished rows.
+ * @param {boolean} isPreparing - Whether the preparing overlay should be visible.
+ * @returns {void}
+ */
+function setOrdersPreparing(isPreparing) {
+    const container = document.getElementById("dynamic-orders-table-container");
+    if (!container) {
+        return;
+    }
+    let overlay = document.getElementById("dynamic-orders-preparing");
+    if (!isPreparing) {
+        if (overlay) {
+            overlay.hidden = true;
+        }
+        return;
+    }
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "dynamic-orders-preparing";
+        overlay.className = "dynamic-orders-preparing";
+        overlay.innerHTML = `
+            <div class="d-inline-flex align-items-center gap-2">
+                <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+                <span>Зареждане...</span>
+            </div>
+        `;
+        container.appendChild(overlay);
+    }
+    overlay.hidden = false;
+}
+
+/** Insert row HTML behind the spinner, then allow one layout pass before the fade.
+ * Vitrine also waits for its stylesheets and frame-height alignment.
+ * Returns false when this render is stale.
+ * @param {*} liveBody - Orders tbody element.
+ * @param {string} rowsHtml - Row markup to insert.
+ * @param {string} viewName - Dynamic view key ("table" | "vitrine").
+ * @param {function(): boolean} isCurrent - True while this render still owns the view.
+ * @returns {Promise<boolean>}
+ */
+async function replaceRowsWhenReady(liveBody, rowsHtml, viewName, isCurrent) {
+    if (viewName === "vitrine") {
+        await ensureVitrineStylesIfNeeded(viewName);
+        if (!isCurrent() || !liveBody.isConnected) {
+            return false;
+        }
+    }
+
+    setOrdersPreparing(true);
+    await waitForNextPaint();
+    if (!isCurrent() || !liveBody.isConnected) {
+        setOrdersPreparing(false);
+        return false;
+    }
+    liveBody.style.visibility = "hidden";
+
+    try {
+        liveBody.innerHTML = rowsHtml;
+        if (viewName === "vitrine" && typeof syncFrameHeights === "function") {
+            syncFrameHeights();
+        }
+        if (typeof highlightSearchInOrders === "function") {
+            highlightSearchInOrders(viewName);
+        }
+        void liveBody.offsetHeight;
+        await waitForNextPaint();
+        return isCurrent() && liveBody.isConnected;
+    } finally {
+        if (liveBody.isConnected) {
+            liveBody.style.visibility = "";
+        }
+        setOrdersPreparing(false);
+    }
 }
 
 /** Fade out currently rendered rows before replacing tbody content.
@@ -263,9 +361,6 @@ function bindOrderRowHandlers() {
 function finalizeRenderedRows(viewName, generation, { restoreExpandedRows = true } = {}) {
     if (!isOrdersRenderCurrent(generation, viewName)) {
         return;
-    }
-    if (typeof syncFrameHeights === "function") {
-        syncFrameHeights();
     }
     if (typeof restoreSummarizeSelection === "function") {
         restoreSummarizeSelection();
