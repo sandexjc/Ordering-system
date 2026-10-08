@@ -252,10 +252,23 @@ async function loadMoreOrders(viewName, generation) {
             return;
         }
 
+        if (viewName === "vitrine") {
+            await ensureVitrineStylesIfNeeded(viewName);
+            if (!isOrdersRenderCurrent(generation, viewName)) {
+                return;
+            }
+        }
+
         const template = document.createElement("tbody");
         template.innerHTML = rowsHtml;
         const newRows = Array.from(template.children);
-        newRows.forEach((row) => liveBody.appendChild(row));
+        newRows.forEach((row) => {
+            row.style.opacity = "0";
+            liveBody.appendChild(row);
+        });
+        if (viewName === "vitrine" && typeof syncFrameHeights === "function") {
+            syncFrameHeights();
+        }
 
         const visibleItems = (cacheEntry.visibleItems || 0) + pageCount;
         updateViewCache(viewName, {
@@ -327,7 +340,15 @@ async function renderCachedRowsIfAvailable(tableBody, viewName, colspan, generat
         return true;
     }
 
-    liveBody.innerHTML = cached.rowsHtml;
+    const cacheReady = await replaceRowsWhenReady(
+        liveBody,
+        cached.rowsHtml,
+        viewName,
+        () => isOrdersRenderCurrent(generation, viewName)
+    );
+    if (!cacheReady) {
+        return true;
+    }
     /** Strip any open markup baked into cached HTML, then re-open via openRowIds. */
     resetCachedRowsOpenMarkup(liveBody);
     updateVisibleItemsCounter(cached.visibleItems || 0, viewName);
@@ -431,7 +452,15 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
             return;
         }
 
-        liveBody.innerHTML = rowsHtml || buildEmptyRow(colspan);
+        const rowsReady = await replaceRowsWhenReady(
+            liveBody,
+            rowsHtml || buildEmptyRow(colspan),
+            resolvedView,
+            () => isOrdersRenderCurrent(renderGeneration, resolvedView)
+        );
+        if (!rowsReady) {
+            return;
+        }
         updateVisibleItemsCounter(visibleItems, resolvedView);
         setupRenderedRows(resolvedView, renderGeneration, { deferHeavyWork: true });
         fadeInRows(liveBody);
