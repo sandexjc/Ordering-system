@@ -44,7 +44,7 @@
     <td>
         {% for item in vitrine.notes.all %}
             <div class="vitrine-notes" id="vitrine-note-{{ item.pk }}">
-                {{ item.user }} -> <span style="color: red;">{{ item.content }}</span>
+                {{ item.user|slice:":1" }} -> <span style="color: red;">{{ item.content }}</span>
             </div>
         {% endfor %}
     </td>

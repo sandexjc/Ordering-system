@@ -88,10 +88,7 @@
     <td>
         {% for item in order.notes.all %}
             <div>
-                {{item.user}} ->
-                <span style="color: red;">
-                    {{item.content}}
-                </span>
+                {{item.user|slice:":1"}} -> <span style="color: red;"> {{item.content}} </span>
             </div>
         {% endfor %}
     </td>
