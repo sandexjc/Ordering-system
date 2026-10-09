@@ -29,7 +29,8 @@ class TableOrderQuerySet(BaseOrderQuerySet):
             return self
 
         return self.filter(
-            unicode_contains("owner", term)
+            self.pk_exact(term)
+            | unicode_contains("owner", term)
             | unicode_contains("telephone", term)
             | self.related_text_exists("plates", term, "material")
             | self.related_text_exists("edges", term, "edge_type", "color_code")

@@ -33,6 +33,12 @@ class BaseOrderQuerySet(BaseQuerySet):
     def owner_contains(self, name):
         return self.filter(unicode_contains("owner", name))
 
+    def pk_exact(self, term):
+        """Exact order-id match when the term is a whole number."""
+        if not str(term).isdecimal():
+            return Q()
+        return Q(pk=int(term))
+
     def related_text_exists(self, related_name, term, *field_names):
         """Match related rows with EXISTS instead of JOIN.
 
