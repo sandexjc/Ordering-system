@@ -51,7 +51,6 @@ class StaticView(MainView):
             context['badges'] = False
 
         context['visible_items'] = len(context['orders'])
-        context['current_time'] = self.get_time_of_day()
         return context
 
     def handle_search(self):

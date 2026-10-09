@@ -8,7 +8,7 @@
  *
  * Used by:
  *   - main/templates/layout/base.html           (navbar icons, footer, fixed-min-width)
- *   - main/templates/layout/content.html        (WelcomeText, table-div, custom-round, bottom-space)
+ *   - main/templates/layout/content.html        (top-space, table-div, custom-round, bottom-space)
  *   - main/templates/components/toolbar.html    (FilterNav, tableIcons)
  *   - table/.../order_row.html, vitrine/.../vitrine_row.html
  *       (hiddenRows, hidden-table, hidden-row-close, orderTaken, normalOrder, offer-row, fixed-min-width)
@@ -42,13 +42,9 @@ body
 	background-blend-mode: lighten;
 }
 
-.WelcomeText
+.top-space
 {
-	text-align: center;
-	margin-bottom: 50px;
-	margin-top: 50px;
-	margin-left: auto;
-	margin-right: auto;
+	min-height: 3rem;
 }
 
 .FilterNav
@@ -75,6 +71,11 @@ body
 	padding-bottom: 20px;
 	margin-top: 20px;
 	width: 90%;
+}
+
+.top-space + .table-div
+{
+	margin-top: 0;
 }
 
 .custom-round

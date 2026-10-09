@@ -65,7 +65,6 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
         context["nav_select"] = current_view
         context["orders"] = []
         context["visible_items"] = 0
-        context["current_time"] = self.get_time_of_day()
         context["dynamic_mode"] = True
         context["current_dynamic_view"] = current_view
         context["feature_summarize_content_enabled"] = settings.DJANGO_FEATURES__SUMMARIZE_CONTENT
