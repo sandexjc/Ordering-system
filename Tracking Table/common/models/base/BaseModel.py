@@ -32,9 +32,12 @@ class BaseModel(models.Model, WorkflowModelMixin):
         abstract = True
     
     def soft_delete(self):
-        self.deleted_at = timezone.now()
-        self.save(update_fields=["deleted_at"])
+        now = timezone.now()
+        self.deleted_at = now
+        self.updated_at = now
+        self.save(update_fields=["deleted_at", "updated_at"])
 
     def restore(self):
         self.deleted_at = None
-        self.save(update_fields=["deleted_at"])
+        self.updated_at = timezone.now()
+        self.save(update_fields=["deleted_at", "updated_at"])

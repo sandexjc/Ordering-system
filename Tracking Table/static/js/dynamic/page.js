@@ -46,7 +46,18 @@ function switchDynamicView(viewName) {
         }
         syncFilterControls(getFiltersForView(viewName), viewName);
     });
-    fetchAndRenderOrders({ viewName, generation });
+    fetchAndRenderOrders({ viewName, generation }).then(() => {
+        const rootNow = document.getElementById("dynamic-orders-root");
+        if (!rootNow || rootNow.dataset.currentView !== viewName) {
+            return;
+        }
+        if (generation !== ordersRenderGeneration) {
+            return;
+        }
+        if (typeof focusOrdersLiveSync === "function") {
+            focusOrdersLiveSync();
+        }
+    });
 }
 
 /** Initialize dynamic page behavior after DOM is ready. */

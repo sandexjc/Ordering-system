@@ -73,19 +73,25 @@ function consumeLocalOrderMutation(orderId)
 }
 
 /**
- * Views that already have a loaded list cache this session.
+ * The visible board, once it has a sync watermark.
+ *
+ * A hidden board keeps its loaded rows and its last watermark.
+ * It is not polled until it is the active tab again.
  *
  * @returns {string[]}
  */
 function getLoadedSyncViewNames()
 {
-    const names = [];
-    viewOrdersCache.forEach((cacheEntry, viewName) => {
-        if (cacheEntry && cacheEntry.watermark) {
-            names.push(viewName);
-        }
-    });
-    return names;
+    const root = document.getElementById("dynamic-orders-root");
+    const viewName = root && root.dataset.currentView;
+    if (!viewName) {
+        return [];
+    }
+    const cacheEntry = viewOrdersCache.get(viewName);
+    if (!cacheEntry || !cacheEntry.watermark) {
+        return [];
+    }
+    return [viewName];
 }
 
 /**
@@ -349,7 +355,7 @@ function removeRowPairFromTbody(tbody, orderId)
 }
 
 /**
- * Drop cached expanded-details HTML so the next expand refetches.
+ * Drop cached expanded-details HTML so a refreshed copy can replace it.
  *
  * @param {string} viewName - Dynamic view key.
  * @param {string} orderId - Order / vitrine id.
@@ -449,7 +455,10 @@ function afterLiveSyncDomPatch(viewName)
 }
 
 /**
- * Refresh expanded details unless a fetch is already in flight for this id.
+ * Refresh details that were already loaded, open or folded.
+ *
+ * Orders that were never opened do not have `fetch-prevent` and are left alone.
+ * The next open still fetches them once.
  *
  * @param {string|number} orderId - Order / vitrine id.
  * @returns {void}
@@ -458,12 +467,7 @@ function refreshOpenOrderDetailsIfNeeded(orderId)
 {
     const key = String(orderId);
     const hiddenRow = document.getElementById("hidden-row-" + key);
-    if (!hiddenRow) {
-        return;
-    }
-    const isOpen = hiddenRow._isOpen === true
-        || (typeof isHiddenRowVisuallyOpen === "function" && isHiddenRowVisuallyOpen(hiddenRow));
-    if (!isOpen) {
+    if (!hiddenRow || !hiddenRow.classList.contains("fetch-prevent")) {
         return;
     }
     if (ordersDetailsInFlight.has(key)) {
@@ -761,7 +765,7 @@ async function pollOrdersSyncForView(viewName)
 }
 
 /**
- * Poll every loaded board (current + cached other app).
+ * Poll the active board from its last sync watermark.
  *
  * @returns {Promise<void>}
  */
@@ -781,20 +785,85 @@ async function pollOrdersSync()
 }
 
 /**
- * Schedule the next poll, with backoff after errors.
+ * Schedule the next poll one sync interval out.
  *
- * @param {number} delayMs - Delay before the next tick.
+ * The interval comes from DJANGO_DYNAMIC_CONTENT__ORDERS_SYNC_INTERVAL_MS.
+ *
+ * @param {number} [delayMs] - Delay before the next tick. Defaults to the sync interval.
  * @returns {void}
  */
 function scheduleOrdersSync(delayMs)
 {
+    const waitMs = Number.isFinite(delayMs) ? delayMs : ORDERS_SYNC_INTERVAL_MS;
     if (ordersSyncTimer) {
         window.clearTimeout(ordersSyncTimer);
     }
-    ordersSyncNextTickAt = Date.now() + delayMs;
-    ordersSyncTimer = window.setTimeout(runOrdersSyncTick, delayMs);
+    ordersSyncNextTickAt = Date.now() + waitMs;
+    ordersSyncTimer = window.setTimeout(runOrdersSyncTick, waitMs);
     if (typeof refreshServerConnectionToast === "function") {
         refreshServerConnectionToast();
+    }
+}
+
+/**
+ * A poll heard the server. Clear the miss streak and keep the next check on the sync interval.
+ *
+ * @returns {void}
+ */
+function markOrdersSyncConnected()
+{
+    ordersSyncMissStreak = 0;
+    ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
+    if (typeof setServerConnected === "function") {
+        setServerConnected(true);
+    } else {
+        isServerConnected = true;
+    }
+    scheduleOrdersSync(ORDERS_SYNC_INTERVAL_MS);
+}
+
+/**
+ * Count a poll that timed out or failed.
+ *
+ * The offline toast waits until two attempts in a row fail.
+ *
+ * @returns {boolean} True when the connection is now treated as down.
+ */
+function noteOrdersSyncAttemptFailed()
+{
+    ordersSyncMissStreak += 1;
+    if (isServerConnected && ordersSyncMissStreak < ORDERS_SYNC_MISS_LIMIT) {
+        return false;
+    }
+    ordersSyncMissStreak = 0;
+    isServerConnected = false;
+    return true;
+}
+
+/**
+ * Show the offline toast and wait before the next attempt.
+ *
+ * The first wait is twice the sync interval (10s at a 5s interval).
+ * The wait after that is 30s.
+ *
+ * @returns {void}
+ */
+function holdOrdersSyncRetry()
+{
+    if (ordersSyncBackoffMs <= ORDERS_SYNC_INTERVAL_MS) {
+        ordersSyncBackoffMs = Math.min(ORDERS_SYNC_INTERVAL_MS * 2, ORDERS_SYNC_BACKOFF_MAX_MS);
+    } else {
+        ordersSyncBackoffMs = ORDERS_SYNC_BACKOFF_MAX_MS;
+    }
+    if (document.visibilityState !== "visible") {
+        return;
+    }
+    if (typeof setServerConnected === "function") {
+        setServerConnected(false);
+    }
+    scheduleOrdersSync(ordersSyncBackoffMs);
+    if (typeof setServerConnectionToastPending === "function") {
+        setServerConnectionToastPending(false);
     }
 }
 
@@ -811,6 +880,31 @@ function abortOrdersSyncInFlight()
         ordersSyncAbort.abort();
     }
     ordersSyncAbort = new AbortController();
+}
+
+/**
+ * Point live sync at the active board without counting a connection miss.
+ *
+ * The hidden board keeps the watermark from its last received sync.
+ * The next poll for that board sends that value as `since`.
+ *
+ * @returns {void}
+ */
+function focusOrdersLiveSync()
+{
+    if (!window.__ordersLiveSyncStarted) {
+        return;
+    }
+    if (document.visibilityState !== "visible") {
+        return;
+    }
+    ordersSyncTickId += 1;
+    abortOrdersSyncInFlight();
+    if (ordersSyncTimer) {
+        window.clearTimeout(ordersSyncTimer);
+        ordersSyncTimer = null;
+    }
+    runOrdersSyncTick();
 }
 
 /**
@@ -837,15 +931,18 @@ function retryOrdersLiveSync()
 /**
  * One poll tick; reschedules itself.
  *
- * A successful HTTP response means the client has a server connection.
- * If the previous poll is still outstanding when this heartbeat fires,
- * there was no response in time and the connection is down.
+ * The sync interval is the timeout. A poll still open at that point is cancelled
+ * and another is sent. The offline toast shows when the second attempt also fails.
+ * After that, retries wait 10s and then 30s.
  *
  * @returns {Promise<void>}
  */
 async function runOrdersSyncTick()
 {
-    ordersSyncTimer = null;
+    if (ordersSyncTimer) {
+        window.clearTimeout(ordersSyncTimer);
+        ordersSyncTimer = null;
+    }
     const root = document.getElementById("dynamic-orders-root");
     if (!root) {
         return;
@@ -854,16 +951,18 @@ async function runOrdersSyncTick()
         return;
     }
 
-    const missedHeartbeat = ordersSyncAwaitingResponse;
-    if (missedHeartbeat) {
-        isServerConnected = false;
-        ordersSyncBackoffMs = Math.min(ordersSyncBackoffMs * 2, 32000);
+    if (ordersSyncAwaitingResponse) {
+        ordersSyncTickId += 1;
         abortOrdersSyncInFlight();
+        if (noteOrdersSyncAttemptFailed()) {
+            holdOrdersSyncRetry();
+            return;
+        }
     }
 
     const tickId = ++ordersSyncTickId;
     ordersSyncFetchSucceededThisTick = false;
-    scheduleOrdersSync(isServerConnected ? ORDERS_SYNC_INTERVAL_MS : ordersSyncBackoffMs);
+    scheduleOrdersSync(ORDERS_SYNC_INTERVAL_MS);
     if (!isServerConnected && typeof setServerConnected === "function") {
         setServerConnected(false);
         if (typeof setServerConnectionToastPending === "function") {
@@ -877,13 +976,7 @@ async function runOrdersSyncTick()
             return;
         }
         if (ordersSyncFetchSucceededThisTick) {
-            ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
-            if (typeof setServerConnected === "function") {
-                setServerConnected(true);
-            } else {
-                isServerConnected = true;
-            }
-            scheduleOrdersSync(ORDERS_SYNC_INTERVAL_MS);
+            markOrdersSyncConnected();
         } else if (!isServerConnected && typeof setServerConnectionToastPending === "function") {
             setServerConnectionToastPending(false);
         }
@@ -896,17 +989,19 @@ async function runOrdersSyncTick()
             return;
         }
         console.error(error);
-        if (!ordersSyncFetchSucceededThisTick) {
-            isServerConnected = false;
-            ordersSyncBackoffMs = Math.min(ordersSyncBackoffMs * 2, 32000);
-            if (document.visibilityState !== "visible") {
-                return;
-            }
-            scheduleOrdersSync(ordersSyncBackoffMs);
-            if (typeof setServerConnected === "function") {
-                setServerConnected(false);
-            }
+        if (ordersSyncFetchSucceededThisTick) {
+            markOrdersSyncConnected();
+            return;
         }
+        if (document.visibilityState !== "visible") {
+            return;
+        }
+        const gaveUp = noteOrdersSyncAttemptFailed();
+        if (!gaveUp) {
+            runOrdersSyncTick();
+            return;
+        }
+        holdOrdersSyncRetry();
     }
 }
 
@@ -923,6 +1018,7 @@ function pauseOrdersLiveSync()
         ordersSyncTimer = null;
     }
     ordersSyncNextTickAt = 0;
+    ordersSyncMissStreak = 0;
     abortOrdersSyncInFlight();
     if (typeof hideServerConnectionToast === "function") {
         hideServerConnectionToast();
@@ -960,6 +1056,7 @@ function setupOrdersLiveSync()
             pauseOrdersLiveSync();
             return;
         }
+        ordersSyncMissStreak = 0;
         ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
         runOrdersSyncTick();
     });

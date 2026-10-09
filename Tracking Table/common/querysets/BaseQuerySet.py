@@ -31,4 +31,5 @@ class BaseQuerySet(models.QuerySet):
 
     # Soft delete all records in this queryset.
     def soft_delete(self):
-        return self.update(deleted_at=timezone.now())
+        now = timezone.now()
+        return self.update(deleted_at=now, updated_at=now)

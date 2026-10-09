@@ -28,10 +28,15 @@ function readDynamicContentInt(datasetKey, fallback)
 const SEARCH_MIN_LENGTH = readDynamicContentInt("searchMinLength", 2);
 const SEARCH_DEBOUNCE_MS = readDynamicContentInt("searchDebounceMs", 700);
 const ORDERS_SYNC_INTERVAL_MS = readDynamicContentInt("ordersSyncIntervalMs", 4000);
+/** Timed-out or failed polls required before the offline toast. Each poll is cancelled at the sync interval. */
+const ORDERS_SYNC_MISS_LIMIT = 2;
+/** Longest wait between reconnect attempts after the connection is dropped. */
+const ORDERS_SYNC_BACKOFF_MAX_MS = 30000;
 const LOCAL_MUTATION_SKIP_MS = readDynamicContentInt("localMutationSkipMs", 60000);
 
 let isOrdersListFetchInFlight = 0;
 let ordersSyncTimer = null;
+/** Wait before the next reconnect attempt. Grows from the sync interval to 10s, then 30s. */
 let ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
 /** Bumped when the tab hides so in-flight heartbeats cannot move `since`. */
 let ordersSyncGeneration = 0;
@@ -44,7 +49,12 @@ let ordersSyncAwaitingResponse = false;
 let ordersSyncFetchSucceededThisTick = false;
 /** When the next heartbeat / reconnect attempt is scheduled. */
 let ordersSyncNextTickAt = 0;
-/** Optimistic until the first missed heartbeat; page load already talked to the server. */
+/**
+ * Consecutive polls that timed out or failed.
+ * Reset when a poll succeeds. The offline toast waits until this reaches the miss limit.
+ */
+let ordersSyncMissStreak = 0;
+/** Optimistic until two polls in a row time out or fail; page load already talked to the server. */
 let isServerConnected = true;
 const recentLocalOrderMutations = window.recentLocalOrderMutations || new Map();
 window.recentLocalOrderMutations = recentLocalOrderMutations;
