@@ -177,6 +177,54 @@ function scheduleSearchCommit(rawValue) {
     }, SEARCH_DEBOUNCE_MS);
 }
 
+/** True when the focused element should keep its own keystrokes.
+ * @param {EventTarget|null} target - Event target.
+ * @returns {boolean}
+ */
+function isSearchTypingBlocked(target) {
+    if (!(target instanceof Element)) {
+        return false;
+    }
+    return Boolean(target.closest(
+        "input, textarea, select, button, a, summary, [contenteditable='true'], [role='button'], th[data-sort-by], [data-progress-step]"
+    ));
+}
+
+/** Start a new search from a key typed while the page itself is focused.
+ * @param {KeyboardEvent} event - Document keydown.
+ * @returns {void}
+ */
+function handlePageTypeToSearch(event) {
+    if (event.defaultPrevented || event.isComposing) {
+        return;
+    }
+    if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+    }
+    if (event.key.length !== 1 || event.key.trim() === "") {
+        return;
+    }
+    if (document.querySelector(".modal.show")) {
+        return;
+    }
+    if (isSearchTypingBlocked(event.target)) {
+        return;
+    }
+
+    const input = document.getElementById("dynamic-search-input");
+    if (!input || document.activeElement === input) {
+        return;
+    }
+
+    event.preventDefault();
+    input.value = event.key;
+    openDynamicSearch({ focusInput: false });
+    input.focus();
+    const caret = input.value.length;
+    input.setSelectionRange(caret, caret);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 /**
  * Wire expandable search UI + debounced requests.
  * @returns {void}
@@ -227,6 +275,8 @@ function setupDynamicSearch() {
             maybeCloseDynamicSearch();
         }
     });
+
+    document.addEventListener("keydown", handlePageTypeToSearch);
 }
 
 /**
