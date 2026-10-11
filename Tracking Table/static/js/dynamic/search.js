@@ -201,7 +201,7 @@ function handlePageTypeToSearch(event) {
     if (event.ctrlKey || event.metaKey || event.altKey) {
         return;
     }
-    if (event.key.length !== 1 || event.key.trim() === "") {
+    if (typeof event.key !== "string" || event.key.length !== 1 || event.key.trim() === "") {
         return;
     }
     if (document.querySelector(".modal.show")) {

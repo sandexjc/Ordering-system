@@ -571,6 +571,62 @@ mark.search-highlight
 	transition: background-color 180ms ease;
 }
 
+#order-form-modal .modal-body.is-syncing > .order-form-modal-form
+{
+	opacity: 0.45;
+	pointer-events: none;
+	transition: opacity 180ms ease;
+}
+
+#order-form-modal .order-form-sync-notice
+{
+	text-align: center;
+}
+
+#order-form-modal .order-form-sync-overlay
+{
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	z-index: 4;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.35rem;
+	width: fit-content;
+	max-width: calc(100% - 1.5rem);
+	margin: 0;
+	padding: 0.9rem 1.15rem;
+	text-align: center;
+	background: #fff;
+	border: 1px solid #b7e4c7;
+	border-radius: 0.5rem;
+	box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.08);
+	transform: translate(-50%, -50%);
+}
+
+#order-form-modal tr.order-form-item-row.is-sync-fresh > td
+{
+	background-color: #d8f3dc;
+	transition: background-color 320ms ease;
+}
+
+#order-form-modal tr.order-form-item-row.is-sync-fresh .form-control:not(.is-dirty):not(.is-invalid),
+#order-form-modal tr.order-form-item-row.is-sync-fresh .form-select:not(.is-dirty):not(.is-invalid),
+#order-form-modal .form-control.is-sync-fresh:not(.is-invalid):not([readonly]),
+#order-form-modal .form-select.is-sync-fresh:not(.is-invalid),
+#order-form-modal textarea.is-sync-fresh:not(.is-invalid)
+{
+	background-color: #d8f3dc !important;
+	border-color: #8fd19e !important;
+}
+
+#order-form-modal tr.order-form-sync-ghost td
+{
+	background-color: #f8d7da;
+	opacity: 0.72;
+}
+
 #order-form-modal tr.is-dirty .form-control:not(.is-invalid):not([readonly]),
 #order-form-modal tr.is-dirty .form-select:not(.is-invalid),
 #order-form-modal .form-control.is-dirty:not(.is-invalid):not([readonly]),

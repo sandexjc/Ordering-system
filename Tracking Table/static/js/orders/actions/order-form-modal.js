@@ -2,7 +2,8 @@
  * orders/actions/order-form-modal.js
  * ----------------------------------
  * Dynamic table/vitrine create/edit order form modal: open, add-row, AJAX save,
- * unsaved-row highlight, save toasts, and live-list patch after success.
+ * unsaved-row highlight, save toasts, live-list patch after success, and
+ * merge of a remote order update into an already-open edit form.
  *
  * Loaded from:
  *   - main/templates/dynamic/orders.html
@@ -21,8 +22,13 @@ const ORDER_FORM_TOAST_SUCCESS_MS = 2000;
 const ORDER_FORM_TOAST_ERROR_MS = 10000;
 const ORDER_FORM_TITLE_CREATE = "Нова заявка";
 const ORDER_FORM_TITLE_EDIT = "Редактиране";
+const ORDER_FORM_REMOTE_UPDATE_MESSAGE = "Поръчката е обновена от друг потребител.";
 let activeOrderFormToast = null;
 let allowOrderFormClose = false;
+let orderFormSubmitInFlight = false;
+let orderFormRemoteSyncInFlight = false;
+let orderFormRemoteSyncQueued = false;
+let orderFormRemoteSyncToken = 0;
 
 /**
  * True when the form URL is create (`/orderForm`), not edit (`/orderForm/<id>`).
@@ -280,6 +286,10 @@ function hideOrderFormUnsavedDialog()
 	if (!dialog) {
 		return;
 	}
+	const focused = document.activeElement;
+	if (focused instanceof HTMLElement && dialog.contains(focused)) {
+		focused.blur();
+	}
 	dialog.classList.remove("is-open");
 	dialog.setAttribute("aria-hidden", "true");
 }
@@ -303,6 +313,24 @@ function showOrderFormUnsavedDialog()
 	if (cancelBtn) {
 		cancelBtn.focus();
 	}
+}
+
+/**
+ * Move focus out of the modal before Bootstrap marks it aria-hidden.
+ *
+ * @param {HTMLElement|null} modal - Order form modal.
+ * @returns {void}
+ */
+function releaseOrderFormModalFocus(modal)
+{
+	if (!modal) {
+		return;
+	}
+	const focused = document.activeElement;
+	if (focused instanceof HTMLElement && modal.contains(focused)) {
+		focused.blur();
+	}
+	modal.inert = true;
 }
 
 /**
@@ -425,6 +453,7 @@ function setOrderFormModalBody(html, options)
 	if (typeof setupManualSealToggle === "function") {
 		setupManualSealToggle(parts.body);
 	}
+	flushQueuedOrderFormRemoteSync();
 }
 
 /**
@@ -466,6 +495,7 @@ function addOrderFormsetRow(formsetRoot)
 		tbody.appendChild(row);
 	}
 	totalInput.value = String(index + 1);
+	row.setAttribute("data-user-added", "1");
 	snapshotOrderFormInitials(row);
 }
 
@@ -615,13 +645,15 @@ function handleOrderFormRowAction(row)
 		return;
 	}
 
-	const saved = isSavedOrderFormRow(row);
-	if (!saved && isEmptyOrderFormRow(row)) {
+	if (!isSavedOrderFormRow(row)) {
 		const formsetRoot = row.closest("[data-formset]");
+		const form = row.closest("form");
 		row.remove();
 		if (formsetRoot) {
 			reindexOrderFormsetRows(formsetRoot);
+			syncOrderFormsetInitialCount(formsetRoot);
 		}
+		updateOrderFormDirtyState(form);
 		return;
 	}
 
@@ -744,6 +776,738 @@ function applyOrderFormLiveRow(orderId, rowsHtml)
 }
 
 /**
+ * Saved instance id on a formset row, or "" for an extra row.
+ *
+ * @param {HTMLElement} row - Item row.
+ * @returns {string}
+ */
+function orderFormRowInstanceId(row)
+{
+	const idInput = row.querySelector('input[name$="-id"]');
+	if (!idInput) {
+		return "";
+	}
+	return String(idInput.value || "").trim();
+}
+
+/**
+ * Field name without the formset index (`plates-0-material` → `material`).
+ *
+ * @param {string} name - Control name.
+ * @returns {string}
+ */
+function orderFormFieldKey(name)
+{
+	return String(name || "").replace(/^.*-\d+-/, "");
+}
+
+/**
+ * True when one control differs from the value it was loaded or last synced with.
+ *
+ * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} el - Form control.
+ * @returns {boolean}
+ */
+function isOrderFormControlDirty(el)
+{
+	return isTrackableOrderFormField(el)
+		&& el.dataset.initialValue != null
+		&& normalizeOrderFormValue(el) !== el.dataset.initialValue;
+}
+
+/**
+ * True when the row still has edits the user has not saved.
+ *
+ * @param {HTMLElement} row - Item row.
+ * @returns {boolean}
+ */
+function orderFormRowHasUnsavedChanges(row)
+{
+	if (row.classList.contains("is-pending-delete") || row.classList.contains("is-dirty")) {
+		return true;
+	}
+	const fields = row.querySelectorAll("input, select, textarea");
+	for (let index = 0; index < fields.length; index += 1) {
+		if (isOrderFormControlDirty(fields[index])) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Extra blank row from the server, not a row the user added or edited.
+ *
+ * @param {HTMLElement} row - Item row.
+ * @returns {boolean}
+ */
+function isBlankExtraOrderFormRow(row)
+{
+	if (row.getAttribute("data-user-added") === "1") {
+		return false;
+	}
+	if (row.classList.contains("is-pending-delete")) {
+		return false;
+	}
+	if (orderFormRowInstanceId(row)) {
+		return false;
+	}
+	return !orderFormRowHasUnsavedChanges(row);
+}
+
+/**
+ * Copy the current value of one control onto another.
+ *
+ * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} fromEl - Source control.
+ * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} toEl - Target control.
+ * @returns {void}
+ */
+function copyOrderFormControlValue(fromEl, toEl)
+{
+	if (fromEl.type === "checkbox" || fromEl.type === "radio") {
+		toEl.checked = fromEl.checked;
+		return;
+	}
+	if (fromEl.tagName === "SELECT") {
+		toEl.value = fromEl.value;
+		return;
+	}
+	toEl.value = fromEl.value;
+}
+
+/**
+ * Comparable field list for one item row, ignoring the formset index.
+ *
+ * @param {HTMLElement} row - Item row.
+ * @returns {string}
+ */
+function orderFormRowSignature(row)
+{
+	return Array.from(row.querySelectorAll("input, select, textarea"))
+		.filter(function (el) {
+			return el.name && el.type !== "hidden";
+		})
+		.map(function (el) {
+			return orderFormFieldKey(el.name) + "=" + normalizeOrderFormValue(el);
+		})
+		.join("|");
+}
+
+/**
+ * Match key for a control. Radios that share a name stay distinct.
+ *
+ * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} el - Form control.
+ * @returns {string}
+ */
+function orderFormControlMatchKey(el)
+{
+	if (el.type === "radio") {
+		return el.name + "::" + el.value;
+	}
+	return el.name;
+}
+
+/**
+ * Light-green highlight for a row or header field brought in by a remote update.
+ * Clears when the user focuses it, or after the same delay as the table highlight.
+ *
+ * @param {HTMLElement} el - Row or control.
+ * @returns {void}
+ */
+function armOrderFormSyncHighlight(el)
+{
+	if (!el) {
+		return;
+	}
+	el.classList.add("is-sync-fresh");
+	if (el._orderFormSyncTimer) {
+		window.clearTimeout(el._orderFormSyncTimer);
+	}
+	const waitMs = typeof SYNC_HIGHLIGHT_MS === "number" ? SYNC_HIGHLIGHT_MS : 120000;
+	el._orderFormSyncTimer = window.setTimeout(function () {
+		el._orderFormSyncTimer = null;
+		clearOrderFormSyncHighlight(el);
+	}, waitMs);
+}
+
+/**
+ * Remove the remote-update green from a row or header field.
+ *
+ * @param {HTMLElement|null} el - Row or control.
+ * @returns {void}
+ */
+function clearOrderFormSyncHighlight(el)
+{
+	if (!el) {
+		return;
+	}
+	if (el._orderFormSyncTimer) {
+		window.clearTimeout(el._orderFormSyncTimer);
+		el._orderFormSyncTimer = null;
+	}
+	el.classList.remove("is-sync-fresh");
+}
+
+/**
+ * Copy server values into fields the user has not edited, and mark the row
+ * when any of those fields changed.
+ *
+ * @param {HTMLElement} currentRow - Row already in the modal.
+ * @param {HTMLElement} incomingRow - Same item from the refetched form.
+ * @returns {void}
+ */
+function mergeCleanFieldsFromIncoming(currentRow, incomingRow)
+{
+	const incomingByKey = new Map();
+	incomingRow.querySelectorAll("input, select, textarea").forEach(function (el) {
+		if (!el.name) {
+			return;
+		}
+		incomingByKey.set(orderFormFieldKey(el.name), el);
+	});
+
+	let changed = false;
+	currentRow.querySelectorAll("input, select, textarea").forEach(function (el) {
+		if (!isTrackableOrderFormField(el) || isOrderFormControlDirty(el)) {
+			return;
+		}
+		const incoming = incomingByKey.get(orderFormFieldKey(el.name));
+		if (!incoming) {
+			return;
+		}
+		const before = normalizeOrderFormValue(el);
+		copyOrderFormControlValue(incoming, el);
+		const after = normalizeOrderFormValue(el);
+		el.dataset.initialValue = after;
+		if (before !== after) {
+			changed = true;
+		}
+	});
+	if (changed) {
+		currentRow.classList.add("is-sync-fresh");
+	}
+}
+
+/**
+ * Visual copy of a row the other user removed.
+ * It stays until this form is saved or closed, and it is not submitted.
+ *
+ * @param {HTMLElement} row - Item row that the other user removed.
+ * @returns {HTMLElement}
+ */
+function buildRemovedOrderFormGhost(row)
+{
+	const ghost = row.cloneNode(true);
+	ghost.classList.remove("order-form-item-row", "is-dirty", "is-pending-delete", "is-sync-fresh");
+	ghost.classList.add("order-form-sync-ghost");
+	ghost.setAttribute("data-removed-id", orderFormRowInstanceId(row));
+	ghost.querySelectorAll("input, select, textarea, button").forEach(function (el) {
+		el.disabled = true;
+		el.removeAttribute("name");
+		el.removeAttribute("id");
+	});
+	return ghost;
+}
+
+/**
+ * Count saved item rows and write INITIAL_FORMS. Saved rows stay first.
+ *
+ * @param {HTMLElement} formsetRoot - Wrapper with data-formset-prefix.
+ * @returns {void}
+ */
+function syncOrderFormsetInitialCount(formsetRoot)
+{
+	const prefix = formsetRoot.getAttribute("data-formset-prefix");
+	const form = formsetRoot.closest("form");
+	const tbody = formsetRoot.querySelector("[data-formset-body]");
+	const initialInput = form && prefix
+		? form.querySelector('[name="' + prefix + '-INITIAL_FORMS"]')
+		: null;
+	if (!tbody || !initialInput) {
+		return;
+	}
+	let count = 0;
+	tbody.querySelectorAll("tr.order-form-item-row").forEach(function (row) {
+		if (orderFormRowInstanceId(row)) {
+			count += 1;
+		}
+	});
+	initialInput.value = String(count);
+}
+
+/**
+ * Merge one formset: keep unsaved rows, take server rows the user has not edited,
+ * highlight new and changed rows, and fade rows the other user removed.
+ *
+ * @param {HTMLElement} currentFs - Formset already in the modal.
+ * @param {HTMLElement} incomingFs - Same formset from the refetched form.
+ * @returns {void}
+ */
+function mergeOrderFormsetRows(currentFs, incomingFs)
+{
+	const tbody = currentFs.querySelector("[data-formset-body]");
+	if (!tbody) {
+		return;
+	}
+	const addRow = tbody.querySelector(".order-form-add-row");
+	const currentRows = Array.from(tbody.querySelectorAll(":scope > tr.order-form-item-row"));
+	const incomingRows = Array.from(incomingFs.querySelectorAll("tbody[data-formset-body] > tr.order-form-item-row"));
+	const currentById = new Map();
+	currentRows.forEach(function (row) {
+		const id = orderFormRowInstanceId(row);
+		if (id) {
+			currentById.set(id, row);
+		}
+	});
+
+	const incomingIds = new Set();
+	const initialRows = [];
+	const extraRows = [];
+	const ghosts = [];
+
+	incomingRows.forEach(function (incomingRow) {
+		const id = orderFormRowInstanceId(incomingRow);
+		if (!id) {
+			return;
+		}
+		incomingIds.add(id);
+		const currentRow = currentById.get(id);
+		if (!currentRow) {
+			const fresh = incomingRow.cloneNode(true);
+			fresh.classList.add("is-sync-fresh");
+			fresh.setAttribute("data-sync-snapshot", "1");
+			initialRows.push(fresh);
+			return;
+		}
+		if (orderFormRowHasUnsavedChanges(currentRow)) {
+			mergeCleanFieldsFromIncoming(currentRow, incomingRow);
+			initialRows.push(currentRow);
+			return;
+		}
+		const changed = orderFormRowSignature(currentRow) !== orderFormRowSignature(incomingRow);
+		const replacement = incomingRow.cloneNode(true);
+		replacement.setAttribute("data-sync-snapshot", "1");
+		if (changed) {
+			replacement.classList.add("is-sync-fresh");
+		}
+		initialRows.push(replacement);
+	});
+
+	currentRows.forEach(function (row) {
+		const id = orderFormRowInstanceId(row);
+		if (id) {
+			if (!incomingIds.has(id) && orderFormRowHasUnsavedChanges(row)) {
+				initialRows.push(row);
+			} else if (!incomingIds.has(id)) {
+				ghosts.push(buildRemovedOrderFormGhost(row));
+			}
+			return;
+		}
+		if (!isBlankExtraOrderFormRow(row)) {
+			extraRows.push(row);
+		}
+	});
+
+	incomingRows.forEach(function (incomingRow) {
+		if (orderFormRowInstanceId(incomingRow)) {
+			return;
+		}
+		const blank = incomingRow.cloneNode(true);
+		blank.setAttribute("data-sync-snapshot", "1");
+		extraRows.push(blank);
+	});
+
+	const nextRows = initialRows.concat(extraRows);
+
+	currentRows.forEach(function (row) {
+		row.remove();
+	});
+	tbody.querySelectorAll(":scope > tr.order-form-sync-ghost").forEach(function (ghost) {
+		const removedId = ghost.getAttribute("data-removed-id") || "";
+		if (removedId && incomingIds.has(removedId)) {
+			ghost.remove();
+		}
+	});
+
+	nextRows.forEach(function (row) {
+		if (addRow) {
+			tbody.insertBefore(row, addRow);
+		} else {
+			tbody.appendChild(row);
+		}
+	});
+	ghosts.forEach(function (ghost) {
+		if (addRow) {
+			tbody.insertBefore(ghost, addRow);
+		} else {
+			tbody.appendChild(ghost);
+		}
+	});
+
+	tbody.querySelectorAll("tr.order-form-item-row[data-sync-snapshot]").forEach(function (row) {
+		snapshotOrderFormInitials(row);
+		row.removeAttribute("data-sync-snapshot");
+	});
+	reindexOrderFormsetRows(currentFs);
+	syncOrderFormsetInitialCount(currentFs);
+
+	const currentDisplay = Array.from(currentFs.querySelectorAll("thead tr, tr.order-form-totals-row"));
+	const incomingDisplay = Array.from(incomingFs.querySelectorAll("thead tr, tr.order-form-totals-row"));
+	currentDisplay.forEach(function (row, index) {
+		const incomingRow = incomingDisplay[index];
+		if (!incomingRow || row.querySelector("input, select, textarea")) {
+			return;
+		}
+		row.innerHTML = incomingRow.innerHTML;
+	});
+}
+
+/**
+ * Update header fields the user has not edited. Dirty fields stay as typed.
+ *
+ * @param {HTMLFormElement} currentForm - Open modal form.
+ * @param {HTMLFormElement} incomingForm - Refetched form.
+ * @returns {void}
+ */
+function mergeOrderFormHeaderFields(currentForm, incomingForm)
+{
+	const incomingByKey = new Map();
+	incomingForm.querySelectorAll("input, select, textarea").forEach(function (el) {
+		if (!el.name || el.closest("tr.order-form-item-row")) {
+			return;
+		}
+		incomingByKey.set(orderFormControlMatchKey(el), el);
+	});
+
+	currentForm.querySelectorAll("input, select, textarea").forEach(function (el) {
+		if (!el.name || el.closest("tr.order-form-item-row") || !isTrackableOrderFormField(el)) {
+			return;
+		}
+		const incoming = incomingByKey.get(orderFormControlMatchKey(el));
+		if (!incoming || isOrderFormControlDirty(el)) {
+			return;
+		}
+		const before = normalizeOrderFormValue(el);
+		copyOrderFormControlValue(incoming, el);
+		const after = normalizeOrderFormValue(el);
+		el.dataset.initialValue = after;
+		if (before !== after) {
+			el.classList.add("is-sync-fresh");
+		}
+	});
+}
+
+/**
+ * Replace display-only blocks (vitrine info, seal prices) from the refetched form.
+ *
+ * @param {HTMLFormElement} currentForm - Open modal form.
+ * @param {HTMLFormElement} incomingForm - Refetched form.
+ * @returns {void}
+ */
+function mergeOrderFormDisplayBlocks(currentForm, incomingForm)
+{
+	const currentHeadings = currentForm.querySelectorAll("h4");
+	const incomingHeadings = incomingForm.querySelectorAll("h4");
+	currentHeadings.forEach(function (heading, index) {
+		if (heading.textContent.trim() !== "Информация за поръчка") {
+			return;
+		}
+		const incomingHeading = incomingHeadings[index];
+		const currentTable = heading.parentElement && heading.parentElement.querySelector("table");
+		const incomingTable = incomingHeading
+			&& incomingHeading.parentElement
+			&& incomingHeading.parentElement.querySelector("table");
+		if (currentTable && incomingTable) {
+			currentTable.innerHTML = incomingTable.innerHTML;
+		}
+	});
+
+	const currentSeal = currentForm.querySelector("#manual-seal-table-wrapper");
+	const incomingSeal = incomingForm.querySelector("#manual-seal-table-wrapper");
+	if (!currentSeal || !incomingSeal) {
+		return;
+	}
+	const currentReadonly = currentSeal.querySelectorAll("input[readonly]");
+	const incomingReadonly = incomingSeal.querySelectorAll("input[readonly]");
+	if (currentReadonly.length !== incomingReadonly.length) {
+		return;
+	}
+	currentReadonly.forEach(function (el, index) {
+		if (el.name || incomingReadonly[index].name) {
+			return;
+		}
+		el.value = incomingReadonly[index].value;
+	});
+}
+
+/**
+ * Keep the manual-seal radios and panel in step with the checkbox.
+ * Does not bind listeners again.
+ *
+ * @param {ParentNode} form - Modal order form.
+ * @returns {void}
+ */
+function syncManualSealVisual(form)
+{
+	const checkbox = form.querySelector("#id_vitrine_manual_seal");
+	const table = form.querySelector("#manual-seal-table-wrapper");
+	const autoMode = form.querySelector("#manual-seal-auto-mode");
+	const customMode = form.querySelector("#manual-seal-custom-mode");
+	if (!checkbox || !table) {
+		return;
+	}
+	table.classList.toggle("is-open", checkbox.checked);
+	if (autoMode && customMode) {
+		customMode.checked = checkbox.checked;
+		autoMode.checked = !checkbox.checked;
+	}
+}
+
+/**
+ * Banner so the open editor can see that someone else changed this order.
+ *
+ * @param {HTMLFormElement} form - Modal order form.
+ * @returns {void}
+ */
+function showOrderFormRemoteUpdateNotice(form)
+{
+	let notice = form.querySelector(".order-form-sync-notice");
+	if (notice) {
+		const text = notice.querySelector(".order-form-sync-notice-text");
+		if (text) {
+			text.textContent = ORDER_FORM_REMOTE_UPDATE_MESSAGE;
+		}
+		return;
+	}
+	notice = document.createElement("div");
+	notice.className = "alert alert-success alert-dismissible fade show order-form-sync-notice text-center mb-3";
+	notice.setAttribute("role", "status");
+	const text = document.createElement("span");
+	text.className = "order-form-sync-notice-text";
+	text.textContent = ORDER_FORM_REMOTE_UPDATE_MESSAGE;
+	const closeBtn = document.createElement("button");
+	closeBtn.type = "button";
+	closeBtn.className = "btn-close";
+	closeBtn.setAttribute("data-bs-dismiss", "alert");
+	closeBtn.setAttribute("aria-label", "Close");
+	notice.append(text, closeBtn);
+	form.insertBefore(notice, form.firstChild);
+}
+
+/**
+ * Apply a freshly fetched edit form onto the open one.
+ * Unsaved controls and rows stay. Everything else comes from the server.
+ *
+ * @param {HTMLFormElement} currentForm - Open modal form.
+ * @param {string} html - Edit form fragment.
+ * @returns {void}
+ */
+function mergeRemoteOrderFormHtml(currentForm, html)
+{
+	const holder = document.createElement("div");
+	holder.innerHTML = html || "";
+	const incomingForm = holder.querySelector("#order-form-modal-form");
+	if (!incomingForm) {
+		throw new Error("Order form fragment missing");
+	}
+	if (incomingForm.getAttribute("data-order-id") !== currentForm.getAttribute("data-order-id")) {
+		return;
+	}
+
+	currentForm.querySelectorAll("[data-formset]").forEach(function (currentFs) {
+		const prefix = currentFs.getAttribute("data-formset-prefix");
+		const incomingFs = prefix
+			? incomingForm.querySelector('[data-formset][data-formset-prefix="' + prefix + '"]')
+			: null;
+		if (incomingFs) {
+			mergeOrderFormsetRows(currentFs, incomingFs);
+		}
+	});
+	mergeOrderFormHeaderFields(currentForm, incomingForm);
+	const orderType = currentForm.querySelector("[name='order_type']");
+	if (!orderType || !isOrderFormControlDirty(orderType)) {
+		syncOrderFormModalTitle(incomingForm, document.getElementById("order-form-modal-title"));
+	}
+	mergeOrderFormDisplayBlocks(currentForm, incomingForm);
+	syncManualSealVisual(currentForm);
+	updateOrderFormDirtyState(currentForm);
+	showOrderFormRemoteUpdateNotice(currentForm);
+	currentForm.querySelectorAll("tr.is-sync-fresh, .is-sync-fresh").forEach(function (el) {
+		armOrderFormSyncHighlight(el);
+	});
+}
+
+/**
+ * Fade the open form and show the update spinner.
+ *
+ * @param {boolean} active - Whether a remote merge is in progress.
+ * @returns {void}
+ */
+function setOrderFormSyncing(active)
+{
+	const body = document.getElementById("order-form-modal-body");
+	if (!body) {
+		return;
+	}
+	body.classList.toggle("is-syncing", active);
+	let overlay = body.querySelector(".order-form-sync-overlay");
+	if (!active) {
+		if (overlay) {
+			overlay.remove();
+		}
+		return;
+	}
+	if (!overlay) {
+		overlay = document.createElement("div");
+		overlay.className = "order-form-sync-overlay";
+		overlay.setAttribute("role", "status");
+		overlay.innerHTML = ""
+			+ '<div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>'
+			+ "<p class=\"mb-0\">" + ORDER_FORM_REMOTE_UPDATE_MESSAGE + "</p>"
+			+ "<p class=\"mb-0\">Зареждане на промените...</p>";
+		body.insertBefore(overlay, body.firstChild);
+	}
+}
+
+/**
+ * Drop a remote merge that belongs to a modal which has since closed.
+ *
+ * @returns {void}
+ */
+function invalidateOrderFormRemoteSync()
+{
+	orderFormRemoteSyncToken += 1;
+	orderFormRemoteSyncQueued = false;
+	orderFormRemoteSyncInFlight = false;
+	setOrderFormSyncing(false);
+}
+
+/**
+ * Order id from an edit form URL (`/orderForm/<id>`).
+ *
+ * @param {string} url - Form URL.
+ * @returns {string}
+ */
+function orderIdFromOrderFormUrl(url)
+{
+	const match = String(url || "").match(/\/orderForm\/(\d+)/);
+	return match ? match[1] : "";
+}
+
+/**
+ * True when the edit modal is open for this order.
+ *
+ * @param {string} orderId - Order / vitrine id.
+ * @returns {HTMLFormElement|null}
+ */
+function openEditOrderForm(orderId)
+{
+	const modal = document.getElementById("order-form-modal");
+	const form = document.getElementById("order-form-modal-form");
+	if (!modal || !modal.classList.contains("show") || !form) {
+		return null;
+	}
+	if (String(form.getAttribute("data-order-id") || "") !== String(orderId)) {
+		return null;
+	}
+	return form;
+}
+
+/**
+ * Start a queued remote merge once the form and any save are idle.
+ *
+ * @returns {void}
+ */
+function flushQueuedOrderFormRemoteSync()
+{
+	if (!orderFormRemoteSyncQueued || orderFormSubmitInFlight || orderFormRemoteSyncInFlight) {
+		return;
+	}
+	orderFormRemoteSyncQueued = false;
+	runOrderFormRemoteSync();
+}
+
+/**
+ * Refetch the open edit form and merge it without dropping unsaved edits.
+ *
+ * @returns {Promise<void>}
+ */
+async function runOrderFormRemoteSync()
+{
+	const modal = document.getElementById("order-form-modal");
+	const form = document.getElementById("order-form-modal-form");
+	const url = modal && modal.dataset.orderFormUrl;
+	const orderId = form && form.getAttribute("data-order-id");
+	if (!modal || !modal.classList.contains("show") || !form || !orderId || !url) {
+		return;
+	}
+
+	const token = ++orderFormRemoteSyncToken;
+	orderFormRemoteSyncInFlight = true;
+	setOrderFormSyncing(true);
+	try {
+		const response = await fetch(url, {
+			method: "GET",
+			credentials: "same-origin",
+			headers: { "X-Requested-With": "XMLHttpRequest" }
+		});
+		if (typeof redirectToLoginIfUnauthenticated === "function"
+			&& redirectToLoginIfUnauthenticated(response)) {
+			return;
+		}
+		if (response.status === 404) {
+			return;
+		}
+		if (!response.ok) {
+			throw new Error("Order form refresh failed");
+		}
+		const html = await response.text();
+		if (token !== orderFormRemoteSyncToken) {
+			return;
+		}
+		const currentForm = openEditOrderForm(orderId);
+		if (!currentForm) {
+			return;
+		}
+		mergeRemoteOrderFormHtml(currentForm, html);
+	} catch (err) {
+		if (token === orderFormRemoteSyncToken) {
+			console.error(err);
+			showOrderFormToast("Възникна грешка при зареждане на промените.", "error");
+		}
+	} finally {
+		if (token !== orderFormRemoteSyncToken) {
+			return;
+		}
+		setOrderFormSyncing(false);
+		orderFormRemoteSyncInFlight = false;
+		flushQueuedOrderFormRemoteSync();
+	}
+}
+
+/**
+ * Live sync changed an order. If its edit modal is open, merge that form.
+ * A closed modal is left alone; opening it loads the form fresh.
+ *
+ * @param {Array<string|number>} orderIds - Order ids updated by someone else.
+ * @returns {void}
+ */
+function syncOpenOrderFormFromLiveUpdate(orderIds)
+{
+	const modal = document.getElementById("order-form-modal");
+	if (!modal || !modal.classList.contains("show") || !Array.isArray(orderIds) || !orderIds.length) {
+		return;
+	}
+	const form = document.getElementById("order-form-modal-form");
+	const openId = (form && form.getAttribute("data-order-id"))
+		|| orderIdFromOrderFormUrl(modal.dataset.orderFormUrl);
+	if (!openId || !orderIds.some(function (id) { return String(id) === String(openId); })) {
+		return;
+	}
+	orderFormRemoteSyncQueued = true;
+	flushQueuedOrderFormRemoteSync();
+}
+
+/**
  * GET the form fragment and show it in the already-open modal.
  *
  * @param {string} url - Create or edit form URL.
@@ -832,6 +1596,7 @@ function submitOrderFormModal(form)
 	}
 
 	const wasCreate = !form.getAttribute("data-order-id");
+	orderFormSubmitInFlight = true;
 	const submitForm = cloneOrderFormWithValues(form);
 	prepareOrderFormsetsForSubmit(submitForm);
 	const postedInitials = collectOrderFormInitials(submitForm);
@@ -895,6 +1660,10 @@ function submitOrderFormModal(form)
 				(err && err.userMessage) || "Възникна грешка!",
 				"error"
 			);
+		})
+		.finally(function () {
+			orderFormSubmitInFlight = false;
+			flushQueuedOrderFormRemoteSync();
 		});
 }
 
@@ -983,13 +1752,19 @@ function setupOrderFormModal()
 		submitOrderFormModal(form);
 	});
 
+	parts.modal.addEventListener("show.bs.modal", function () {
+		parts.modal.inert = false;
+	});
+
 	parts.modal.addEventListener("hide.bs.modal", function (event) {
 		if (allowOrderFormClose) {
 			allowOrderFormClose = false;
 			hideOrderFormUnsavedDialog();
+			releaseOrderFormModalFocus(parts.modal);
 			return;
 		}
 		if (!orderFormHasUnsavedChanges()) {
+			releaseOrderFormModalFocus(parts.modal);
 			return;
 		}
 		event.preventDefault();
@@ -1009,8 +1784,22 @@ function setupOrderFormModal()
 		});
 	}
 
+	const clearFreshFromEvent = function (event) {
+		const row = event.target.closest("tr.is-sync-fresh");
+		if (row) {
+			clearOrderFormSyncHighlight(row);
+		}
+		const field = event.target.closest(".is-sync-fresh");
+		if (field && field !== row) {
+			clearOrderFormSyncHighlight(field);
+		}
+	};
+	parts.modal.addEventListener("focusin", clearFreshFromEvent);
+	parts.modal.addEventListener("pointerdown", clearFreshFromEvent);
+
 	parts.modal.addEventListener("hidden.bs.modal", function () {
 		hideOrderFormUnsavedDialog();
+		invalidateOrderFormRemoteSync();
 		if (parts.body) {
 			parts.body.innerHTML = "";
 		}
