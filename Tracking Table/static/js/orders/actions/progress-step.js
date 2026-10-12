@@ -197,6 +197,11 @@ function submit_progress_step(stepEl)
     set_progress_step_loading(stepEl);
     refresh_progress_step_row_height(stepEl);
 
+    const orderId = get_progress_step_order_id(stepEl);
+    const mutationToken = orderId && typeof rememberLocalOrderMutation === "function"
+        ? rememberLocalOrderMutation(orderId)
+        : null;
+
     fetch(url, {
         method: "POST",
         credentials: "same-origin",
@@ -227,11 +232,10 @@ function submit_progress_step(stepEl)
             if (typeof apply_progress_update_response === "function") {
                 apply_progress_update_response(result.data);
             }
-            if (typeof rememberLocalOrderMutation === "function") {
-                rememberLocalOrderMutation(get_progress_step_order_id(stepEl));
+            if (orderId && typeof rememberLocalOrderMutation === "function") {
+                rememberLocalOrderMutation(orderId, { keepEcho: true });
             }
 
-            const orderId = get_progress_step_order_id(stepEl);
             if (orderId && typeof cache_order_details === "function") {
                 cache_order_details(orderId);
             }
@@ -239,6 +243,9 @@ function submit_progress_step(stepEl)
         })
         .catch((error) => {
             console.error(error);
+            if (typeof forgetLocalOrderMutation === "function") {
+                forgetLocalOrderMutation(orderId, mutationToken);
+            }
             clear_progress_step_loading(stepEl, true);
             refresh_progress_step_row_height(stepEl);
         });

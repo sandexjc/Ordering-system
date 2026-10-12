@@ -23,54 +23,131 @@
  */
 
 /**
- * Remember a local mutation so this tab does not purple-highlight its own click.
+ * Local-edit marker for one order, or null when it is missing or expired.
  *
  * @param {string|number} orderId - Order / vitrine id.
- * @returns {void}
+ * @returns {{at: number, baselineUpdatedAt: number, echoUpdatedAt: number|null}|null}
  */
-function rememberLocalOrderMutation(orderId)
+function localOrderMutationEntry(orderId)
 {
-    if (orderId == null || orderId === "") {
-        return;
-    }
     const key = String(orderId);
-    recentLocalOrderMutations.set(key, Date.now());
-    const row = typeof getLiveVisibleOrderRow === "function"
-        ? getLiveVisibleOrderRow(key)
-        : document.querySelector('tr.visibleRows[data-row="' + key + '"]');
-    if (row) {
-        row.setAttribute("data-updated-at", String(Date.now() / 1000));
+    const entry = recentLocalOrderMutations.get(key);
+    if (entry == null) {
+        return null;
     }
+    const normalized = typeof entry === "number"
+        ? { at: entry, baselineUpdatedAt: 0, echoUpdatedAt: null }
+        : entry;
+    if (Date.now() - normalized.at > LOCAL_MUTATION_SKIP_MS) {
+        recentLocalOrderMutations.delete(key);
+        return null;
+    }
+    return normalized;
 }
 
 /**
- * True when this tab mutated the row and we have not yet consumed the echo.
+ * Remember a local mutation so this tab does not purple-highlight its own click.
+ *
+ * Sync uses an inclusive second as `since`, so the same save can be delivered
+ * twice. The marker stays until a strictly newer `updated_at` arrives.
+ *
+ * @param {string|number} orderId - Order / vitrine id.
+ * @param {{keepEcho?: boolean}} [options] - Keep the recorded echo when restamping after a local replace.
+ * @returns {number|null} Marker time, so a failed save can forget this click only.
+ */
+function rememberLocalOrderMutation(orderId, options)
+{
+    if (orderId == null || orderId === "") {
+        return null;
+    }
+    const key = String(orderId);
+    const keepEcho = Boolean(options && options.keepEcho);
+    const previous = localOrderMutationEntry(orderId);
+    const row = typeof getLiveVisibleOrderRow === "function"
+        ? getLiveVisibleOrderRow(key)
+        : document.querySelector('tr.visibleRows[data-row="' + key + '"]');
+    const currentUpdatedAt = rowUpdatedAtValue(row);
+    const rowStillHasClientStamp = Boolean(
+        previous && Math.abs(currentUpdatedAt - (previous.at / 1000)) < 0.002
+    );
+    const baselineUpdatedAt = previous && (keepEcho || rowStillHasClientStamp)
+        ? previous.baselineUpdatedAt
+        : currentUpdatedAt;
+    const stampedAt = Date.now();
+    recentLocalOrderMutations.set(key, {
+        at: stampedAt,
+        baselineUpdatedAt: baselineUpdatedAt,
+        echoUpdatedAt: keepEcho && previous ? previous.echoUpdatedAt : null,
+    });
+    if (row) {
+        row.setAttribute("data-updated-at", String(stampedAt / 1000));
+    }
+    return stampedAt;
+}
+
+/**
+ * Drop a local-edit marker after the save failed.
+ *
+ * A newer click on the same order (a different marker time) is left in place.
+ *
+ * @param {string|number} orderId - Order / vitrine id.
+ * @param {number|null} [stampedAt] - Value returned by `rememberLocalOrderMutation`.
+ * @returns {void}
+ */
+function forgetLocalOrderMutation(orderId, stampedAt)
+{
+    const entry = localOrderMutationEntry(orderId);
+    if (!entry) {
+        return;
+    }
+    if (stampedAt != null && entry.at !== stampedAt) {
+        return;
+    }
+    recentLocalOrderMutations.delete(String(orderId));
+}
+
+/**
+ * True when this tab mutated the row and the marker is still inside the skip window.
  *
  * @param {string|number} orderId - Order / vitrine id.
  * @returns {boolean}
  */
 function isRecentLocalOrderMutation(orderId)
 {
-    const stamped = recentLocalOrderMutations.get(String(orderId));
-    if (stamped == null) {
-        return false;
-    }
-    if (Date.now() - stamped > LOCAL_MUTATION_SKIP_MS) {
-        recentLocalOrderMutations.delete(String(orderId));
-        return false;
-    }
-    return true;
+    return localOrderMutationEntry(orderId) != null;
 }
 
 /**
- * Drop the local-echo marker after the matching sync payload is handled.
+ * True when this sync row is the user's own save, or a repeat of that same save.
+ *
+ * A later `updated_at` is someone else's change. When `record` is true the marker
+ * is cleared so that change can highlight.
  *
  * @param {string|number} orderId - Order / vitrine id.
- * @returns {void}
+ * @param {number} incomingAt - `data-updated-at` on the server row, in Unix seconds.
+ * @param {boolean} [record=true] - Persist the echo time / clear the marker.
+ * @returns {boolean}
  */
-function consumeLocalOrderMutation(orderId)
+function isLocalEchoUpdate(orderId, incomingAt, record)
 {
-    recentLocalOrderMutations.delete(String(orderId));
+    const entry = localOrderMutationEntry(orderId);
+    if (!entry) {
+        return false;
+    }
+    const incoming = Number.isFinite(incomingAt) ? incomingAt : 0;
+    if (incoming <= entry.baselineUpdatedAt) {
+        return true;
+    }
+    if (entry.echoUpdatedAt == null || incoming <= entry.echoUpdatedAt) {
+        if (record !== false) {
+            entry.echoUpdatedAt = Math.max(entry.echoUpdatedAt || 0, incoming);
+        }
+        return true;
+    }
+    if (record !== false) {
+        recentLocalOrderMutations.delete(String(orderId));
+    }
+    return false;
 }
 
 /**
@@ -385,7 +462,7 @@ function highlightSyncedRow(row)
         return;
     }
     const orderId = row.getAttribute("data-row") || row.id;
-    if (isRecentLocalOrderMutation(orderId)) {
+    if (isLocalEchoUpdate(orderId, rowUpdatedAtValue(row), false)) {
         return;
     }
     row.classList.add("is-sync-highlight");
@@ -548,24 +625,14 @@ function applyDeletedOrder(viewName, tbody, orderId, isLive)
  */
 function applyRowPair(viewName, tbody, pair, isLive, hasMore, filters, forceReplace)
 {
-    const localEcho = isLive && isRecentLocalOrderMutation(pair.id);
+    const localEcho = isLive && isLocalEchoUpdate(pair.id, rowUpdatedAtValue(pair.summary));
     const existing = tbody.querySelector('tr.visibleRows[data-row="' + pair.id + '"]');
     if (existing) {
         if (!forceReplace && !shouldReplaceSummary(existing, pair.summary)) {
-            const incomingAt = pair.summary.getAttribute("data-updated-at");
-            if (incomingAt) {
-                existing.setAttribute("data-updated-at", incomingAt);
-            }
-            if (localEcho) {
-                consumeLocalOrderMutation(pair.id);
-            }
             return;
         }
         dropCachedOrderDetails(viewName, pair.id);
         replaceSummaryRow(tbody, pair, { highlight: !localEcho });
-        if (localEcho) {
-            consumeLocalOrderMutation(pair.id);
-        }
         if (isLive && !localEcho) {
             refreshOpenOrderDetailsIfNeeded(pair.id);
         }
@@ -578,8 +645,6 @@ function applyRowPair(viewName, tbody, pair, isLive, hasMore, filters, forceRepl
     insertRowPairInSortOrder(tbody, pair.summary, pair.hidden, filters);
     if (!localEcho) {
         highlightSyncedRow(pair.summary);
-    } else {
-        consumeLocalOrderMutation(pair.id);
     }
 }
 
@@ -699,7 +764,7 @@ async function applySyncPayload(viewName, payload)
         if (!pair.id) {
             return;
         }
-        const localEcho = isLive && isRecentLocalOrderMutation(pair.id);
+        const localEcho = isLive && isLocalEchoUpdate(pair.id, rowUpdatedAtValue(pair.summary));
         if (!localEcho) {
             remoteUpdatedIds.push(pair.id);
         }

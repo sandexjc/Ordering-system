@@ -756,7 +756,7 @@ function applyOrderFormLiveRow(orderId, rowsHtml)
     applyRowPair(viewName, tbody, pair, true, hasMore, filters, true);
 
 	if (typeof rememberLocalOrderMutation === "function") {
-		rememberLocalOrderMutation(orderId);
+		rememberLocalOrderMutation(orderId, { keepEcho: true });
 	}
 	if (typeof persistSyncedTbody === "function") {
 		persistSyncedTbody(viewName, tbody, true);

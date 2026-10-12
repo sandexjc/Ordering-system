@@ -338,6 +338,9 @@ function setup_progress_delete_handlers()
 
 		const csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
 		const formData = new FormData(form);
+		const mutationToken = typeof rememberLocalOrderMutation === "function"
+			? rememberLocalOrderMutation(id)
+			: null;
 
 		fetch(url, {
 			method: "POST",
@@ -360,11 +363,14 @@ function setup_progress_delete_handlers()
 
 			apply_progress_update_response(result.data);
 			if (typeof rememberLocalOrderMutation === "function") {
-				rememberLocalOrderMutation(id);
+				rememberLocalOrderMutation(id, { keepEcho: true });
 			}
 		})
 		.catch(err => {
 			console.error(err);
+			if (typeof forgetLocalOrderMutation === "function") {
+				forgetLocalOrderMutation(id, mutationToken);
+			}
 
 			document.querySelectorAll(".ALERT-E-UPD-VIEW").forEach(el => el.style.display = "inline");
 			document.querySelectorAll(".ALERT-S-UPD-VIEW").forEach(el => el.style.display = "none");
