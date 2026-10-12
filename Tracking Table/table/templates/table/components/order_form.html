@@ -36,7 +36,7 @@
 					{% for item in plate_forms %}
 						{% include "table/components/order_form_plate_row.html" with item=item currency=currency %}
 					{% endfor %}
-					{% include "table/components/order_form_add_row.html" with colspan=6 %}
+					{% include "table/components/order_form_add_row.html" with colspan=6 formset_prefix=plate_forms.prefix %}
 					<tr class="order-form-totals-row">
 						<th colspan="5">Общо</th>
 						<th>
@@ -69,7 +69,7 @@
 					{% for item in cutting_forms %}
 						{% include "table/components/order_form_cutting_row.html" with item=item currency=currency %}
 					{% endfor %}
-					{% include "table/components/order_form_add_row.html" with colspan=4 %}
+					{% include "table/components/order_form_add_row.html" with colspan=4 formset_prefix=cutting_forms.prefix %}
 					<tr class="order-form-totals-row">
 						<th colspan="3">Общо</th>
 						<th>
@@ -110,7 +110,7 @@
 					{% for item in edge_forms %}
 						{% include "table/components/order_form_edge_row.html" with item=item currency=currency %}
 					{% endfor %}
-					{% include "table/components/order_form_add_row.html" with colspan=6 %}
+					{% include "table/components/order_form_add_row.html" with colspan=6 formset_prefix=edge_forms.prefix %}
 					<tr class="order-form-totals-row">
 						<th colspan="4">Общо</th>
 						<th>
@@ -144,7 +144,7 @@
 					{% for item in edging_forms %}
 						{% include "table/components/order_form_edging_row.html" with item=item currency=currency %}
 					{% endfor %}
-					{% include "table/components/order_form_add_row.html" with colspan=4 %}
+					{% include "table/components/order_form_add_row.html" with colspan=4 formset_prefix=edging_forms.prefix %}
 					<tr class="order-form-totals-row">
 						<th colspan="3">Общо</th>
 						<th>
@@ -179,7 +179,7 @@
 					{% for item in others_forms %}
 						{% include "table/components/order_form_other_row.html" with item=item currency=currency %}
 					{% endfor %}
-					{% include "table/components/order_form_add_row.html" with colspan=4 %}
+					{% include "table/components/order_form_add_row.html" with colspan=4 formset_prefix=others_forms.prefix %}
 					<tr class="order-form-totals-row">
 						<th colspan="3">Общо</th>
 						<th>{{ current_order.others_total }} {{ currency }}</th>
@@ -206,7 +206,7 @@
 					{% for item in payment_forms %}
 						{% include "table/components/order_form_payment_row.html" with item=item currency=currency %}
 					{% endfor %}
-					{% include "table/components/order_form_add_row.html" with colspan=3 %}
+					{% include "table/components/order_form_add_row.html" with colspan=3 formset_prefix=payment_forms.prefix %}
 					<tr class="order-form-totals-row">
 						<td colspan="2"><strong>Всичко платено</strong></td>
 						<td><strong>{{ current_order.paid }} {{ currency }}</strong></td>

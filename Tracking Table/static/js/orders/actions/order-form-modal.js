@@ -1000,10 +1000,11 @@ function buildRemovedOrderFormGhost(row)
 	ghost.classList.remove("order-form-item-row", "is-dirty", "is-pending-delete", "is-sync-fresh");
 	ghost.classList.add("order-form-sync-ghost");
 	ghost.setAttribute("data-removed-id", orderFormRowInstanceId(row));
-	ghost.querySelectorAll("input, select, textarea, button").forEach(function (el) {
+	const removedId = orderFormRowInstanceId(row) || "new";
+	ghost.querySelectorAll("input, select, textarea, button").forEach(function (el, index) {
 		el.disabled = true;
 		el.removeAttribute("name");
-		el.removeAttribute("id");
+		el.id = "order-form-ghost-" + removedId + "-" + index;
 	});
 	return ghost;
 }
@@ -1286,6 +1287,7 @@ function showOrderFormRemoteUpdateNotice(form)
 	text.textContent = ORDER_FORM_REMOTE_UPDATE_MESSAGE;
 	const closeBtn = document.createElement("button");
 	closeBtn.type = "button";
+	closeBtn.id = "order-form-sync-notice-close";
 	closeBtn.className = "btn-close";
 	closeBtn.setAttribute("data-bs-dismiss", "alert");
 	closeBtn.setAttribute("aria-label", "Close");
