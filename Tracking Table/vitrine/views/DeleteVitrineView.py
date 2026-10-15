@@ -1,5 +1,5 @@
 from common.views import BaseDeleteView
-from vitrine.models import Vitrine
+from vitrine.models import Change, Vitrine
 
 
 class DeleteVitrine(BaseDeleteView):
@@ -17,3 +17,5 @@ class DeleteVitrine(BaseDeleteView):
     """
 
     model = Vitrine
+    change_model = Change
+    fk_field_name = "vitrine_id"

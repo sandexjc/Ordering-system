@@ -1,5 +1,5 @@
 from common.views import BaseDeleteView
-from table.models import Order
+from table.models import Change, Order
 
 
 class DeleteOrder(BaseDeleteView):
@@ -17,3 +17,5 @@ class DeleteOrder(BaseDeleteView):
     """
     
     model = Order
+    change_model = Change
+    fk_field_name = "order_id"

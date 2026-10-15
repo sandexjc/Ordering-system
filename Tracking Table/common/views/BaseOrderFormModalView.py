@@ -8,12 +8,12 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_protect
 
-from common.mixins import DynamicFeatureFlagRequiredMixin
+from common.mixins import DynamicFeatureFlagRequiredMixin, OrderHistoryMixin
 from common.service import CurrencyOperations
 
 
 @method_decorator(csrf_protect, name="dispatch")
-class BaseOrderFormModalView(DynamicFeatureFlagRequiredMixin, LoginRequiredMixin, View):
+class BaseOrderFormModalView(OrderHistoryMixin, DynamicFeatureFlagRequiredMixin, LoginRequiredMixin, View):
 
     """
 
@@ -142,17 +142,10 @@ class BaseOrderFormModalView(DynamicFeatureFlagRequiredMixin, LoginRequiredMixin
         )
 
     def create_change_record(self, related_item, new_state):
-        if not self.change_model or not self.fk_field_name:
+        if related_item == "Note":
+            self.log_note(self.object, new_state)
             return
-        self.change_model.objects.create(
-            **{
-                self.fk_field_name: self.object,
-                "user": self.request.user.first_name,
-                "operation": "created",
-                "related_item": related_item,
-                "new_state": new_state,
-            }
-        )
+        self.log_created(self.object, related_item)
 
     def save_note(self, note_form):
         if not self.note_form_class:
@@ -169,14 +162,17 @@ class BaseOrderFormModalView(DynamicFeatureFlagRequiredMixin, LoginRequiredMixin
         user = self.request.user.first_name
         for formset in formsets.values():
             formset.instance = self.object
+            self.mark_new_forms(formset)
             instances = formset.save(commit=False)
             for item in instances:
                 item.modified_by = user
                 setattr(item, self.fk_field_name, self.object)
                 item.run_workflow_save()
+            self.log_formset(self.object, formset, instances)
             for item in formset.deleted_objects:
                 item.modified_by = user
                 item.run_workflow_delete()
+                self.log_deleted_item(self.object, item)
 
     def success_payload(self):
         self.object = self.fetch_order_for_rows(self.object.pk)
@@ -239,10 +235,12 @@ class BaseOrderFormModalView(DynamicFeatureFlagRequiredMixin, LoginRequiredMixin
 
                 if is_create:
                     self.create_change_record(self.change_what, self.object.id)
+                else:
+                    self.log_order_form(self.object, order_form)
 
                 if note_form is not None:
                     note = self.save_note(note_form)
-                    if is_create and note is not None:
+                    if note is not None:
                         self.create_change_record("Note", note.content)
 
                 self.save_formsets(formsets)

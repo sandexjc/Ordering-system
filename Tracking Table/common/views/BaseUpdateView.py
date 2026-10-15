@@ -1,4 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from common.mixins import OrderHistoryMixin
 from django.views.generic import UpdateView
 from django.shortcuts import redirect
 from django.http import JsonResponse, Http404
@@ -8,7 +10,7 @@ from django.db import transaction
 import json
 
 
-class BaseUpdateView(LoginRequiredMixin, UpdateView):
+class BaseUpdateView(OrderHistoryMixin, LoginRequiredMixin, UpdateView):
 
     """
 
@@ -78,6 +80,14 @@ class BaseUpdateView(LoginRequiredMixin, UpdateView):
             order_instance.order_taken = False
 
         order_instance.save()
+        self.log_order_form(order_instance, order_form)
+        for extra_form in extra_forms.values():
+            if hasattr(extra_form, "forms"):
+                self.log_formset(order_instance, extra_form, [
+                    form.instance
+                    for form in extra_form.forms
+                    if getattr(form.instance, "pk", None) and form.has_changed()
+                ])
 
         return JsonResponse(self.serialize_response(order_instance))
 

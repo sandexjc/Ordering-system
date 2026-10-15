@@ -1,5 +1,5 @@
 from common.views import BaseUpdateView
-from vitrine.models import Vitrine
+from vitrine.models import Change, Vitrine
 from vitrine.forms import VitrineProgressForm
 
 class UpdateVitrine(BaseUpdateView):
@@ -19,3 +19,5 @@ class UpdateVitrine(BaseUpdateView):
 
     model = Vitrine
     form_class = VitrineProgressForm
+    change_model = Change
+    fk_field_name = "vitrine_id"

@@ -1,5 +1,5 @@
 from common.views import BaseEditView
-from table.models import Order 
+from table.models import Change, Order 
 from table import forms
 
 class EditOrder(BaseEditView):
@@ -21,6 +21,7 @@ class EditOrder(BaseEditView):
     model = Order
     form_class = forms.EditOrderForm
     note_form_class = forms.AddNoteForm
+    change_model = Change
     template_name = 'table/edit_order.html'
 
     related_formsets = {

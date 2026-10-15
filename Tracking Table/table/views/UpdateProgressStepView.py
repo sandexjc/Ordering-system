@@ -1,5 +1,5 @@
 from common.views import BaseUpdateProgressStepView
-from table.models import Edge, Order, Plate
+from table.models import Change, Edge, Order, Plate
 from table.service.table.OrderReady import plates_make_order_ready
 
 from django.core import serializers
@@ -28,6 +28,8 @@ class UpdateProgressStep(BaseUpdateProgressStepView):
     """
 
     model = Order
+    change_model = Change
+    fk_field_name = "order_id"
     allowed_fields = {
         "plate": ("ordered", "delivered", "cutted", "edged"),
         "edge": ("ordered", "delivered"),

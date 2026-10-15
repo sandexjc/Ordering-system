@@ -2,9 +2,10 @@ from django.views.generic import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
+from common.mixins import OrderHistoryMixin
 from common.service import CurrencyOperations
 
-class BaseEditView(LoginRequiredMixin, UpdateView):
+class BaseEditView(OrderHistoryMixin, LoginRequiredMixin, UpdateView):
 
     """
 
@@ -26,6 +27,7 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
     note_form_class = None
     related_formsets = []
     fk_field_name = None
+    change_model = None
     redirect_url = None
 
     # --- Helpers --- #
@@ -77,6 +79,7 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
         # handle order form
         self.object = order_form.save(commit=False)
         self.object.run_workflow_save()
+        self.log_order_form(self.object, order_form)
 
         # handle note form
         note = note_form.save(commit=False)
@@ -84,19 +87,23 @@ class BaseEditView(LoginRequiredMixin, UpdateView):
             setattr(note, self.fk_field_name, self.object)
             note.user = user
             note.run_workflow_save()
+            self.log_note(self.object, note.content)
 
         # Handle realated formsets
         for formset in formsets.values():
+            self.mark_new_forms(formset)
             instances = formset.save(commit=False)
 
             for item in instances:
                 item.modified_by = user
                 setattr(item, self.fk_field_name, self.object)
                 item.run_workflow_save()
-            
+            self.log_formset(self.object, formset, instances)
+
             for item in formset.deleted_objects:
                 item.modified_by = user
                 item.run_workflow_delete()
+                self.log_deleted_item(self.object, item)
 
         messages.success(self.request, "Промените са запазени успешно!")
         return redirect(self.redirect_url, self.object.pk)

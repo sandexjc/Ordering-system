@@ -6,19 +6,25 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_protect
 
-from common.mixins import DynamicFeatureFlagRequiredMixin
+from common.mixins import DynamicFeatureFlagRequiredMixin, OrderHistoryMixin
 
 import json
 
 
 @method_decorator(csrf_protect, name="dispatch")
-class BaseUpdateProgressStepView(DynamicFeatureFlagRequiredMixin, LoginRequiredMixin, View):
+class BaseUpdateProgressStepView(
+    DynamicFeatureFlagRequiredMixin,
+    LoginRequiredMixin,
+    OrderHistoryMixin,
+    View,
+):
 
     """
 
     Hierarchy:
     DynamicFeatureFlagRequiredMixin -> BaseUpdateProgressStepView
     LoginRequiredMixin -> BaseUpdateProgressStepView
+    OrderHistoryMixin -> BaseUpdateProgressStepView
     View -> BaseUpdateProgressStepView
 
     Shared JSON POST for dynamic click-to-toggle progress steps.
@@ -102,9 +108,13 @@ class BaseUpdateProgressStepView(DynamicFeatureFlagRequiredMixin, LoginRequiredM
         if self.is_step_disabled(order, target, item, field, value):
             return JsonResponse({"error": "Progress step is disabled"}, status=400)
 
+        watched = self.allowed_fields.get(target) or ()
+        before = {name: getattr(item, name) for name in watched}
+
         with transaction.atomic():
             self.apply_step_value(order, target, item, field, value)
             self.after_step_applied(order, target, item, field, value)
+            self.log_progress_changes(order, item, before)
 
         return JsonResponse(self.serialize_response(order, target, item))
 

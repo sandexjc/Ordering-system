@@ -26,8 +26,8 @@ from vitrine.models import (
 )
 
 
-# Item deletes can create Change rows via post_delete signals, so Change
-# must be cleared after items and before the parent order model.
+# Change rows point at the order, so they are cleared with the other
+# child rows before the parent order model.
 APP_DELETE_PLAN = {
     "table": {
         "order_model": Order,

@@ -1,2 +1,3 @@
 from .DynamicFeatureFlagRequiredMixin import DynamicFeatureFlagRequiredMixin
 from .DynamicDetailsModeMixin import DynamicDetailsModeMixin
+from .OrderHistoryMixin import OrderHistoryMixin

@@ -1,7 +1,7 @@
 from common.views import BaseEditView
 from django.conf import settings
 from vitrine.service import VitrineContextBuilder
-from vitrine.models import Vitrine
+from vitrine.models import Change, Vitrine
 from vitrine import forms
 
 class EditVitrine(BaseEditView):
@@ -23,6 +23,7 @@ class EditVitrine(BaseEditView):
     model = Vitrine
     form_class = forms.EditVitrineForm
     note_form_class = forms.AddNoteForm
+    change_model = Change
     template_name = 'vitrine/edit_vitrine.html'
 
     related_formsets = {

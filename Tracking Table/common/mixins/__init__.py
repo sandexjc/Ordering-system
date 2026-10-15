@@ -4,10 +4,6 @@ from .forms import (
     FormSetStyleMixin,
 )
 
-from .signals import (
-    BaseChangeSignalMixin,
-)
-
 from .workflow import (
     WorkflowModelMixin,
 )
@@ -15,4 +11,5 @@ from .workflow import (
 from .views import (
     DynamicFeatureFlagRequiredMixin,
     DynamicDetailsModeMixin,
+    OrderHistoryMixin,
 )

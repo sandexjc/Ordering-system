@@ -3,7 +3,7 @@ from django.views.generic import UpdateView
 from django.core import serializers
 
 from common.views import BaseUpdateView
-from table.models import Order
+from table.models import Change, Order
 from table.forms import PlateProgressFormSet, EdgeProgressFormSet, OrderProgressForm
 from table.service.table.OrderReady import plates_make_order_ready
 
@@ -26,6 +26,8 @@ class UpdateOrder(BaseUpdateView):
 
     model = Order
     form_class = OrderProgressForm
+    change_model = Change
+    fk_field_name = "order_id"
 
     def get_extra_forms(self):
         return {

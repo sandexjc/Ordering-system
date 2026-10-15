@@ -23,9 +23,9 @@ class CreateOrder(BaseCreateView):
     """
 
     model = Order
-    change_model = Change
     form_class = CreateOrderForm
     note_form_class = AddNoteForm
+    change_model = Change
     related_field_name = "order_id"
     change_what = "Order"
     redirect_name = "table:editOrder"

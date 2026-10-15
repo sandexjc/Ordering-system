@@ -7,9 +7,11 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.detail import SingleObjectMixin
 
+from common.mixins import OrderHistoryMixin
+
 
 @method_decorator(csrf_protect, name="dispatch")
-class BaseDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
+class BaseDeleteView(OrderHistoryMixin, LoginRequiredMixin, SingleObjectMixin, View):
 
     """
 
@@ -58,8 +60,8 @@ class BaseDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
             return JsonResponse({"status": "ok"})
 
         try:
-            # Run custom workflow delete sequence
             self.object.run_workflow_delete()
+            self.log_deleted(self.object)
         except Exception as exc:
             return JsonResponse(
                 {"status": "error", "message": str(exc)},

@@ -2,7 +2,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView
 from django.shortcuts import redirect
 
-class BaseCreateView(LoginRequiredMixin, CreateView):
+from common.mixins import OrderHistoryMixin
+
+class BaseCreateView(OrderHistoryMixin, LoginRequiredMixin, CreateView):
 
     """
 
@@ -50,17 +52,9 @@ class BaseCreateView(LoginRequiredMixin, CreateView):
         # Run model custom save logic sequence
         self.object.run_workflow_save()
 
-        # Create Change record
         if self.change_model and self.change_what:
-            self.change_model.objects.create(
-                **{
-                    self.related_field_name: self.object,
-                    "user": user.first_name,
-                    "operation": "created",
-                    "related_item": self.change_what,
-                    "new_state": self.object.id,
-                }
-            )
+            self.fk_field_name = self.related_field_name
+            self.log_created(self.object, self.change_what)
 
         # Create Note (if form provided and note text is not empty)
         if self.note_form_class and note:
@@ -71,16 +65,8 @@ class BaseCreateView(LoginRequiredMixin, CreateView):
             add_note.content = note
             add_note.save()
 
-            # Create change record for Note
             if self.change_model:
-                self.change_model.objects.create(
-                    **{
-                        self.related_field_name: self.object,
-                        "user": user.first_name,
-                        "operation": "created",
-                        "related_item": "Note",
-                        "new_state": note,
-                    }
-                )
+                self.fk_field_name = self.related_field_name
+                self.log_note(self.object, note)
 
         return redirect(self.redirect_name, self.object.pk)

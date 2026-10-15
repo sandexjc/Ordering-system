@@ -1,5 +1,5 @@
 from common.views import BaseUpdateProgressStepView
-from vitrine.models import Vitrine
+from vitrine.models import Change, Vitrine
 
 
 class UpdateProgressStep(BaseUpdateProgressStepView):
@@ -22,6 +22,8 @@ class UpdateProgressStep(BaseUpdateProgressStepView):
     """
 
     model = Vitrine
+    change_model = Change
+    fk_field_name = "vitrine_id"
     allowed_fields = {
         "order": ("order_ready", "order_taken"),
     }
