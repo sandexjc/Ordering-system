@@ -10,6 +10,7 @@ urlpatterns = [
     path('orderForm', views.VitrineOrderFormModal.as_view(), name='orderForm'),
     path('orderForm/<int:pk>', views.VitrineOrderFormModal.as_view(), name='orderFormEdit'),
     path('view_vitrine/<int:pk>', views.ViewVitrine.as_view(), name='vitrine_view'),
+    path('getVitrineHistory/<int:pk>', views.VitrineHistory.as_view(), name='vitrineHistory'),
     path('update_vitrine/<int:pk>', views.UpdateVitrine.as_view(), name='update'),
     path('delete_vitrine/<int:pk>', views.DeleteVitrine.as_view(), name='delete'),
     path('print_vitrine/<int:pk>', views.PrintVitrine.as_view(), name='print_vitrine'),

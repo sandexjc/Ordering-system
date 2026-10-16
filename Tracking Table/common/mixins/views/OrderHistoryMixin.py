@@ -65,6 +65,7 @@ class OrderHistoryMixin:
 
     _SKIP_FIELDS = {
         "id",
+        "created_date",
         "white_seal_type",
         "black_seal_type",
         "white_seal_total_value",

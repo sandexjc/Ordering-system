@@ -6,4 +6,5 @@ from .DeleteVitrineView import DeleteVitrine
 from .PrintVitrineView import PrintVitrine
 from .UpdateVitrineView import UpdateVitrine
 from .UpdateProgressStepView import UpdateProgressStep
+from .VitrineHistoryView import VitrineHistory
 from .VitrinePriceSettingsView import VitrinePriceSettings

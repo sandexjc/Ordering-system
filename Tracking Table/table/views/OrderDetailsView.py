@@ -78,6 +78,7 @@ class ViewOrder(DynamicDetailsModeMixin, LoginRequiredMixin, TemplateView):
         print_url = reverse("table:printOrder", kwargs={"pk": order.id})
         delete_target = f"modal-delete-{order.id}"
         history_target = f"history-tab-{order.id}"
+        history_url = reverse("table:orderHistory", kwargs={"pk": order.id})
         refresh_option = True
 
         # Prepare context
@@ -94,6 +95,7 @@ class ViewOrder(DynamicDetailsModeMixin, LoginRequiredMixin, TemplateView):
             "toolbar_print_url": print_url,
             "toolbar_delete_target": delete_target,
             "toolbar_history_target": history_target,
+            "toolbar_history_url": history_url,
             "toolbar_refresh_option": refresh_option,
             "feature_order_weight_enabled": settings.DJANGO_FEATURES__ORDER_WEIGHT,
         })

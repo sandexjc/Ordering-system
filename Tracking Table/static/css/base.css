@@ -13,6 +13,7 @@
  *   - table/.../order_row.html, vitrine/.../vitrine_row.html
  *       (hiddenRows, hidden-table, hidden-row-close, orderTaken, normalOrder, offer-row, fixed-min-width)
  *   - common/.../order_toolbar.html             (hidden-buttons, tableIcons)
+ *   - common/.../offcanvas_history.html         (history-panel, history-lines, history-refresh)
  *   - table/.../order_table.html                (order-details, table-order-details, order-weight-estimate)
  *   - static/js/orders/details/spinner.js, orders/row-expand/*, orders/details/fetch.js
  *       (order-spinner*, orderClicked, rowSelected, hidden-row-close)
@@ -246,6 +247,65 @@ table.table-order-details thead tr th:not(:first-child) {
 	margin-right: auto;
 	padding-bottom: 20px;
 	text-align: center;
+}
+
+.history-panel
+{
+	--bs-offcanvas-width: clamp(40vw, 480px, 50vw);
+	width: clamp(40vw, 480px, 50vw);
+	min-width: 40vw;
+	max-width: 50vw;
+}
+
+.history-panel-header
+{
+	position: relative;
+	justify-content: center;
+}
+
+.history-panel-header .offcanvas-title
+{
+	width: 100%;
+	margin-bottom: 0;
+	text-align: center;
+}
+
+.history-panel-header .btn-close
+{
+	position: absolute;
+	right: 1rem;
+}
+
+.history-lines
+{
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.history-line
+{
+	margin-bottom: 0.7rem;
+}
+
+.history-refresh-wrap
+{
+	display: flex;
+	justify-content: center;
+	margin-top: 0.5rem;
+	padding-bottom: 0.25rem;
+}
+
+.history-refresh-btn
+{
+	padding: 0;
+	border: 0;
+	line-height: 1;
+}
+
+.history-refresh-icon
+{
+	width: 20px;
+	height: 20px;
 }
 
 /* =============================================================================

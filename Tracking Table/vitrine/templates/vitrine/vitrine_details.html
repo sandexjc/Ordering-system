@@ -7,6 +7,7 @@
     {% include "common/modals/progress_modal.html" with object=vitrine app_name="vitrine" progress_table_template="vitrine/vitrine_progress_form.html" %}
 {% endif %}
 {% include "common/modals/delete_modal.html" with object=vitrine app_name="vitrine" %}
+{% include "common/components/offcanvas_history.html" with object=vitrine %}
 
 <div class="container-fluid order-view" id="order-view-{{ vitrine.id }}">
     {% if dynamic_mode %}
