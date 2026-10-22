@@ -1,8 +1,10 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.urls import reverse_lazy
 
 from accounts.forms import UserSetPasswordForm
+from accounts.helpers.device_cookie import append_device
 from accounts.helpers.set_password_token_generator import SET_PASSWORD_TOKEN_GENERATOR
 
 
@@ -29,4 +31,11 @@ class SetNewPassword(PasswordResetConfirmView):
             self.request,
             "Паролата е зададена. Влезте с потребителското си име.",
         )
-        return super().form_valid(form)
+        enroll_browser = (
+            settings.DJANGO_FEATURES__BROWSER_COOKIE_FILTER
+            and not form.user.has_usable_password()
+        )
+        response = super().form_valid(form)
+        if enroll_browser:
+            append_device(self.request, response, form.user)
+        return response

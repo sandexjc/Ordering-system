@@ -54,7 +54,7 @@ def _cookie_kwargs():
     }
 
 
-def write_secrets(response, raw_secrets):
+def write_secrets(request, response, raw_secrets):
     kept = [
         raw_secret
         for raw_secret in raw_secrets
@@ -67,8 +67,11 @@ def write_secrets(response, raw_secrets):
             samesite="Strict",
             secure=bool(settings.DJANGO_SECURITY_ENABLE),
         )
+        request.COOKIES.pop(COOKIE_NAME, None)
         return response
-    response.set_cookie(COOKIE_NAME, ".".join(kept), **_cookie_kwargs())
+    cookie_value = ".".join(kept)
+    response.set_cookie(COOKIE_NAME, cookie_value, **_cookie_kwargs())
+    request.COOKIES[COOKIE_NAME] = cookie_value
     return response
 
 
@@ -79,7 +82,7 @@ def append_device(request, response, user, device_name=""):
         device_name=device_name,
         secret_hash=hash_secret(raw_secret),
     )
-    write_secrets(response, read_secrets(request) + [raw_secret])
+    write_secrets(request, response, read_secrets(request) + [raw_secret])
     return device
 
 
@@ -92,5 +95,5 @@ def revoke_device(request, response, device):
         for raw_secret in read_secrets(request)
         if hash_secret(raw_secret) != device.secret_hash
     ]
-    write_secrets(response, kept)
+    write_secrets(request, response, kept)
     return device
