@@ -1,1 +1,2 @@
 from .AjaxLoginRedirectMiddleware import AjaxLoginRedirectMiddleware
+from .BrowserCookieFilterMiddleware import BrowserCookieFilterMiddleware

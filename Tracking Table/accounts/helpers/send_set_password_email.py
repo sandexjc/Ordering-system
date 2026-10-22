@@ -6,7 +6,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from accounts.helpers.set_password_token_generator import SET_PASSWORD_TOKEN_GENERATOR
-from accounts.models.User import User as AccountsUser
+from accounts.models.user.UserModel import User as AccountsUser
 
 ACTIVATION_EMAIL_SUBJECT = "Активиране на потребителски акаунт"
 ACTIVATION_EMAIL_TEMPLATE = "accounts/email/set_password.txt"

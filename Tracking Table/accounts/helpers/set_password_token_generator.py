@@ -1,6 +1,6 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
-from accounts.models.User import User
+from accounts.models.user.UserModel import User
 
 
 class SetPasswordTokenGenerator(PasswordResetTokenGenerator):

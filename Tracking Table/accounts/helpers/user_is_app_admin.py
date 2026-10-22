@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User as AuthUser
 
 from accounts.helpers.constants import USER_ROLE_ADMIN, USER_ROLES
-from accounts.models.User import User
+from accounts.models.user.UserModel import User
 
 
 def user_is_app_admin(user):

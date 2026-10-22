@@ -34,6 +34,9 @@ DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING = env_bool("DJANGO_FEATURES__DYNAMIC_CO
 DJANGO_FEATURES__SUMMARIZE_CONTENT = env_bool("DJANGO_FEATURES__SUMMARIZE_CONTENT", default=False)
 DJANGO_FEATURES__ORDER_WEIGHT = env_bool("DJANGO_FEATURES__ORDER_WEIGHT", default=False)
 DJANGO_FEATURES__VITRINE_OFFERS = env_bool("DJANGO_FEATURES__VITRINE_OFFERS", default=True)
+DJANGO_FEATURES__BROWSER_COOKIE_FILTER = env_bool("DJANGO_FEATURES__BROWSER_COOKIE_FILTER", default=False)
+DJANGO_DEVICE_COOKIE__MAX_AGE = env_int("DJANGO_DEVICE_COOKIE__MAX_AGE", default=365 * 24 * 60 * 60)
+DJANGO_DEVICE_COOKIE__MAX_SECRETS = env_int("DJANGO_DEVICE_COOKIE__MAX_SECRETS", default=20)
 
 # Dynamic content properties (used when DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING is on)
 DJANGO_DYNAMIC_CONTENT__SEARCH_MIN_LENGTH = env_int(
@@ -100,6 +103,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'common.middleware.BrowserCookieFilterMiddleware.BrowserCookieFilterMiddleware',
     'common.middleware.AjaxLoginRedirectMiddleware.AjaxLoginRedirectMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
