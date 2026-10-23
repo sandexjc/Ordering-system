@@ -1,14 +1,18 @@
-from .ActivateDeviceView import ActivateDevice
-from .AdminPasswordResetEmailView import AdminPasswordResetEmail
-from .ChangePasswordView import ChangePassword
-from .CreateUserView import CreateUser
-from .DeviceActivationEmailView import DeviceActivationEmail
-from .DeviceListView import DeviceList
-from .LoginView import Login
-from .LogoutView import Logout
-from .ProfileView import Profile
-from .RevokeDeviceView import RevokeDevice
-from .SetNewPasswordView import SetNewPassword
-from .SetUserActiveView import SetUserActive
-from .SetUserRoleView import SetUserRole
-from .ViewUsersView import ViewUsers
+from .devices import (
+    ActivateDevice,
+    DeviceActivationEmail,
+    DeviceList,
+    RevokeDevice,
+)
+from .users import (
+    AdminPasswordResetEmail,
+    ChangePassword,
+    CreateUser,
+    Login,
+    Logout,
+    Profile,
+    SetNewPassword,
+    SetUserActive,
+    SetUserRole,
+    ViewUsers,
+)

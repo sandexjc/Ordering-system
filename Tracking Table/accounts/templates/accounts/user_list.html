@@ -7,6 +7,7 @@
 
 {% block links %}
 <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/user-list.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'accounts/css/user-list-devices.css' %}">
 <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/send-password-email-button.css' %}">
 {% endblock %}
 
@@ -99,6 +100,18 @@
 									</tr>
 								</tbody>
 							</table>
+							{% if browser_cookie_filter_enabled %}
+							<div class="user-list-devices"
+								data-list-url="{% url 'accounts:user-devices' listed_user.pk %}">
+								<h3 class="user-list-devices-header">Устройства</h3>
+								<form class="user-list-device-send-form" method="post" action="{% url 'accounts:send-user-device-activation-email' listed_user.pk %}" data-send-url="{% url 'accounts:send-user-device-activation-email' listed_user.pk %}">
+									{% csrf_token %}
+									<input type="text" name="device_name" maxlength="100" class="form-control form-control-sm user-list-device-name" placeholder="Име на устройството">
+									<button type="submit" class="btn btn-sm btn-primary">Изпрати имейл</button>
+								</form>
+								<ul class="user-list-device-list"></ul>
+							</div>
+							{% endif %}
 						</div>
 					</td>
 				</tr>
@@ -129,4 +142,5 @@
 {% block scripts %}
 <script type="text/javascript" src="{% static 'accounts/js/send-password-email-button.js' %}"></script>
 <script type="text/javascript" src="{% static 'accounts/js/user-list.js' %}"></script>
+<script type="text/javascript" src="{% static 'accounts/js/user-list-devices.js' %}"></script>
 {% endblock %}

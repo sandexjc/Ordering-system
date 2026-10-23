@@ -125,6 +125,7 @@ function open_user_list_helper_row(main_row, helper_row, helper_inner)
     main_row.classList.add("is-expanded");
     main_row.setAttribute("aria-expanded", "true");
     helper_row.setAttribute("aria-hidden", "false");
+    helper_inner.dispatchEvent(new CustomEvent("user-list-helper-open"));
 }
 
 /**

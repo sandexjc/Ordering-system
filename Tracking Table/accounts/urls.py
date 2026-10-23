@@ -76,6 +76,21 @@ urlpatterns = [
         views.AdminPasswordResetEmail.as_view(),
         name='send-set-password-email',
     ),
+    path(
+        'view-users/<int:pk>/devices/',
+        views.DeviceList.as_view(),
+        name='user-devices',
+    ),
+    path(
+        'view-users/<int:pk>/send-activation-email/',
+        views.DeviceActivationEmail.as_view(),
+        name='send-user-device-activation-email',
+    ),
+    path(
+        'view-users/<int:pk>/devices/<int:device_pk>/revoke/',
+        views.RevokeDevice.as_view(),
+        name='revoke-user-device',
+    ),
 
     # Public one-time link that enrolls a browser. Does not change the password.
     path(
