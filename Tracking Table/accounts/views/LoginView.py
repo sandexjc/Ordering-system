@@ -3,11 +3,11 @@ from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.forms.utils import ErrorDict
 
 from accounts.forms import LoginForm
-from accounts.helpers.device_cookie import (
+from accounts.helpers.devices.device_cookie import (
     DEVICE_LOGIN_MESSAGE,
     user_owns_cookie_device,
 )
-from accounts.helpers.login_rate_limit import (
+from accounts.helpers.users.login_rate_limit import (
     LOGIN_RATE_LIMIT_MESSAGE,
     clear_login_failures,
     login_is_locked,

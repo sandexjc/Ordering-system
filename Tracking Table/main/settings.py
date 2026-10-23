@@ -125,7 +125,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'accounts.helpers.context_processors.accounts_roles',
+                'accounts.helpers.users.context_processors.accounts_roles',
             ],
         },
     },

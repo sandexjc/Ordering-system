@@ -2,7 +2,7 @@ from django.conf import settings
 from django.http import HttpResponseForbidden
 from django.urls import Resolver404, resolve
 
-from accounts.helpers.device_cookie import (
+from accounts.helpers.devices.device_cookie import (
     EXEMPT_URL_NAMES,
     cookie_has_active_device,
     touch_active_devices,

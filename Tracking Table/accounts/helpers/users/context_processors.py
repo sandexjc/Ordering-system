@@ -1,4 +1,4 @@
-from accounts.helpers.user_is_app_admin import user_is_app_admin
+from accounts.helpers.users.user_is_app_admin import user_is_app_admin
 
 
 def accounts_roles(request):

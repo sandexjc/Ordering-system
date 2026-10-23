@@ -27,6 +27,20 @@
 			</div>
 		</form>
 	</div>
+	{% if browser_cookie_filter_enabled %}
+	<div class="profile-devices" id="profile-devices"
+		data-list-url="{% url 'accounts:profile-devices' %}"
+		data-send-url="{% url 'accounts:send-device-activation-email' %}">
+		<h2 class="profile-devices-header">Устройства</h2>
+		<form id="profile-device-send-form" class="profile-device-send-form" method="post" action="{% url 'accounts:send-device-activation-email' %}">
+			{% csrf_token %}
+			<input type="text" name="device_name" maxlength="100" class="form-control profile-device-name" placeholder="Име на устройството">
+			<button type="submit" class="btn btn-primary" id="profile-device-send">Изпрати имейл</button>
+		</form>
+		<p class="profile-device-status" id="profile-device-status"></p>
+		<ul class="profile-device-list" id="profile-device-list"></ul>
+	</div>
+	{% endif %}
 </div>
 {% endblock %}
 

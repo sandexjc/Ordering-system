@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 
-from accounts.helpers.send_set_password_email import send_set_password_email
+from accounts.helpers.users.send_set_password_email import send_set_password_email
 from accounts.mixins import AdminRequiredMixin
 from accounts.models import User
 

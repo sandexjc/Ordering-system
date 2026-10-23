@@ -4,12 +4,63 @@ from accounts import views
 app_name = 'accounts'
 
 urlpatterns = [
-    path('login/', views.Login.as_view(), name='login'),
-    path('logout/', views.Logout.as_view(), name='logout'),
-    path('profile/', views.Profile.as_view(), name='profile'),
-    path('change-password/', views.ChangePassword.as_view(), name='change-password'),
-    path('create-user/', views.CreateUser.as_view(), name='create-user'),
-    path('view-users/', views.ViewUsers.as_view(), name='view-users'),
+    # Sign in and sign out.
+    path(
+        'login/',
+        views.Login.as_view(),
+        name='login',
+    ),
+    path(
+        'logout/',
+        views.Logout.as_view(),
+        name='logout',
+    ),
+
+    # Logged-in profile and its device list.
+    path(
+        'profile/',
+        views.Profile.as_view(),
+        name='profile',
+    ),
+    path(
+        'profile/devices/',
+        views.DeviceList.as_view(),
+        name='profile-devices',
+    ),
+    path(
+        'profile/devices/send-activation-email/',
+        views.DeviceActivationEmail.as_view(),
+        name='send-device-activation-email',
+    ),
+    path(
+        'profile/devices/<int:pk>/revoke/',
+        views.RevokeDevice.as_view(),
+        name='revoke-profile-device',
+    ),
+
+    # Password email for the logged-in user, and the public page that saves it.
+    path(
+        'change-password/',
+        views.ChangePassword.as_view(),
+        name='change-password',
+    ),
+    path(
+        'set-password/<uidb64>/<token>/',
+        views.SetNewPassword.as_view(),
+        name='set-password',
+    ),
+
+    # Admin user management.
+    path(
+        'create-user/',
+        views.CreateUser.as_view(),
+        name='create-user',
+    ),
+    path(
+        'view-users/',
+        views.ViewUsers.as_view(),
+        name='view-users',
+    ),
     path(
         'view-users/<int:pk>/set-active/',
         views.SetUserActive.as_view(),
@@ -25,9 +76,11 @@ urlpatterns = [
         views.AdminPasswordResetEmail.as_view(),
         name='send-set-password-email',
     ),
+
+    # Public one-time link that enrolls a browser. Does not change the password.
     path(
-        'set-password/<uidb64>/<token>/',
-        views.SetNewPassword.as_view(),
-        name='set-password',
+        'activate-device/<uidb64>/<token>/',
+        views.ActivateDevice.as_view(),
+        name='activate-device',
     ),
 ]

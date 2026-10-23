@@ -75,15 +75,19 @@ def write_secrets(request, response, raw_secrets):
     return response
 
 
-def append_device(request, response, user, device_name=""):
+def enroll_device(request, response, device):
     raw_secret = secrets.token_urlsafe(32)
-    device = Device.objects.create(
-        user=user,
-        device_name=device_name,
-        secret_hash=hash_secret(raw_secret),
-    )
+    device.secret_hash = hash_secret(raw_secret)
+    device.token_hash = None
+    device.last_used_at = timezone.now()
+    device.save()
     write_secrets(request, response, read_secrets(request) + [raw_secret])
     return device
+
+
+def append_device(request, response, user, device_name=""):
+    device = Device(user=user, device_name=device_name or "")
+    return enroll_device(request, response, device)
 
 
 def revoke_device(request, response, device):

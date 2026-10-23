@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
-from accounts.helpers.send_set_password_email import (
+from accounts.helpers.users.send_set_password_email import (
     CHANGE_PASSWORD_EMAIL_SUBJECT,
     CHANGE_PASSWORD_EMAIL_TEMPLATE,
     send_set_password_email,

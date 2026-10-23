@@ -32,3 +32,61 @@
     text-align: center;
     padding-top: 1rem;
 }
+
+.profile-devices
+{
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.profile-devices-header
+{
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.profile-device-send-form
+{
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.profile-device-name
+{
+    max-width: 18rem;
+}
+
+.profile-device-status
+{
+    text-align: center;
+    min-height: 1.5rem;
+}
+
+.profile-device-list
+{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.profile-device-row
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-device-meta
+{
+    color: #6c757d;
+    font-size: 0.9rem;
+}

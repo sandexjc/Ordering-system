@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
 from accounts.forms import UserCreateForm
-from accounts.helpers.send_set_password_email import send_set_password_email
+from accounts.helpers.users.send_set_password_email import send_set_password_email
 from accounts.mixins import AdminRequiredMixin
 
 

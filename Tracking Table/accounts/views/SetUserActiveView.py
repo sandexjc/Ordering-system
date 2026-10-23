@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 
-from accounts.helpers.user_is_app_admin import deactivate_blocked_reason
+from accounts.helpers.users.user_is_app_admin import deactivate_blocked_reason
 from accounts.mixins import AdminRequiredMixin
 from accounts.models import User
 

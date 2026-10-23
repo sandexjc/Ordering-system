@@ -1,7 +1,7 @@
 from django.views.generic import ListView
 
-from accounts.helpers.constants import USER_ROLE_CHOICES
-from accounts.helpers.user_is_app_admin import (
+from accounts.models.user.UserModel import USER_ROLE_CHOICES
+from accounts.helpers.users.user_is_app_admin import (
     deactivate_blocked_reason,
     role_change_blocked_reason,
 )

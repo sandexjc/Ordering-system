@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -31,6 +32,7 @@ class Profile(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["profile_form"] = context["form"]
+        context["browser_cookie_filter_enabled"] = settings.DJANGO_FEATURES__BROWSER_COOKIE_FILTER
         return context
 
     def form_valid(self, form):
