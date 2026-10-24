@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from django.http import HttpRequest
 
 from accounts.helpers.devices.send_device_activation_email import send_device_activation_email
+from common.middleware.CanonicalHostMiddleware import public_site_host
 
 
 class Command(BaseCommand):
@@ -36,7 +37,7 @@ class Command(BaseCommand):
             self.stdout.write("No user with that username and email. No email sent.")
             return
 
-        host = self._site_host()
+        host = public_site_host()
         if host is None:
             self.stdout.write("Site host is not configured. No email sent.")
             return
@@ -48,11 +49,3 @@ class Command(BaseCommand):
             self.stdout.write("No email sent.")
             return
         self.stdout.write("Activation email sent to %s." % email)
-
-    def _site_host(self):
-        hosts = [host for host in settings.ALLOWED_HOSTS if host and host != "*"]
-        if len(hosts) == 1:
-            return hosts[0]
-        if settings.DEBUG:
-            return "localhost:8000"
-        return None
