@@ -28,11 +28,7 @@ class DeviceActivationEmail(LoginRequiredMixin, DynamicFeatureFlagRequiredMixin,
     def post(self, request, pk=None, *args, **kwargs):
         target = device_subject(request, pk)
         try:
-            sent = send_device_activation_email(
-                request,
-                target,
-                device_name=request.POST.get("device_name", ""),
-            )
+            sent = send_device_activation_email(request, target)
         except Exception:
             return JsonResponse({"ok": False})
         return JsonResponse({"ok": bool(sent)})

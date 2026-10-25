@@ -4,6 +4,7 @@ import secrets
 from django.conf import settings
 from django.utils import timezone
 
+from accounts.helpers.devices.device_label import device_label_from_request
 from accounts.models import Device
 
 
@@ -79,6 +80,7 @@ def enroll_device(request, response, device):
     raw_secret = secrets.token_urlsafe(32)
     device.secret_hash = hash_secret(raw_secret)
     device.token_hash = None
+    device.device_name = device_label_from_request(request)
     device.last_used_at = timezone.now()
     device.save()
     write_secrets(request, response, read_secrets(request) + [raw_secret])

@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 from accounts.helpers.devices.device_cookie import enroll_device
+from accounts.helpers.devices.device_label import attach_device_client_hints
 from accounts.helpers.devices.send_device_activation_email import activation_from_link
 
 
@@ -25,7 +26,8 @@ class ActivateDevice(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not settings.DJANGO_FEATURES__BROWSER_COOKIE_FILTER:
             raise Http404()
-        return super().dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
+        return attach_device_client_hints(response)
 
     def get(self, request, *args, **kwargs):
         device = activation_from_link(kwargs["uidb64"], kwargs["token"])

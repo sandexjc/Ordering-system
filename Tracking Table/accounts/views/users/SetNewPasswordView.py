@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 
 from accounts.forms import UserSetPasswordForm
 from accounts.helpers.devices.device_cookie import append_device
+from accounts.helpers.devices.device_label import attach_device_client_hints
 from accounts.helpers.users.set_password_token_generator import SET_PASSWORD_TOKEN_GENERATOR
 
 
@@ -25,6 +26,12 @@ class SetNewPassword(PasswordResetConfirmView):
     success_url = reverse_lazy("accounts:login")
     title = "Задайте парола"
     token_generator = SET_PASSWORD_TOKEN_GENERATOR
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        if settings.DJANGO_FEATURES__BROWSER_COOKIE_FILTER:
+            attach_device_client_hints(response)
+        return response
 
     def form_valid(self, form):
         messages.success(

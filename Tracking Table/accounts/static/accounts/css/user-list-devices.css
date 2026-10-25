@@ -16,14 +16,8 @@
 .user-list-device-send-form
 {
     display: flex;
-    gap: 0.5rem;
-    align-items: center;
+    justify-content: center;
     margin-bottom: 0.75rem;
-}
-
-.user-list-device-name
-{
-    flex: 1;
 }
 
 .user-list-device-list

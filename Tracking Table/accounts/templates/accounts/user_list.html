@@ -106,7 +106,6 @@
 								<h3 class="user-list-devices-header">Устройства</h3>
 								<form class="user-list-device-send-form" method="post" action="{% url 'accounts:send-user-device-activation-email' listed_user.pk %}" data-send-url="{% url 'accounts:send-user-device-activation-email' listed_user.pk %}">
 									{% csrf_token %}
-									<input type="text" name="device_name" maxlength="100" class="form-control form-control-sm user-list-device-name" placeholder="Име на устройството">
 									<button type="submit" class="btn btn-sm btn-primary">Изпрати имейл</button>
 								</form>
 								<ul class="user-list-device-list"></ul>
