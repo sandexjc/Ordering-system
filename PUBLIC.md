@@ -100,6 +100,26 @@ When `DJANGO_FEATURES__ORDER_WEIGHT=true`, table orders show an approximate weig
 
 The command does not require the feature flag.
 
+## Browser device access
+
+`DJANGO_FEATURES__BROWSER_COOKIE_FILTER` defaults to off. While it is off, sign-in and the rest of the site work as before.
+
+While it is on, a browser that has not been added for that account is refused. The set-password page and the device-activation page stay open so a locked-out browser can still be added.
+
+A new account is added for the browser that sets its first password from the email. Changing the password of an account that already has one does not add or remove a device. Signing out does not remove the device either.
+
+On the profile page and on `/accounts/view-users/`, the button **Добавяне на устройство** emails a one-time link. Open that link in the browser that should be allowed, then press the confirm button. The device list shows that browser and can remove it. After a successful send, a message says **Имейлът за добавяне на устройство е изпратен.** The name is filled in from that browser, for example `Mac, macOS, 26.6.2, Chrome`. Safari and Firefox do not send the operating-system version, so their names leave the version out.
+
+The device belongs to the site address that confirmed it. `www.razkroi-mt.com` is redirected to `razkroi-mt.com`, and `127.0.0.1` is redirected to `localhost`, so those pairs share one device. Opening the link from a mail app can still show a refusal until the site address is typed or the page is reloaded.
+
+If no browser can get in, run this on the server. It emails one activation link and does not print the link:
+
+```bash
+python manage.py send_device_activation_email <username> <email>
+```
+
+The username and email must belong to the same account. In production an `http://` copy of the link is sent on to `https://` before the confirm page is shown. The device is added only after the button is pressed.
+
 ## Demo data commands (beta / local only)
 
 For local testing only (requires `pip install faker` for seeding):

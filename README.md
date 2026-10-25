@@ -170,6 +170,9 @@ Optional variables supported in settings include:
 - `DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING`
 - `DJANGO_FEATURES__SUMMARIZE_CONTENT`
 - `DJANGO_FEATURES__ORDER_WEIGHT`
+- `DJANGO_FEATURES__BROWSER_COOKIE_FILTER`
+- `DJANGO_DEVICE_COOKIE__MAX_AGE`
+- `DJANGO_DEVICE_COOKIE__MAX_SECRETS`
 - `DJANGO_DYNAMIC_CONTENT__SEARCH_MIN_LENGTH`
 - `DJANGO_DYNAMIC_CONTENT__SEARCH_DEBOUNCE_MS`
 - `DJANGO_DYNAMIC_CONTENT__ORDERS_SYNC_INTERVAL_MS`
@@ -353,6 +356,32 @@ python manage.py recalculate_order_weights --all --dry-run
 ```
 
 The command does not require the feature flag. Use `--all` or `--order-id` (not both). `--dry-run` prints the old and new values without writing.
+
+## Browser device cookie
+
+`DJANGO_FEATURES__BROWSER_COOKIE_FILTER` defaults to off. Off, the site is unchanged: no device check, no device UI, and the device URLs return 404.
+
+On, `BrowserCookieFilterMiddleware` runs after authentication. Every Django response returns 403 unless the browser cookie holds a secret for an active device. Two pages stay open without that cookie: `accounts:set-password` and `accounts:activate-device`. Login still requires the account to own one secret in the cookie. Logout does not clear it.
+
+The cookie name is `browser_devices`. It stores one or more raw secrets separated by dots. It is `HttpOnly`, `SameSite=Strict`, and `Secure` when `DJANGO_SECURITY_ENABLE` is on. It is a host-only cookie: `localhost` and a LAN address are different cookies, and `www` and the apex host would be too. `SameSite=Strict` means a tab opened from a mail app does not send the cookie; typing the site address or reloading does.
+
+`DJANGO_DEVICE_COOKIE__MAX_AGE` defaults to 365 days. `DJANGO_DEVICE_COOKIE__MAX_SECRETS` defaults to 20. The database stores only the SHA-256 hash. `secret_hash` is the enrolled cookie secret. `token_hash` is the one-time email link. A pending row has `token_hash`, an empty `secret_hash`, and an empty `revoked_at`. Pending rows do not grant access and do not appear in the device list. Deploying this feature requires the accounts migrations that add `Device` and `token_hash`.
+
+A new user receives a device when they submit the set-password form and the account still has no usable password. Opening that page does not enroll the browser. Changing the password of an account that already has one does not read or write devices.
+
+Profile (`/accounts/profile/`) and the admin user list (`/accounts/view-users/`) can list enrolled devices, email an activation link, and revoke a device. Each section on the profile has its own form. Saving details or sending the device email is an AJAX request: the button shows a spinner, then a check or a cross for 3 seconds. The device button label is **Добавяне на устройство**. A success toast says that the activation email was sent; a failure toast says it was not. The user-list action is limited to admins. The button sits under that user's device list.
+
+The activation email is separate from the password email. Its link is `/accounts/activate-device/<uidb64>/<token>/` and it expires with `PASSWORD_RESET_TIMEOUT`. GET shows a confirm page. POST enrolls that browser and redirects to login. Sending another link revokes older pending rows for that user. The device name is taken from the confirming request, not typed: device family, platform, platform version, and browser, for example `Mac, macOS, 26.6.2, Chrome`. The version comes from `Sec-CH-UA-Platform-Version`. The set-password and activate-device responses ask Chrome for it with `Accept-CH` and `Critical-CH`. Chrome sends it on HTTPS and on `http://localhost`. It does not send it to a plain `http://` LAN address. Safari and Firefox do not send it, so those labels omit the version (`Mac, macOS, Safari`).
+
+When nobody can pass the cookie check, run this on the server:
+
+```bash
+python manage.py send_device_activation_email <username> <email>
+```
+
+Both arguments are required and must match the same account. The command does not print the link or the secret, and it does not clear enrolled devices. It sends nothing when the flag is off, the username and email do not match, or the site host is not configured. The link host comes from `public_site_host()`: the one canonical name in `DJANGO_ALLOWED_HOSTS`, with `www` removed. With `DJANGO_DEBUG` and `DJANGO_ALLOWED_HOSTS=*`, that host is `localhost:8000`. A single named host is returned without a port. Local mail uses the console backend while debug is on, so the message prints in the command terminal.
+
+`CanonicalHostMiddleware` runs first. `www.<host>` redirects to `<host>`, and `127.0.0.1` redirects to `localhost`, before the cookie check. Keep both the apex name and `www` in `DJANGO_ALLOWED_HOSTS` so the `www` request reaches Django and can be redirected. In production, `DJANGO_SECURITY_ENABLE` redirects HTTP to HTTPS before the confirm page runs, so an `http://` copy of an activation link still ends on the HTTPS confirm page. The device is added only when the button is pressed.
 
 ## Frontend static JS map (`Tracking Table/static/js`)
 
