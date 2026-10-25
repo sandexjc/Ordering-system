@@ -56,16 +56,22 @@ function send_profile_device_email(event)
 {
     event.preventDefault();
     const button = document.getElementById("profile-device-send");
-    submit_profile_form(profile_device_send_form, button, profile_devices.getAttribute("data-send-url"));
+    submit_profile_form(profile_device_send_form, button, profile_devices.getAttribute("data-send-url"), function (ok) {
+        show_profile_toast(
+            ok ? "Имейлът за добавяне на устройство е изпратен." : "Имейлът не беше изпратен.",
+            ok ? "success" : "error"
+        );
+    });
 }
 
 /**
  * @param {HTMLFormElement} form
  * @param {HTMLButtonElement} button
  * @param {string|null} url
+ * @param {function(boolean): void|null} on_result
  * @returns {void}
  */
-function submit_profile_form(form, button, url)
+function submit_profile_form(form, button, url, on_result)
 {
     if (!button || button.disabled)
     {
@@ -92,11 +98,49 @@ function submit_profile_form(form, button, url)
             return response.json();
         })
         .then(function (data) {
-            set_profile_button_result(button, Boolean(data && data.ok), original_html);
+            const ok = Boolean(data && data.ok);
+            set_profile_button_result(button, ok, original_html);
+            if (on_result)
+            {
+                on_result(ok);
+            }
         })
         .catch(function () {
             set_profile_button_result(button, false, original_html);
+            if (on_result)
+            {
+                on_result(false);
+            }
         });
+}
+
+let active_profile_toast = null;
+
+/**
+ * @param {string} message
+ * @param {"success"|"error"} type
+ * @returns {void}
+ */
+function show_profile_toast(message, type)
+{
+    const toast_el = document.getElementById("profile-toast");
+    const toast_body = document.getElementById("profile-toast-body");
+    if (!toast_el || !toast_body || !window.bootstrap || !bootstrap.Toast)
+    {
+        return;
+    }
+    if (active_profile_toast)
+    {
+        active_profile_toast.hide();
+    }
+    toast_el.classList.remove("bg-success", "bg-danger");
+    toast_el.classList.add(type === "success" ? "bg-success" : "bg-danger");
+    toast_body.textContent = message;
+    active_profile_toast = new bootstrap.Toast(toast_el, {
+        delay: type === "success" ? 2500 : 9000,
+        autohide: true,
+    });
+    active_profile_toast.show();
 }
 
 /**

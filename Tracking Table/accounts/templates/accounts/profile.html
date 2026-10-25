@@ -38,11 +38,20 @@
 			<ul class="profile-device-list" id="profile-device-list"></ul>
 			<form id="profile-device-send-form" class="profile-device-send-form" method="post" action="{% url 'accounts:send-device-activation-email' %}">
 				{% csrf_token %}
-				<button type="submit" class="btn btn-primary" id="profile-device-send">Изпрати имейл</button>
+				<button type="submit" class="btn btn-primary" id="profile-device-send">Добавяне на устройство</button>
 			</form>
 		</div>
 	</section>
 	{% endif %}
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+	<div id="profile-toast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+		<div class="d-flex">
+			<div id="profile-toast-body" class="toast-body"></div>
+			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+		</div>
+	</div>
 </div>
 {% endblock %}
 

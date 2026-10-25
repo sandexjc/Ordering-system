@@ -104,11 +104,11 @@
 							<div class="user-list-devices"
 								data-list-url="{% url 'accounts:user-devices' listed_user.pk %}">
 								<h3 class="user-list-devices-header">Устройства</h3>
+								<ul class="user-list-device-list"></ul>
 								<form class="user-list-device-send-form" method="post" action="{% url 'accounts:send-user-device-activation-email' listed_user.pk %}" data-send-url="{% url 'accounts:send-user-device-activation-email' listed_user.pk %}">
 									{% csrf_token %}
-									<button type="submit" class="btn btn-sm btn-primary">Изпрати имейл</button>
+									<button type="submit" class="btn btn-sm btn-primary">Добавяне на устройство</button>
 								</form>
-								<ul class="user-list-device-list"></ul>
 							</div>
 							{% endif %}
 						</div>
