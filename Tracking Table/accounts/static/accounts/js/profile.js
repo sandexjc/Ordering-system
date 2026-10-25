@@ -10,14 +10,149 @@ const viewport_width = window.innerWidth;
 /** Set viewport scale based on min required viewport width and current viewport width */
 set_viewport_scale(viewport_width, MIN_VIEWPORT_WIDTH);
 
+const PROFILE_CHECK_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>';
+const PROFILE_CROSS_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>';
+const PROFILE_RESULT_MS = 3000;
+
+document.querySelectorAll(".profile-section-toggle").forEach(function (button) {
+    button.addEventListener("click", function () {
+        const section = button.closest(".profile-section");
+        const open = section.classList.toggle("is-open");
+        button.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+});
+
+const profile_details_form = document.getElementById("profile-details-form");
+if (profile_details_form)
+{
+    profile_details_form.addEventListener("submit", save_profile_details);
+}
+
 const profile_devices = document.getElementById("profile-devices");
 const profile_device_list = document.getElementById("profile-device-list");
-const profile_device_status = document.getElementById("profile-device-status");
 const profile_device_send_form = document.getElementById("profile-device-send-form");
 if (profile_devices && profile_device_send_form)
 {
     load_profile_devices();
     profile_device_send_form.addEventListener("submit", send_profile_device_email);
+}
+
+/**
+ * @param {Event} event
+ * @returns {void}
+ */
+function save_profile_details(event)
+{
+    event.preventDefault();
+    const button = document.getElementById("profile-details-save");
+    submit_profile_form(profile_details_form, button);
+}
+
+/**
+ * @param {Event} event
+ * @returns {void}
+ */
+function send_profile_device_email(event)
+{
+    event.preventDefault();
+    const button = document.getElementById("profile-device-send");
+    submit_profile_form(profile_device_send_form, button, profile_devices.getAttribute("data-send-url"));
+}
+
+/**
+ * @param {HTMLFormElement} form
+ * @param {HTMLButtonElement} button
+ * @param {string|null} url
+ * @returns {void}
+ */
+function submit_profile_form(form, button, url)
+{
+    if (!button || button.disabled)
+    {
+        return;
+    }
+    const original_html = button.getAttribute("data-original-html") || button.innerHTML;
+    button.setAttribute("data-original-html", original_html);
+    set_profile_button_busy(button);
+    const csrf = form.querySelector("[name=csrfmiddlewaretoken]");
+    fetch(url || form.action, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": csrf ? csrf.value : "",
+        },
+        body: new FormData(form),
+    })
+        .then(function (response) {
+            if (!response.ok)
+            {
+                throw new Error("request failed");
+            }
+            return response.json();
+        })
+        .then(function (data) {
+            set_profile_button_result(button, Boolean(data && data.ok), original_html);
+        })
+        .catch(function () {
+            set_profile_button_result(button, false, original_html);
+        });
+}
+
+/**
+ * @param {HTMLButtonElement} button
+ * @returns {void}
+ */
+function set_profile_button_busy(button)
+{
+    if (!button.getAttribute("data-original-class"))
+    {
+        button.setAttribute("data-original-class", button.className);
+    }
+    button.disabled = true;
+    button.setAttribute("aria-busy", "true");
+    switch_profile_button_state(button, function () {
+        button.classList.remove("btn-success", "btn-danger");
+        button.classList.add("btn-primary");
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    });
+}
+
+/**
+ * @param {HTMLButtonElement} button
+ * @param {boolean} ok
+ * @param {string} original_html
+ * @returns {void}
+ */
+function set_profile_button_result(button, ok, original_html)
+{
+    switch_profile_button_state(button, function () {
+        button.classList.remove("btn-primary", "btn-success", "btn-danger");
+        button.classList.add(ok ? "btn-success" : "btn-danger");
+        button.innerHTML = ok ? PROFILE_CHECK_ICON : PROFILE_CROSS_ICON;
+        button.removeAttribute("aria-busy");
+    });
+    window.setTimeout(function () {
+        switch_profile_button_state(button, function () {
+        button.innerHTML = original_html;
+        button.className = button.getAttribute("data-original-class") || button.className;
+        button.disabled = false;
+        });
+    }, PROFILE_RESULT_MS);
+}
+
+/**
+ * @param {HTMLButtonElement} button
+ * @param {function(): void} apply_state
+ * @returns {void}
+ */
+function switch_profile_button_state(button, apply_state)
+{
+    button.classList.add("is-switching");
+    window.setTimeout(function () {
+        apply_state();
+        button.classList.remove("is-switching");
+    }, 180);
 }
 
 /**
@@ -40,7 +175,11 @@ function load_profile_devices()
             render_profile_devices(data.devices || []);
         })
         .catch(function () {
-            profile_device_status.textContent = "Устройствата не могат да бъдат заредени.";
+            profile_device_list.innerHTML = "";
+            const empty = document.createElement("li");
+            empty.className = "profile-device-empty";
+            empty.textContent = "Устройствата не могат да бъдат заредени.";
+            profile_device_list.appendChild(empty);
         });
 }
 
@@ -53,10 +192,12 @@ function render_profile_devices(devices)
     profile_device_list.innerHTML = "";
     if (!devices.length)
     {
-        profile_device_status.textContent = "Няма добавени устройства.";
+        const empty = document.createElement("li");
+        empty.className = "profile-device-empty";
+        empty.textContent = "Няма добавени устройства.";
+        profile_device_list.appendChild(empty);
         return;
     }
-    profile_device_status.textContent = "";
     devices.forEach(function (device) {
         const row = document.createElement("li");
         row.className = "profile-device-row";
@@ -85,49 +226,6 @@ function render_profile_devices(devices)
 }
 
 /**
- * @param {Event} event
- * @returns {void}
- */
-function send_profile_device_email(event)
-{
-    event.preventDefault();
-    const button = document.getElementById("profile-device-send");
-    if (!button || button.disabled)
-    {
-        return;
-    }
-    button.disabled = true;
-    const csrf = profile_device_send_form.querySelector("[name=csrfmiddlewaretoken]");
-    fetch(profile_devices.getAttribute("data-send-url"), {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-            "X-Requested-With": "XMLHttpRequest",
-            "X-CSRFToken": csrf ? csrf.value : "",
-        },
-        body: new FormData(profile_device_send_form),
-    })
-        .then(function (response) {
-            if (!response.ok)
-            {
-                throw new Error("send failed");
-            }
-            return response.json();
-        })
-        .then(function (data) {
-            profile_device_status.textContent = data && data.ok
-                ? "Имейлът за добавяне на устройство е изпратен."
-                : "Имейлът не беше изпратен.";
-        })
-        .catch(function () {
-            profile_device_status.textContent = "Имейлът не беше изпратен.";
-        })
-        .finally(function () {
-            button.disabled = false;
-        });
-}
-
-/**
  * @param {string} url
  * @param {HTMLButtonElement} button
  * @returns {void}
@@ -138,7 +236,8 @@ function revoke_profile_device(url, button)
     {
         return;
     }
-    button.disabled = true;
+    const original_html = button.innerHTML;
+    set_profile_button_busy(button);
     const csrf = profile_device_send_form.querySelector("[name=csrfmiddlewaretoken]");
     fetch(url, {
         method: "POST",
@@ -156,11 +255,10 @@ function revoke_profile_device(url, button)
             return response.json();
         })
         .then(function () {
-            load_profile_devices();
+            set_profile_button_result(button, true, original_html);
+            window.setTimeout(load_profile_devices, PROFILE_RESULT_MS);
         })
         .catch(function () {
-            profile_device_status.textContent = "Устройството не беше премахнато.";
-            button.disabled = false;
+            set_profile_button_result(button, false, original_html);
         });
 }
-

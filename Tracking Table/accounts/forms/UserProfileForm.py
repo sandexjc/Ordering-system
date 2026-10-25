@@ -15,6 +15,7 @@ class UserProfileForm(forms.ModelForm):
 
         model = get_user_model()
         fields = (
+            "username",
             "first_name",
             "last_name",
             "email",
@@ -23,6 +24,10 @@ class UserProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
+        self.fields["username"].label = "Потребителско име"
+        self.fields["username"].disabled = True
+        self.fields["username"].required = False
+        self.fields["username"].help_text = ""
         self.fields["first_name"].label = "Име"
         self.fields["first_name"].required = True
         self.fields["last_name"].label = "Фамилия"

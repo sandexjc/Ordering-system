@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.views.generic import UpdateView
 
@@ -36,5 +37,13 @@ class Profile(LoginRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
+            form.save()
+            return JsonResponse({"ok": True})
         messages.success(self.request, "Профилът е запазен.")
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"ok": False}, status=400)
+        return super().form_invalid(form)
