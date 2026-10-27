@@ -312,6 +312,39 @@ table.table-order-details thead tr th:not(:first-child) {
    Table cell helpers (list tables)
    ============================================================================= */
 
+/*
+ * Bootstrap 5.3 paints .table cells with the page background and drops the
+ * divider under the header. 5.1.3 kept cells transparent and drew a 2px line
+ * between thead and tbody. The order list and the expanded details table
+ * (table-order-details) rely on that.
+ *
+ * 5.3 also draws hover and stripe tints with a 9999px inset shadow on every
+ * cell. Opening a row animates height inside the orders table, so that shadow
+ * is repainted on each frame. The shadow is turned off. Hover uses a flat tint.
+ */
+.table
+{
+	--bs-table-bg: transparent;
+	--bs-table-color: #212529;
+	color: #212529;
+	border-color: #dee2e6;
+}
+
+.table > :not(caption) > * > *
+{
+	box-shadow: none;
+}
+
+.table-hover > tbody > tr:hover > *
+{
+	background-color: rgba(0, 0, 0, 0.075);
+}
+
+.table > :not(:first-child)
+{
+	border-top: 2px solid currentColor;
+}
+
 /** Cells with padding to beautify the text */
 .table > :not(caption) > * > td {
 	padding-left: 0.25rem;
