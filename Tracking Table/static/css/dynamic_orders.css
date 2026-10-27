@@ -874,3 +874,36 @@ mark.search-highlight
 	width: 19px;
 	height: 19px;
 }
+
+/* Dark theme: connection toast and the yellow edited-row highlight. */
+[data-bs-theme="dark"] .server-connection-toast,
+[data-bs-theme="dark"] .server-connection-toast .toast-header,
+[data-bs-theme="dark"] .server-connection-toast-retry
+{
+	background: #2b3035;
+	color: #f8f9fa;
+	border-color: #495057;
+}
+
+[data-bs-theme="dark"] .server-connection-toast .toast-body
+{
+	color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] #order-form-modal tr.is-dirty > td
+{
+	background-color: #6b5420;
+	color: #fff;
+}
+
+[data-bs-theme="dark"] #order-form-modal tr.is-dirty .form-control:not(.is-invalid):not([readonly]),
+[data-bs-theme="dark"] #order-form-modal tr.is-dirty .form-select:not(.is-invalid),
+[data-bs-theme="dark"] #order-form-modal .form-control.is-dirty:not(.is-invalid):not([readonly]),
+[data-bs-theme="dark"] #order-form-modal .form-select.is-dirty:not(.is-invalid),
+[data-bs-theme="dark"] #order-form-modal textarea.is-dirty:not(.is-invalid)
+{
+	background-color: #5c4816 !important;
+	color: #fff !important;
+	border-color: #e6b325 !important;
+	box-shadow: inset 0 0 0 1px #e6b325;
+}

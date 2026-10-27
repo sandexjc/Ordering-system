@@ -1,2 +1,2 @@
 from .items import Device
-from .user import User
+from .user import User, UserPreference

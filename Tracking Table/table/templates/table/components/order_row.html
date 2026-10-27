@@ -7,7 +7,7 @@
     {% if order.invoice %}
         <td style="color: red;" id="ID{{order.id}}">{{ order.id }}</td>
     {% else %}
-        <td style="color: black;" id="ID{{order.id}}">{{ order.id }}</td>
+        <td class="tone-ink" id="ID{{order.id}}">{{ order.id }}</td>
     {% endif %}
 
     <td>{{order.created_date|date:"d.m.Y"}}</td>
@@ -23,7 +23,7 @@
                 {% elif item.from_client %}
                     <div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
                 {% else %}
-                    <div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
+                    <div class="Plate tone-ink" id="plate{{item.pk}}">{{item.material}} - {{item.quantity}}</div>
                 {% endif %}
             {% endif %}
         {% endfor %}
@@ -39,7 +39,7 @@
                 {% elif item.from_client %}
                     <div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
                 {% else %}
-                    <div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
+                    <div class="Plate tone-ink" id="plate{{item.pk}}">{{item.material}} - {{item.quantity}}</div>
                 {% endif %}
             {% endif %}
         {% endfor %}
@@ -54,7 +54,7 @@
                 {% elif item.from_client %}
                     <div class="Plate" id="plate{{item.pk}}" style="color: #7b2cbf;" >{{item.material}} - {{item.quantity}}</div>
                 {% else %}
-                    <div class="Plate" id="plate{{item.pk}}" style="color: black;" >{{item.material}} - {{item.quantity}}</div>
+                    <div class="Plate tone-ink" id="plate{{item.pk}}">{{item.material}} - {{item.quantity}}</div>
                 {% endif %}
             {% endif %}
         {% endfor %}
@@ -71,7 +71,7 @@
                     {{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
                     </div>
                 {% else %}
-                    <div class="Edge" id="edge{{item.pk}}" style="color: black;">
+                    <div class="Edge tone-ink" id="edge{{item.pk}}">
                     {{item.edge_type}}-{{item.color_code}} - {{item.quantity}}
                     </div>
                 {% endif %}

@@ -28,6 +28,17 @@ if (profile_details_form)
     profile_details_form.addEventListener("submit", save_profile_details);
 }
 
+const profile_appearance_form = document.getElementById("profile-appearance-form");
+if (profile_appearance_form)
+{
+    const theme_input = profile_appearance_form.querySelector("[name=theme]");
+    if (theme_input)
+    {
+        theme_input.addEventListener("change", preview_profile_theme);
+    }
+    profile_appearance_form.addEventListener("submit", save_profile_appearance);
+}
+
 const profile_devices = document.getElementById("profile-devices");
 const profile_device_list = document.getElementById("profile-device-list");
 const profile_device_send_form = document.getElementById("profile-device-send-form");
@@ -46,6 +57,38 @@ function save_profile_details(event)
     event.preventDefault();
     const button = document.getElementById("profile-details-save");
     submit_profile_form(profile_details_form, button);
+}
+
+/**
+ * @returns {void}
+ */
+function preview_profile_theme()
+{
+    const theme_input = profile_appearance_form.querySelector("[name=theme]");
+    if (!theme_input)
+    {
+        return;
+    }
+    if (theme_input.value === "light" || theme_input.value === "dark")
+    {
+        document.documentElement.setAttribute("data-bs-theme", theme_input.value);
+    }
+}
+
+/**
+ * @param {Event} event
+ * @returns {void}
+ */
+function save_profile_appearance(event)
+{
+    event.preventDefault();
+    const button = document.getElementById("profile-appearance-save");
+    submit_profile_form(profile_appearance_form, button, null, function (ok) {
+        show_profile_toast(
+            ok ? "Настройките за външен вид са запазени." : "Настройките не бяха запазени.",
+            ok ? "success" : "error"
+        );
+    });
 }
 
 /**

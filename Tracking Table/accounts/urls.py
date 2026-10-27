@@ -23,6 +23,11 @@ urlpatterns = [
         name='profile',
     ),
     path(
+        'profile/appearance/',
+        views.AppearancePreference.as_view(),
+        name='profile-appearance',
+    ),
+    path(
         'profile/devices/',
         views.DeviceList.as_view(),
         name='profile-devices',

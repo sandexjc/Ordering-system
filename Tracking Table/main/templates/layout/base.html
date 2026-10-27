@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
-<html>
+<html data-bs-theme="{{ appearance_theme }}">
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1" id="viewport-scale-meta">
@@ -10,12 +10,13 @@
 		<link rel="icon" type="image/x-icon" href="{% static 'images/favico.png' %}">
 		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.3.3/css/bootstrap.css' %}">
 		<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'css/appearance.css' %}">
 		{% block links %}
 		<link rel="stylesheet" type="text/css" href="{% static 'css/progressbar.css' %}">
 		{% endblock %}
 	</head>
 	<body>
-		<nav class="navbar fixed-min-width" data-bs-theme="light" style="background-color: #e6e6e9; --bs-bg-opacity: .5;">
+		<nav class="navbar fixed-min-width">
 			<div class="container-fluid">
 				<a class="navbar-brand" href="{% url 'home' %}">
 					<img src="{% static 'images/favico.png' %}" style="width: 30px; height: 30px; margin-bottom: 2px;">

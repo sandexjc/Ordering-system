@@ -5,6 +5,10 @@
     flex-shrink: 0;
 }
 
+.holes-svg circle {
+    fill: currentColor;
+}
+
 .empty {
     width: 6px;
     flex-shrink: 0;

@@ -31,9 +31,10 @@ class FormFieldsStyleMixin:
     def set_readonly(self, field_name):
         # Make a field readonly with a greyed-out style.
         if field_name in self.fields:
+            css_class = self.fields[field_name].widget.attrs.get("class", "")
             self.fields[field_name].widget.attrs.update({
                 "readonly": True,
-                "style": "background-color: #e9ecef; font-weight: bold;",
+                "class": f"{css_class} field-readonly".strip(),
             })
 
     def set_switch(self, field_name):
@@ -78,8 +79,7 @@ class FormFieldsStyleMixin:
         # Set small dropdown selective menu with notes of gray color
         if field_name in self.fields:
             self.fields[field_name].widget.attrs.update({
-                "style": "background-color: #faf9f9",
-                "class": "form-select form-select-sm",
+                "class": "form-select form-select-sm field-surface",
             })
     
     def disable_if(self, condition: bool, field_name: str, reason: str | None = None):
@@ -93,12 +93,9 @@ class FormFieldsStyleMixin:
             if reason:
                 field.help_text = reason
             
-            # Preserve any existing style
-            current_style = field.widget.attrs.get("style", "")
-            new_style = f"{current_style} background-color: #e9ecef; opacity: 0.75;"
-            
+            css_class = field.widget.attrs.get("class", "")
             field.widget.attrs.update({
-                "style": new_style.strip(),
+                "class": f"{css_class} field-disabled".strip(),
                 "title": reason or "This field is disabled",
             })
     

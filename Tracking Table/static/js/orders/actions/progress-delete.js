@@ -68,6 +68,27 @@ function sync_vitrine_order_taken_enabled(orderPk, isReady)
 }
 
 /**
+ * Status colors stay inline. The default ink follows the theme via .tone-ink.
+ *
+ * @param {HTMLElement|null} el
+ * @param {string|null} color - A status color, or null for the theme ink.
+ * @returns {void}
+ */
+function set_row_ink(el, color)
+{
+	if (!el) {
+		return;
+	}
+	if (color) {
+		el.style.color = color;
+		el.classList.remove("tone-ink");
+		return;
+	}
+	el.style.color = "";
+	el.classList.add("tone-ink");
+}
+
+/**
  * Apply JSON from a progress update to list-row colors and progress bars.
  *
  * @param {object} data - Serialized `{ order, plates?, edges? }` payload.
@@ -87,9 +108,7 @@ function apply_progress_update_response(data)
 			}
 
 			const idLabel = document.getElementById(`ID${o.pk}`);
-			if (idLabel) {
-				idLabel.style.color = o.fields.invoice ? "red" : "black";
-			}
+			set_row_ink(idLabel, o.fields.invoice ? "red" : null);
 
 			sync_progress_step(`order-progress-order_taken-${o.pk}`, o.fields.order_taken === true);
 			sync_progress_step(`order-progress-invoice-${o.pk}`, o.fields.invoice === true);
@@ -103,13 +122,13 @@ function apply_progress_update_response(data)
 			const plate = document.getElementById(`plate${p.pk}`);
 			if (plate) {
 				if (p.fields.ordered && !p.fields.from_client && !p.fields.delivered) {
-					plate.style.color = "red";
+					set_row_ink(plate, "red");
 				} else if (p.fields.delivered) {
-					plate.style.color = "#8ac926";
+					set_row_ink(plate, "#8ac926");
 				} else if (p.fields.from_client) {
-					plate.style.color = "#7b2cbf";
+					set_row_ink(plate, "#7b2cbf");
 				} else {
-					plate.style.color = "black";
+					set_row_ink(plate, null);
 				}
 			}
 
@@ -124,11 +143,11 @@ function apply_progress_update_response(data)
 			const edge = document.getElementById(`edge${e.pk}`);
 			if (edge) {
 				if (e.fields.ordered && !e.fields.delivered) {
-					edge.style.color = "red";
+					set_row_ink(edge, "red");
 				} else if (e.fields.delivered) {
-					edge.style.color = "#8ac926";
+					set_row_ink(edge, "#8ac926");
 				} else {
-					edge.style.color = "black";
+					set_row_ink(edge, null);
 				}
 			}
 

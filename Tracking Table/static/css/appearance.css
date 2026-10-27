@@ -1,0 +1,225 @@
+/*
+ * appearance.css
+ * --------------
+ * Per-user light and dark surfaces. Bootstrap colors follow data-bs-theme
+ * on the document. These rules cover the page, order tables, profile, and
+ * user list, whose colors are written directly in our CSS.
+ *
+ * Loaded from:
+ *   - main/templates/layout/base.html
+ */
+
+.navbar
+{
+	background-color: #e6e6e9;
+}
+
+[data-bs-theme="dark"] body
+{
+	background-color: #14171c;
+	background-blend-mode: multiply;
+	color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .navbar
+{
+	background-color: #212529;
+}
+
+[data-bs-theme="dark"] .WebFooter
+{
+	color: #ced4da;
+}
+
+[data-bs-theme="dark"] .table-div,
+[data-bs-theme="dark"] .profile-page,
+[data-bs-theme="dark"] .user-list-page,
+[data-bs-theme="dark"] .create-user-page,
+[data-bs-theme="dark"] .change-password-page,
+[data-bs-theme="dark"] .vitrine-price-settings-page
+{
+	background-color: #2b3035;
+	color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .table
+{
+	--bs-table-color: #e9ecef;
+	color: #e9ecef;
+	border-color: #495057;
+}
+
+[data-bs-theme="dark"] .hiddenRows
+{
+	background-color: #343a40;
+}
+
+[data-bs-theme="dark"] .hidden-row-close
+{
+	color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .hidden-row-close:hover,
+[data-bs-theme="dark"] .hidden-row-close:focus-visible
+{
+	color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .order-spinner
+{
+	color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .table-order-details td.order-weight-estimate
+{
+	color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .normalOrder
+{
+	background-color: #2b3035;
+}
+
+[data-bs-theme="dark"] .orderTaken
+{
+	background-color: #6a5b32;
+}
+
+[data-bs-theme="dark"] .orderClicked
+{
+	background-color: #3a414a;
+}
+
+[data-bs-theme="dark"] .rowSelected
+{
+	background-blend-mode: normal;
+	background-color: #4a5160;
+}
+
+[data-bs-theme="dark"] #dynamic-orders-root .offer-row
+{
+	background-color: #1a3d66;
+}
+
+[data-bs-theme="dark"] #dynamic-orders-root .offer-row.rowSelected
+{
+	background-color: #245a86;
+}
+
+[data-bs-theme="dark"] #dynamic-orders-root .visibleRows.summarize-selected
+{
+	background-blend-mode: normal;
+	background-color: #1b4332;
+	box-shadow: inset 4px 0 0 #52b788;
+}
+
+[data-bs-theme="dark"] #dynamic-orders-root .offer-row.summarize-selected
+{
+	background-color: #1b4332;
+}
+
+[data-bs-theme="dark"] .profile-section
+{
+	border-color: #495057;
+}
+
+[data-bs-theme="dark"] .profile-section-toggle
+{
+	background: #343a40;
+	color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .profile-section-toggle::after
+{
+	border-right-color: #ced4da;
+	border-bottom-color: #ced4da;
+}
+
+[data-bs-theme="dark"] .profile-device-row
+{
+	border-bottom-color: #495057;
+}
+
+[data-bs-theme="dark"] .profile-device-meta,
+[data-bs-theme="dark"] .profile-device-empty
+{
+	color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .user-list-helper-row
+{
+	background-color: #343a40;
+}
+
+[data-bs-theme="dark"] .user-list-main-row > td:first-child::before
+{
+	color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .user-list-main-row.is-expanded > td:first-child::before
+{
+	color: #f8f9fa;
+}
+
+.tone-ink
+{
+	color: #212529;
+}
+
+[data-bs-theme="dark"] .tone-ink
+{
+	color: #f8f9fa;
+}
+
+.field-surface
+{
+	background-color: #faf9f9;
+}
+
+.field-readonly
+{
+	background-color: #e9ecef;
+	font-weight: bold;
+}
+
+.field-disabled
+{
+	background-color: #e9ecef;
+	opacity: 0.75;
+}
+
+[data-bs-theme="dark"] .field-surface,
+[data-bs-theme="dark"] .field-readonly,
+[data-bs-theme="dark"] .field-disabled
+{
+	background-color: #343a40;
+	color: #f8f9fa;
+	border-color: #6c757d;
+}
+
+[data-bs-theme="dark"] .toast:not(.bg-success):not(.bg-danger)
+{
+	--bs-toast-bg: #2b3035;
+	--bs-toast-color: #f8f9fa;
+	--bs-toast-header-color: #f8f9fa;
+	--bs-toast-header-bg: #343a40;
+	background-color: #2b3035;
+	color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .vitrine-price-settings-row.is-dirty .vitrine-price-settings-label
+{
+	color: #ffe08a;
+}
+
+[data-bs-theme="dark"] .vitrine-price-settings-row.is-dirty .form-control
+{
+	background-color: #5c4816;
+	color: #fff;
+	border-color: #e6b325;
+}
+
+[data-bs-theme="dark"] .holes-svg circle
+{
+	fill: #f8f9fa;
+}

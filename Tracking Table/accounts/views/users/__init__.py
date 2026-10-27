@@ -1,4 +1,5 @@
 from .AdminPasswordResetEmailView import AdminPasswordResetEmail
+from .AppearancePreferenceView import AppearancePreference
 from .ChangePasswordView import ChangePassword
 from .CreateUserView import CreateUser
 from .LoginView import Login

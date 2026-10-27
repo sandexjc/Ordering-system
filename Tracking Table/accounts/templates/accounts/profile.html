@@ -27,6 +27,20 @@
 			</form>
 		</div>
 	</section>
+	<section class="profile-section is-open">
+		<button type="button" class="profile-section-toggle" aria-expanded="true">
+			Външен вид
+		</button>
+		<div class="profile-section-body">
+			<form id="profile-appearance-form" class="profile-form" method="post" action="{% url 'accounts:profile-appearance' %}">
+				{% csrf_token %}
+				{% bootstrap_form preference_form %}
+				<div class="profile-submit">
+					<button type="submit" class="btn btn-primary" id="profile-appearance-save">Запази</button>
+				</div>
+			</form>
+		</div>
+	</section>
 	{% if browser_cookie_filter_enabled %}
 	<section class="profile-section is-open">
 		<button type="button" class="profile-section-toggle" aria-expanded="true">

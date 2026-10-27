@@ -6,6 +6,7 @@ from .devices import (
 )
 from .users import (
     AdminPasswordResetEmail,
+    AppearancePreference,
     ChangePassword,
     CreateUser,
     Login,
