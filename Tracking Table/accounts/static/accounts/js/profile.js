@@ -31,11 +31,9 @@ if (profile_details_form)
 const profile_appearance_form = document.getElementById("profile-appearance-form");
 if (profile_appearance_form)
 {
-    const theme_input = profile_appearance_form.querySelector("[name=theme]");
-    if (theme_input)
-    {
-        theme_input.addEventListener("change", preview_profile_theme);
-    }
+    profile_appearance_form.querySelectorAll("[name=theme], [name=background]").forEach(function (input) {
+        input.addEventListener("change", preview_profile_appearance);
+    });
     profile_appearance_form.addEventListener("submit", save_profile_appearance);
 }
 
@@ -60,19 +58,34 @@ function save_profile_details(event)
 }
 
 /**
+ * @param {HTMLFormElement} form
+ * @param {string} name
+ * @param {string[]} allowed
+ * @param {string} attribute
  * @returns {void}
  */
-function preview_profile_theme()
+function preview_profile_choice(form, name, allowed, attribute)
 {
-    const theme_input = profile_appearance_form.querySelector("[name=theme]");
-    if (!theme_input)
+    const input = form.querySelector("[name=" + name + "]");
+    if (!input || allowed.indexOf(input.value) === -1)
     {
         return;
     }
-    if (theme_input.value === "light" || theme_input.value === "dark")
-    {
-        document.documentElement.setAttribute("data-bs-theme", theme_input.value);
-    }
+    document.documentElement.setAttribute(attribute, input.value);
+}
+
+/**
+ * @returns {void}
+ */
+function preview_profile_appearance()
+{
+    preview_profile_choice(profile_appearance_form, "theme", ["light", "dark"], "data-bs-theme");
+    preview_profile_choice(
+        profile_appearance_form,
+        "background",
+        ["city", "plain", "warm_paper", "blue", "green", "sand", "slate"],
+        "data-bg"
+    );
 }
 
 /**

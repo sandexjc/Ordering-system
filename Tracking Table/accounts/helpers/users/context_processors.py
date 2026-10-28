@@ -7,4 +7,8 @@ def accounts_roles(request):
 
 
 def appearance(request):
-    return {"appearance_theme": UserPreference.theme_for(request.user)}
+    saved = UserPreference.appearance_for(request.user)
+    return {
+        "appearance_theme": saved["theme"],
+        "appearance_background": saved["background"],
+    }

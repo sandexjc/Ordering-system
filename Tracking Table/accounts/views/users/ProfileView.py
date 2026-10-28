@@ -34,9 +34,8 @@ class Profile(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["profile_form"] = context["form"]
-        context["preference_form"] = UserPreferenceForm(
-            initial={"theme": UserPreference.theme_for(self.request.user)}
-        )
+        saved = UserPreference.appearance_for(self.request.user)
+        context["preference_form"] = UserPreferenceForm(initial=saved)
         context["browser_cookie_filter_enabled"] = settings.DJANGO_FEATURES__BROWSER_COOKIE_FILTER
         return context
 

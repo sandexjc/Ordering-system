@@ -21,6 +21,89 @@
 	color: #e9ecef;
 }
 
+html[data-bg="plain"] body,
+html[data-bg="blue"] body,
+html[data-bg="green"] body,
+html[data-bg="sand"] body,
+html[data-bg="slate"] body
+{
+	background-image: none;
+	background-blend-mode: normal;
+}
+
+html[data-bg="plain"] body
+{
+	background-color: #f4f5f7;
+}
+
+html[data-bg="blue"] body
+{
+	background-color: #d7e6f5;
+}
+
+html[data-bg="green"] body
+{
+	background-color: #dceadf;
+}
+
+html[data-bg="sand"] body
+{
+	background-color: #f0e2c8;
+}
+
+html[data-bg="slate"] body
+{
+	background-color: #d5dbe3;
+}
+
+html[data-bs-theme="dark"][data-bg="plain"] body
+{
+	background-color: #14171c;
+	color: #e9ecef;
+}
+
+html[data-bs-theme="dark"][data-bg="blue"] body
+{
+	background-color: #1a3148;
+	color: #e9ecef;
+}
+
+html[data-bs-theme="dark"][data-bg="green"] body
+{
+	background-color: #1c3328;
+	color: #e9ecef;
+}
+
+html[data-bs-theme="dark"][data-bg="sand"] body
+{
+	background-color: #3a3224;
+	color: #e9ecef;
+}
+
+html[data-bs-theme="dark"][data-bg="slate"] body
+{
+	background-color: #24303a;
+	color: #e9ecef;
+}
+
+html[data-bg="warm_paper"] body
+{
+	background-image: linear-gradient(165deg, #f6ead0 0%, #e4cf9e 48%, #f8f3e8 100%);
+	background-color: #f3e6c8;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: cover;
+	background-blend-mode: normal;
+}
+
+html[data-bs-theme="dark"][data-bg="warm_paper"] body
+{
+	background-image: linear-gradient(165deg, #4a3d28 0%, #2c261c 55%, #17140f 100%);
+	background-color: #2c261c;
+	background-blend-mode: normal;
+	color: #e9ecef;
+}
+
 [data-bs-theme="dark"] .navbar
 {
 	background-color: #212529;

@@ -10,6 +10,35 @@ THEME_CHOICES = (
     (THEME_DARK, "Тъмна"),
 )
 
+BACKGROUND_CITY = "city"
+BACKGROUND_PLAIN = "plain"
+BACKGROUND_WARM_PAPER = "warm_paper"
+BACKGROUND_BLUE = "blue"
+BACKGROUND_GREEN = "green"
+BACKGROUND_SAND = "sand"
+BACKGROUND_SLATE = "slate"
+
+BACKGROUND_CHOICES = (
+    (BACKGROUND_CITY, "Град"),
+    (BACKGROUND_PLAIN, "Едноцветен"),
+    (BACKGROUND_WARM_PAPER, "Топла хартия"),
+    (BACKGROUND_BLUE, "Синьо"),
+    (BACKGROUND_GREEN, "Зелено"),
+    (BACKGROUND_SAND, "Пясък"),
+    (BACKGROUND_SLATE, "Шисти"),
+)
+
+_THEMES = (THEME_LIGHT, THEME_DARK)
+_BACKGROUNDS = (
+    BACKGROUND_CITY,
+    BACKGROUND_PLAIN,
+    BACKGROUND_WARM_PAPER,
+    BACKGROUND_BLUE,
+    BACKGROUND_GREEN,
+    BACKGROUND_SAND,
+    BACKGROUND_SLATE,
+)
+
 
 class UserPreference(models.Model):
 
@@ -35,15 +64,32 @@ class UserPreference(models.Model):
         choices=THEME_CHOICES,
         default=THEME_LIGHT,
     )
+    background = models.CharField(
+        max_length=16,
+        choices=BACKGROUND_CHOICES,
+        default=BACKGROUND_CITY,
+    )
 
     def __str__(self):
         return "Appearance for %s" % self.user_id
 
     @classmethod
-    def theme_for(cls, user):
+    def appearance_for(cls, user):
+        values = {
+            "theme": THEME_LIGHT,
+            "background": BACKGROUND_CITY,
+        }
         if not getattr(user, "is_authenticated", False):
-            return THEME_LIGHT
-        theme = cls.objects.filter(pk=user.pk).values_list("theme", flat=True).first()
-        if theme in (THEME_LIGHT, THEME_DARK):
-            return theme
-        return THEME_LIGHT
+            return values
+        row = cls.objects.filter(pk=user.pk).values("theme", "background").first()
+        if not row:
+            return values
+        if row["theme"] in _THEMES:
+            values["theme"] = row["theme"]
+        if row["background"] in _BACKGROUNDS:
+            values["background"] = row["background"]
+        return values
+
+    @classmethod
+    def theme_for(cls, user):
+        return cls.appearance_for(user)["theme"]

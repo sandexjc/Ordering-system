@@ -31,7 +31,8 @@ class AppearancePreference(LoginRequiredMixin, View):
             return redirect("accounts:profile")
         preference, _created = UserPreference.objects.get_or_create(user=request.user)
         preference.theme = form.cleaned_data["theme"]
-        preference.save(update_fields=["theme"])
+        preference.background = form.cleaned_data["background"]
+        preference.save(update_fields=["theme", "background"])
         if ajax:
             return JsonResponse({"ok": True})
         messages.success(request, "Настройките за външен вид са запазени.")
