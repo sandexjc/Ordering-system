@@ -11,4 +11,5 @@ def appearance(request):
     return {
         "appearance_theme": saved["theme"],
         "appearance_background": saved["background"],
+        "appearance_accent": saved["accent"],
     }

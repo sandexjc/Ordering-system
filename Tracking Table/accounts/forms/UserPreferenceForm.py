@@ -1,6 +1,10 @@
 from django import forms
 
-from accounts.models.user.UserPreferenceModel import BACKGROUND_CHOICES, THEME_CHOICES
+from accounts.models.user.UserPreferenceModel import (
+    ACCENT_CHOICES,
+    BACKGROUND_CHOICES,
+    THEME_CHOICES,
+)
 
 
 class UserPreferenceForm(forms.Form):
@@ -14,3 +18,4 @@ class UserPreferenceForm(forms.Form):
 
     theme = forms.ChoiceField(choices=THEME_CHOICES, label="Тема")
     background = forms.ChoiceField(choices=BACKGROUND_CHOICES, label="Фон")
+    accent = forms.ChoiceField(choices=ACCENT_CHOICES, label="Акцент")
