@@ -9,6 +9,16 @@
  *   - main/templates/layout/base.html
  */
 
+html[data-text="small"]
+{
+	font-size: 80%;
+}
+
+html[data-text="large"]
+{
+	font-size: 120%;
+}
+
 .navbar
 {
 	background-color: #e6e6e9;

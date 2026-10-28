@@ -31,7 +31,7 @@ if (profile_details_form)
 const profile_appearance_form = document.getElementById("profile-appearance-form");
 if (profile_appearance_form)
 {
-    profile_appearance_form.querySelectorAll("[name=theme], [name=background], [name=accent]").forEach(function (input) {
+    profile_appearance_form.querySelectorAll("[name=theme], [name=background], [name=accent], [name=text_size]").forEach(function (input) {
         input.addEventListener("change", preview_profile_appearance);
     });
     profile_appearance_form.addEventListener("submit", save_profile_appearance);
@@ -91,6 +91,12 @@ function preview_profile_appearance()
         "accent",
         ["stone", "blue", "teal", "sand", "indigo", "rose", "orange", "slate", "clear"],
         "data-accent"
+    );
+    preview_profile_choice(
+        profile_appearance_form,
+        "text_size",
+        ["small", "medium", "large"],
+        "data-text"
     );
 }
 

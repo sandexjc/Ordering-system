@@ -17,6 +17,12 @@ BACKGROUND_CHOICES = (
     ("slate", "Шисти"),
 )
 
+TEXT_SIZE_CHOICES = (
+    ("small", "Малък"),
+    ("medium", "Среден"),
+    ("large", "Голям"),
+)
+
 ACCENT_CHOICES = (
     ("stone", "Сиво"),
     ("blue", "Синьо"),
@@ -64,6 +70,11 @@ class UserPreference(models.Model):
         choices=ACCENT_CHOICES,
         default="stone",
     )
+    text_size = models.CharField(
+        max_length=16,
+        choices=TEXT_SIZE_CHOICES,
+        default="medium",
+    )
 
     def __str__(self):
         return "Appearance for %s" % self.user_id
@@ -74,10 +85,13 @@ class UserPreference(models.Model):
             "theme": "light",
             "background": "city",
             "accent": "stone",
+            "text_size": "medium",
         }
         if not getattr(user, "is_authenticated", False):
             return values
-        row = cls.objects.filter(pk=user.pk).values("theme", "background", "accent").first()
+        row = cls.objects.filter(pk=user.pk).values(
+            "theme", "background", "accent", "text_size"
+        ).first()
         if not row:
             return values
         if row["theme"] in dict(THEME_CHOICES):
@@ -86,6 +100,8 @@ class UserPreference(models.Model):
             values["background"] = row["background"]
         if row["accent"] in dict(ACCENT_CHOICES):
             values["accent"] = row["accent"]
+        if row["text_size"] in dict(TEXT_SIZE_CHOICES):
+            values["text_size"] = row["text_size"]
         return values
 
     @classmethod

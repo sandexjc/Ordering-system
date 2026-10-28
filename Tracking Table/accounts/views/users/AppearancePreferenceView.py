@@ -33,7 +33,8 @@ class AppearancePreference(LoginRequiredMixin, View):
         preference.theme = form.cleaned_data["theme"]
         preference.background = form.cleaned_data["background"]
         preference.accent = form.cleaned_data["accent"]
-        preference.save(update_fields=["theme", "background", "accent"])
+        preference.text_size = form.cleaned_data["text_size"]
+        preference.save(update_fields=["theme", "background", "accent", "text_size"])
         if ajax:
             return JsonResponse({"ok": True})
         messages.success(request, "Настройките за външен вид са запазени.")

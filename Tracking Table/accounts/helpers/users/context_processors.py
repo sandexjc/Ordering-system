@@ -12,4 +12,5 @@ def appearance(request):
         "appearance_theme": saved["theme"],
         "appearance_background": saved["background"],
         "appearance_accent": saved["accent"],
+        "appearance_text_size": saved["text_size"],
     }
