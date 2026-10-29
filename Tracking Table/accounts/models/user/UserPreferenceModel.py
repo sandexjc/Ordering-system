@@ -29,6 +29,11 @@ ROW_DENSITY_CHOICES = (
     ("dense", "Плътно"),
 )
 
+MOTION_CHOICES = (
+    ("off", "Нормално"),
+    ("reduce", "Намалено"),
+)
+
 ACCENT_CHOICES = (
     ("stone", "Сиво"),
     ("blue", "Синьо"),
@@ -86,6 +91,11 @@ class UserPreference(models.Model):
         choices=ROW_DENSITY_CHOICES,
         default="standard",
     )
+    reduced_motion = models.CharField(
+        max_length=16,
+        choices=MOTION_CHOICES,
+        default="off",
+    )
 
     def __str__(self):
         return "Appearance for %s" % self.user_id
@@ -98,11 +108,12 @@ class UserPreference(models.Model):
             "accent": "stone",
             "text_size": "medium",
             "row_density": "standard",
+            "reduced_motion": "off",
         }
         if not getattr(user, "is_authenticated", False):
             return values
         row = cls.objects.filter(pk=user.pk).values(
-            "theme", "background", "accent", "text_size", "row_density"
+            "theme", "background", "accent", "text_size", "row_density", "reduced_motion"
         ).first()
         if not row:
             return values
@@ -116,6 +127,8 @@ class UserPreference(models.Model):
             values["text_size"] = row["text_size"]
         if row["row_density"] in dict(ROW_DENSITY_CHOICES):
             values["row_density"] = row["row_density"]
+        if row["reduced_motion"] in dict(MOTION_CHOICES):
+            values["reduced_motion"] = row["reduced_motion"]
         return values
 
     @classmethod

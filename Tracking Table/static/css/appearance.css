@@ -44,6 +44,21 @@ html[data-density="dense"] .visibleRows > td > div + div
 	margin-top: 0;
 }
 
+/*
+ * Shorten the two appearance motions. A tiny duration still fires
+ * transitionend, which the row open and close code waits for.
+ * Save-button spinners use animation, so they keep spinning.
+ */
+html[data-motion="reduce"] .hiddenRows
+{
+	transition-duration: 0.05s;
+}
+
+html[data-motion="reduce"] .profile-section-toggle::after
+{
+	transition-duration: 0.05s;
+}
+
 .navbar
 {
 	background-color: #e6e6e9;
