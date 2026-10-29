@@ -19,6 +19,31 @@ html[data-text="large"]
 	font-size: 120%;
 }
 
+/*
+ * List cells already have no vertical padding. Compact and dense only
+ * tighten the order and vitrine list rows (.visibleRows), not forms or
+ * the opened details.
+ */
+html[data-density="compact"] .visibleRows > td
+{
+	line-height: 1.15;
+}
+
+html[data-density="compact"] .visibleRows > td > div + div
+{
+	margin-top: 0.05rem;
+}
+
+html[data-density="dense"] .visibleRows > td
+{
+	line-height: 1;
+}
+
+html[data-density="dense"] .visibleRows > td > div + div
+{
+	margin-top: 0;
+}
+
 .navbar
 {
 	background-color: #e6e6e9;

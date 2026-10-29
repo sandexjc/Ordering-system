@@ -13,4 +13,5 @@ def appearance(request):
         "appearance_background": saved["background"],
         "appearance_accent": saved["accent"],
         "appearance_text_size": saved["text_size"],
+        "appearance_row_density": saved["row_density"],
     }
