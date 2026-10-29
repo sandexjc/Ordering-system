@@ -36,6 +36,7 @@ Each stream supports searchable dashboards, order editing, progress tracking, pr
 - **User authentication**
   - Login/logout and user administration pages are included.
   - Main views require authenticated access.
+  - Each account can set its own appearance from the profile page. See [Appearance preferences](#appearance-preferences).
 
 ## Technical overview
 
@@ -67,6 +68,7 @@ Each stream supports searchable dashboards, order editing, progress tracking, pr
 - `/vitrine/` - vitrine board
 - `/dynamic/` - dynamic board (requires `DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING=True`)
 - `/accounts/login/` - authentication
+- `/accounts/profile/` - signed-in profile, including appearance
 - `/admin/` - Django admin
 
 Table progress POST endpoints:
@@ -356,6 +358,32 @@ python manage.py recalculate_order_weights --all --dry-run
 ```
 
 The command does not require the feature flag. Use `--all` or `--order-id` (not both). `--dry-run` prints the old and new values without writing.
+
+## Appearance preferences
+
+Each logged-in account sets its own look on `/accounts/profile/`, in the foldable section **Външен вид**. There is no admin screen and no site-wide override. Settings are stored on `accounts.UserPreference`, one row per account (`settings.AUTH_USER_MODEL`, related name `appearance`). A missing row means the defaults below. The row is created on the first successful save, not on read.
+
+Save posts to `/accounts/profile/appearance/` (`accounts:profile-appearance`). Changing a control updates the open page immediately. **Запази** writes that account's row over AJAX, with the same spinner and toast as the other profile sections. Leaving the page without saving drops the preview. The next full page load reads the row through `accounts.helpers.users.context_processors.appearance` and prints the values on `<html>` in `main/templates/layout/base.html`. Styles live in `static/css/appearance.css`.
+
+Login, set-password, device activation, and print stay on the default light look. They do not read the saved row. Order status colors stay fixed. Accent does not recolor delete, progress, print, or history buttons.
+
+| Profile label | Field | Default | Choices |
+| --- | --- | --- | --- |
+| Тема | `theme` | `light` | Светла (`light`), Тъмна (`dark`) |
+| Фон | `background` | `city` | Град (`city`), Едноцветен (`plain`), Топла хартия (`warm_paper`), Синьо (`blue`), Зелено (`green`), Пясък (`sand`), Шисти (`slate`) |
+| Акцент | `accent` | `stone` | Сиво (`stone`), Синьо (`blue`), Тюркоаз (`teal`), Пясък (`sand`), Индиго (`indigo`), Розово (`rose`), Оранжево (`orange`), Шисти (`slate`), Прозрачен (`clear`) |
+| Размер на текста | `text_size` | `medium` | Малък (`small`, 80%), Среден (`medium`, 100%), Голям (`large`, 120%) |
+| Оформление | `row_density` | `standard` | Стандартно (`standard`), Компактно (`compact`), Плътно (`dense`) |
+| Анимации | `reduced_motion` | `off` | Включено (`off`), Изключено (`reduce`) |
+
+What each one changes:
+
+- **Тема** switches light and dark surfaces. `data-bs-theme` follows the saved theme.
+- **Фон** sets the page background: the city image, a flat color, or warm paper.
+- **Акцент** colors the navbar and solid primary buttons. **Сиво** keeps the gray navbar and the usual blue primary buttons. **Прозрачен** lets the page background show through the navbar; those primary buttons stay blue. Outline danger, success, warning, and info buttons stay semantic.
+- **Размер на текста** sets the root font size. It is separate from `static/js/core/viewport.js`, which only shrinks narrow screens. The 1000px minimum layout stays.
+- **Оформление** changes spacing on order and vitrine list rows (`.visibleRows`) only. **Стандартно** is the current spacing. **Компактно** and **Плътно** tighten line height and the gap between stacked lines. Profile forms, modals, and opened order details stay as they are.
+- **Анимации** **Изключено** shortens the order-row open and close and the profile section arrow. Save-button spinners still run. The form shows **Включено** / **Изключено**. The model choice labels stay **Нормално** / **Намалено** so they match the existing migration.
 
 ## Browser device cookie
 

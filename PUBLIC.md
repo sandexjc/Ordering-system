@@ -37,6 +37,19 @@ The Ordering System helps teams manage the full order journey, from initial offe
 
 The system is intended for authenticated internal users and supports role-based operational usage through account login.
 
+## Appearance
+
+On the profile page, **Външен вид** stores how the site looks for that account. Nobody else is changed, and there is no shared setting for the whole site. A change shows on the open page at once. **Запази** keeps it for the next visit. Leaving without saving drops the preview.
+
+- **Тема**: **Светла** or **Тъмна**.
+- **Фон**: **Град**, **Едноцветен**, **Топла хартия**, **Синьо**, **Зелено**, **Пясък**, or **Шисти**. **Град** is the usual background.
+- **Акцент**: colors the top bar and the solid primary buttons. **Сиво** is the usual gray bar and blue buttons. **Прозрачен** lets the page background show through the top bar. Delete, progress, print, and history buttons stay the same colors.
+- **Размер на текста**: **Малък**, **Среден**, or **Голям**. **Среден** is the usual size.
+- **Оформление**: **Стандартно**, **Компактно**, or **Плътно** on the order and vitrine lists. Forms and opened order details stay as they are. **Стандартно** is the usual spacing.
+- **Анимации**: **Включено** or **Изключено**. **Изключено** shortens opening an order row and folding a profile section. The save spinner still runs. **Включено** is the usual motion.
+
+Sign-in, set-password, device activation, and printed pages stay on the usual light look. Order status colors do not change.
+
 ## Dynamic order editing
 
 On the dynamic board, table and vitrine orders are created and edited in one modal.
