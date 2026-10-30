@@ -362,19 +362,23 @@ async function renderCachedRowsIfAvailable(tableBody, viewName, colspan, generat
 
 /**
  * Fetch first page from endpoint and render loading/success/error states.
- * @returns {Promise<void>}
+ *
+ * Resolves true only after the rows are on screen, or stored for a view that is no longer current.
+ * The sync watermark moves in that same moment. A failed load leaves the previous watermark in place.
+ *
+ * @returns {Promise<boolean>}
  */
 async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, generation = null } = {}) {
     const tableBody = document.getElementById("dynamic-orders-body");
     if (!tableBody) {
-        return;
+        return false;
     }
 
     const resolvedView = viewName || tableBody.dataset.view || "table";
     const endpoint = tableBody.dataset.endpoint;
     const colspan = Number.parseInt(tableBody.dataset.colspan || "10", 10);
     if (!endpoint || tableBody.dataset.view !== resolvedView) {
-        return;
+        return false;
     }
 
     const renderGeneration =
@@ -393,26 +397,27 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
             renderGeneration
         );
         if (renderedFromCache) {
-            return;
+            return true;
         }
     }
 
     if (!isOrdersRenderCurrent(renderGeneration, resolvedView)) {
-        return;
+        return false;
     }
 
     await fadeOutRows(tableBody);
     if (!isOrdersRenderCurrent(renderGeneration, resolvedView)) {
-        return;
+        return false;
     }
 
     const loadingBody = getLiveOrdersBody(resolvedView);
     if (!loadingBody) {
-        return;
+        return false;
     }
     loadingBody.innerHTML = buildLoadingRow(colspan);
     setFooterStatus("");
 
+    let previousList = null;
     try {
         const response = await fetch(buildOrdersUrl(endpoint, null, resolvedView), {
             headers: {
@@ -421,7 +426,7 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
         });
         if (typeof redirectToLoginIfUnauthenticated === "function"
             && redirectToLoginIfUnauthenticated(response)) {
-            return;
+            return false;
         }
         if (!response.ok) {
             throw new Error(`HTTP ${response.status} ${response.statusText}`);
@@ -433,6 +438,13 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
         const hasMore = Boolean(payload.has_more);
         const nextCursor = payload.next_cursor || null;
         const previousCache = viewOrdersCache.get(resolvedView);
+        previousList = {
+            rowsHtml: previousCache?.rowsHtml || "",
+            visibleItems: previousCache?.visibleItems || 0,
+            hasMore: Boolean(previousCache?.hasMore),
+            nextCursor: previousCache?.nextCursor || null,
+            watermark: previousCache?.watermark ?? null,
+        };
 
         /** Keep payload for this view even after switch; do not wipe openRowIds/scrollY. */
         updateViewCache(resolvedView, {
@@ -441,16 +453,18 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
             hasMore,
             nextCursor,
             orderDetails: previousCache?.orderDetails || {},
-            watermark: payload.watermark || previousCache?.watermark,
         });
 
+        const listWatermark = payload.watermark || previousList.watermark;
         if (!isOrdersRenderCurrent(renderGeneration, resolvedView)) {
-            return;
+            updateViewCache(resolvedView, { watermark: listWatermark });
+            return true;
         }
 
         const liveBody = getLiveOrdersBody(resolvedView);
         if (!liveBody) {
-            return;
+            updateViewCache(resolvedView, previousList);
+            return false;
         }
 
         const rowsReady = await replaceRowsWhenReady(
@@ -460,8 +474,10 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
             () => isOrdersRenderCurrent(renderGeneration, resolvedView)
         );
         if (!rowsReady) {
-            return;
+            updateViewCache(resolvedView, previousList);
+            return false;
         }
+        updateViewCache(resolvedView, { watermark: listWatermark });
         updateVisibleItemsCounter(visibleItems, resolvedView);
         setupRenderedRows(resolvedView, renderGeneration, { deferHeavyWork: true });
         fadeInRows(liveBody);
@@ -471,14 +487,18 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
         } else {
             setFooterStatus("");
         }
+        return true;
     } catch (error) {
+        if (previousList) {
+            updateViewCache(resolvedView, previousList);
+        }
         if (!isOrdersRenderCurrent(renderGeneration, resolvedView)) {
-            return;
+            return false;
         }
         console.error(error);
         const liveBody = getLiveOrdersBody(resolvedView);
         if (!liveBody) {
-            return;
+            return false;
         }
         liveBody.innerHTML = buildErrorRow(colspan);
         fadeInRows(liveBody);
@@ -493,6 +513,7 @@ async function fetchAndRenderOrders({ forceRefresh = false, viewName = null, gen
                 { once: true }
             );
         }
+        return false;
     }
     } finally {
         isOrdersListFetchInFlight = Math.max(0, isOrdersListFetchInFlight - 1);

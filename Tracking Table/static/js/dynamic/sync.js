@@ -706,7 +706,25 @@ async function refetchOrdersIntoCache(viewName)
 }
 
 /**
+ * Move `since` forward. Called only after this payload is on the board or in cache.
+ *
+ * @param {string} viewName - Dynamic view key.
+ * @param {string} watermark - Server watermark from the sync payload.
+ * @returns {void}
+ */
+function storeSyncWatermark(viewName, watermark)
+{
+    if (!watermark) {
+        return;
+    }
+    updateViewCache(viewName, { watermark: watermark });
+}
+
+/**
  * Apply a sync payload to the live table or a cached tbody.
+ *
+ * The watermark stays put until the rows are applied, or a reload has rendered.
+ * A failed reload keeps the previous `since`, so the next poll asks for the same changes.
  *
  * @param {string} viewName - Dynamic view key.
  * @param {object} payload - Sync JSON.
@@ -714,10 +732,6 @@ async function refetchOrdersIntoCache(viewName)
  */
 async function applySyncPayload(viewName, payload)
 {
-    if (payload.watermark) {
-        updateViewCache(viewName, { watermark: payload.watermark });
-    }
-
     const root = document.getElementById("dynamic-orders-root");
     const isLive = Boolean(root && root.dataset.currentView === viewName);
     const cacheEntry = viewOrdersCache.get(viewName);
@@ -726,17 +740,27 @@ async function applySyncPayload(viewName, payload)
     }
 
     if (payload.reload) {
-        if (isLive && typeof fetchAndRenderOrders === "function") {
-            await fetchAndRenderOrders({ forceRefresh: true, viewName: viewName });
-            return;
+        const previousWatermark = cacheEntry.watermark;
+        try {
+            if (isLive && typeof fetchAndRenderOrders === "function") {
+                const rendered = await fetchAndRenderOrders({ forceRefresh: true, viewName: viewName });
+                if (rendered !== true) {
+                    updateViewCache(viewName, { watermark: previousWatermark });
+                }
+                return;
+            }
+            await refetchOrdersIntoCache(viewName);
+        } catch (error) {
+            updateViewCache(viewName, { watermark: previousWatermark });
+            throw error;
         }
-        await refetchOrdersIntoCache(viewName);
         return;
     }
 
     const deletedIds = Array.isArray(payload.deleted_ids) ? payload.deleted_ids : [];
     const pairs = parseOrderRowPairs(payload.rows_html || "");
     if (!deletedIds.length && !pairs.length) {
+        storeSyncWatermark(viewName, payload.watermark);
         return;
     }
 
@@ -788,6 +812,7 @@ async function applySyncPayload(viewName, payload)
             syncOpenOrderFormFromLiveUpdate(formSyncIds);
         }
     }
+    storeSyncWatermark(viewName, payload.watermark);
 }
 
 /**
