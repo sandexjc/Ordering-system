@@ -518,6 +518,7 @@ static/js/
 
 ### Notes for maintainers
 
+- `dynamic/sync.js` polls the visible board. `DJANGO_DYNAMIC_CONTENT__ORDERS_SYNC_INTERVAL_MS` is the gap after a poll settles, not a deadline. One poll is in flight at a time. A poll still waiting after 10 seconds is aborted and counted as a miss. The offline toast appears after two misses in a row. Hiding the tab aborts the open poll so a late response cannot move `since`.
 - `handle_orders_properties()` orchestrates progress/delete, edit-submit, and alert setup helpers.
 - jQuery is still required for `orders/actions/{edit-submit,alerts,history}.js`.
 - Keep this map in **developer docs only** (`README.md`). Do not publish it in `PUBLIC.md` or under publicly served `static/` paths.

@@ -949,12 +949,49 @@ function holdOrdersSyncRetry()
 }
 
 /**
- * Drop an in-flight heartbeat without moving `since`.
+ * Stop the deadline that aborts a poll still waiting after ORDERS_SYNC_TIMEOUT_MS.
  *
  * @returns {void}
  */
-function abortOrdersSyncInFlight()
+function clearOrdersSyncTimeout()
 {
+    if (ordersSyncTimeoutTimer) {
+        window.clearTimeout(ordersSyncTimeoutTimer);
+        ordersSyncTimeoutTimer = null;
+    }
+}
+
+/**
+ * Abort this poll if it is still open when the deadline passes.
+ *
+ * The sync interval does not cancel a poll. The next poll is scheduled only
+ * after this one succeeds, fails, or hits this deadline.
+ *
+ * @returns {void}
+ */
+function armOrdersSyncTimeout()
+{
+    clearOrdersSyncTimeout();
+    ordersSyncTimeoutTimer = window.setTimeout(() => {
+        ordersSyncTimeoutTimer = null;
+        if (!ordersSyncAwaitingResponse || document.visibilityState !== "visible") {
+            return;
+        }
+        abortOrdersSyncInFlight("timeout");
+    }, ORDERS_SYNC_TIMEOUT_MS);
+}
+
+/**
+ * Drop an in-flight heartbeat without moving `since`.
+ *
+ * A "timeout" abort is a connection miss. Hiding or refocusing the tab is not.
+ *
+ * @param {string} [reason] - "timeout", "hide", "focus", or "supersede".
+ * @returns {void}
+ */
+function abortOrdersSyncInFlight(reason)
+{
+    ordersSyncAbortReason = reason || "supersede";
     ordersSyncGeneration += 1;
     ordersSyncAwaitingResponse = false;
     if (ordersSyncAbort) {
@@ -979,8 +1016,9 @@ function focusOrdersLiveSync()
     if (document.visibilityState !== "visible") {
         return;
     }
+    clearOrdersSyncTimeout();
     ordersSyncTickId += 1;
-    abortOrdersSyncInFlight();
+    abortOrdersSyncInFlight("focus");
     if (ordersSyncTimer) {
         window.clearTimeout(ordersSyncTimer);
         ordersSyncTimer = null;
@@ -1010,11 +1048,30 @@ function retryOrdersLiveSync()
 }
 
 /**
- * One poll tick; reschedules itself.
+ * Schedule the next poll after this one has settled without a server response.
  *
- * The sync interval is the timeout. A poll still open at that point is cancelled
- * and another is sent. The offline toast shows when the second attempt also fails.
- * After that, retries wait 10s and then 30s.
+ * The first miss while the toast is still hidden waits one sync interval.
+ * Once the connection is treated as down, the wait is the reconnect backoff.
+ *
+ * @returns {void}
+ */
+function scheduleOrdersSyncAfterMiss()
+{
+    const gaveUp = noteOrdersSyncAttemptFailed();
+    if (!gaveUp) {
+        scheduleOrdersSync(ORDERS_SYNC_INTERVAL_MS);
+        return;
+    }
+    holdOrdersSyncRetry();
+}
+
+/**
+ * One poll tick. The next tick is scheduled only after this poll settles.
+ *
+ * One poll is in flight at a time. It stays open until the server answers or
+ * ORDERS_SYNC_TIMEOUT_MS passes. The offline toast shows when the second
+ * attempt also fails. After that, retries wait 10s and then 30s, and each
+ * retry uses the same deadline.
  *
  * @returns {Promise<void>}
  */
@@ -1031,19 +1088,13 @@ async function runOrdersSyncTick()
     if (document.visibilityState !== "visible") {
         return;
     }
-
     if (ordersSyncAwaitingResponse) {
-        ordersSyncTickId += 1;
-        abortOrdersSyncInFlight();
-        if (noteOrdersSyncAttemptFailed()) {
-            holdOrdersSyncRetry();
-            return;
-        }
+        return;
     }
 
     const tickId = ++ordersSyncTickId;
     ordersSyncFetchSucceededThisTick = false;
-    scheduleOrdersSync(ORDERS_SYNC_INTERVAL_MS);
+    ordersSyncAbortReason = "";
     if (!isServerConnected && typeof setServerConnected === "function") {
         setServerConnected(false);
         if (typeof setServerConnectionToastPending === "function") {
@@ -1051,6 +1102,7 @@ async function runOrdersSyncTick()
         }
     }
 
+    armOrdersSyncTimeout();
     try {
         await pollOrdersSync();
         if (tickId !== ordersSyncTickId || document.visibilityState !== "visible") {
@@ -1058,18 +1110,25 @@ async function runOrdersSyncTick()
         }
         if (ordersSyncFetchSucceededThisTick) {
             markOrdersSyncConnected();
-        } else if (!isServerConnected && typeof setServerConnectionToastPending === "function") {
+            return;
+        }
+        if (!isServerConnected && typeof setServerConnectionToastPending === "function") {
             setServerConnectionToastPending(false);
         }
+        const waitMs = isServerConnected ? ORDERS_SYNC_INTERVAL_MS : ordersSyncBackoffMs;
+        scheduleOrdersSync(waitMs);
     } catch (error) {
         if (tickId !== ordersSyncTickId) {
             return;
         }
         ordersSyncAwaitingResponse = false;
-        if (error && error.name === "AbortError") {
+        const timedOut = Boolean(error && error.name === "AbortError" && ordersSyncAbortReason === "timeout");
+        if (error && error.name === "AbortError" && !timedOut) {
             return;
         }
-        console.error(error);
+        if (!timedOut) {
+            console.error(error);
+        }
         if (ordersSyncFetchSucceededThisTick) {
             markOrdersSyncConnected();
             return;
@@ -1077,12 +1136,11 @@ async function runOrdersSyncTick()
         if (document.visibilityState !== "visible") {
             return;
         }
-        const gaveUp = noteOrdersSyncAttemptFailed();
-        if (!gaveUp) {
-            runOrdersSyncTick();
-            return;
+        scheduleOrdersSyncAfterMiss();
+    } finally {
+        if (tickId === ordersSyncTickId) {
+            clearOrdersSyncTimeout();
         }
-        holdOrdersSyncRetry();
     }
 }
 
@@ -1093,6 +1151,7 @@ async function runOrdersSyncTick()
  */
 function pauseOrdersLiveSync()
 {
+    clearOrdersSyncTimeout();
     ordersSyncTickId += 1;
     if (ordersSyncTimer) {
         window.clearTimeout(ordersSyncTimer);
@@ -1100,7 +1159,7 @@ function pauseOrdersLiveSync()
     }
     ordersSyncNextTickAt = 0;
     ordersSyncMissStreak = 0;
-    abortOrdersSyncInFlight();
+    abortOrdersSyncInFlight("hide");
     if (typeof hideServerConnectionToast === "function") {
         hideServerConnectionToast();
     }

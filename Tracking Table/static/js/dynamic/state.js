@@ -28,7 +28,12 @@ function readDynamicContentInt(datasetKey, fallback)
 const SEARCH_MIN_LENGTH = readDynamicContentInt("searchMinLength", 2);
 const SEARCH_DEBOUNCE_MS = readDynamicContentInt("searchDebounceMs", 700);
 const ORDERS_SYNC_INTERVAL_MS = readDynamicContentInt("ordersSyncIntervalMs", 4000);
-/** Timed-out or failed polls required before the offline toast. Each poll is cancelled at the sync interval. */
+/**
+ * How long one poll may stay open. The sync interval is only the gap after it settles.
+ * A poll still waiting this long is aborted and counted as a miss.
+ */
+const ORDERS_SYNC_TIMEOUT_MS = 10000;
+/** Timed-out or failed polls required before the offline toast. */
 const ORDERS_SYNC_MISS_LIMIT = 2;
 /** Longest wait between reconnect attempts after the connection is dropped. */
 const ORDERS_SYNC_BACKOFF_MAX_MS = 30000;
@@ -36,11 +41,15 @@ const LOCAL_MUTATION_SKIP_MS = readDynamicContentInt("localMutationSkipMs", 6000
 
 let isOrdersListFetchInFlight = 0;
 let ordersSyncTimer = null;
+/** Aborts a poll that is still open after ORDERS_SYNC_TIMEOUT_MS. */
+let ordersSyncTimeoutTimer = null;
 /** Wait before the next reconnect attempt. Grows from the sync interval to 10s, then 30s. */
 let ordersSyncBackoffMs = ORDERS_SYNC_INTERVAL_MS;
 /** Bumped when the tab hides so in-flight heartbeats cannot move `since`. */
 let ordersSyncGeneration = 0;
 let ordersSyncAbort = null;
+/** Why the in-flight poll was aborted. Only "timeout" counts as a connection miss. */
+let ordersSyncAbortReason = "";
 /** Bumped at the start of each heartbeat tick so a superseded poll cannot update status. */
 let ordersSyncTickId = 0;
 /** True while a sync fetch has started and has not yet returned (or been aborted). */
