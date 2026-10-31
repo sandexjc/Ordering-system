@@ -359,6 +359,15 @@ mark.search-highlight
 	background-color: #efe6fb;
 }
 
+/* Dark theme keeps the light list text, so the highlight has to be a dark purple.
+   Cells paint their own background, so the color is set on the row and on each cell. */
+[data-bs-theme="dark"] #dynamic-orders-root tr.visibleRows.is-sync-highlight,
+[data-bs-theme="dark"] #dynamic-orders-root tr.visibleRows.is-sync-highlight > td
+{
+	background-color: #4e3a6b;
+	color: #f4eefe;
+}
+
 /* =============================================================================
    Server connection toast (heartbeat / live sync)
    ============================================================================= */

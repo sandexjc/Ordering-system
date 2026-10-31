@@ -84,9 +84,9 @@
 	background-color: #16c60c;
 }
 
-/* === Active → None Connector Line (white) === */
+/* === Active → None Connector Line (same grey as an inactive circle) === */
 .progressbar li.active + li:not(.active):not(.disabled):after {
-	background-color: #fff;
+	background-color: #ddd;
 }
 
 /* === Active → Disabled Connector Line (gray) === */
@@ -99,14 +99,14 @@
 	background-color: #ddd;
 }
 
-/* === None → None Connector Line (white) === */
+/* === None → None Connector Line (same grey as an inactive circle) === */
 .progressbar li:not(.active):not(.disabled) + li:not(.active):not(.disabled):after {
-	background-color: #fff;
+	background-color: #ddd;
 }
 
-/* === None → Active Connector Line (white) === */
+/* === None → Active Connector Line (same grey as an inactive circle) === */
 .progressbar li:not(.active):not(.disabled) + li.active:after {
-	background-color: #fff;
+	background-color: #ddd;
 }
 
 /* === Disabled → Active Connector Line (gray) === */
@@ -288,6 +288,17 @@
     #dynamic-orders-root .progressbar-interactive li.is-preview-off .progress-step-mark {
         opacity: 0.2;
     }
+
+    /* The connector follows the same hover preview as the circles. */
+    #dynamic-orders-root .progressbar-interactive li.active:not(.is-preview-off) + li.is-preview:after,
+    #dynamic-orders-root .progressbar-interactive li.is-preview + li.active:not(.is-preview-off):after,
+    #dynamic-orders-root .progressbar-interactive li.is-preview + li.is-preview:after {
+        background-color: #16c60c;
+    }
+
+    #dynamic-orders-root .progressbar-interactive li.is-preview-off + li:after {
+        background-color: #ddd;
+    }
 }
 
 #dynamic-orders-root .progressbar-interactive li.is-loading:before {
@@ -340,4 +351,89 @@
     #dynamic-orders-root .progressbar-interactive li:after {
         transition: none;
     }
+}
+
+/* =============================================================================
+   Dark theme
+   Every circle is the same dark disc. An unfinished link uses that disc's
+   border color. The link turns green only between two completed steps.
+   ============================================================================= */
+
+html[data-bs-theme="dark"] .progressbar
+{
+	--progress-disc: #1c2127;
+	--progress-ring: #5c656e;
+}
+
+html[data-bs-theme="dark"] .progressbar li:before,
+html[data-bs-theme="dark"] .progressbar li.disabled:before,
+html[data-bs-theme="dark"] .progressbar li.active.disabled:before
+{
+	background-color: var(--progress-disc);
+	border-color: var(--progress-ring);
+	color: #ced4da;
+}
+
+html[data-bs-theme="dark"] .progressbar li.active:not(.disabled):before
+{
+	background-color: var(--progress-disc);
+	border-color: #16c60c;
+	color: #16c60c;
+}
+
+html[data-bs-theme="dark"] .progressbar li.disabled
+{
+	background-color: transparent;
+	color: #adb5bd;
+}
+
+html[data-bs-theme="dark"] .progressbar li.disabled:before,
+html[data-bs-theme="dark"] .progressbar li.active.disabled:before
+{
+	color: #adb5bd;
+}
+
+html[data-bs-theme="dark"] .progressbar li:after,
+html[data-bs-theme="dark"] .progressbar li.active + li:not(.active):not(.disabled):after,
+html[data-bs-theme="dark"] .progressbar li.active + li.disabled:after,
+html[data-bs-theme="dark"] .progressbar li:not(.active):not(.disabled) + li.disabled:after,
+html[data-bs-theme="dark"] .progressbar li:not(.active):not(.disabled) + li:not(.active):not(.disabled):after,
+html[data-bs-theme="dark"] .progressbar li:not(.active):not(.disabled) + li.active:after,
+html[data-bs-theme="dark"] .progressbar li.disabled + li.active:after,
+html[data-bs-theme="dark"] .progressbar li.disabled + li:after,
+html[data-bs-theme="dark"] .progressbar li.disabled:after
+{
+	background-color: var(--progress-ring);
+}
+
+html[data-bs-theme="dark"] .progressbar li.active:not(.disabled) + li.active:not(.disabled):after
+{
+	background-color: #16c60c;
+}
+
+html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive .progress-step-disabled-icon
+{
+	color: #adb5bd;
+}
+
+html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.is-preview-off:before,
+html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.is-loading:before
+{
+	background-color: var(--progress-disc);
+	border-color: var(--progress-ring);
+}
+
+@media (hover: hover) {
+	html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.is-preview:before
+	{
+		background-color: var(--progress-disc);
+		border-color: #16c60c;
+	}
+
+	html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.active.is-preview-off + li.active:after,
+	html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.is-preview-off + li.is-preview-off:after,
+	html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.active + li.is-preview-off:after
+	{
+		background-color: var(--progress-ring);
+	}
 }
