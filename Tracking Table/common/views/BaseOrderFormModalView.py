@@ -1,5 +1,7 @@
+import uuid
+
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.http import Http404, HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -60,6 +62,20 @@ class BaseOrderFormModalView(OrderHistoryMixin, DynamicFeatureFlagRequiredMixin,
     row_prefetch_related = ()
     create_url_name = None
     edit_url_name = None
+
+    def posted_create_uuid(self):
+        raw = (self.request.POST.get("create_uuid") or "").strip()
+        if not raw:
+            return None
+        try:
+            return str(uuid.UUID(raw))
+        except ValueError:
+            return None
+
+    def existing_order_for_create(self, token):
+        if not token:
+            return None
+        return self.model.objects.filter(create_uuid=token).first()
 
     def get_order(self):
         pk = self.kwargs.get("pk")
@@ -174,17 +190,20 @@ class BaseOrderFormModalView(OrderHistoryMixin, DynamicFeatureFlagRequiredMixin,
                 item.run_workflow_delete()
                 self.log_deleted_item(self.object, item)
 
-    def success_payload(self):
+    def success_payload(self, already_saved=False):
         self.object = self.fetch_order_for_rows(self.object.pk)
         form = self.form_class(instance=self.object)
         note_form = self.note_form_class() if self.note_form_class else None
         formsets = self.get_formsets(instance=self.object)
-        return {
+        payload = {
             "status": "ok",
             "id": self.object.pk,
             "form_html": self.render_form_html(form, note_form, formsets),
             "rows_html": self.render_rows_html(self.object),
         }
+        if already_saved:
+            payload["already_saved"] = True
+        return payload
 
     def error_payload(self, form, note_form, formsets, message, status=400):
         return JsonResponse(
@@ -205,6 +224,12 @@ class BaseOrderFormModalView(OrderHistoryMixin, DynamicFeatureFlagRequiredMixin,
 
     def post(self, request, *args, **kwargs):
         is_create = self.kwargs.get("pk") is None
+        create_uuid = self.posted_create_uuid() if is_create else None
+        existing = self.existing_order_for_create(create_uuid)
+        if existing is not None:
+            self.object = existing
+            return JsonResponse(self.success_payload(already_saved=True))
+
         self.object = self.resolve_object()
         order_form = self.form_class(
             data=request.POST,
@@ -231,6 +256,8 @@ class BaseOrderFormModalView(OrderHistoryMixin, DynamicFeatureFlagRequiredMixin,
         try:
             with transaction.atomic():
                 self.object = order_form.save(commit=False)
+                if create_uuid:
+                    self.object.create_uuid = create_uuid
                 self.object.run_workflow_save()
 
                 if is_create:
@@ -244,6 +271,15 @@ class BaseOrderFormModalView(OrderHistoryMixin, DynamicFeatureFlagRequiredMixin,
                         self.create_change_record("Note", note.content)
 
                 self.save_formsets(formsets)
+        except IntegrityError:
+            existing = self.existing_order_for_create(create_uuid)
+            if existing is None:
+                return JsonResponse(
+                    {"status": "error", "message": "Възникна грешка!"},
+                    status=500,
+                )
+            self.object = existing
+            return JsonResponse(self.success_payload(already_saved=True))
         except Exception as exc:
             return JsonResponse(
                 {"status": "error", "message": str(exc)},

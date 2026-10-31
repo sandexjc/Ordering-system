@@ -20,6 +20,8 @@
 
 const ORDER_FORM_TOAST_SUCCESS_MS = 2000;
 const ORDER_FORM_TOAST_ERROR_MS = 10000;
+const ORDER_FORM_CREATE_ID_FIELD = "create_uuid";
+const ORDER_FORM_SAVE_TIMEOUT_MS = 10000;
 const ORDER_FORM_TITLE_CREATE = "Нова заявка";
 const ORDER_FORM_TITLE_EDIT = "Редактиране";
 const ORDER_FORM_REMOTE_UPDATE_MESSAGE = "Поръчката е обновена от друг потребител.";
@@ -36,6 +38,64 @@ let orderFormRemoteSyncToken = 0;
  * @param {string} url - Create or edit form URL.
  * @returns {boolean}
  */
+/**
+ * New id for one create attempt. Reused until the modal closes or a new form opens.
+ *
+ * @returns {string}
+ */
+function createOrderFormRequestId()
+{
+	if (window.crypto && typeof window.crypto.randomUUID === "function") {
+		return window.crypto.randomUUID();
+	}
+	return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (character) {
+		const random = Math.random() * 16 | 0;
+		const value = character === "x" ? random : (random & 0x3 | 0x8);
+		return value.toString(16);
+	});
+}
+
+/**
+ * Drop the create token so the next open form is a new attempt.
+ *
+ * @returns {void}
+ */
+function clearOrderFormRequestId()
+{
+	const modal = document.getElementById("order-form-modal");
+	if (modal) {
+		delete modal.dataset.orderFormCreateUuid;
+	}
+}
+
+/**
+ * Hidden create token for this open form. Edit forms do not carry one.
+ *
+ * @param {HTMLFormElement} form - Modal order form.
+ * @returns {void}
+ */
+function ensureOrderFormRequestId(form)
+{
+	if (!form || form.getAttribute("data-order-id")) {
+		return;
+	}
+	const modal = document.getElementById("order-form-modal");
+	if (!modal) {
+		return;
+	}
+	if (!modal.dataset.orderFormCreateUuid) {
+		modal.dataset.orderFormCreateUuid = createOrderFormRequestId();
+	}
+	let input = form.querySelector("[name='" + ORDER_FORM_CREATE_ID_FIELD + "']");
+	if (!input) {
+		input = document.createElement("input");
+		input.type = "hidden";
+		input.name = ORDER_FORM_CREATE_ID_FIELD;
+		form.appendChild(input);
+	}
+	input.value = modal.dataset.orderFormCreateUuid;
+}
+
 function isOrderFormCreateUrl(url)
 {
 	if (!url) {
@@ -443,6 +503,7 @@ function setOrderFormModalBody(html, options)
 	const form = parts.body.querySelector("#order-form-modal-form");
 	syncOrderFormModalTitle(form, parts.title);
 	if (form) {
+		ensureOrderFormRequestId(form);
 		if (options && options.initials) {
 			applyOrderFormInitials(form, options.initials);
 		} else {
@@ -1559,6 +1620,7 @@ function openOrderFormModal(url)
 	if (!url) {
 		return;
 	}
+	clearOrderFormRequestId();
 	const parts = getOrderFormModalParts();
 	if (!parts.modal) {
 		return;
@@ -1593,12 +1655,13 @@ function submitOrderFormModal(form)
 	const url = form.getAttribute("action");
 	const saveBtn = form.querySelector("#order-form-modal-save");
 	const csrfInput = form.querySelector("[name=csrfmiddlewaretoken]");
-	if (!url || !csrfInput) {
+	if (!url || !csrfInput || orderFormSubmitInFlight) {
 		return;
 	}
 
 	const wasCreate = !form.getAttribute("data-order-id");
 	orderFormSubmitInFlight = true;
+	ensureOrderFormRequestId(form);
 	const submitForm = cloneOrderFormWithValues(form);
 	prepareOrderFormsetsForSubmit(submitForm);
 	const postedInitials = collectOrderFormInitials(submitForm);
@@ -1613,7 +1676,7 @@ function submitOrderFormModal(form)
 	const controller = new AbortController();
 	const timeoutId = window.setTimeout(function () {
 		controller.abort();
-	}, 10000);
+	}, ORDER_FORM_SAVE_TIMEOUT_MS);
 
 	fetch(url, {
 		method: "POST",
@@ -1802,6 +1865,7 @@ function setupOrderFormModal()
 	parts.modal.addEventListener("hidden.bs.modal", function () {
 		hideOrderFormUnsavedDialog();
 		invalidateOrderFormRemoteSync();
+		clearOrderFormRequestId();
 		if (parts.body) {
 			parts.body.innerHTML = "";
 		}

@@ -31,6 +31,7 @@ class Order(TableOrder, BaseOrder):
     order_ready = models.BooleanField(default=False)
     order_taken = models.BooleanField(default=False)
     order_type = models.CharField(max_length=10, choices=order_type_choices, default="offer")
+    create_uuid = models.CharField(max_length=36, null=True, blank=True, unique=True)
 
     --- Table Order fields ---
 

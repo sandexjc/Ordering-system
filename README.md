@@ -114,6 +114,8 @@ Table and vitrine share one create/edit modal on `/dynamic/` (`static/js/orders/
   - Create stays open and reloads as the edit form.
   - Edit closes the modal.
   - The live orders list is patched from the save response in both cases.
+  - The save button stays busy until the server answers, or for 10 seconds. After 10 seconds the button can be used again.
+  - A create form carries one `create_uuid` for as long as it stays open. Posting that id again returns the order already saved instead of inserting another, then follows the same create success path: the modal stays open and reloads as the edit form. Closing the modal or opening a new create form starts a new id.
 - **Unsaved row highlight**:
   - A changed table row is highlighted until its fields match the last loaded or saved values.
   - In the main form, only the changed field is highlighted. Its label stays unchanged.
