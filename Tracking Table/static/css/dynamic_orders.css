@@ -916,3 +916,20 @@ mark.search-highlight
 	border-color: #e6b325 !important;
 	box-shadow: inset 0 0 0 1px #e6b325;
 }
+
+[data-bs-theme="dark"] #order-form-modal tr.order-form-item-row.is-sync-fresh > td
+{
+	background-color: #1b4332;
+	color: #e8f6ec;
+}
+
+[data-bs-theme="dark"] #order-form-modal tr.order-form-item-row.is-sync-fresh .form-control:not(.is-dirty):not(.is-invalid),
+[data-bs-theme="dark"] #order-form-modal tr.order-form-item-row.is-sync-fresh .form-select:not(.is-dirty):not(.is-invalid),
+[data-bs-theme="dark"] #order-form-modal .form-control.is-sync-fresh:not(.is-invalid):not([readonly]),
+[data-bs-theme="dark"] #order-form-modal .form-select.is-sync-fresh:not(.is-invalid),
+[data-bs-theme="dark"] #order-form-modal textarea.is-sync-fresh:not(.is-invalid)
+{
+	background-color: #143528 !important;
+	color: #e8f6ec !important;
+	border-color: #74c69d !important;
+}

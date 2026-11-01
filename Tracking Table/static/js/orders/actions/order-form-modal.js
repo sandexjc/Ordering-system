@@ -1009,43 +1009,36 @@ function clearOrderFormSyncHighlight(el)
 }
 
 /**
- * Copy server values into fields the user has not edited, and mark the row
- * when any of those fields changed.
+ * Signature of the values this row was loaded or last synced with.
+ *
+ * @param {HTMLElement} row - Item row already in the modal.
+ * @returns {string}
+ */
+function orderFormRowBaselineSignature(row)
+{
+	return Array.from(row.querySelectorAll("input, select, textarea"))
+		.filter(function (el) {
+			return el.name && el.type !== "hidden";
+		})
+		.map(function (el) {
+			const baseline = el.dataset.initialValue != null
+				? el.dataset.initialValue
+				: normalizeOrderFormValue(el);
+			return orderFormFieldKey(el.name) + "=" + baseline;
+		})
+		.join("|");
+}
+
+/**
+ * True when the refetched row differs from the baseline, so someone else changed it.
  *
  * @param {HTMLElement} currentRow - Row already in the modal.
  * @param {HTMLElement} incomingRow - Same item from the refetched form.
- * @returns {void}
+ * @returns {boolean}
  */
-function mergeCleanFieldsFromIncoming(currentRow, incomingRow)
+function orderFormIncomingChangedRow(currentRow, incomingRow)
 {
-	const incomingByKey = new Map();
-	incomingRow.querySelectorAll("input, select, textarea").forEach(function (el) {
-		if (!el.name) {
-			return;
-		}
-		incomingByKey.set(orderFormFieldKey(el.name), el);
-	});
-
-	let changed = false;
-	currentRow.querySelectorAll("input, select, textarea").forEach(function (el) {
-		if (!isTrackableOrderFormField(el) || isOrderFormControlDirty(el)) {
-			return;
-		}
-		const incoming = incomingByKey.get(orderFormFieldKey(el.name));
-		if (!incoming) {
-			return;
-		}
-		const before = normalizeOrderFormValue(el);
-		copyOrderFormControlValue(incoming, el);
-		const after = normalizeOrderFormValue(el);
-		el.dataset.initialValue = after;
-		if (before !== after) {
-			changed = true;
-		}
-	});
-	if (changed) {
-		currentRow.classList.add("is-sync-fresh");
-	}
+	return orderFormRowBaselineSignature(currentRow) !== orderFormRowSignature(incomingRow);
 }
 
 /**
@@ -1097,8 +1090,9 @@ function syncOrderFormsetInitialCount(formsetRoot)
 }
 
 /**
- * Merge one formset: keep unsaved rows, take server rows the user has not edited,
- * highlight new and changed rows, and fade rows the other user removed.
+ * Merge one formset. A row someone else changed replaces local edits and is
+ * marked green. A row only this user changed stays yellow. New and removed
+ * rows are unchanged.
  *
  * @param {HTMLElement} currentFs - Formset already in the modal.
  * @param {HTMLElement} incomingFs - Same formset from the refetched form.
@@ -1141,8 +1135,14 @@ function mergeOrderFormsetRows(currentFs, incomingFs)
 			return;
 		}
 		if (orderFormRowHasUnsavedChanges(currentRow)) {
-			mergeCleanFieldsFromIncoming(currentRow, incomingRow);
-			initialRows.push(currentRow);
+			if (!orderFormIncomingChangedRow(currentRow, incomingRow)) {
+				initialRows.push(currentRow);
+				return;
+			}
+			const replacement = incomingRow.cloneNode(true);
+			replacement.classList.add("is-sync-fresh");
+			replacement.setAttribute("data-sync-snapshot", "1");
+			initialRows.push(replacement);
 			return;
 		}
 		const changed = orderFormRowSignature(currentRow) !== orderFormRowSignature(incomingRow);
@@ -1358,7 +1358,7 @@ function showOrderFormRemoteUpdateNotice(form)
 
 /**
  * Apply a freshly fetched edit form onto the open one.
- * Unsaved controls and rows stay. Everything else comes from the server.
+ * A row someone else changed is replaced. Other unsaved rows and header fields stay.
  *
  * @param {HTMLFormElement} currentForm - Open modal form.
  * @param {string} html - Edit form fragment.
