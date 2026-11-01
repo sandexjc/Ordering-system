@@ -20,6 +20,36 @@ html[data-text="large"]
 }
 
 /*
+ * Wide windows scale the page the way browser zoom does. The font-size
+ * above is reset so the two do not stack. Narrow windows keep text size only;
+ * the viewport meta tag already fits those screens.
+ */
+@media (min-width: 1000px)
+{
+	html[data-text="small"],
+	html[data-text="medium"],
+	html[data-text="large"]
+	{
+		font-size: 100%;
+	}
+
+	html[data-text="small"]
+	{
+		zoom: 0.8;
+	}
+
+	html[data-text="medium"]
+	{
+		zoom: 0.9;
+	}
+
+	html[data-text="large"]
+	{
+		zoom: 1;
+	}
+}
+
+/*
  * List cells already have no vertical padding. Compact and dense only
  * tighten the order and vitrine list rows (.visibleRows), not forms or
  * the opened details.

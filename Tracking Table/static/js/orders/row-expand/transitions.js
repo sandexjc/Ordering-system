@@ -30,8 +30,9 @@ function _cancelPendingTransitionAndLockHeight(hiddenRow) {
   // If it's not displayed, leave (no locking needed)
   if (cs.display === "none") return;
 
-  // convert computed height to px and lock as inline height so animations start from current visual height
-  hiddenRow.style.height = hiddenRow.getBoundingClientRect().height + "px";
+  // offsetHeight is the CSS pixel height. getBoundingClientRect includes the
+  // page zoom, and writing that number into style.height shrinks the row.
+  hiddenRow.style.height = hiddenRow.offsetHeight + "px";
 }
 
 /**
@@ -82,12 +83,12 @@ function onHiddenRowContentUpdated(hiddenRow) {
   // If an animation is currently pending, lock current computed height and proceed
   _cancelPendingTransitionAndLockHeight(hiddenRow);
 
-  const currentHeight = hiddenRow.getBoundingClientRect().height;
+  const currentHeight = hiddenRow.offsetHeight;
 
-  // scrollHeight on a locked px height reports the lock, not shorter content
+  // A locked px height reports that lock, not shorter content.
   hiddenRow.style.transition = "none";
   hiddenRow.style.height = "auto";
-  const newHeight = hiddenRow.scrollHeight;
+  const newHeight = hiddenRow.offsetHeight;
   hiddenRow.style.height = currentHeight + "px";
   hiddenRow.getBoundingClientRect();
   hiddenRow.style.transition = "";
