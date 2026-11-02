@@ -76,7 +76,7 @@
 /* === Active Step Circle === */
 .progressbar li.active:before {
 	border-color: #16c60c;
-	content: "✔️";
+	content: "";
 }
 
 /* === Active → Active Connector Line (green) === */
@@ -134,7 +134,7 @@
 .progressbar li.disabled:before {
 	border-color: #aaa;
 	background-color: #f5f5f5;
-	content: "✖️";
+	content: "";
 	color: #aaa;
 }
 
@@ -147,8 +147,41 @@
 .progressbar li.active.disabled:before {
 	border-color: #aaa;
 	background-color: #f5f5f5;
-	content: "✖️";
+	content: "";
 	color: #aaa;
+}
+
+.progressbar .progress-step-icons {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	width: 1.875rem;
+	height: 1.875rem;
+	margin-left: -0.9375rem;
+	z-index: 3;
+	pointer-events: none;
+}
+
+.progressbar .progress-step-mark,
+.progressbar .progress-step-disabled-icon {
+	position: absolute;
+	inset: 0;
+	width: 1.125rem;
+	height: 1.125rem;
+	margin: auto;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.progressbar li.active:not(.disabled) .progress-step-mark {
+	opacity: 1;
+	color: #16c60c;
+}
+
+.progressbar li.disabled .progress-step-disabled-icon {
+	opacity: 1;
+	color: #aaa;
+	transform: translateX(0.2px);
 }
 
 /* =============================================================================
@@ -185,16 +218,8 @@
     cursor: default;
 }
 
-#dynamic-orders-root .progressbar-interactive .progress-step-mark {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-    line-height: 1;
-    opacity: 0;
-    pointer-events: none;
+#dynamic-orders-root .progressbar-interactive .progress-step-mark,
+#dynamic-orders-root .progressbar-interactive .progress-step-disabled-icon {
     transition: opacity 0.22s ease;
 }
 
@@ -214,18 +239,6 @@
 
 #dynamic-orders-root .progressbar-interactive li.disabled .progress-step-mark {
     display: none;
-}
-
-#dynamic-orders-root .progressbar-interactive .progress-step-disabled-icon {
-    position: absolute;
-    inset: 0;
-    width: 0.875rem;
-    height: 0.875rem;
-    margin: auto;
-    color: #aaa;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.22s ease;
 }
 
 #dynamic-orders-root .progressbar-interactive li.disabled .progress-step-disabled-icon {
@@ -432,7 +445,8 @@ html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.is-l
 
 	html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.active.is-preview-off + li.active:after,
 	html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.is-preview-off + li.is-preview-off:after,
-	html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.active + li.is-preview-off:after
+	html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.active + li.is-preview-off:after,
+	html[data-bs-theme="dark"] #dynamic-orders-root .progressbar-interactive li.is-preview-off + li:after
 	{
 		background-color: var(--progress-ring);
 	}
