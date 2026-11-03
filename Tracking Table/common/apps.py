@@ -6,6 +6,7 @@ class CommonConfig(AppConfig):
     name = "common"
 
     def ready(self):
-        from common.db import connect_sqlite_unicode_lower
+        from common.db import connect_sqlite_pragmas, connect_sqlite_unicode_lower
 
+        connect_sqlite_pragmas()
         connect_sqlite_unicode_lower()

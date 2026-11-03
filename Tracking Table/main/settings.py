@@ -141,10 +141,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'main.wsgi.application'
 
 # Database
+# timeout: seconds a connection waits on a SQLite lock, then OperationalError.
+# WAL is set on connect in common.db.sqlite_pragmas.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 5,
+        },
     }
 }
 
