@@ -4,11 +4,12 @@ from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
 from django.db.models import Max, Min, Q
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime
 
+from common.http import client_disconnected
 from common.mixins import DynamicFeatureFlagRequiredMixin
 from common.views import MainView
 
@@ -345,7 +346,17 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
             "reload": reload,
         }
 
+    def abandoned_sync_response(self):
+        """499 when the browser already aborted this poll."""
+        if client_disconnected(self.request):
+            return HttpResponse(status=499)
+        return None
+
     def render_sync_json_response(self):
+        abandoned = self.abandoned_sync_response()
+        if abandoned is not None:
+            return abandoned
+
         watermark = self.get_sync_watermark()
         since = self.parse_since()
         if since is None:
@@ -367,6 +378,9 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
 
         matching_rows = []
         if active_ids:
+            abandoned = self.abandoned_sync_response()
+            if abandoned is not None:
+                return abandoned
             matching_rows = list(
                 self.get_filtered_queryset().filter(pk__in=active_ids).distinct()
             )
@@ -381,6 +395,11 @@ class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
                 created_ids.append(row.pk)
             else:
                 updated_ids.append(row.pk)
+
+        if matching_rows:
+            abandoned = self.abandoned_sync_response()
+            if abandoned is not None:
+                return abandoned
 
         return JsonResponse(
             {
