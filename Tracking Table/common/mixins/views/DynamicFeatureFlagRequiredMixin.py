@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.http import Http404
+from django.shortcuts import redirect
 
 
 class DynamicFeatureFlagRequiredMixin:
@@ -23,5 +24,7 @@ class DynamicFeatureFlagRequiredMixin:
 
     def dispatch(self, request, *args, **kwargs):
         if not self.is_dynamic_feature_enabled():
+            if self.feature_setting_name == "DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING":
+                return redirect("table")
             raise Http404(self.feature_disabled_message)
         return super().dispatch(request, *args, **kwargs)

@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from common.mixins import OrderHistoryMixin
+from common.mixins import OrderHistoryMixin, StaticTreeClosedMixin
 from django.views.generic import UpdateView
 from django.shortcuts import redirect
 from django.http import JsonResponse, Http404
@@ -10,12 +10,14 @@ from django.db import transaction
 import json
 
 
-class BaseUpdateView(OrderHistoryMixin, LoginRequiredMixin, UpdateView):
+class BaseUpdateView(LoginRequiredMixin, StaticTreeClosedMixin, OrderHistoryMixin, UpdateView):
 
     """
 
     Hierarchy:
     LoginRequiredMixin -> BaseUpdateView
+    StaticTreeClosedMixin -> BaseUpdateView
+    OrderHistoryMixin -> BaseUpdateView
     UpdateView -> BaseUpdateView
 
     --- Fields inherited from LoginRequiredMixin ---

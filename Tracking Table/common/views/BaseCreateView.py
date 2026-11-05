@@ -2,14 +2,16 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView
 from django.shortcuts import redirect
 
-from common.mixins import OrderHistoryMixin
+from common.mixins import OrderHistoryMixin, StaticTreeClosedMixin
 
-class BaseCreateView(OrderHistoryMixin, LoginRequiredMixin, CreateView):
+class BaseCreateView(LoginRequiredMixin, StaticTreeClosedMixin, OrderHistoryMixin, CreateView):
 
     """
 
     Hierarchy:
     LoginRequiredMixin -> BaseCreateView
+    StaticTreeClosedMixin -> BaseCreateView
+    OrderHistoryMixin -> BaseCreateView
     CreateView -> BaseCreateView
 
     --- Fields inherited from LoginRequiredMixin ---

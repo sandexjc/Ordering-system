@@ -3,6 +3,7 @@ from datetime import datetime, time, timezone as datetime_timezone
 from decimal import Decimal, InvalidOperation
 
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Max, Min, Q
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
@@ -14,17 +15,15 @@ from common.mixins import DynamicFeatureFlagRequiredMixin
 from common.views import MainView
 
 
-class DynamicView(DynamicFeatureFlagRequiredMixin, MainView):
+class DynamicView(LoginRequiredMixin, DynamicFeatureFlagRequiredMixin, MainView):
 
     """
     Dynamic landing page container view.
 
     Hierarchy:
-    LoginRequiredMixin
-            \
-             -> MainView -> DynamicView
-            /
-    TemplateView
+    LoginRequiredMixin -> DynamicView
+    DynamicFeatureFlagRequiredMixin -> DynamicView
+    MainView -> DynamicView
 
     --- Fields inherited from MainView ---
 

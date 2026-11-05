@@ -2,15 +2,17 @@ from django.views.generic import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
-from common.mixins import OrderHistoryMixin
+from common.mixins import OrderHistoryMixin, StaticTreeClosedMixin
 from common.service import CurrencyOperations
 
-class BaseEditView(OrderHistoryMixin, LoginRequiredMixin, UpdateView):
+class BaseEditView(LoginRequiredMixin, StaticTreeClosedMixin, OrderHistoryMixin, UpdateView):
 
     """
 
     Hierarchy:
     LoginRequiredMixin -> BaseEditView
+    StaticTreeClosedMixin -> BaseEditView
+    OrderHistoryMixin -> BaseEditView
     UpdateView -> BaseEditView
 
     --- Fields inherited from LoginRequiredMixin ---

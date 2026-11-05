@@ -109,6 +109,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'common.middleware.FeatureTreeMiddleware.FeatureTreeMiddleware',
     'common.middleware.BrowserCookieFilterMiddleware.BrowserCookieFilterMiddleware',
     'common.middleware.AjaxLoginRedirectMiddleware.AjaxLoginRedirectMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',

@@ -13,8 +13,8 @@ import json
 
 @method_decorator(csrf_protect, name="dispatch")
 class BaseUpdateProgressStepView(
-    DynamicFeatureFlagRequiredMixin,
     LoginRequiredMixin,
+    DynamicFeatureFlagRequiredMixin,
     OrderHistoryMixin,
     View,
 ):
@@ -22,8 +22,8 @@ class BaseUpdateProgressStepView(
     """
 
     Hierarchy:
-    DynamicFeatureFlagRequiredMixin -> BaseUpdateProgressStepView
     LoginRequiredMixin -> BaseUpdateProgressStepView
+    DynamicFeatureFlagRequiredMixin -> BaseUpdateProgressStepView
     OrderHistoryMixin -> BaseUpdateProgressStepView
     View -> BaseUpdateProgressStepView
 
@@ -34,7 +34,7 @@ class BaseUpdateProgressStepView(
     - CSRF required (middleware + csrf_protect; client sends X-CSRFToken)
     - POST only
     - field allowlist (`allowed_fields`)
-    - 404 when DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING is off
+    - redirect to /table/ when DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING is off
 
     --- Fields inherited from DynamicFeatureFlagRequiredMixin ---
 

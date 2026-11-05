@@ -12,4 +12,5 @@ from .views import (
     DynamicFeatureFlagRequiredMixin,
     DynamicDetailsModeMixin,
     OrderHistoryMixin,
+    StaticTreeClosedMixin,
 )

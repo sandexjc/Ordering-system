@@ -1,3 +1,4 @@
 from .AjaxLoginRedirectMiddleware import AjaxLoginRedirectMiddleware
 from .BrowserCookieFilterMiddleware import BrowserCookieFilterMiddleware
 from .CanonicalHostMiddleware import CanonicalHostMiddleware
+from .FeatureTreeMiddleware import FeatureTreeMiddleware

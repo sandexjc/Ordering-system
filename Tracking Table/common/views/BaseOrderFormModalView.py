@@ -15,13 +15,14 @@ from common.service import CurrencyOperations
 
 
 @method_decorator(csrf_protect, name="dispatch")
-class BaseOrderFormModalView(OrderHistoryMixin, DynamicFeatureFlagRequiredMixin, LoginRequiredMixin, View):
+class BaseOrderFormModalView(LoginRequiredMixin, DynamicFeatureFlagRequiredMixin, OrderHistoryMixin, View):
 
     """
 
     Hierarchy:
-    DynamicFeatureFlagRequiredMixin -> BaseOrderFormModalView
     LoginRequiredMixin -> BaseOrderFormModalView
+    DynamicFeatureFlagRequiredMixin -> BaseOrderFormModalView
+    OrderHistoryMixin -> BaseOrderFormModalView
     View -> BaseOrderFormModalView
 
     Shared GET fragment + JSON POST for the dynamic create/edit order modal.

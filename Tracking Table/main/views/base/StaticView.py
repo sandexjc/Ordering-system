@@ -1,20 +1,20 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 
-from main.forms import SearchForm, FilterForm
+from common.mixins import StaticTreeClosedMixin
 from common.views import MainView
+from main.forms import SearchForm, FilterForm
 
 
-class StaticView(MainView):
+class StaticView(LoginRequiredMixin, StaticTreeClosedMixin, MainView):
 
     """
     Static content base view with shared table/filter/search behavior.
 
     Hierarchy:
-    LoginRequiredMixin
-            \
-             -> MainView -> StaticView
-            /
-    TemplateView
+    LoginRequiredMixin -> StaticView
+    StaticTreeClosedMixin -> StaticView
+    MainView -> StaticView
 
     --- Fields inherited from MainView ---
 
@@ -86,11 +86,11 @@ class StaticView(MainView):
         data = self.request.POST
         fast_select = data.get('fast_select')
 
-        if fast_select and fast_select.isnumeric():
+        if fast_select and str(fast_select).isnumeric():
             orders = self.get_queryset_latest_by_count(int(fast_select))
             filter_badge = True
         else:
-            orders = self.get_queryset_all()
+            orders = self.get_queryset_latest_by_count(self.default_items_count)
             filter_badge = False
 
         return {
@@ -121,9 +121,6 @@ class StaticView(MainView):
 
     def get_queryset_latest_by_count(self, count):
         return self.model.objects.latest_by_count(self.order_type, count)
-
-    def get_queryset_all(self):
-        return self.model.objects.all_by_order_type(self.order_type)
 
     def get_default_queryset(self):
         return self.model.objects.latest_by_count(self.order_type, self.default_items_count)
