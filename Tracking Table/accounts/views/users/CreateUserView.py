@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
@@ -22,7 +23,11 @@ class CreateUser(AdminRequiredMixin, CreateView):
     success_url = reverse_lazy("accounts:view-users")
 
     def form_valid(self, form):
-        response = super().form_valid(form)
+        try:
+            response = super().form_valid(form)
+        except ValidationError as exc:
+            form.add_error("email", exc.message_dict.get("email", exc.messages))
+            return self.form_invalid(form)
         try:
             sent = send_set_password_email(self.request, self.object)
         except Exception:

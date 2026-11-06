@@ -37,6 +37,10 @@ The Ordering System helps teams manage the full order journey, from initial offe
 
 The system is intended for authenticated internal users and supports role-based operational usage through account login.
 
+## Account email
+
+Two accounts cannot use the same email address. Capital letters do not count as a different address. Saving **Данни за потребителя** on the profile page refuses the change and shows **Този имейл адрес вече се използва.** Creating a user with an email that is already in use shows the same sentence on the form.
+
 ## Appearance
 
 On the profile page, **Външен вид** stores how the site looks for that account. Nobody else is changed, and there is no shared setting for the whole site. A change shows on the open page at once. **Запази** keeps it for the next visit. Leaving without saving drops the preview.

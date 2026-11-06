@@ -1,34 +1,26 @@
 from django.contrib import auth
 from django.db import models
 
+from accounts.service import UserWorkflow
+from common.mixins import WorkflowModelMixin
 
-USER_ROLE_ADMIN = "Admin"
-USER_ROLE_STORE = "Store"
-USER_ROLE_WAREHOUSE = "Warehouse"
-USER_ROLE_EXTERNAL = "External"
 
 USER_ROLES = (
-    USER_ROLE_ADMIN,
-    USER_ROLE_STORE,
-    USER_ROLE_WAREHOUSE,
-    USER_ROLE_EXTERNAL,
-)
-
-USER_ROLE_CHOICES = (
-    (USER_ROLE_ADMIN, "Администратор"),
-    (USER_ROLE_STORE, "Магазин"),
-    (USER_ROLE_WAREHOUSE, "Склад"),
-    (USER_ROLE_EXTERNAL, "Външен потребител"),
+    ("Admin", "Администратор"),
+    ("Store", "Магазин"),
+    ("Warehouse", "Склад"),
+    ("External", "Външен потребител"),
 )
 
 
-class User(auth.models.User, auth.models.PermissionsMixin):
+class User(auth.models.User, auth.models.PermissionsMixin, WorkflowModelMixin):
 
     """
 
     Hierarchy:
     auth.models.User -> User
     auth.models.PermissionsMixin -> User
+    WorkflowModelMixin -> User
 
     --- Fields inherited from auth.models.User ---
 
@@ -38,17 +30,23 @@ class User(auth.models.User, auth.models.PermissionsMixin):
 
     Inherits Django permissions fields.
 
+    --- Fields inherited from WorkflowModelMixin ---
+
+    workflow_service_class = BaseWorkflow
+
     --- Fields defined on User ---
 
-    role = CharField(choices Admin/Store/Warehouse/External, default Store)
+    role = CharField(choices in USER_ROLES, default Store)
     password_reset_version = incremented on each set-password email so older links stop working
 
     """
 
+    workflow_service_class = UserWorkflow
+
     role = models.CharField(
         max_length=32,
-        choices=USER_ROLE_CHOICES,
-        default=USER_ROLE_STORE,
+        choices=USER_ROLES,
+        default="Store",
     )
     password_reset_version = models.PositiveIntegerField(default=0)
 

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.views.generic import ListView
 
-from accounts.models.user.UserModel import USER_ROLE_CHOICES
+from accounts.models.user.UserModel import USER_ROLES
 from accounts.helpers.users.user_is_app_admin import (
     deactivate_blocked_reason,
     role_change_blocked_reason,
@@ -25,7 +25,7 @@ class ViewUsers(AdminRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         actor = self.request.user
-        context["role_choices"] = USER_ROLE_CHOICES
+        context["role_choices"] = USER_ROLES
         context["browser_cookie_filter_enabled"] = settings.DJANGO_FEATURES__BROWSER_COOKIE_FILTER
         for listed_user in context["user_list"]:
             listed_user.deactivate_block = deactivate_blocked_reason(actor, listed_user)

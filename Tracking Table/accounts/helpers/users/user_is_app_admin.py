@@ -1,6 +1,10 @@
 from django.contrib.auth.models import User as AuthUser
 
-from accounts.models.user.UserModel import USER_ROLE_ADMIN, USER_ROLES, User
+from accounts.models.user.UserModel import USER_ROLES, User
+
+
+ADMIN_ROLE = "Admin"
+ROLE_CODES = {code for code, _label in USER_ROLES}
 
 
 def user_is_app_admin(user):
@@ -11,12 +15,12 @@ def user_is_app_admin(user):
     accounts_user = User.objects.filter(pk=user.pk).first()
     if accounts_user is None:
         return False
-    return accounts_user.role == USER_ROLE_ADMIN
+    return accounts_user.role == ADMIN_ROLE
 
 
 def active_app_admin_count():
     admin_pks = set(
-        User.objects.filter(is_active=True, role=USER_ROLE_ADMIN).values_list("pk", flat=True)
+        User.objects.filter(is_active=True, role=ADMIN_ROLE).values_list("pk", flat=True)
     )
     admin_pks.update(
         AuthUser.objects.filter(is_active=True, is_superuser=True).values_list("pk", flat=True)
@@ -35,13 +39,13 @@ def deactivate_blocked_reason(actor, target):
 def role_change_blocked_reason(actor, target, new_role=None):
     if actor.pk == target.pk:
         return "Не можете да промените собствената си група."
-    if new_role is not None and new_role not in USER_ROLES:
+    if new_role is not None and new_role not in ROLE_CODES:
         return "Невалидна група."
     demoting_last_admin = (
-        target.role == USER_ROLE_ADMIN
+        target.role == ADMIN_ROLE
         and not target.is_superuser
         and active_app_admin_count() <= 1
-        and (new_role is None or new_role != USER_ROLE_ADMIN)
+        and (new_role is None or new_role != ADMIN_ROLE)
     )
     if demoting_last_admin:
         return "Не можете да премахнете групата на последния администратор."

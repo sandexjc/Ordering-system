@@ -42,5 +42,5 @@ class UserCreateForm(forms.ModelForm):
         user = super().save(commit=False)
         user.set_unusable_password()
         if commit:
-            user.save()
+            user.run_workflow_save()
         return user

@@ -54,7 +54,15 @@ function save_profile_details(event)
 {
     event.preventDefault();
     const button = document.getElementById("profile-details-save");
-    submit_profile_form(profile_details_form, button);
+    submit_profile_form(profile_details_form, button, null, function (ok, data) {
+        if (!ok)
+        {
+            show_profile_toast(
+                (data && data.error) || "Профилът не беше запазен.",
+                "error"
+            );
+        }
+    });
 }
 
 /**
@@ -171,18 +179,17 @@ function submit_profile_form(form, button, url, on_result)
         body: new FormData(form),
     })
         .then(function (response) {
-            if (!response.ok)
-            {
-                throw new Error("request failed");
-            }
-            return response.json();
+            return response.json().then(function (data) {
+                return { failed: !response.ok, data: data };
+            });
         })
-        .then(function (data) {
-            const ok = Boolean(data && data.ok);
+        .then(function (result) {
+            const data = result.data;
+            const ok = !result.failed && Boolean(data && data.ok);
             set_profile_button_result(button, ok, original_html);
             if (on_result)
             {
-                on_result(ok);
+                on_result(ok, data);
             }
         })
         .catch(function () {

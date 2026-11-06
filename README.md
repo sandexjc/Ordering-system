@@ -36,6 +36,7 @@ Each stream supports searchable dashboards, order editing, progress tracking, pr
 - **User authentication**
   - Login/logout and user administration pages are included.
   - Main views require authenticated access.
+  - Two accounts cannot share an email address. See [Account email](#account-email).
   - Each account can set its own appearance from the profile page. See [Appearance preferences](#appearance-preferences).
 
 ## Technical overview
@@ -360,6 +361,12 @@ python manage.py recalculate_order_weights --all --dry-run
 ```
 
 The command does not require the feature flag. Use `--all` or `--order-id` (not both). `--dry-run` prints the old and new values without writing.
+
+## Account email
+
+An account email is unique. `UserWorkflow.pre_save` trims the address and rejects the save when another user already has it. Comparison ignores case. An empty address is not treated as taken. Both forms that edit the address require one, so a blank value is not saved from those screens. This does not change the database schema.
+
+Creating a user at `/accounts/create-user/` and saving **Данни за потребителя** on `/accounts/profile/` both run that workflow. The profile save is AJAX. The button shows a cross, and a toast says **Този имейл адрес вече се използва.** The create-user page shows that same sentence on the email field. Role changes, activation, and password resets do not go through this workflow. Django admin does not either.
 
 ## Appearance preferences
 
