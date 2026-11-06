@@ -1,5 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
+from django.shortcuts import redirect
 
 from common.mixins import StaticTreeClosedMixin
 from common.views import MainView
@@ -44,6 +46,8 @@ class StaticView(LoginRequiredMixin, StaticTreeClosedMixin, MainView):
             elif action == 'Filter':
                 context.update(self.handle_filter())
 
+        elif self.request.GET.get('fast_select') == 'all':
+            context.update(self.handle_all_orders())
         else:
             context['orders'] = self.get_default_queryset()
             context['search_form'] = self.search_form_class
@@ -100,6 +104,36 @@ class StaticView(LoginRequiredMixin, StaticTreeClosedMixin, MainView):
             'filter_form': self.filter_form_class(self.request.POST),
         }
 
+    def handle_all_orders(self):
+        # Pages all orders for the static всички choice, default_items_count per page.
+        page_obj = Paginator(
+            self.get_queryset_all(),
+            self.default_items_count,
+        ).get_page(self.request.GET.get('page'))
+        return {
+            'orders': page_obj.object_list,
+            'page_obj': page_obj,
+            'page_links': self.get_page_links(page_obj),
+            'filter_badge': False,
+            'search_form': self.search_form_class,
+            'filter_form': self.filter_form_class(initial={'fast_select': 'all'}),
+            'badges': False,
+        }
+
+    def get_page_links(self, page_obj):
+        # Builds numbered page links, including the gap marker, for the template.
+        links = []
+        for number in page_obj.paginator.get_elided_page_range(page_obj.number):
+            if number == page_obj.paginator.ELLIPSIS:
+                links.append({'ellipsis': True, 'label': number})
+            else:
+                links.append({
+                    'ellipsis': False,
+                    'number': number,
+                    'current': number == page_obj.number,
+                })
+        return links
+
     def get_queryset_by_search(self, category, search_value):
         if category == "ID":
             if search_value.isnumeric():
@@ -122,8 +156,15 @@ class StaticView(LoginRequiredMixin, StaticTreeClosedMixin, MainView):
     def get_queryset_latest_by_count(self, count):
         return self.model.objects.latest_by_count(self.order_type, count)
 
+    def get_queryset_all(self):
+        # Every active order of this type, newest first.
+        return self.model.objects.all_by_order_type(self.order_type)
+
     def get_default_queryset(self):
         return self.model.objects.latest_by_count(self.order_type, self.default_items_count)
 
     def post(self, request, *args, **kwargs):
+        # Redirects всички to a GET page URL. Other posts render in place.
+        if request.POST.get('action') == 'Filter' and request.POST.get('fast_select') == 'all':
+            return redirect(f'{request.path}?fast_select=all')
         return self.render_to_response(self.get_context_data())

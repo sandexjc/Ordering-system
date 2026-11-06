@@ -1,0 +1,33 @@
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="mt-3 mb-2" aria-label="Страници с поръчки">
+    <ul class="pagination pagination-sm justify-content-center mb-2">
+        <li class="page-item{% if not page_obj.has_previous %} disabled{% endif %}">
+            {% if page_obj.has_previous %}
+                <a class="page-link" href="?fast_select=all&amp;page={{ page_obj.previous_page_number }}">Предишна</a>
+            {% else %}
+                <span class="page-link">Предишна</span>
+            {% endif %}
+        </li>
+        {% for link in page_links %}
+            {% if link.ellipsis %}
+                <li class="page-item disabled"><span class="page-link">{{ link.label }}</span></li>
+            {% elif link.current %}
+                <li class="page-item active" aria-current="page"><span class="page-link">{{ link.number }}</span></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="?fast_select=all&amp;page={{ link.number }}">{{ link.number }}</a></li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item{% if not page_obj.has_next %} disabled{% endif %}">
+            {% if page_obj.has_next %}
+                <a class="page-link" href="?fast_select=all&amp;page={{ page_obj.next_page_number }}">Следваща</a>
+            {% else %}
+                <span class="page-link">Следваща</span>
+            {% endif %}
+        </li>
+    </ul>
+    <p class="text-center text-muted small mb-0">
+        Страница {{ page_obj.number }} от {{ page_obj.paginator.num_pages }}
+        ({{ page_obj.paginator.count }} общо)
+    </p>
+</nav>
+{% endif %}

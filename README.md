@@ -60,7 +60,7 @@ Each stream supports searchable dashboards, order editing, progress tracking, pr
   - Querysets default to active (non-deleted) records.
 - **Composable search/filter dashboard behavior**
   - Search by `ID`, `Client Name`, `Telephone`, or `All`.
-  - Fast filter options for recent 100/200/300/500/all entries.
+  - Fast filter options for the latest 100/200/300/500 orders. **всички** pages through every order on the static boards. See [Static board list](#static-board-list).
 
 ## Key URLs
 
@@ -581,3 +581,14 @@ Set `DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING=False`:
 | `apply_progress_update_response` | Applies the JSON payload to row colors and progress-bar `.active` classes. |
 | `sync_progress_step` | Toggles one progress `<li>` `.active` / `data-active`. |
 | `sync_vitrine_order_taken_enabled` | Enables or disables the vitrine taken step from `order_ready`. |
+
+## Static board list
+
+When `DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING` is off, `/table/` and `/vitrine/` are served by `StaticView`. With the flag on, `FeatureTreeMiddleware` sends those URLs to `/dynamic/`, so the filter below is not shown on the dynamic board. The dynamic board keeps its own cursor loading and does not use `FilterForm`.
+
+The static filter is labeled **Виж** (`FilterForm` in `components/filter_form.html`):
+
+- **последни 100 / 200 / 300 / 500** show that many latest orders. The first visit shows the latest 100 (`default_items_count`). These lists are not paged.
+- **всички** opens every order of that board, newest first, 100 per page. Choosing it goes to `?fast_select=all`. Further pages use `?fast_select=all&page=N`.
+- The pager (`components/orders_pagination.html`, included from `layout/content.html`) appears only for **всички**, and only when there is more than one page. It shows previous, next, and the page numbers, with a gap when the list is long.
+- Search and a count filter leave the paged address and return to a single unpaged result.
