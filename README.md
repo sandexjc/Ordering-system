@@ -176,6 +176,7 @@ Optional variables supported in settings include:
 - `DJANGO_FEATURES__SUMMARIZE_CONTENT`
 - `DJANGO_FEATURES__ORDER_WEIGHT`
 - `DJANGO_FEATURES__BROWSER_COOKIE_FILTER`
+- `DJANGO_FEATURES__DB_BACKUP`
 - `DJANGO_DEVICE_COOKIE__MAX_AGE`
 - `DJANGO_DEVICE_COOKIE__MAX_SECRETS`
 - `DJANGO_DYNAMIC_CONTENT__SEARCH_MIN_LENGTH`
@@ -186,6 +187,11 @@ Optional variables supported in settings include:
 - `DJANGO_DYNAMIC_CONTENT__SYNC_HIGHLIGHT_MS`
 - `DJANGO_DYNAMIC_CONTENT__NOF_ORDERS_INIT_LOAD`
 - `DJANGO_DYNAMIC_CONTENT__NOF_ORDERS_SECONDARY_LOAD`
+- `DJANGO_BACKUP_DIR`
+- `DJANGO_BACKUP_AT`
+- `DJANGO_BACKUP_KEEP_DAYS`
+
+`DJANGO_FEATURES__DB_BACKUP` turns database backups on (default `False`). The app still starts when it is off. `DJANGO_BACKUP_DIR` is the directory for the daily backup files. A relative path is kept as given, and `~` is expanded. `DJANGO_BACKUP_AT` is the local time of day in `HH:MM` (default `02:00`, timezone `Europe/Sofia`). `DJANGO_BACKUP_KEEP_DAYS` is how many daily files to keep (default `14`).
 
 ### 4) Run migrations and start the app
 
