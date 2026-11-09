@@ -10,3 +10,7 @@ class CommonConfig(AppConfig):
 
         connect_sqlite_pragmas()
         connect_sqlite_unicode_lower()
+
+        from common.backup.scheduler import start_backup_scheduler
+
+        start_backup_scheduler()

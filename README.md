@@ -191,7 +191,7 @@ Optional variables supported in settings include:
 - `DJANGO_BACKUP_AT`
 - `DJANGO_BACKUP_KEEP_DAYS`
 
-`DJANGO_FEATURES__DB_BACKUP` turns database backups on (default `False`). The app still starts when it is off. `DJANGO_BACKUP_DIR` is the directory for the daily backup files. A relative path is kept as given, and `~` is expanded. `DJANGO_BACKUP_AT` is the local time of day in `HH:MM` (default `02:00`, timezone `Europe/Sofia`). `DJANGO_BACKUP_KEEP_DAYS` is how many daily files to keep (default `14`).
+`DJANGO_FEATURES__DB_BACKUP` turns database backups on (default `False`). The app still starts when it is off. `DJANGO_BACKUP_DIR` is the directory for the daily backup files. A relative path is kept as given, and `~` is expanded. `DJANGO_BACKUP_AT` is the local time of day in `HH:MM` (default `02:00`, timezone `Europe/Sofia`). `DJANGO_BACKUP_KEEP_DAYS` is how many daily files to keep (default `14`). The daily export and the import command are described in Database backup.
 
 ### 4) Run migrations and start the app
 
@@ -202,6 +202,32 @@ python manage.py runserver
 ```
 
 Then open `http://127.0.0.1:8000/`.
+
+## Database backup
+
+When `DJANGO_FEATURES__DB_BACKUP` is on and `DJANGO_BACKUP_DIR` is set, `runserver` writes one JSON backup a day at `DJANGO_BACKUP_AT` in `Europe/Sofia`. The timer lives in that server process. It does not run for other management commands.
+
+If the server is not running at that time, that day's file is skipped. Starting the server later does not write the missed file.
+
+The file is named `backup-YYYY-MM-DD.json`. It includes users, accounts, table rows, and vitrine rows, including soft-deleted rows. It leaves out sessions, permissions, content types, and admin log entries. Hashed passwords are in the file.
+
+From the `Tracking Table` directory:
+
+```bash
+python manage.py export_backup
+python manage.py export_backup --force
+```
+
+`export_backup` leaves today's file in place when it already exists. `--force` replaces it. Daily files older than `DJANGO_BACKUP_KEEP_DAYS` are removed.
+
+A new database needs its tables before a backup can be loaded. Run `migrate`, then import one exported file:
+
+```bash
+python manage.py import_backup backup-YYYY-MM-DD.json
+python manage.py import_backup backup-YYYY-MM-DD.json --apply
+```
+
+Without `--apply`, the command only describes the load. A load overwrites rows with the same primary key and inserts rows that are missing. Rows that exist only in the current database are left in place.
 
 ## Auto Seal Feature Sync Command
 
