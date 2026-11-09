@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from common.backup import BackupError, export_backup
+from common.backup.export_backup import BackupError, export_backup
 
 
 class Command(BaseCommand):

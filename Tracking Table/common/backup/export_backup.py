@@ -29,7 +29,7 @@ BACKUP_FILE_NAME = re.compile(r"^backup-(\d{4}-\d{2}-\d{2})\.json$")
 
 
 class BackupError(Exception):
-    """The backup settings do not allow an export."""
+    """The backup settings or file do not allow this operation."""
 
 
 @dataclass(frozen=True)
@@ -46,18 +46,18 @@ def export_backup(*, force=False):
     Skips the write when that file already exists unless force is set.
     Removes daily files dated before the retention window.
     """
-    backup_dir = _backup_dir()
+    backup_dir = backup_directory()
     today = timezone.localdate()
     destination = backup_dir / f"backup-{today.isoformat()}.json"
 
-    with _backup_lock(backup_dir):
+    with backup_lock(backup_dir):
         written = _write_dump(destination, force=force)
         removed = _remove_old_files(backup_dir, today, settings.DJANGO_BACKUP_KEEP_DAYS)
 
     return ExportResult(path=destination, written=written, removed=removed)
 
 
-def _backup_dir():
+def backup_directory():
     if not settings.DJANGO_FEATURES__DB_BACKUP:
         raise BackupError("Database backup is off. Set DJANGO_FEATURES__DB_BACKUP=True.")
 
@@ -73,7 +73,7 @@ def _backup_dir():
 
 
 @contextmanager
-def _backup_lock(backup_dir):
+def backup_lock(backup_dir):
     backup_dir.mkdir(parents=True, exist_ok=True)
     lock_path = backup_dir / ".backup.lock"
     with lock_path.open("a") as lock_file:
