@@ -263,7 +263,11 @@ async function loadMoreOrders(viewName, generation) {
         template.innerHTML = rowsHtml;
         const newRows = Array.from(template.children);
         newRows.forEach((row) => {
-            row.style.opacity = "0";
+            // Only summary rows are faded in. The detail <tr> must stay
+            // opaque; otherwise the expanded order (spinner and content) is invisible.
+            if (row.classList.contains("visibleRows")) {
+                row.style.opacity = "0";
+            }
             liveBody.appendChild(row);
         });
         if (viewName === "vitrine" && typeof syncFrameHeights === "function") {
