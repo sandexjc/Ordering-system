@@ -1,4 +1,15 @@
-<table class="table table-sm custom-table-sm table-no-wrap table-min-width">
+<table
+	class="table table-sm custom-table-sm table-no-wrap table-min-width"
+	data-vitrine-order-info
+	data-price-black="{{ current_order.black_profile_price }}"
+	data-price-matte="{{ current_order.matte_profile_price }}"
+	data-price-inox="{{ current_order.inox_profile_price }}"
+	data-price-gold="{{ current_order.gold_profile_price }}"
+	data-price-white-seal="{{ current_order.white_seal_price }}"
+	data-price-black-seal="{{ current_order.black_seal_price }}"
+	data-price-hole="{{ current_order.add_hole_price }}"
+	data-price-manufacturing="{{ current_order.manufacturing_price }}"
+>
     <tbody>
         <tr class="section-header">
             <th><strong>Профил</strong></th>
@@ -6,41 +17,33 @@
             <th><strong>Цена за л.м</strong></th>
             <th><strong>Стойност</strong></th>
         </tr>
-        {% if black_profile_len != "0.00" %}
-            <tr>
-                <td class="indent-cell">Черeн</td>
-                <td>{{ black_profile_len }} л.м.</td>
-                <td>{{ current_order.black_profile_price }} {{ currency }}</td>
-                <td>{{ black_profile_total }} {{ currency }}</td>
-            </tr>
-        {% endif %}
-        {% if matte_profile_len != "0.00" %}
-            <tr>
-                <td class="indent-cell">Матов</td>
-                <td>{{ matte_profile_len }} л.м.</td>
-                <td>{{ current_order.matte_profile_price }} {{ currency }}</td>
-                <td>{{ matte_profile_total }} {{ currency }}</td>
-            </tr>
-        {% endif %}
-        {% if inox_profile_len != "0.00" %}
-            <tr>
-                <td class="indent-cell">Инокс</td>
-                <td>{{ inox_profile_len }} л.м.</td>
-                <td>{{ current_order.inox_profile_price }} {{ currency }}</td>
-                <td>{{ inox_profile_total }} {{ currency }}</td>
-            </tr>
-        {% endif %}
-        {% if gold_profile_len != "0.00" %}
-            <tr>
-                <td class="indent-cell">Златист</td>
-                <td>{{ gold_profile_len }} л.м.</td>
-                <td>{{ current_order.gold_profile_price }} {{ currency }}</td>
-                <td>{{ gold_profile_total }} {{ currency }}</td>
-            </tr>
-        {% endif %}
+        <tr data-vitrine-profile="Black"{% if black_profile_len == "0.00" %} hidden{% endif %}>
+            <td class="indent-cell">Черeн</td>
+            <td><span data-vitrine-qty>{{ black_profile_len }}</span> л.м.</td>
+            <td><span data-vitrine-price>{{ current_order.black_profile_price }}</span> {{ currency }}</td>
+            <td><span data-vitrine-amount>{{ black_profile_total }}</span> {{ currency }}</td>
+        </tr>
+        <tr data-vitrine-profile="Matte"{% if matte_profile_len == "0.00" %} hidden{% endif %}>
+            <td class="indent-cell">Матов</td>
+            <td><span data-vitrine-qty>{{ matte_profile_len }}</span> л.м.</td>
+            <td><span data-vitrine-price>{{ current_order.matte_profile_price }}</span> {{ currency }}</td>
+            <td><span data-vitrine-amount>{{ matte_profile_total }}</span> {{ currency }}</td>
+        </tr>
+        <tr data-vitrine-profile="Inox"{% if inox_profile_len == "0.00" %} hidden{% endif %}>
+            <td class="indent-cell">Инокс</td>
+            <td><span data-vitrine-qty>{{ inox_profile_len }}</span> л.м.</td>
+            <td><span data-vitrine-price>{{ current_order.inox_profile_price }}</span> {{ currency }}</td>
+            <td><span data-vitrine-amount>{{ inox_profile_total }}</span> {{ currency }}</td>
+        </tr>
+        <tr data-vitrine-profile="Gold"{% if gold_profile_len == "0.00" %} hidden{% endif %}>
+            <td class="indent-cell">Златист</td>
+            <td><span data-vitrine-qty>{{ gold_profile_len }}</span> л.м.</td>
+            <td><span data-vitrine-price>{{ current_order.gold_profile_price }}</span> {{ currency }}</td>
+            <td><span data-vitrine-amount>{{ gold_profile_total }}</span> {{ currency }}</td>
+        </tr>
         <tr>
             <td colspan="3"><strong>Общо</strong></td>
-            <td><strong>{{ current_order.frames_total }} {{ currency }}</strong></td>
+            <td><strong><span data-vitrine-total="frames">{{ current_order.frames_total }}</span> {{ currency }}</strong></td>
         </tr>
         <tr><td colspan="4"></td></tr>
         <tr class="section-header">
@@ -49,25 +52,21 @@
             <th><strong>Цена за л.м</strong></th>
             <th><strong>Стойност</strong></th>
         </tr>
-        {% if black_seal != "0.00" %}
-        <tr>
+        <tr data-vitrine-seal="Black"{% if black_seal == "0.00" %} hidden{% endif %}>
             <td class="indent-cell">Черно</td>
-            <td>{{ black_seal }} л.м.</td>
-            <td>{{ current_order.black_seal_price }} {{ currency }}</td>
-            <td>{{ black_seal_total }} {{ currency }}</td>
+            <td><span data-vitrine-qty>{{ black_seal }}</span> л.м.</td>
+            <td><span data-vitrine-price>{{ current_order.black_seal_price }}</span> {{ currency }}</td>
+            <td><span data-vitrine-amount>{{ black_seal_total }}</span> {{ currency }}</td>
         </tr>
-        {% endif %}
-        {% if white_seal != "0.00" %}
-        <tr>
+        <tr data-vitrine-seal="White"{% if white_seal == "0.00" %} hidden{% endif %}>
             <td class="indent-cell">Бяло</td>
-            <td>{{ white_seal }} л.м.</td>
-            <td>{{ current_order.white_seal_price }} {{ currency }}</td>
-            <td>{{ white_seal_total }} {{ currency }}</td>
+            <td><span data-vitrine-qty>{{ white_seal }}</span> л.м.</td>
+            <td><span data-vitrine-price>{{ current_order.white_seal_price }}</span> {{ currency }}</td>
+            <td><span data-vitrine-amount>{{ white_seal_total }}</span> {{ currency }}</td>
         </tr>
-        {% endif %}
         <tr>
             <td colspan="3"><strong>Общо</strong></td>
-            <td><strong>{{ current_order.seals_total }} {{ currency }}</strong></td>
+            <td><strong><span data-vitrine-total="seals">{{ current_order.seals_total }}</span> {{ currency }}</strong></td>
         </tr>
         <tr><td colspan="4"></td></tr>
         <tr class="section-header">
@@ -76,25 +75,21 @@
             <th><strong>Ед. цена</strong></th>
             <th><strong>Стойност</strong></th>
         </tr>
-        {% if total_frames_count != "0" %}
-        <tr>
+        <tr data-vitrine-row="manufacturing"{% if total_frames_count == "0" %} hidden{% endif %}>
             <td class="indent-cell">Изработка</td>
-            <td>{{ total_frames_count }}</td>
-            <td>{{ current_order.manufacturing_price }} {{ currency }}</td>
-            <td>{{ current_order.manufacturing_total }} {{ currency }}</td>
+            <td><span data-vitrine-qty>{{ total_frames_count }}</span></td>
+            <td><span data-vitrine-price>{{ current_order.manufacturing_price }}</span> {{ currency }}</td>
+            <td><span data-vitrine-amount>{{ current_order.manufacturing_total }}</span> {{ currency }}</td>
         </tr>
-        {% endif %}
-        {% if additional_holes != "0" %}
-            <tr>
-                <td class="indent-cell">Д-ни отвори</td>
-                <td>{{ additional_holes }}</td>
-                <td>{{ current_order.add_hole_price }} {{ currency }}</td>
-                <td>{{ current_order.holes_total }} {{ currency }}</td>
-            </tr>
-        {% endif %}
+        <tr data-vitrine-row="holes"{% if additional_holes == "0" %} hidden{% endif %}>
+            <td class="indent-cell">Д-ни отвори</td>
+            <td><span data-vitrine-qty>{{ additional_holes }}</span></td>
+            <td><span data-vitrine-price>{{ current_order.add_hole_price }}</span> {{ currency }}</td>
+            <td><span data-vitrine-amount>{{ current_order.holes_total }}</span> {{ currency }}</td>
+        </tr>
         <tr>
             <td colspan="3"><strong>Общо</strong></td>
-            <td><strong>{{ additional_total }} {{ currency }}</strong></td>
+            <td><strong><span data-vitrine-total="additional">{{ additional_total }}</span> {{ currency }}</strong></td>
         </tr>
     </tbody>
 </table>

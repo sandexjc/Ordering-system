@@ -3,7 +3,7 @@
  * ----------------------------------
  * Dynamic table/vitrine create/edit order form modal: open, add-row, AJAX save,
  * unsaved-row highlight, save toasts, live-list patch after success,
- * client-side line values and totals before save, and
+ * client-side line values and vitrine order-information totals before save, and
  * merge of a remote order update into an already-open edit form.
  *
  * Loaded from:
@@ -267,9 +267,344 @@ function orderFormRowCents(row)
 }
 
 /**
+ * Divide and round. "up" matches Decimal ROUND_HALF_UP.
+ * "even" matches Decimal's default ROUND_HALF_EVEN, used when the
+ * order-information table formats a length or a displayed amount.
+ *
+ * @param {bigint} numerator - Signed integer.
+ * @param {bigint} divisor - Positive divisor.
+ * @param {"up"|"even"} mode - Rounding mode.
+ * @returns {bigint}
+ */
+function roundOrderFormDiv(numerator, divisor, mode)
+{
+	const negative = numerator < 0n;
+	const abs = negative ? -numerator : numerator;
+	const quotient = abs / divisor;
+	const doubled = (abs % divisor) * 2n;
+	let rounded = quotient;
+	if (mode === "up") {
+		if (doubled >= divisor) {
+			rounded += 1n;
+		}
+	} else if (doubled > divisor || (doubled === divisor && quotient % 2n === 1n)) {
+		rounded += 1n;
+	}
+	return negative ? -rounded : rounded;
+}
+
+/**
+ * Format an integer that already counts `places` decimal digits.
+ *
+ * @param {bigint} units - Scaled integer.
+ * @param {number} places - Digits after the decimal point.
+ * @returns {string}
+ */
+function formatOrderFormUnits(units, places)
+{
+	const negative = units < 0n;
+	const abs = (negative ? -units : units).toString();
+	const sign = negative ? "-" : "";
+	if (places <= 0) {
+		return sign + abs;
+	}
+	const digits = abs.padStart(places + 1, "0");
+	return sign + digits.slice(0, -places) + "." + digits.slice(-places);
+}
+
+/**
+ * Whole-number part of a typed decimal. Frame sizes and counts are integers.
+ *
+ * @param {string} raw - Field text.
+ * @returns {bigint}
+ */
+function orderFormWhole(raw)
+{
+	const parsed = parseOrderFormDecimal(raw);
+	const whole = parsed.scale === 0
+		? parsed.units
+		: parsed.units / (10n ** BigInt(parsed.scale));
+	return parsed.negative ? -whole : whole;
+}
+
+/**
+ * Field text from a row input or select.
+ *
+ * @param {HTMLElement} row - Item row.
+ * @param {string} suffix - Name ending, including the hyphen.
+ * @returns {string}
+ */
+function orderFormRowField(row, suffix)
+{
+	const el = row.querySelector('input[name$="' + suffix + '"], select[name$="' + suffix + '"]');
+	return el ? el.value : "";
+}
+
+/**
+ * Cents for one parsed amount times a price that is already in cents.
+ *
+ * @param {{negative: boolean, units: bigint, scale: number}} parsed - Amount.
+ * @param {bigint} priceCents - Price in cents.
+ * @param {"up"|"even"} mode - Rounding mode.
+ * @returns {bigint}
+ */
+function orderFormProductCents(parsed, priceCents, mode)
+{
+	const denom = 10n ** BigInt(parsed.scale);
+	const cents = roundOrderFormDiv(parsed.units * priceCents, denom, mode);
+	return parsed.negative ? -cents : cents;
+}
+
+/**
+ * Price stored on the vitrine order-information table.
+ *
+ * @param {HTMLElement} table - Table with data-price-* attributes.
+ * @param {string} key - Attribute suffix.
+ * @returns {bigint}
+ */
+function vitrinePriceCents(table, key)
+{
+	return orderFormDecimalCents(parseOrderFormDecimal(table.getAttribute("data-price-" + key) || "0"));
+}
+
+/**
+ * Write one order-information cell.
+ *
+ * @param {HTMLElement|null} row - Info row.
+ * @param {string} name - data-vitrine-* suffix.
+ * @param {string} text - Replacement text.
+ * @returns {void}
+ */
+function setVitrineInfoText(row, name, text)
+{
+	const el = row && row.querySelector("[data-vitrine-" + name + "]");
+	if (el) {
+		el.textContent = text;
+	}
+}
+
+/**
+ * Frames that count toward the preview. Blank extra rows are left out.
+ * A saved row stays in until it is marked for deletion.
+ *
+ * @param {HTMLFormElement} form - Modal order form.
+ * @returns {Array<{length: bigint, width: bigint, quantity: bigint, holes: bigint, profile: string, includeSeal: boolean}>}
+ */
+function vitrinePreviewFrames(form)
+{
+	const formset = form.querySelector('[data-order-calc="frame"]');
+	const frames = [];
+	if (!formset) {
+		return frames;
+	}
+	formset.querySelectorAll("tr.order-form-item-row").forEach(function (row) {
+		if (row.classList.contains("is-pending-delete")) {
+			return;
+		}
+		if (!isSavedOrderFormRow(row) && isEmptyOrderFormRow(row)) {
+			return;
+		}
+		const sealToggle = row.querySelector('input[name$="-auto_calculate_seal"]');
+		frames.push({
+			length: orderFormWhole(orderFormRowField(row, "-length")),
+			width: orderFormWhole(orderFormRowField(row, "-width")),
+			quantity: orderFormWhole(orderFormRowField(row, "-quantity")),
+			holes: orderFormWhole(orderFormRowField(row, "-holes_count")),
+			profile: orderFormRowField(row, "-profile_type") || "Black",
+			includeSeal: !sealToggle || sealToggle.checked,
+		});
+	});
+	return frames;
+}
+
+/**
+ * Update the vitrine order-information table from the open frames.
+ * Returns frames + seals + holes + manufacturing, which is the part of
+ * the order total that does not come from other services. Glass stays 0,
+ * matching the workflow. Returns 0 when this is not a vitrine form.
+ *
+ * @param {HTMLFormElement} form - Modal order form.
+ * @returns {bigint}
+ */
+function refreshVitrineOrderInfo(form)
+{
+	const table = form.querySelector("[data-vitrine-order-info]");
+	if (!table) {
+		return 0n;
+	}
+	const profileKey = { Black: "black", Matte: "matte", Inox: "inox", Gold: "gold" };
+	const profileUnits = { Black: 0n, Matte: 0n, Inox: 0n, Gold: 0n };
+	const sealTenths = { Black: 0n, White: 0n };
+	const sealValue = { Black: 0n, White: 0n };
+	let framesTotal = 0n;
+	let frameCount = 0n;
+	let holesCount = 0n;
+	let holesTotal = 0n;
+	const holePrice = vitrinePriceCents(table, "hole");
+
+	vitrinePreviewFrames(form).forEach(function (frame) {
+		const units = 2n * (frame.length + frame.width) * frame.quantity;
+		const priceKey = profileKey[frame.profile];
+		frameCount += frame.quantity;
+		if (priceKey) {
+			profileUnits[frame.profile] += units;
+			framesTotal += roundOrderFormDiv(units * vitrinePriceCents(table, priceKey), 1000n, "up");
+		}
+		const extraHoles = (frame.holes > 2n ? frame.holes - 2n : 0n) * frame.quantity;
+		holesCount += extraHoles;
+		holesTotal += extraHoles * holePrice;
+		if (frame.includeSeal && priceKey) {
+			const sealType = frame.profile === "Black" || frame.profile === "Gold" ? "Black" : "White";
+			const tenths = roundOrderFormDiv(units, 100n, "even");
+			sealTenths[sealType] += tenths;
+			sealValue[sealType] += roundOrderFormDiv(tenths * vitrinePriceCents(table, sealType === "Black" ? "black-seal" : "white-seal"), 10n, "up");
+		}
+	});
+
+	Object.keys(profileKey).forEach(function (profile) {
+		const row = table.querySelector('[data-vitrine-profile="' + profile + '"]');
+		const units = profileUnits[profile];
+		const hundredths = roundOrderFormDiv(units, 10n, "even");
+		const price = vitrinePriceCents(table, profileKey[profile]);
+		if (row) {
+			row.hidden = hundredths === 0n;
+		}
+		setVitrineInfoText(row, "qty", formatOrderFormUnits(hundredths, 2));
+		setVitrineInfoText(row, "amount", formatOrderFormCents(roundOrderFormDiv(units * price, 1000n, "even")));
+	});
+	const framesEl = table.querySelector('[data-vitrine-total="frames"]');
+	if (framesEl) {
+		framesEl.textContent = formatOrderFormCents(framesTotal);
+	}
+
+	const manualToggle = form.querySelector("#id_vitrine_manual_seal");
+	const manualOn = Boolean(manualToggle && manualToggle.checked);
+	const whiteParsed = parseOrderFormDecimal(orderFormNamedValue(form, "white_seal_custom_amount"));
+	const blackParsed = parseOrderFormDecimal(orderFormNamedValue(form, "black_seal_custom_amount"));
+	const whitePrice = vitrinePriceCents(table, "white-seal");
+	const blackPrice = vitrinePriceCents(table, "black-seal");
+	if (manualToggle) {
+		setOrderFormNamedValue(form, "white_seal_total_value", formatOrderFormCents(orderFormProductCents(whiteParsed, whitePrice, "up")));
+		setOrderFormNamedValue(form, "black_seal_total_value", formatOrderFormCents(orderFormProductCents(blackParsed, blackPrice, "up")));
+	}
+	let sealsTotal = sealValue.Black + sealValue.White;
+	const sealQty = { Black: sealTenths.Black * 10n, White: sealTenths.White * 10n };
+	const sealAmount = {
+		Black: roundOrderFormDiv(sealTenths.Black * blackPrice, 10n, "even"),
+		White: roundOrderFormDiv(sealTenths.White * whitePrice, 10n, "even"),
+	};
+	if (manualOn) {
+		sealsTotal = manualSealTotalCents(whiteParsed, whitePrice, blackParsed, blackPrice);
+		sealQty.White = scaledHundredths(whiteParsed);
+		sealQty.Black = scaledHundredths(blackParsed);
+		sealAmount.White = orderFormProductCents(whiteParsed, whitePrice, "even");
+		sealAmount.Black = orderFormProductCents(blackParsed, blackPrice, "even");
+	}
+
+	["Black", "White"].forEach(function (sealType) {
+		const row = table.querySelector('[data-vitrine-seal="' + sealType + '"]');
+		if (row) {
+			row.hidden = sealQty[sealType] === 0n;
+		}
+		setVitrineInfoText(row, "qty", formatOrderFormUnits(sealQty[sealType], 2));
+		setVitrineInfoText(row, "amount", formatOrderFormCents(sealAmount[sealType]));
+	});
+	const sealsEl = table.querySelector('[data-vitrine-total="seals"]');
+	if (sealsEl) {
+		sealsEl.textContent = formatOrderFormCents(sealsTotal);
+	}
+
+	const manufacturingPrice = vitrinePriceCents(table, "manufacturing");
+	const manufacturingTotal = frameCount * manufacturingPrice;
+	const manufacturingRow = table.querySelector('[data-vitrine-row="manufacturing"]');
+	if (manufacturingRow) {
+		manufacturingRow.hidden = frameCount === 0n;
+	}
+	setVitrineInfoText(manufacturingRow, "qty", formatOrderFormUnits(frameCount, 0));
+	setVitrineInfoText(manufacturingRow, "amount", formatOrderFormCents(manufacturingTotal));
+
+	const holesRow = table.querySelector('[data-vitrine-row="holes"]');
+	if (holesRow) {
+		holesRow.hidden = holesCount === 0n;
+	}
+	setVitrineInfoText(holesRow, "qty", formatOrderFormUnits(holesCount, 0));
+	setVitrineInfoText(holesRow, "amount", formatOrderFormCents(holesTotal));
+	const additionalEl = table.querySelector('[data-vitrine-total="additional"]');
+	if (additionalEl) {
+		additionalEl.textContent = formatOrderFormCents(manufacturingTotal + holesTotal);
+	}
+
+	return framesTotal + sealsTotal + holesTotal + manufacturingTotal;
+}
+
+/**
+ * Value of a named form control.
+ *
+ * @param {ParentNode} form - Modal order form.
+ * @param {string} name - Control name.
+ * @returns {string}
+ */
+function orderFormNamedValue(form, name)
+{
+	const el = form.querySelector('[name="' + name + '"]');
+	return el ? el.value : "";
+}
+
+/**
+ * Set a named control when the form has it.
+ *
+ * @param {ParentNode} form - Modal order form.
+ * @param {string} name - Control name.
+ * @param {string} text - New value.
+ * @returns {void}
+ */
+function setOrderFormNamedValue(form, name, text)
+{
+	const el = form.querySelector('[name="' + name + '"]');
+	if (el) {
+		el.value = text;
+	}
+}
+
+/**
+ * Parsed amount as hundredths, rounded half-even the way the info table prints it.
+ *
+ * @param {{negative: boolean, units: bigint, scale: number}} parsed - Amount.
+ * @returns {bigint}
+ */
+function scaledHundredths(parsed)
+{
+	let hundredths;
+	if (parsed.scale > 2) {
+		hundredths = roundOrderFormDiv(parsed.units, 10n ** BigInt(parsed.scale - 2), "even");
+	} else {
+		hundredths = parsed.units * (10n ** BigInt(2 - parsed.scale));
+	}
+	return parsed.negative ? -hundredths : hundredths;
+}
+
+/**
+ * Manual seal total: one half-up rounding of the two amount × price products.
+ *
+ * @param {{negative: boolean, units: bigint, scale: number}} whiteParsed - White amount.
+ * @param {bigint} whitePrice - White price in cents.
+ * @param {{negative: boolean, units: bigint, scale: number}} blackParsed - Black amount.
+ * @param {bigint} blackPrice - Black price in cents.
+ * @returns {bigint}
+ */
+function manualSealTotalCents(whiteParsed, whitePrice, blackParsed, blackPrice)
+{
+	const scale = Math.max(whiteParsed.scale, blackParsed.scale);
+	const whiteNum = whiteParsed.units * whitePrice * (10n ** BigInt(scale - whiteParsed.scale));
+	const blackNum = blackParsed.units * blackPrice * (10n ** BigInt(scale - blackParsed.scale));
+	const signed = (whiteParsed.negative ? -whiteNum : whiteNum) + (blackParsed.negative ? -blackNum : blackNum);
+	return roundOrderFormDiv(signed, 10n ** BigInt(scale), "up");
+}
+
+/**
  * Fill readonly line values and the section, paid, and balance totals
- * from the quantities and prices currently in the table order form.
- * Vitrine forms have no data-order-calc markers, so this leaves them alone.
+ * from the quantities and prices currently in the order form.
+ * A vitrine form also refreshes the order-information table.
  * The server still recalculates the same figures on save.
  *
  * @param {HTMLFormElement|null} form - Modal order form.
@@ -277,10 +612,10 @@ function orderFormRowCents(row)
  */
 function refreshOrderFormTotals(form)
 {
-	if (!form || !form.querySelector("[data-order-calc]")) {
+	if (!form || !form.querySelector("[data-order-calc], [data-vitrine-order-info]")) {
 		return;
 	}
-	let grand = 0n;
+	let grand = refreshVitrineOrderInfo(form);
 	form.querySelectorAll('[data-order-calc="line"]').forEach(function (formset) {
 		let section = 0n;
 		formset.querySelectorAll("tr.order-form-item-row").forEach(function (row) {
@@ -1473,6 +1808,25 @@ function mergeOrderFormDisplayBlocks(currentForm, incomingForm)
 }
 
 /**
+ * The manual-seal radios update the checkbox in a later listener.
+ * Copy the selected mode onto the checkbox first so the preview uses it.
+ *
+ * @param {HTMLFormElement} form - Modal order form.
+ * @param {EventTarget|null} target - Control that changed.
+ * @returns {void}
+ */
+function syncOrderFormManualSealChoice(form, target)
+{
+	if (!target || target.name !== "manual-seal-mode") {
+		return;
+	}
+	const checkbox = form.querySelector("#id_vitrine_manual_seal");
+	if (checkbox) {
+		checkbox.checked = target.id === "manual-seal-custom-mode";
+	}
+}
+
+/**
  * Keep the manual-seal radios and panel in step with the checkbox.
  * Does not bind listeners again.
  *
@@ -1971,10 +2325,8 @@ function setupOrderFormModal()
 		if (!form) {
 			return;
 		}
-		const name = event.target.name || "";
-		if (name.endsWith("-quantity") || name.endsWith("-price") || name.endsWith("-value") || name.endsWith("-from_client")) {
-			refreshOrderFormTotals(form);
-		}
+		syncOrderFormManualSealChoice(form, event.target);
+		refreshOrderFormTotals(form);
 		updateOrderFormDirtyState(form);
 	});
 
@@ -1983,10 +2335,8 @@ function setupOrderFormModal()
 		if (!form) {
 			return;
 		}
-		const name = event.target.name || "";
-		if (name.endsWith("-quantity") || name.endsWith("-price") || name.endsWith("-value") || name.endsWith("-from_client")) {
-			refreshOrderFormTotals(form);
-		}
+		syncOrderFormManualSealChoice(form, event.target);
+		refreshOrderFormTotals(form);
 		updateOrderFormDirtyState(form);
 	});
 

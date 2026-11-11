@@ -2,7 +2,7 @@ from django.conf import settings
 
 from common.views import BaseOrderFormModalView
 from vitrine.models import Change, Vitrine
-from vitrine.service import VitrineContextBuilder
+from vitrine.service import VitrineContextBuilder, VitrinePriceSetter
 from vitrine import forms
 
 
@@ -54,6 +54,13 @@ class VitrineOrderFormModal(BaseOrderFormModalView):
         "others_forms": forms.OthersFormSet,
         "payment_forms": forms.PaymentFormSet,
     }
+
+    def get_form_context(self, form, note_form, formsets):
+        # A new order gets its prices on save. Apply the same prices in memory
+        # so the modal can preview totals before that save.
+        if self.object is not None and not self.object.pk:
+            VitrinePriceSetter(self.object).set_prices()
+        return super().get_form_context(form, note_form, formsets)
 
     def get_extra_form_context(self):
         extra = {
