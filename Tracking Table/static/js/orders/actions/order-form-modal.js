@@ -2,7 +2,8 @@
  * orders/actions/order-form-modal.js
  * ----------------------------------
  * Dynamic table/vitrine create/edit order form modal: open, add-row, AJAX save,
- * unsaved-row highlight, save toasts, live-list patch after success, and
+ * unsaved-row highlight, save toasts, live-list patch after success,
+ * client-side line values and totals before save, and
  * merge of a remote order update into an already-open edit form.
  *
  * Loaded from:
@@ -158,6 +159,171 @@ function normalizeOrderFormDecimal(value)
 	}
 	const numeric = Number(cleaned);
 	return Number.isFinite(numeric) ? numeric.toFixed(2) : cleaned;
+}
+
+/**
+ * Split a typed decimal into sign, integer digits, and fractional scale.
+ * Empty or unfinished text ("", ".", ",") is zero. A comma is a decimal point.
+ *
+ * @param {string} raw - Field text.
+ * @returns {{negative: boolean, units: bigint, scale: number}}
+ */
+function parseOrderFormDecimal(raw)
+{
+	const cleaned = String(raw ?? "").trim().replace(",", ".");
+	if (cleaned === "" || cleaned === "." || cleaned === "-" || cleaned === "-.") {
+		return { negative: false, units: 0n, scale: 0 };
+	}
+	const match = cleaned.match(/^(-?)(\d*)(?:\.(\d*))?$/);
+	if (!match || (match[2] === "" && match[3] == null)) {
+		return { negative: false, units: 0n, scale: 0 };
+	}
+	const fraction = match[3] || "";
+	const whole = match[2] || "0";
+	return {
+		negative: match[1] === "-",
+		units: BigInt(whole + fraction || "0"),
+		scale: fraction.length,
+	};
+}
+
+/**
+ * Format integer cents as a 2-decimal money string.
+ *
+ * @param {bigint} cents - Amount in cents.
+ * @returns {string}
+ */
+function formatOrderFormCents(cents)
+{
+	const negative = cents < 0n;
+	const digits = (negative ? -cents : cents).toString().padStart(3, "0");
+	return (negative ? "-" : "") + digits.slice(0, -2) + "." + digits.slice(-2);
+}
+
+/**
+ * Multiply two parsed decimals and round half-up to cents.
+ * Same rounding as Decimal.quantize(..., ROUND_HALF_UP) on the server.
+ *
+ * @param {{negative: boolean, units: bigint, scale: number}} left - First factor.
+ * @param {{negative: boolean, units: bigint, scale: number}} right - Second factor.
+ * @returns {bigint}
+ */
+function multiplyOrderFormMoney(left, right)
+{
+	const product = left.units * right.units;
+	const scale = left.scale + right.scale;
+	let cents;
+	if (scale > 2) {
+		const divisor = 10n ** BigInt(scale - 2);
+		const remainder = product % divisor;
+		cents = product / divisor + (remainder * 2n >= divisor ? 1n : 0n);
+	} else {
+		cents = product * (10n ** BigInt(2 - scale));
+	}
+	return left.negative === right.negative ? cents : -cents;
+}
+
+/**
+ * Round one parsed decimal half-up to cents.
+ *
+ * @param {{negative: boolean, units: bigint, scale: number}} parsed - Amount.
+ * @returns {bigint}
+ */
+function orderFormDecimalCents(parsed)
+{
+	return multiplyOrderFormMoney(parsed, { negative: false, units: 1n, scale: 0 });
+}
+
+/**
+ * Price and line total for one item row.
+ * A plate marked "from client" is charged 0. Its previous price is kept
+ * on the input so unchecking the box can restore it.
+ *
+ * @param {HTMLElement} row - Item row.
+ * @returns {bigint} Line total in cents.
+ */
+function orderFormRowCents(row)
+{
+	const quantity = row.querySelector('input[name$="-quantity"]');
+	const price = row.querySelector('input[name$="-price"]');
+	const fromClient = row.querySelector('input[name$="-from_client"]');
+	if (fromClient && fromClient.checked) {
+		if (price && price.dataset.priceBeforeClient == null) {
+			price.dataset.priceBeforeClient = price.value;
+		}
+		if (price) {
+			price.value = formatOrderFormCents(0n);
+		}
+		return 0n;
+	}
+	if (price && price.dataset.priceBeforeClient != null) {
+		price.value = price.dataset.priceBeforeClient;
+		delete price.dataset.priceBeforeClient;
+	}
+	return multiplyOrderFormMoney(
+		parseOrderFormDecimal(quantity ? quantity.value : ""),
+		parseOrderFormDecimal(price ? price.value : "")
+	);
+}
+
+/**
+ * Fill readonly line values and the section, paid, and balance totals
+ * from the quantities and prices currently in the table order form.
+ * Vitrine forms have no data-order-calc markers, so this leaves them alone.
+ * The server still recalculates the same figures on save.
+ *
+ * @param {HTMLFormElement|null} form - Modal order form.
+ * @returns {void}
+ */
+function refreshOrderFormTotals(form)
+{
+	if (!form || !form.querySelector("[data-order-calc]")) {
+		return;
+	}
+	let grand = 0n;
+	form.querySelectorAll('[data-order-calc="line"]').forEach(function (formset) {
+		let section = 0n;
+		formset.querySelectorAll("tr.order-form-item-row").forEach(function (row) {
+			if (row.classList.contains("is-pending-delete")) {
+				return;
+			}
+			const value = row.querySelector('input[name$="-value"]');
+			const cents = orderFormRowCents(row);
+			if (value) {
+				value.value = formatOrderFormCents(cents);
+			}
+			section += cents;
+		});
+		const target = formset.querySelector("[data-order-section-total]");
+		if (target) {
+			target.textContent = formatOrderFormCents(section);
+		}
+		grand += section;
+	});
+
+	let paid = 0n;
+	form.querySelectorAll('[data-order-calc="payment"]').forEach(function (formset) {
+		formset.querySelectorAll("tr.order-form-item-row").forEach(function (row) {
+			if (row.classList.contains("is-pending-delete")) {
+				return;
+			}
+			const value = row.querySelector('input[name$="-value"]');
+			paid += orderFormDecimalCents(parseOrderFormDecimal(value ? value.value : ""));
+		});
+	});
+
+	const grandEl = form.querySelector("[data-order-grand-total]");
+	const paidEl = form.querySelector("[data-order-paid]");
+	const balanceEl = form.querySelector("[data-order-balance]");
+	if (grandEl) {
+		grandEl.textContent = formatOrderFormCents(grand);
+	}
+	if (paidEl) {
+		paidEl.textContent = formatOrderFormCents(paid);
+	}
+	if (balanceEl) {
+		balanceEl.textContent = formatOrderFormCents(grand - paid);
+	}
 }
 
 /**
@@ -508,8 +674,9 @@ function setOrderFormModalBody(html, options)
 			applyOrderFormInitials(form, options.initials);
 		} else {
 			snapshotOrderFormInitials(form);
-			updateOrderFormDirtyState(form);
 		}
+		refreshOrderFormTotals(form);
+		updateOrderFormDirtyState(form);
 	}
 	if (typeof setupManualSealToggle === "function") {
 		setupManualSealToggle(parts.body);
@@ -558,6 +725,7 @@ function addOrderFormsetRow(formsetRoot)
 	totalInput.value = String(index + 1);
 	row.setAttribute("data-user-added", "1");
 	snapshotOrderFormInitials(row);
+	refreshOrderFormTotals(form);
 }
 
 /**
@@ -690,7 +858,9 @@ function setOrderFormRowPendingDelete(row, pendingDelete)
 		deleteInput.checked = pendingDelete;
 	}
 	syncOrderFormRowAction(row, pendingDelete);
-	updateOrderFormDirtyState(row.closest("form"));
+	const form = row.closest("form");
+	refreshOrderFormTotals(form);
+	updateOrderFormDirtyState(form);
 }
 
 /**
@@ -714,6 +884,7 @@ function handleOrderFormRowAction(row)
 			reindexOrderFormsetRows(formsetRoot);
 			syncOrderFormsetInitialCount(formsetRoot);
 		}
+		refreshOrderFormTotals(form);
 		updateOrderFormDirtyState(form);
 		return;
 	}
@@ -1392,6 +1563,7 @@ function mergeRemoteOrderFormHtml(currentForm, html)
 	}
 	mergeOrderFormDisplayBlocks(currentForm, incomingForm);
 	syncManualSealVisual(currentForm);
+	refreshOrderFormTotals(currentForm);
 	updateOrderFormDirtyState(currentForm);
 	showOrderFormRemoteUpdateNotice(currentForm);
 	currentForm.querySelectorAll("tr.is-sync-fresh, .is-sync-fresh").forEach(function (el) {
@@ -1796,16 +1968,26 @@ function setupOrderFormModal()
 
 	parts.modal.addEventListener("input", function (event) {
 		const form = event.target.closest("#order-form-modal-form");
-		if (form) {
-			updateOrderFormDirtyState(form);
+		if (!form) {
+			return;
 		}
+		const name = event.target.name || "";
+		if (name.endsWith("-quantity") || name.endsWith("-price") || name.endsWith("-value") || name.endsWith("-from_client")) {
+			refreshOrderFormTotals(form);
+		}
+		updateOrderFormDirtyState(form);
 	});
 
 	parts.modal.addEventListener("change", function (event) {
 		const form = event.target.closest("#order-form-modal-form");
-		if (form) {
-			updateOrderFormDirtyState(form);
+		if (!form) {
+			return;
 		}
+		const name = event.target.name || "";
+		if (name.endsWith("-quantity") || name.endsWith("-price") || name.endsWith("-value") || name.endsWith("-from_client")) {
+			refreshOrderFormTotals(form);
+		}
+		updateOrderFormDirtyState(form);
 	});
 
 	parts.modal.addEventListener("submit", function (event) {
