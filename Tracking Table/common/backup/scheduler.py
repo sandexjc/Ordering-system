@@ -68,11 +68,12 @@ def _backup_loop():
 
 
 def _sleep_until(target):
+    """Sleep until target. A second sleep happens only if the first returns early."""
     while True:
         remaining = (target - timezone.localtime()).total_seconds()
         if remaining <= 0:
             return
-        time.sleep(min(remaining, 30))
+        time.sleep(remaining)
 
 
 def _export_once():
