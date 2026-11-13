@@ -125,11 +125,11 @@ While it is on, a browser that has not been added for that account is refused. T
 
 A new account is added for the browser that sets its first password from the email. Changing the password of an account that already has one does not add or remove a device. Signing out does not remove the device either.
 
-On the profile page and on `/accounts/view-users/`, the button **Добавяне на устройство** emails a one-time link. Open that link in the browser that should be allowed, then press the confirm button. The device list shows that browser and can remove it. After a successful send, a message says **Имейлът за добавяне на устройство е изпратен.** The name is filled in from that browser, for example `Mac, macOS, 26.6.2, Chrome`. Safari and Firefox do not send the operating-system version, so their names leave the version out.
+On the profile page, **Добавяне на устройство** opens a window. The window shows a QR code of the activation link and a button that emails that same link. Open the code with the device that should be allowed, or send the email and open the link there, then press the confirm button. The code uses the address of the profile page, so the phone has to be able to open that address. A code made at `localhost` points the phone at itself. One unused link is kept until it is used or it expires, so opening the window again or sending the email again keeps the link that was already issued. On `/accounts/view-users/`, the same button emails the link immediately and does not show a code. An admin uses that when someone cannot sign in. The device list shows the browser after it is confirmed and can remove it. After a successful send, a message says **Имейлът за добавяне на устройство е изпратен.** The name is filled in from the browser that confirms the link, for example `Mac, macOS, 26.6.2, Chrome`. Safari and Firefox do not send the operating-system version, so their names leave the version out.
 
 The device belongs to the site address that confirmed it. `www.razkroi-mt.com` is redirected to `razkroi-mt.com`, and `127.0.0.1` is redirected to `localhost`, so those pairs share one device. Opening the link from a mail app can still show a refusal until the site address is typed or the page is reloaded.
 
-If no browser can get in, run this on the server. It emails one activation link and does not print the link:
+If no browser can get in, run this on the server. It emails the activation link already waiting when that link is still unused and has not expired. Otherwise it emails a new one. It does not print the link:
 
 ```bash
 python manage.py send_device_activation_email <username> <email>
