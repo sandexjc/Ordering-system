@@ -38,6 +38,11 @@ urlpatterns = [
         name='send-device-activation-email',
     ),
     path(
+        'profile/devices/activation-qr/',
+        views.DeviceActivationQr.as_view(),
+        name='device-activation-qr',
+    ),
+    path(
         'profile/devices/<int:pk>/revoke/',
         views.RevokeDevice.as_view(),
         name='revoke-profile-device',

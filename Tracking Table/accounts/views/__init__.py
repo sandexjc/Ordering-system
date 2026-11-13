@@ -1,6 +1,7 @@
 from .devices import (
     ActivateDevice,
     DeviceActivationEmail,
+    DeviceActivationQr,
     DeviceList,
     RevokeDevice,
 )
