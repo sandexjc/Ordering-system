@@ -10,9 +10,12 @@ class Device(models.Model):
     Hierarchy:
     models.Model -> Device
 
-    One enrolled browser secret for one user. The browser keeps the raw
-    secret. This row keeps only the hash. A row with token_hash and no
-    secret_hash is an emailed link that has not been confirmed yet.
+    One enrolled browser. The browser keeps the raw enrollment secret.
+    This row keeps only that hash.
+
+    A row with token_hash and no secret_hash is an activation link that
+    has not been confirmed yet. activation_secret holds that link's raw
+    token until the link is used, revoked, or replaced.
 
     """
 
@@ -24,6 +27,7 @@ class Device(models.Model):
     device_name = models.CharField(max_length=100, blank=True, default="")
     secret_hash = models.CharField(max_length=64, unique=True, null=True, blank=True)
     token_hash = models.CharField(max_length=64, unique=True, null=True, blank=True)
+    activation_secret = models.CharField(max_length=64, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     last_used_at = models.DateTimeField(default=timezone.now)
     revoked_at = models.DateTimeField(null=True, blank=True)

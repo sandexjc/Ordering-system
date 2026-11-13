@@ -6,7 +6,7 @@ from django.views.generic import TemplateView
 
 from accounts.helpers.devices.device_cookie import enroll_device
 from accounts.helpers.devices.device_label import attach_device_client_hints
-from accounts.helpers.devices.send_device_activation_email import activation_from_link
+from accounts.helpers.devices.device_activation import activation_from_link
 
 
 class ActivateDevice(TemplateView):

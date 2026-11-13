@@ -80,6 +80,7 @@ def enroll_device(request, response, device):
     raw_secret = secrets.token_urlsafe(32)
     device.secret_hash = hash_secret(raw_secret)
     device.token_hash = None
+    device.activation_secret = None
     device.device_name = device_label_from_request(request)
     device.last_used_at = timezone.now()
     device.save()

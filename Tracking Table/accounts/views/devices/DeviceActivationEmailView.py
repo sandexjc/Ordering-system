@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.views import View
 
 from accounts.helpers.devices.device_subject import device_subject
-from accounts.helpers.devices.send_device_activation_email import send_device_activation_email
+from accounts.helpers.devices.device_activation import send_device_activation_email
 from common.mixins import DynamicFeatureFlagRequiredMixin
 
 
@@ -16,8 +16,8 @@ class DeviceActivationEmail(LoginRequiredMixin, DynamicFeatureFlagRequiredMixin,
     DynamicFeatureFlagRequiredMixin -> DeviceActivationEmail
     View -> DeviceActivationEmail
 
-    Emails a one-time device link. Without pk, to the logged-in user.
-    With pk, to that user, for an admin. POST only.
+    Emails the current device activation link. Without pk, to the logged-in
+    user. With pk, to that user, for an admin. POST only.
 
     """
 

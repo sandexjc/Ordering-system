@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.http import HttpRequest
 
-from accounts.helpers.devices.send_device_activation_email import send_device_activation_email
+from accounts.helpers.devices.device_activation import send_device_activation_email
 from common.middleware.CanonicalHostMiddleware import public_site_host
 
 
@@ -11,9 +11,11 @@ class Command(BaseCommand):
 
     """
 
-    Email one device-activation link. The link is the same one the profile
-    and the user list send. Opening it in a browser enrolls that browser.
-    Old device cookies are left as they are.
+    Email one device-activation link. If that account already has an
+    unused link that has not expired, the email sends that same link.
+    Otherwise the old pending links are replaced with a new one.
+    Opening it in a browser enrolls that browser. Old device cookies
+    are left as they are.
 
     """
 
