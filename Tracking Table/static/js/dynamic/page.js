@@ -10,6 +10,20 @@
  */
 
 /**
+ * Keep the address bar on the view that is actually showing.
+ * @param {*} viewName - Dynamic view key ("table" | "vitrine").
+ * @returns {void}
+ */
+function rememberDynamicView(viewName) {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("view") === viewName) {
+        return;
+    }
+    url.searchParams.set("view", viewName);
+    window.history.replaceState(null, "", url);
+}
+
+/**
  * Switch between table/vitrine shells and trigger new async load.
  * @param {*} viewName - Dynamic view key ("table" | "vitrine").
  * @returns {void}
@@ -29,6 +43,7 @@ function switchDynamicView(viewName) {
 
     const { generation } = beginOrdersRender(viewName);
     root.dataset.currentView = viewName;
+    rememberDynamicView(viewName);
     updateDynamicNavigation(viewName);
     updateNewOrderLink(viewName);
     if (typeof syncSummarizeButtonVisibility === "function") {
@@ -82,9 +97,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const navButtons = document.querySelectorAll("[data-dynamic-view]");
     navButtons.forEach((button) => {
-        button.addEventListener("click", () => {
+        button.addEventListener("click", (event) => {
             const selectedView = button.dataset.dynamicView;
             const currentView = root.dataset.currentView;
+            const plainLeftClick = event.button === 0
+                && !event.metaKey
+                && !event.ctrlKey
+                && !event.shiftKey
+                && !event.altKey;
+            if (button.tagName === "A" && !plainLeftClick) {
+                return;
+            }
+            if (button.tagName === "A") {
+                event.preventDefault();
+            }
             if (!selectedView || selectedView === currentView) {
                 return;
             }

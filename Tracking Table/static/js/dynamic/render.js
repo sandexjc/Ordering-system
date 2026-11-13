@@ -102,6 +102,14 @@ function updateDynamicNavigation(viewName) {
     navButtons.forEach((button) => {
         const isActive = button.dataset.dynamicView === viewName;
         button.classList.toggle("active", isActive);
+        if (button.tagName !== "A") {
+            return;
+        }
+        if (isActive) {
+            button.setAttribute("aria-current", "page");
+        } else {
+            button.removeAttribute("aria-current");
+        }
     });
 }
 
