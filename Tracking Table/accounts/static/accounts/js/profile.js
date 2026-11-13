@@ -40,10 +40,25 @@ if (profile_appearance_form)
 const profile_devices = document.getElementById("profile-devices");
 const profile_device_list = document.getElementById("profile-device-list");
 const profile_device_send_form = document.getElementById("profile-device-send-form");
+const profile_device_modal = document.getElementById("profile-device-modal");
+const profile_device_qr = document.getElementById("profile-device-qr");
+const profile_device_email = document.getElementById("profile-device-email");
+const profile_device_email_html = profile_device_email ? profile_device_email.innerHTML : "";
+let profile_device_picture_request = null;
+let profile_device_picture_url = "";
+let profile_device_can_email = false;
 if (profile_devices && profile_device_send_form)
 {
     load_profile_devices();
-    profile_device_send_form.addEventListener("submit", send_profile_device_email);
+    if (profile_device_modal)
+    {
+        profile_device_modal.addEventListener("show.bs.modal", open_profile_device_modal);
+        profile_device_modal.addEventListener("hidden.bs.modal", reset_profile_device_modal);
+    }
+    if (profile_device_email)
+    {
+        profile_device_email.addEventListener("click", send_profile_device_email);
+    }
 }
 
 /**
@@ -137,19 +152,171 @@ function save_profile_appearance(event)
 }
 
 /**
- * @param {Event} event
  * @returns {void}
  */
-function send_profile_device_email(event)
+function open_profile_device_modal()
 {
-    event.preventDefault();
-    const button = document.getElementById("profile-device-send");
-    submit_profile_form(profile_device_send_form, button, profile_devices.getAttribute("data-send-url"), function (ok) {
-        show_profile_toast(
-            ok ? "Имейлът за добавяне на устройство е изпратен." : "Имейлът не беше изпратен.",
-            ok ? "success" : "error"
-        );
-    });
+    reset_profile_device_modal();
+    const controller = new AbortController();
+    profile_device_picture_request = controller;
+    const csrf = profile_device_send_form.querySelector("[name=csrfmiddlewaretoken]");
+    fetch(profile_devices.getAttribute("data-qr-url"), {
+        method: "POST",
+        credentials: "same-origin",
+        signal: controller.signal,
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": csrf ? csrf.value : "",
+        },
+    })
+        .then(function (response) {
+            const content_type = response.headers.get("Content-Type") || "";
+            if (!response.ok || content_type.indexOf("image/svg+xml") !== 0)
+            {
+                throw new Error("picture failed");
+            }
+            const can_email = response.headers.get("X-Can-Email") === "1";
+            return response.blob().then(function (blob) {
+                return { blob: blob, can_email: can_email };
+            });
+        })
+        .then(function (result) {
+            if (profile_device_picture_request !== controller)
+            {
+                return;
+            }
+            // The picture is an image response. Keep it out of the page HTML.
+            profile_device_picture_url = URL.createObjectURL(result.blob);
+            const image = document.createElement("img");
+            image.alt = "Код за добавяне на устройство";
+            image.src = profile_device_picture_url;
+            profile_device_qr.innerHTML = "";
+            profile_device_qr.appendChild(image);
+            profile_device_can_email = result.can_email;
+            profile_device_email.disabled = !result.can_email;
+            if (result.can_email)
+            {
+                profile_device_email.removeAttribute("title");
+            }
+            else
+            {
+                profile_device_email.title = "Няма въведен имейл.";
+            }
+        })
+        .catch(function (error) {
+            if (error && error.name === "AbortError")
+            {
+                return;
+            }
+            if (profile_device_picture_request !== controller)
+            {
+                return;
+            }
+            show_profile_device_qr_message("Кодът не може да бъде зареден.");
+        });
+}
+
+/**
+ * @returns {void}
+ */
+function reset_profile_device_modal()
+{
+    if (profile_device_picture_request)
+    {
+        profile_device_picture_request.abort();
+        profile_device_picture_request = null;
+    }
+    if (profile_device_picture_url)
+    {
+        URL.revokeObjectURL(profile_device_picture_url);
+        profile_device_picture_url = "";
+    }
+    profile_device_can_email = false;
+    if (profile_device_qr)
+    {
+        profile_device_qr.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Зареждане</span></div>';
+    }
+    if (profile_device_email)
+    {
+        profile_device_email.innerHTML = profile_device_email_html;
+        profile_device_email.disabled = true;
+        profile_device_email.removeAttribute("aria-busy");
+        profile_device_email.removeAttribute("title");
+    }
+}
+
+/**
+ * @param {string} message
+ * @returns {void}
+ */
+function show_profile_device_qr_message(message)
+{
+    profile_device_qr.innerHTML = "";
+    const note = document.createElement("p");
+    note.className = "profile-device-qr-message";
+    note.textContent = message;
+    profile_device_qr.appendChild(note);
+}
+
+/**
+ * @returns {void}
+ */
+function send_profile_device_email()
+{
+    if (!profile_device_email || profile_device_email.disabled)
+    {
+        return;
+    }
+    profile_device_email.disabled = true;
+    profile_device_email.setAttribute("aria-busy", "true");
+    profile_device_email.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    const csrf = profile_device_send_form.querySelector("[name=csrfmiddlewaretoken]");
+    fetch(profile_devices.getAttribute("data-send-url"), {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRFToken": csrf ? csrf.value : "",
+        },
+        body: new FormData(profile_device_send_form),
+    })
+        .then(function (response) {
+            return response.json().then(function (data) {
+                return { failed: !response.ok, data: data };
+            });
+        })
+        .then(function (result) {
+            const ok = !result.failed && Boolean(result.data && result.data.ok);
+            if (ok)
+            {
+                const modal = bootstrap.Modal.getInstance(profile_device_modal) || bootstrap.Modal.getOrCreateInstance(profile_device_modal);
+                modal.hide();
+                show_profile_toast("Имейлът за добавяне на устройство е изпратен.", "success");
+                return;
+            }
+            finish_profile_device_email(false);
+        })
+        .catch(function () {
+            finish_profile_device_email(false);
+        });
+}
+
+/**
+ * @param {boolean} ok
+ * @returns {void}
+ */
+function finish_profile_device_email(ok)
+{
+    if (profile_device_email)
+    {
+        profile_device_email.innerHTML = profile_device_email_html;
+        profile_device_email.disabled = !profile_device_can_email;
+        profile_device_email.removeAttribute("aria-busy");
+    }
+    if (!ok)
+    {
+        show_profile_toast("Имейлът не беше изпратен.", "error");
+    }
 }
 
 /**

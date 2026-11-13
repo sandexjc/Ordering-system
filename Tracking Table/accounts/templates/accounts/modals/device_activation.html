@@ -1,0 +1,27 @@
+<div class="modal fade" id="profile-device-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="profile-device-modal-title" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered profile-device-modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="profile-device-modal-title">Добавяне на устройство</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body profile-device-modal-body">
+				<p class="profile-device-modal-lead">За да добавите ново устройство към профила, отворете кода по-долу с устройството, което искате да добавите, или изпратете връзката по имейл.</p>
+				<div class="profile-device-modal-choices">
+					<div class="profile-device-qr" id="profile-device-qr" aria-live="polite">
+						<div class="spinner-border" role="status">
+							<span class="visually-hidden">Зареждане</span>
+						</div>
+					</div>
+					<div class="profile-device-modal-split" aria-hidden="true"></div>
+					<button type="button" class="btn btn-primary profile-device-email" id="profile-device-email" disabled aria-label="Изпрати имейл за добавяне на устройство">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/></svg>
+					</button>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+			</div>
+		</div>
+	</div>
+</div>

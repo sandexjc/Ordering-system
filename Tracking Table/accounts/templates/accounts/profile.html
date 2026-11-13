@@ -48,14 +48,16 @@
 		</button>
 		<div class="profile-section-body profile-devices" id="profile-devices"
 			data-list-url="{% url 'accounts:profile-devices' %}"
-			data-send-url="{% url 'accounts:send-device-activation-email' %}">
+			data-send-url="{% url 'accounts:send-device-activation-email' %}"
+			data-qr-url="{% url 'accounts:device-activation-qr' %}">
 			<ul class="profile-device-list" id="profile-device-list"></ul>
 			<form id="profile-device-send-form" class="profile-device-send-form" method="post" action="{% url 'accounts:send-device-activation-email' %}">
 				{% csrf_token %}
-				<button type="submit" class="btn btn-primary" id="profile-device-send">Добавяне на устройство</button>
+				<button type="button" class="btn btn-primary" id="profile-device-send" data-bs-toggle="modal" data-bs-target="#profile-device-modal">Добавяне на устройство</button>
 			</form>
 		</div>
 	</section>
+	{% include "accounts/modals/device_activation.html" %}
 	{% endif %}
 </div>
 
