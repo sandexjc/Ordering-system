@@ -24,6 +24,15 @@ function rememberDynamicView(viewName) {
 }
 
 /**
+ * Show the active app in the tab title.
+ * @param {*} viewName - Dynamic view key ("table" | "vitrine").
+ * @returns {void}
+ */
+function updateDynamicTitle(viewName) {
+    document.title = viewName === "vitrine" ? "TTable · Витрини" : "TTable · Разкрой";
+}
+
+/**
  * Switch between table/vitrine shells and trigger new async load.
  * @param {*} viewName - Dynamic view key ("table" | "vitrine").
  * @returns {void}
@@ -44,6 +53,7 @@ function switchDynamicView(viewName) {
     const { generation } = beginOrdersRender(viewName);
     root.dataset.currentView = viewName;
     rememberDynamicView(viewName);
+    updateDynamicTitle(viewName);
     updateDynamicNavigation(viewName);
     updateNewOrderLink(viewName);
     if (typeof syncSummarizeButtonVisibility === "function") {
