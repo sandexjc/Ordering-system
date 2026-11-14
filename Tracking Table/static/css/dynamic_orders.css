@@ -33,6 +33,13 @@
 	background: rgba(255, 255, 255, 0.86);
 }
 
+/* Same surface as the dark list, so this cover does not flash white before the rows appear. */
+[data-bs-theme="dark"] .dynamic-orders-preparing
+{
+	background: rgba(43, 48, 53, 0.92);
+	color: #e9ecef;
+}
+
 .dynamic-orders-preparing[hidden]
 {
 	display: none;
