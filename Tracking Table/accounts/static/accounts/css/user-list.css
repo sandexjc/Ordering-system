@@ -28,18 +28,29 @@ body
 
 .user-list-table
 {
-    overflow-x: clip;
+    --user-list-helper-min: 36rem;
+    overflow-x: auto;
+    container-type: inline-size;
+}
+
+.user-list-table .table
+{
+    width: 100%;
+    table-layout: fixed;
 }
 
 .user-list-email-col
 {
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .user-list-table .table th
 {
     vertical-align: bottom;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .user-list-main-row
@@ -57,6 +68,7 @@ body
 {
     position: relative;
     padding-left: 1.2rem !important;
+    overflow-wrap: anywhere;
 }
 
 .user-list-main-row > td:first-child::before
@@ -101,8 +113,11 @@ body
 
 .user-list-helper-inner.is-open
 {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     opacity: 1;
+    overflow: hidden;
 }
 
 .user-role-status
@@ -115,8 +130,8 @@ body
 
 .user-list-helper-actions-table
 {
-    width: 100%;
-    max-width: 60%;
+    width: 60%;
+    min-width: 0;
     margin: 0 auto;
     table-layout: fixed;
     border-collapse: separate;
@@ -153,6 +168,14 @@ body
 .user-list-helper-actions-table .btn.is-switching
 {
     opacity: 0.55;
+}
+
+@container (max-width: 52rem)
+{
+    .user-list-helper-actions-table
+    {
+        width: 100%;
+    }
 }
 
 .user-role-status .user-role-select

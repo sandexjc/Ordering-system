@@ -1,7 +1,7 @@
 .user-list-devices
 {
-    width: 100%;
-    max-width: 60%;
+    width: 60%;
+    min-width: 0;
     margin: 1.5rem auto 0;
 }
 
@@ -37,8 +37,27 @@
     border-bottom: 1px solid #e9ecef;
 }
 
+.user-list-device-row > :first-child
+{
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.user-list-device-revoke
+{
+    flex-shrink: 0;
+}
+
 .user-list-device-meta
 {
     color: #6c757d;
     font-size: 0.85rem;
+}
+
+@container (max-width: 52rem)
+{
+    .user-list-devices
+    {
+        width: 100%;
+    }
 }
