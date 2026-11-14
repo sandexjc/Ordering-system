@@ -59,6 +59,7 @@ if (profile_devices && profile_device_send_form)
     {
         profile_device_email.addEventListener("click", send_profile_device_email);
     }
+    bind_profile_device_revoke_confirm();
 }
 
 /**
@@ -514,13 +515,77 @@ function render_profile_devices(devices)
         button.className = "btn btn-sm btn-danger";
         button.textContent = "Премахни";
         button.addEventListener("click", function () {
-            revoke_profile_device(device.revoke_url, button);
+            open_profile_device_revoke_confirm(device, button);
         });
 
         row.appendChild(text);
         row.appendChild(button);
         profile_device_list.appendChild(row);
     });
+}
+
+let pending_profile_device_revoke = null;
+
+/**
+ * @returns {void}
+ */
+function bind_profile_device_revoke_confirm()
+{
+    const modal = document.getElementById("profile-device-revoke-confirm");
+    const confirm_button = document.getElementById("profile-device-revoke-confirm-submit");
+    if (!modal || !confirm_button)
+    {
+        return;
+    }
+    confirm_button.addEventListener("click", function () {
+        const pending = pending_profile_device_revoke;
+        if (!pending)
+        {
+            return;
+        }
+        pending_profile_device_revoke = null;
+        if (window.bootstrap && bootstrap.Modal)
+        {
+            const modal_instance = bootstrap.Modal.getInstance(modal) || bootstrap.Modal.getOrCreateInstance(modal);
+            modal_instance.hide();
+        }
+        revoke_profile_device(pending.url, pending.button);
+    });
+    modal.addEventListener("hidden.bs.modal", function () {
+        pending_profile_device_revoke = null;
+    });
+}
+
+/**
+ * @param {{device_name: string, revoke_url: string}} device
+ * @param {HTMLButtonElement} button
+ * @returns {void}
+ */
+function open_profile_device_revoke_confirm(device, button)
+{
+    if (button.disabled)
+    {
+        return;
+    }
+    const modal = document.getElementById("profile-device-revoke-confirm");
+    if (!modal || !window.bootstrap || !bootstrap.Modal)
+    {
+        return;
+    }
+    pending_profile_device_revoke = {
+        url: device.revoke_url,
+        button: button,
+    };
+    const confirm_text = modal.querySelector(".device-revoke-confirm-text");
+    if (confirm_text)
+    {
+        confirm_text.replaceChildren(
+            document.createTextNode("Сигурни ли сте, че искате да премахнете това устройство: "),
+            Object.assign(document.createElement("strong"), { textContent: device.device_name || "" }),
+            document.createTextNode("?")
+        );
+    }
+    bootstrap.Modal.getOrCreateInstance(modal).show();
 }
 
 /**

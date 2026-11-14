@@ -58,6 +58,7 @@
 		</div>
 	</section>
 	{% include "accounts/modals/device_activation.html" %}
+	{% include "accounts/modals/revoke_device_confirm.html" with revoke_modal_id="profile-device-revoke-confirm" revoke_confirm_id="profile-device-revoke-confirm-submit" %}
 	{% endif %}
 </div>
 

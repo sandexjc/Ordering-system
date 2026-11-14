@@ -105,9 +105,9 @@
 								data-list-url="{% url 'accounts:user-devices' listed_user.pk %}">
 								<h3 class="user-list-devices-header">Устройства</h3>
 								<ul class="user-list-device-list"></ul>
-								<form class="user-list-device-send-form" method="post" action="{% url 'accounts:send-user-device-activation-email' listed_user.pk %}" data-send-url="{% url 'accounts:send-user-device-activation-email' listed_user.pk %}">
+								<form class="user-list-device-send-form" method="post" action="{% url 'accounts:send-user-device-activation-email' listed_user.pk %}" data-send-url="{% url 'accounts:send-user-device-activation-email' listed_user.pk %}" data-username="{{ listed_user.username }}">
 									{% csrf_token %}
-									<button type="submit" class="btn btn-sm btn-primary">Добавяне на устройство</button>
+									<button type="button" class="btn btn-sm btn-primary user-list-device-send">Добавяне на устройство</button>
 								</form>
 							</div>
 							{% endif %}
@@ -136,6 +136,10 @@
 	{% endif %}
 {% endfor %}
 {% include "accounts/modals/user_role_confirm.html" %}
+{% if browser_cookie_filter_enabled %}
+{% include "accounts/modals/send_device_activation_email_confirm.html" %}
+{% include "accounts/modals/revoke_device_confirm.html" with revoke_modal_id="user-list-device-revoke-confirm" revoke_confirm_id="user-list-device-revoke-confirm-submit" %}
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
