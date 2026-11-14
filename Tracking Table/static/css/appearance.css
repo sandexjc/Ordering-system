@@ -95,6 +95,13 @@ html[data-motion="reduce"] .candy-box-toggle .candy-box span
 	transition-delay: 0s;
 }
 
+html[data-motion="reduce"] .navbar-user-icon-head,
+html[data-motion="reduce"] .navbar-user-icon-shoulders
+{
+	transition-duration: 0.05s;
+	transition-delay: 0s;
+}
+
 .navbar
 {
 	background-color: #e6e6e9;

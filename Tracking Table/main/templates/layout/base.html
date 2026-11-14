@@ -84,19 +84,41 @@
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-								Welcome <strong>{{user.first_name}}</strong> 
-								<img src="{% static 'images/user.png' %}" class="navbarIcons">
+								Welcome <strong>{{user.first_name}}</strong>
+								<svg class="navbar-user-icon" width="30" height="30" viewBox="0 0 16 16" aria-hidden="true">
+									<circle class="navbar-user-icon-head" cx="8" cy="5" r="2.15" fill="none" stroke="currentColor" stroke-width="1.4"/>
+									<path class="navbar-user-icon-shoulders" d="M3.25 13.25v-.55c0-2 1.9-3.4 4.75-3.4s4.75 1.4 4.75 3.4v.55" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+								</svg>
 							</a>
-							<ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="position: absolute;">
-								<li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Профил</a></li>
-								<li><a class="dropdown-item" href="{% url 'accounts:change-password' %}">Смяна на парола</a></li>
+							<ul class="dropdown-menu profile-menu" aria-labelledby="navbarDropdown" style="position: absolute;">
+								<li>
+									<a class="dropdown-item" href="{% url 'accounts:profile' %}">
+										<svg class="navbar-menu-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+											<circle cx="8" cy="5" r="2.15" fill="none" stroke="currentColor" stroke-width="1.4"/>
+											<path d="M3.25 13.25v-.55c0-2 1.9-3.4 4.75-3.4s4.75 1.4 4.75 3.4v.55" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+										</svg>
+										Профил
+									</a>
+								</li>
+								<li>
+									<a class="dropdown-item" href="{% url 'accounts:change-password' %}">
+										<svg class="navbar-menu-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+											<circle cx="5.25" cy="8" r="2.7" fill="none" stroke="currentColor" stroke-width="1.4"/>
+											<path d="M7.7 8h6.1M11.7 8v2M13.7 8v1.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+										</svg>
+										Смяна на парола
+									</a>
+								</li>
 								<li><hr class="dropdown-divider"></li>
 								<li>
 									<form id="logout-form" action="{% url 'accounts:logout' %}" method="post" style="margin: 0;">
 										{% csrf_token %}
 										<a href="#" class="dropdown-item" onclick="event.preventDefault(); this.closest('form').submit();">
+											<svg class="navbar-menu-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+												<path d="M6.75 2.75h-3a1 1 0 0 0-1 1v8.5a1 1 0 0 0 1 1h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+												<path d="M8.5 8h5.25M11.75 5.75 14.25 8l-2.5 2.25" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+											</svg>
 											Изход
-											<img src="{% static 'images/logout.svg' %}" alt="" class="dropdown-logout-icon">
 										</a>
 									</form>
 								</li>
