@@ -506,6 +506,56 @@ table.table-order-details thead tr th:not(:first-child) {
 	text-align: left;
 }
 
+.table-scroll > .table > thead th,
+#dynamic-orders-table-container > .table > thead th
+{
+	z-index: 3;
+	background-color: #e7eaee;
+	box-shadow: inset 0 1px 0 #b7bec6, inset 0 -1px 0 #b7bec6;
+}
+
+.table-scroll > .table > thead tr:nth-child(2) th,
+#dynamic-orders-table-container > .table > thead tr:nth-child(2) th
+{
+	box-shadow: inset 0 -2px 0 #b7bec6;
+}
+
+@media (min-width: 1000px)
+{
+	.table-scroll > .table > thead th,
+	#dynamic-orders-table-container > .table > thead th
+	{
+		position: sticky;
+		top: 0;
+		overflow: visible;
+	}
+
+	.table-scroll > .table > thead tr:first-child th,
+	#dynamic-orders-table-container > .table > thead tr:first-child th
+	{
+		z-index: 4;
+	}
+
+	.table-scroll > .table > thead tr:nth-child(2) th,
+	#dynamic-orders-table-container > .table > thead tr:nth-child(2) th
+	{
+		top: var(--order-head-row, 2.4rem);
+	}
+}
+
+[data-bs-theme="dark"] .table-scroll > .table > thead th,
+[data-bs-theme="dark"] #dynamic-orders-table-container > .table > thead th
+{
+	background-color: #3a424a;
+	box-shadow: inset 0 1px 0 #8d959c, inset 0 -1px 0 #8d959c;
+}
+
+[data-bs-theme="dark"] .table-scroll > .table > thead tr:nth-child(2) th,
+[data-bs-theme="dark"] #dynamic-orders-table-container > .table > thead tr:nth-child(2) th
+{
+	box-shadow: inset 0 -2px 0 #8d959c;
+}
+
 .table-content-brake td,
 .table-content-brake th
 {
@@ -595,6 +645,128 @@ table.table-order-details thead tr th:not(:first-child) {
 .ALERT-E-DEL-VIEW .alert .btn-close
 {
 	padding: 0.7rem 0.75rem;
+}
+
+/* =============================================================================
+   Narrow screens
+   The page stays at normal size. Wide order tables scroll inside their box.
+   ============================================================================= */
+
+@media (max-width: 999px)
+{
+	.navbar.fixed-min-width,
+	.WebFooter.fixed-min-width,
+	.top-space.fixed-min-width,
+	.table-div.fixed-min-width,
+	.modal.fixed-min-width,
+	.modal-dialog.fixed-min-width,
+	.container-fluid.fixed-min-width
+	{
+		min-width: 0;
+	}
+
+	.table-div.fixed-min-width
+	{
+		width: 100%;
+	}
+
+	.modal-backdrop
+	{
+		min-width: 0;
+	}
+
+	.profile-page,
+	.create-user-page,
+	.change-password-page,
+	.vitrine-price-settings-page
+	{
+		width: 100%;
+		min-width: 0;
+	}
+
+	.FilterNav .nav
+	{
+		flex-wrap: wrap;
+		gap: 0.35rem;
+	}
+
+	.table-scroll,
+	#dynamic-orders-table-container
+	{
+		overflow-x: auto;
+		max-width: 100%;
+		container-type: inline-size;
+	}
+
+	a,
+	button,
+	.btn,
+	label,
+	select,
+	summary,
+	img
+	{
+		touch-action: manipulation;
+	}
+
+	/* The first tap was only painting :hover, and the click never arrived. */
+	.btn:hover:not(:active),
+	.btn:focus:not(:active)
+	{
+		color: var(--bs-btn-color);
+		background-color: var(--bs-btn-bg);
+		border-color: var(--bs-btn-border-color);
+	}
+
+	.table-hover > tbody > tr:hover > *
+	{
+		background-color: transparent;
+	}
+
+	.nav-tabs .nav-link:hover,
+	.nav-tabs .nav-link:focus
+	{
+		isolation: auto;
+		border-color: transparent;
+	}
+
+	.nav-tabs .nav-link.active:hover,
+	.nav-tabs .nav-link.active:focus
+	{
+		border-color: var(--bs-nav-tabs-link-active-border-color);
+	}
+
+	.table-scroll > .table,
+	#dynamic-orders-table-container > .table
+	{
+		width: max-content;
+		min-width: 1000px;
+	}
+
+	.table-scroll .hiddenRows,
+	#dynamic-orders-table-container .hiddenRows
+	{
+		position: sticky;
+		left: 0;
+		width: 100cqi;
+		max-width: 100cqi;
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	.table-scroll .hidden-table,
+	.table-scroll .hidden-buttons,
+	#dynamic-orders-table-container .hidden-table,
+	#dynamic-orders-table-container .hidden-buttons
+	{
+		width: 100%;
+		min-width: 0;
+	}
+
+	.table-content-brake td.no-padding-cell
+	{
+		overflow: visible;
+	}
 }
 
 /* =============================================================================

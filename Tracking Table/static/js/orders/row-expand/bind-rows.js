@@ -46,7 +46,7 @@ function handle_orders() {
     hiddenRow._isAnimating = false;
     hiddenRow._pendingTransitionHandler = null;
 
-    visibleRow.addEventListener("click", function onVisibleOrderRowClick() {
+    function toggleVisibleOrderRow() {
       if (typeof isSummarizeMode !== "undefined" && isSummarizeMode) {
         if (typeof toggleSummarizeRowSelection === "function") {
           toggleSummarizeRowSelection(visibleRow);
@@ -60,6 +60,18 @@ function handle_orders() {
       } else {
         closeHiddenRow(liveHidden, visibleRow);
       }
+    }
+
+    /** A phone often drops the click after a scroll. The touch itself opens the row. */
+    visibleRow.addEventListener("pointerup", function (event) {
+      if (event.pointerType === "mouse") return;
+      visibleRow._touchToggleAt = Date.now();
+      toggleVisibleOrderRow();
+    });
+
+    visibleRow.addEventListener("click", function () {
+      if (visibleRow._touchToggleAt && Date.now() - visibleRow._touchToggleAt < 700) return;
+      toggleVisibleOrderRow();
     });
 
     const closeBtn = hiddenRow.querySelector(".hidden-row-close");

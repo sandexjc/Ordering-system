@@ -8,12 +8,14 @@
 {% endblock %}
 
 {% block table_content %}
+<div class="table-scroll">
 <table class="table table-hover table-bordered table-content-brake">
     {% include "vitrine/components/table_header.html" %}
     <tbody>
         {% include "vitrine/components/table_rows.html" %}
     </tbody>
 </table>
+</div>
 {% endblock %}
 
 {% block vitrine_scripts %}

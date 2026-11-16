@@ -324,31 +324,28 @@ mark.search-highlight
    Interactive order-details progress table
    ============================================================================= */
 
-@media (max-width: 767.98px)
+@media (max-width: 999px)
 {
-	#dynamic-orders-root .table-order-details-interactive thead
+	.hiddenRows .order-details
 	{
-		display: none;
-	}
-
-	#dynamic-orders-root .table-order-details-interactive .order-progress-item-row
-	{
-		display: flex;
-		flex-direction: column;
-	}
-
-	#dynamic-orders-root .table-order-details-interactive .order-progress-item-row > td
-	{
-		display: block;
-		width: 100%;
+		overflow-x: auto;
 		max-width: 100%;
-		padding-top: 0.35rem;
-		padding-bottom: 0.35rem;
 	}
 
-	#dynamic-orders-root .table-order-details-interactive .order-progress-item-row > td:first-child
+	.hiddenRows .table-order-details
 	{
-		font-size: 0.9rem;
+		min-width: 36rem;
+	}
+
+	.dynamic-search:hover:not(.is-open) .dynamic-search-input
+	{
+		width: 0;
+		min-width: 0;
+		opacity: 0;
+		padding-left: 0;
+		padding-right: 0;
+		border-width: 0;
+		pointer-events: none;
 	}
 }
 

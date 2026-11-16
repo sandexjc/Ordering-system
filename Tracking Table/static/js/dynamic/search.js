@@ -242,12 +242,15 @@ function setupDynamicSearch() {
     const initialView = root?.dataset.currentView || "table";
     syncSearchControls(initialView);
 
-    searchRoot.addEventListener("mouseenter", () => {
-        openDynamicSearch({ focusInput: false });
-    });
-    searchRoot.addEventListener("mouseleave", () => {
-        maybeCloseDynamicSearch();
-    });
+    const hoverOpensSearch = window.matchMedia("(hover: hover)").matches;
+    if (hoverOpensSearch) {
+        searchRoot.addEventListener("mouseenter", () => {
+            openDynamicSearch({ focusInput: false });
+        });
+        searchRoot.addEventListener("mouseleave", () => {
+            maybeCloseDynamicSearch();
+        });
+    }
 
     toggle.addEventListener("click", (event) => {
         event.preventDefault();

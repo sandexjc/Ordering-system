@@ -106,25 +106,48 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const navButtons = document.querySelectorAll("[data-dynamic-view]");
-    navButtons.forEach((button) => {
-        button.addEventListener("click", (event) => {
-            const selectedView = button.dataset.dynamicView;
-            const currentView = root.dataset.currentView;
-            const plainLeftClick = event.button === 0
+    let touchViewAt = 0;
+
+    function openDynamicViewFromControl(button, event) {
+        const selectedView = button.dataset.dynamicView;
+        const currentView = root.dataset.currentView;
+        const plainLeftClick = !event
+            || event.type !== "click"
+            || (
+                event.button === 0
                 && !event.metaKey
                 && !event.ctrlKey
                 && !event.shiftKey
-                && !event.altKey;
-            if (button.tagName === "A" && !plainLeftClick) {
+                && !event.altKey
+            );
+        if (button.tagName === "A" && !plainLeftClick) {
+            return;
+        }
+        if (button.tagName === "A" && event) {
+            event.preventDefault();
+        }
+        if (!selectedView || selectedView === currentView) {
+            return;
+        }
+        switchDynamicView(selectedView);
+    }
+
+    navButtons.forEach((button) => {
+        button.addEventListener("pointerup", (event) => {
+            if (event.pointerType === "mouse") {
                 return;
             }
-            if (button.tagName === "A") {
-                event.preventDefault();
-            }
-            if (!selectedView || selectedView === currentView) {
+            touchViewAt = Date.now();
+            openDynamicViewFromControl(button, event);
+        });
+        button.addEventListener("click", (event) => {
+            if (Date.now() - touchViewAt < 700) {
+                if (button.tagName === "A") {
+                    event.preventDefault();
+                }
                 return;
             }
-            switchDynamicView(selectedView);
+            openDynamicViewFromControl(button, event);
         });
     });
 });

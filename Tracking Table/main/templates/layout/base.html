@@ -3,7 +3,7 @@
 <html data-bs-theme="{{ appearance_theme }}" data-bg="{{ appearance_background }}" data-accent="{{ appearance_accent }}" data-text="{{ appearance_text_size }}" data-density="{{ appearance_row_density }}" data-motion="{{ appearance_reduced_motion }}">
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1" id="viewport-scale-meta">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		{% block title %}
 		<title>TTable</title>
 		{% endblock %}
@@ -135,7 +135,6 @@
 		
 		<script type="text/javascript" src="{% static 'jquery/jquery-3.7.1.min.js' %}"></script>
 		<script type="text/javascript" src="{% static 'bootstrap/5.3.3/js/bootstrap.bundle.js' %}"></script>
-		<script type="text/javascript" src="{% static 'js/core/viewport.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/core/auto-dismiss-alerts.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/offline/register-sw.js' %}"></script>
 

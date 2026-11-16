@@ -111,6 +111,31 @@ body
     padding: 2.5rem 1rem;
 }
 
+@media (max-width: 999px)
+{
+    .user-list-page
+    {
+        width: 100%;
+        min-width: 0;
+        padding: 1rem;
+    }
+
+    .user-list-table .table
+    {
+        width: max-content;
+        min-width: 48rem;
+        table-layout: auto;
+    }
+
+    .user-list-helper-inner.is-open
+    {
+        position: sticky;
+        left: 0;
+        width: 100cqi;
+        max-width: 100cqi;
+    }
+}
+
 .user-list-helper-inner.is-open
 {
     display: flex;

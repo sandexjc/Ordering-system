@@ -422,7 +422,7 @@ What each one changes:
 - **Тема** switches light and dark surfaces. `data-bs-theme` follows the saved theme.
 - **Фон** sets the page background: the city image, a flat color, or warm paper.
 - **Акцент** colors the navbar and solid primary buttons. **Сиво** keeps the gray navbar and the usual blue primary buttons. **Прозрачен** lets the page background show through the navbar; those primary buttons stay blue. Outline danger, success, warning, and info buttons stay semantic.
-- **Размер на текста** sets the root font size. It is separate from `static/js/core/viewport.js`, which only shrinks narrow screens. The 1000px minimum layout stays.
+- **Размер на текста** sets the root font size.
 - **Оформление** changes spacing on order and vitrine list rows (`.visibleRows`) only. **Стандартно** is the current spacing. **Компактно** and **Плътно** tighten line height and the gap between stacked lines. Profile forms, modals, and opened order details stay as they are.
 - **Анимации** **Изключено** shortens the order-row open and close and the profile section arrow. Save-button spinners still run. The form shows **Включено** / **Изключено**. The model choice labels stay **Нормално** / **Намалено** so they match the existing migration.
 
@@ -467,7 +467,6 @@ App-specific assets under `accounts/static`, `vitrine/static`, etc. are outside 
 ```text
 static/js/
   core/
-    viewport.js
     boot.js
   orders/
     row-expand/
@@ -505,12 +504,11 @@ static/js/
 **`main/templates/layout/base.html`**
 
 1. jQuery, Bootstrap
-2. `core/viewport.js`
-3. `orders/row-expand/{transitions,open-close,bind-rows}.js`
-4. `orders/details/{spinner,error,fetch}.js`
-5. `orders/actions/{progress-delete,edit-submit,alerts,properties,history}.js`
-6. `core/boot.js`
-7. optional `vitrine_scripts`
+2. `orders/row-expand/{transitions,open-close,bind-rows}.js`
+3. `orders/details/{spinner,error,fetch}.js`
+4. `orders/actions/{progress-delete,edit-submit,alerts,properties,history}.js`
+5. `core/boot.js`
+6. optional `vitrine_scripts`
 
 **`main/templates/dynamic/orders.html`** (after `{{ block.super }}`)
 
@@ -531,14 +529,13 @@ static/js/
 
 **Login**
 
-- `accounts/templates/accounts/login.html` → `core/viewport.js` (plus accounts login-base)
+- `accounts/templates/accounts/login.html`, `activate-device.html`, and `set-password.html` use their own layout and do not load `core/boot.js`.
 
 ### File → main exports
 
 | File | Functions / role |
 |------|------------------|
-| `core/viewport.js` | `set_viewport_scale` |
-| `core/boot.js` | side effects: scale + `handle_orders()` |
+| `core/boot.js` | side effects: `handle_orders()` and pins the orders and vitrine headers on small screens |
 | `orders/row-expand/transitions.js` | `_cancelPendingTransitionAndLockHeight`, `onHiddenRowContentUpdated` |
 | `orders/row-expand/open-close.js` | `focusClosedOrderRow`, `openHiddenRow`, `closeHiddenRow` |
 | `orders/row-expand/bind-rows.js` | `handle_orders` |
