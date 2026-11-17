@@ -9,7 +9,7 @@
  * Depends on (load order):
  *   - dynamic/state.js
  *   - dynamic/session.js → redirectToLoginIfUnauthenticated
- *   - dynamic/connection.js → setServerConnected, hideServerConnectionToast, refreshServerConnectionToast, setServerConnectionToastPending
+ *   - dynamic/connection.js → setServerConnected, hideServerConnectionToast, refreshServerConnectionToast, setServerConnectionToastPending, showRemoteDeletedOrdersToast
  *   - dynamic/filters.js → getFiltersForView, getOrdersEndpointForView, updateVisibleItemsCounter
  *   - dynamic/search.js  → getSearchForView, highlightSearchInOrders
  *   - dynamic/cache.js   → updateViewCache, captureLiveRowsHtml, isHiddenRowVisuallyOpen
@@ -115,6 +115,53 @@ function forgetLocalOrderMutation(orderId, stampedAt)
 function isRecentLocalOrderMutation(orderId)
 {
     return localOrderMutationEntry(orderId) != null;
+}
+
+/**
+ * Remember a delete this tab just started, without stamping the row.
+ *
+ * The poll can return that delete before the delete request itself finishes.
+ *
+ * @param {string|number} orderId - Order / vitrine id.
+ * @returns {void}
+ */
+function rememberLocalOrderDelete(orderId)
+{
+    if (orderId == null || orderId === "") {
+        return;
+    }
+    recentLocalOrderDeletes.set(String(orderId), Date.now());
+}
+
+/**
+ * Drop the delete marker after the delete request failed.
+ *
+ * @param {string|number} orderId - Order / vitrine id.
+ * @returns {void}
+ */
+function forgetLocalOrderDelete(orderId)
+{
+    recentLocalOrderDeletes.delete(String(orderId));
+}
+
+/**
+ * True when this tab started deleting the order and the marker is still fresh.
+ *
+ * @param {string|number} orderId - Order / vitrine id.
+ * @returns {boolean}
+ */
+function isRecentLocalOrderDelete(orderId)
+{
+    const key = String(orderId);
+    const startedAt = recentLocalOrderDeletes.get(key);
+    if (startedAt == null) {
+        return false;
+    }
+    if (Date.now() - startedAt > LOCAL_MUTATION_SKIP_MS) {
+        recentLocalOrderDeletes.delete(key);
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -590,6 +637,28 @@ function replaceSummaryRow(tbody, pair, { highlight = true } = {})
 }
 
 /**
+ * Order number and owner from a summary row that is about to disappear.
+ *
+ * @param {HTMLElement} row - Visible summary row.
+ * @param {string|number} orderId - Fallback id when the first cell is empty.
+ * @returns {{id: string, owner: string}}
+ */
+function remoteDeletedOrderNotice(row, orderId)
+{
+    const cells = row.querySelectorAll(":scope > td");
+    const idText = cells[0] ? cells[0].textContent.replace(/\s+/g, " ").trim() : "";
+    const ownerCell = cells[2];
+    const ownerNode = ownerCell ? ownerCell.childNodes[0] : null;
+    const owner = ownerNode && ownerNode.nodeType === Node.TEXT_NODE
+        ? ownerNode.textContent.trim()
+        : "";
+    return {
+        id: idText || String(orderId),
+        owner: owner,
+    };
+}
+
+/**
  * Apply one deleted id to a tbody (live uses the existing delete animation).
  *
  * @param {string} viewName - Dynamic view key.
@@ -758,6 +827,9 @@ async function applySyncPayload(viewName, payload)
     }
 
     const deletedIds = Array.isArray(payload.deleted_ids) ? payload.deleted_ids : [];
+    const softDeletedIds = new Set(
+        (Array.isArray(payload.soft_deleted_ids) ? payload.soft_deleted_ids : []).map((orderId) => String(orderId))
+    );
     const pairs = parseOrderRowPairs(payload.rows_html || "");
     if (!deletedIds.length && !pairs.length) {
         storeSyncWatermark(viewName, payload.watermark);
@@ -780,9 +852,24 @@ async function applySyncPayload(viewName, payload)
         return;
     }
 
+    const remoteDeletedNotices = [];
     deletedIds.forEach((orderId) => {
+        if (
+            isLive
+            && softDeletedIds.has(String(orderId))
+            && !isRecentLocalOrderMutation(orderId)
+            && !isRecentLocalOrderDelete(orderId)
+        ) {
+            const existing = tbody.querySelector('tr.visibleRows[data-row="' + String(orderId) + '"]');
+            if (existing) {
+                remoteDeletedNotices.push(remoteDeletedOrderNotice(existing, orderId));
+            }
+        }
         applyDeletedOrder(viewName, tbody, orderId, isLive);
     });
+    if (remoteDeletedNotices.length && typeof showRemoteDeletedOrdersToast === "function") {
+        showRemoteDeletedOrdersToast(remoteDeletedNotices);
+    }
     const remoteUpdatedIds = [];
     pairs.forEach((pair) => {
         if (!pair.id) {

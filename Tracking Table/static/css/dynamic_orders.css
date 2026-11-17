@@ -506,6 +506,28 @@ mark.search-highlight
 	text-align: center;
 }
 
+.remote-order-deleted-toast
+{
+	border-left-color: #b45309;
+}
+
+.remote-order-deleted-toast .toast-body
+{
+	max-height: 14rem;
+	overflow-y: auto;
+}
+
+.remote-order-deleted-toast-list
+{
+	margin: 0;
+	padding-left: 1.1rem;
+}
+
+.remote-order-deleted-toast-note
+{
+	margin: 0.45rem 0 0;
+}
+
 /* =============================================================================
    Create / edit order form modal
    ============================================================================= */
@@ -901,6 +923,11 @@ mark.search-highlight
 [data-bs-theme="dark"] .server-connection-toast .toast-body
 {
 	color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .remote-order-deleted-toast
+{
+	border-left-color: #fbbf24;
 }
 
 [data-bs-theme="dark"] #order-form-modal tr.is-dirty > td

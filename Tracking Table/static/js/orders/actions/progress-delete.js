@@ -464,6 +464,11 @@ function setup_progress_delete_handlers()
 		btn.innerHTML = `Loading... <span class="spinner-border spinner-border-sm"></span>`;
 
 		const formData = new FormData(form);
+		// Mark this delete before the response, so a poll that returns it
+		// does not announce the order as deleted by someone else.
+		if (typeof rememberLocalOrderDelete === "function") {
+			rememberLocalOrderDelete(id);
+		}
 		const controller = new AbortController();
 		const timeoutId = window.setTimeout(function () {
 			controller.abort();
@@ -499,6 +504,9 @@ function setup_progress_delete_handlers()
 		})
 		.catch(err => {
 			console.error(err);
+			if (typeof forgetLocalOrderDelete === "function") {
+				forgetLocalOrderDelete(id);
+			}
 
 			if (errorAlert) {
 				const msgEl = errorAlert.querySelector(".alertmsgdiv");

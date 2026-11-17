@@ -339,6 +339,7 @@ class DynamicView(LoginRequiredMixin, DynamicFeatureFlagRequiredMixin, MainView)
         return {
             "watermark": watermark,
             "deleted_ids": [],
+            "soft_deleted_ids": [],
             "created_ids": [],
             "updated_ids": [],
             "rows_html": "",
@@ -371,7 +372,7 @@ class DynamicView(LoginRequiredMixin, DynamicFeatureFlagRequiredMixin, MainView)
         if not changed:
             return JsonResponse(self.empty_sync_payload(watermark))
 
-        deleted_ids = [row.pk for row in changed if row.deleted_at is not None]
+        soft_deleted_ids = [row.pk for row in changed if row.deleted_at is not None]
         active_ids = [row.pk for row in changed if row.deleted_at is None]
         created_at_by_id = {row.pk: row.created_at for row in changed}
 
@@ -384,6 +385,9 @@ class DynamicView(LoginRequiredMixin, DynamicFeatureFlagRequiredMixin, MainView)
                 self.get_filtered_queryset().filter(pk__in=active_ids).distinct()
             )
         matching_id_set = {row.pk for row in matching_rows}
+        # deleted_ids leaves the board. soft_deleted_ids is only a real delete;
+        # the rest are edits that no longer match the open filter.
+        deleted_ids = list(soft_deleted_ids)
         deleted_ids.extend(pk for pk in active_ids if pk not in matching_id_set)
 
         created_ids = []
@@ -404,6 +408,7 @@ class DynamicView(LoginRequiredMixin, DynamicFeatureFlagRequiredMixin, MainView)
             {
                 "watermark": watermark,
                 "deleted_ids": deleted_ids,
+                "soft_deleted_ids": soft_deleted_ids,
                 "created_ids": created_ids,
                 "updated_ids": updated_ids,
                 "rows_html": self.render_rows_html(matching_rows) if matching_rows else "",

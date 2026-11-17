@@ -3,6 +3,20 @@
     class="toast-container position-fixed bottom-0 end-0 p-3"
 >
     <div
+        id="remote-order-deleted-toast"
+        class="toast server-connection-toast remote-order-deleted-toast"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        data-bs-autohide="false"
+    >
+        <div class="toast-header">
+            <strong class="me-auto" id="remote-order-deleted-toast-title">Поръчката е изтрита</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div id="remote-order-deleted-toast-body" class="toast-body"></div>
+    </div>
+    <div
         id="server-connection-toast"
         class="toast server-connection-toast server-connection-toast--offline"
         role="alert"

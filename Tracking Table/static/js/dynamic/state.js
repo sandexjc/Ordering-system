@@ -67,6 +67,9 @@ let ordersSyncMissStreak = 0;
 let isServerConnected = true;
 const recentLocalOrderMutations = window.recentLocalOrderMutations || new Map();
 window.recentLocalOrderMutations = recentLocalOrderMutations;
+/** Order ids this tab has asked to delete, so the live poll does not toast them. */
+const recentLocalOrderDeletes = window.recentLocalOrderDeletes || new Map();
+window.recentLocalOrderDeletes = recentLocalOrderDeletes;
 const ordersDetailsInFlight = window.ordersDetailsInFlight || new Set();
 window.ordersDetailsInFlight = ordersDetailsInFlight;
 
