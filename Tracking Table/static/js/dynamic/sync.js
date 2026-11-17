@@ -16,7 +16,7 @@
  *   - dynamic/fetch.js   → buildOrdersUrl, fetchAndRenderOrders, getLiveOrdersBody
  * Runtime depends on:
  *   - orders/actions/progress-delete.js → remove_deleted_order_row
- *   - orders/actions/order-form-modal.js → syncOpenOrderFormFromLiveUpdate (optional)
+ *   - orders/actions/order-form-modal.js → syncOpenOrderFormFromLiveUpdate, closeOrderFormForDeletedOrder (optional)
  *   - orders/details/fetch.js           → get_order
  *   - orders/row-expand/bind-rows.js    → handle_orders
  *   - vitrine/js/virtual_rows.js        → syncFrameHeights (optional)
@@ -890,7 +890,15 @@ async function applySyncPayload(viewName, payload)
         }
         const formSyncIds = remoteUpdatedIds.slice();
         deletedIds.forEach((orderId) => {
-            if (isRecentLocalOrderMutation(orderId)) {
+            if (softDeletedIds.has(String(orderId))
+                && typeof closeOrderFormForDeletedOrder === "function") {
+                closeOrderFormForDeletedOrder(orderId);
+            }
+            if (
+                isRecentLocalOrderMutation(orderId)
+                || isRecentLocalOrderDelete(orderId)
+                || softDeletedIds.has(String(orderId))
+            ) {
                 return;
             }
             formSyncIds.push(orderId);

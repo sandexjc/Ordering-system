@@ -710,6 +710,28 @@ function isTrackableOrderFormField(el)
 }
 
 /**
+ * Value used for dirty checks and remote comparisons.
+ * A plate marked "from client" displays price and line total as 0 while the
+ * saved price stays on the input. That display is not an edit.
+ *
+ * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} el - Form control.
+ * @returns {string}
+ */
+function orderFormComparableValue(el)
+{
+	const row = el.closest("tr");
+	const fromClient = row && row.querySelector('input[name$="-from_client"]');
+	const fromClientChecked = Boolean(fromClient && fromClient.checked);
+	if (fromClientChecked && el.name && el.name.endsWith("-price") && el.dataset.priceBeforeClient != null) {
+		return normalizeOrderFormDecimal(el.dataset.priceBeforeClient);
+	}
+	if (fromClientChecked && el.name && el.name.endsWith("-value")) {
+		return normalizeOrderFormDecimal("0");
+	}
+	return normalizeOrderFormValue(el);
+}
+
+/**
  * Remember the loaded value of each tracked control under `root`.
  *
  * @param {ParentNode} root - Form or a newly added row.
@@ -793,9 +815,7 @@ function updateOrderFormDirtyState(form)
 	const dirtyRows = new Set();
 	form.querySelectorAll("input, select, textarea").forEach(function (el) {
 		const row = el.closest("tr");
-		const changed = isTrackableOrderFormField(el)
-			&& el.dataset.initialValue != null
-			&& normalizeOrderFormValue(el) !== el.dataset.initialValue;
+		const changed = isOrderFormControlDirty(el);
 		if (row) {
 			el.classList.remove("is-dirty");
 			if (changed) {
@@ -909,6 +929,21 @@ function closeOrderFormModal()
 	hideOrderFormUnsavedDialog();
 	const instance = bootstrap.Modal.getInstance(parts.modal) || bootstrap.Modal.getOrCreateInstance(parts.modal);
 	instance.hide();
+}
+
+/**
+ * Close the edit modal when this order was deleted.
+ * The order is gone, so unsaved edits are not confirmed.
+ *
+ * @param {string|number} orderId - Deleted order / vitrine id.
+ * @returns {void}
+ */
+function closeOrderFormForDeletedOrder(orderId)
+{
+	if (!openEditOrderForm(orderId)) {
+		return;
+	}
+	closeOrderFormModal();
 }
 
 /**
@@ -1378,7 +1413,7 @@ function isOrderFormControlDirty(el)
 {
 	return isTrackableOrderFormField(el)
 		&& el.dataset.initialValue != null
-		&& normalizeOrderFormValue(el) !== el.dataset.initialValue;
+		&& orderFormComparableValue(el) !== el.dataset.initialValue;
 }
 
 /**
@@ -1454,7 +1489,7 @@ function orderFormRowSignature(row)
 			return el.name && el.type !== "hidden";
 		})
 		.map(function (el) {
-			return orderFormFieldKey(el.name) + "=" + normalizeOrderFormValue(el);
+			return orderFormFieldKey(el.name) + "=" + orderFormComparableValue(el);
 		})
 		.join("|");
 }
@@ -1529,7 +1564,7 @@ function orderFormRowBaselineSignature(row)
 		.map(function (el) {
 			const baseline = el.dataset.initialValue != null
 				? el.dataset.initialValue
-				: normalizeOrderFormValue(el);
+				: orderFormComparableValue(el);
 			return orderFormFieldKey(el.name) + "=" + baseline;
 		})
 		.join("|");
@@ -2044,6 +2079,9 @@ async function runOrderFormRemoteSync()
 			return;
 		}
 		if (response.status === 404) {
+			if (token === orderFormRemoteSyncToken) {
+				closeOrderFormModal();
+			}
 			return;
 		}
 		if (!response.ok) {
