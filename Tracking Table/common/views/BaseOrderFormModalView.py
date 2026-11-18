@@ -206,6 +206,11 @@ class BaseOrderFormModalView(LoginRequiredMixin, DynamicFeatureFlagRequiredMixin
             payload["already_saved"] = True
         return payload
 
+    def validation_message(self, order_form, note_form, formsets):
+        # Subclasses can replace this with a field error. The default stays
+        # the generic toast used for every other invalid order form.
+        return "Възникна грешка!"
+
     def error_payload(self, form, note_form, formsets, message, status=400):
         return JsonResponse(
             {
@@ -251,7 +256,7 @@ class BaseOrderFormModalView(LoginRequiredMixin, DynamicFeatureFlagRequiredMixin
                 order_form,
                 note_form,
                 formsets,
-                "Възникна грешка!",
+                self.validation_message(order_form, note_form, formsets),
             )
 
         try:

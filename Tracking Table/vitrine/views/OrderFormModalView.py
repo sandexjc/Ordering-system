@@ -62,6 +62,15 @@ class VitrineOrderFormModal(BaseOrderFormModalView):
             VitrinePriceSetter(self.object).set_prices()
         return super().get_form_context(form, note_form, formsets)
 
+    def validation_message(self, order_form, note_form, formsets):
+        frame_formset = formsets.get("frame_forms")
+        if frame_formset is not None:
+            for form in frame_formset:
+                profile_errors = form.errors.get("profile_type")
+                if profile_errors:
+                    return profile_errors[0]
+        return super().validation_message(order_form, note_form, formsets)
+
     def get_extra_form_context(self):
         extra = {
             "feature_auto_seal_enabled": settings.DJANGO_FEATURES__AUTO_SEAL_SELECT,

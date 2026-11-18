@@ -30,11 +30,24 @@ class AddFrameForm(VitrineForm):
         super().__init__(*args, **kwargs)
         self.set_sm_dropdown("profile_type")
         self.set_sm_dropdown("holes_position")
+        self.require_profile_choice()
         
         if settings.DJANGO_FEATURES__AUTO_SEAL_SELECT:
             self.set_switch("auto_calculate_seal")
         else:
             self.fields.pop("auto_calculate_seal", None)
+
+    def require_profile_choice(self):
+        # The model default is Black. A new row must not inherit that, or a
+        # frame is saved as black when the profile dropdown was never touched.
+        profile = self.fields["profile_type"]
+        profile.choices = [("", "---------")] + [
+            choice for choice in profile.choices if choice[0] != ""
+        ]
+        profile.required = True
+        profile.error_messages["required"] = "Изберете тип профил."
+        if not self.instance.pk:
+            self.initial["profile_type"] = ""
 
 
 # Formset for managing multiple Frames items linked to a single Vitrine

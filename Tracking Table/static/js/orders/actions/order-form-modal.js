@@ -384,7 +384,8 @@ function setVitrineInfoText(row, name, text)
 }
 
 /**
- * Frames that count toward the preview. Blank extra rows are left out.
+ * Frames that count toward the preview. Blank extra rows are left out,
+ * and a row with no profile type is left out so it is not priced as black.
  * A saved row stays in until it is marked for deletion.
  *
  * @param {HTMLFormElement} form - Modal order form.
@@ -404,13 +405,17 @@ function vitrinePreviewFrames(form)
 		if (!isSavedOrderFormRow(row) && isEmptyOrderFormRow(row)) {
 			return;
 		}
+		const profile = orderFormRowField(row, "-profile_type");
+		if (!profile) {
+			return;
+		}
 		const sealToggle = row.querySelector('input[name$="-auto_calculate_seal"]');
 		frames.push({
 			length: orderFormWhole(orderFormRowField(row, "-length")),
 			width: orderFormWhole(orderFormRowField(row, "-width")),
 			quantity: orderFormWhole(orderFormRowField(row, "-quantity")),
 			holes: orderFormWhole(orderFormRowField(row, "-holes_count")),
-			profile: orderFormRowField(row, "-profile_type") || "Black",
+			profile: profile,
 			includeSeal: !sealToggle || sealToggle.checked,
 		});
 	});
