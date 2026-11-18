@@ -60,7 +60,7 @@
             {% endfor %}
 
             {% if dynamic_mode %}
-                <tr><th scope="row" colspan="5">ПОРЪЧКА</th></tr>
+                <tr><th scope="row" colspan="5">ДЕТАЙЛИ ЗА ПОРЪЧКА</th></tr>
                 <tr class="order-progress-item-row">
                     <td>Поръчката е взета</td>
                     <td colspan="4">
@@ -77,8 +77,12 @@
 
             {% if feature_order_weight_enabled %}
                 <tr class="order-progress-item-row">
-                    <td class="order-weight-estimate">Приблизително тегло на поръчката - {{ order.weight }} кг</td>
-                    <td colspan="4"></td>
+                    <td class="order-weight-estimate">Приблизително тегло на поръчката</td>
+                    <td colspan="4">
+                        <div class="order-weight-value-track">
+                            <span class="badge rounded-pill order-weight-chip-value">{{ order.weight }} кг</span>
+                        </div>
+                    </td>
                 </tr>
             {% endif %}
         </tbody>

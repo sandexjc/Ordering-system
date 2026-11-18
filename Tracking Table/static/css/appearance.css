@@ -427,9 +427,10 @@ html[data-accent="slate"] .btn-primary
 	color: #adb5bd;
 }
 
-[data-bs-theme="dark"] .table-order-details td.order-weight-estimate
+[data-bs-theme="dark"] .order-weight-chip-value
 {
-	color: #e9ecef;
+	background: #adb5bd;
+	color: #212529;
 }
 
 [data-bs-theme="dark"] .normalOrder

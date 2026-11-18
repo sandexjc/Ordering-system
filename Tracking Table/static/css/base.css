@@ -368,9 +368,20 @@ table.table-order-details thead tr th:not(:first-child) {
 	text-align: center;
 }
 
-.table-order-details td.order-weight-estimate
+.order-weight-value-track
 {
-	color: #000;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	width: 100%;
+	align-items: center;
+}
+
+.order-weight-chip-value
+{
+	justify-self: center;
+	--bs-badge-font-size: 0.85em;
+	background: #495057;
+	color: #fff;
 }
 
 .hidden-buttons
