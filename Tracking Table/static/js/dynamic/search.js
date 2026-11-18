@@ -94,7 +94,7 @@ function openDynamicSearch({ focusInput = true } = {}) {
         toggle.setAttribute("aria-expanded", "true");
     }
     if (focusInput && input) {
-        window.requestAnimationFrame(() => input.focus());
+        input.focus();
     }
 }
 
@@ -118,7 +118,7 @@ function maybeCloseDynamicSearch() {
     if (input && document.activeElement === input) {
         return;
     }
-    if (searchRoot.matches(":hover")) {
+    if (searchRoot.matches(":hover") && window.matchMedia("(hover: hover)").matches) {
         return;
     }
 
@@ -252,14 +252,37 @@ function setupDynamicSearch() {
         });
     }
 
-    toggle.addEventListener("click", (event) => {
-        event.preventDefault();
-        if (searchRoot.classList.contains("is-open") && document.activeElement === input) {
-            input.blur();
-            maybeCloseDynamicSearch();
+    let touchSearchAt = 0;
+
+    function closeDynamicSearch() {
+        input.blur();
+        searchRoot.classList.remove("is-open");
+        toggle.setAttribute("aria-expanded", "false");
+    }
+
+    function toggleDynamicSearch() {
+        if (searchRoot.classList.contains("is-open")) {
+            closeDynamicSearch();
             return;
         }
         openDynamicSearch({ focusInput: true });
+    }
+
+    // The keyboard opens only when focus() runs inside the touch itself.
+    toggle.addEventListener("touchend", (event) => {
+        touchSearchAt = Date.now();
+        if (event.cancelable) {
+            event.preventDefault();
+        }
+        toggleDynamicSearch();
+    }, { passive: false });
+
+    toggle.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (Date.now() - touchSearchAt < 700) {
+            return;
+        }
+        toggleDynamicSearch();
     });
 
     input.addEventListener("focus", () => {

@@ -40,6 +40,8 @@ function place_order_table_head()
 /**
  * On a narrow screen the table scroller blocks normal sticky headers.
  * Slide the header down with the page, and sideways with the columns.
+ * Pinned cells do not take hits. A tap on that paint is claimed below,
+ * so it can sort instead of opening the order row underneath.
  */
 function pin_order_table_head()
 {
@@ -93,6 +95,8 @@ var order_head_hold_pin = false;
 var order_head_touch_x = 0;
 var order_head_touch_y = 0;
 var order_head_gesture_moves = false;
+/** Header cell under the finger when the pinned header was touched. */
+var order_head_touch_cell = null;
 /** A thumb tap often slides a few pixels. Past this, the gesture is a scroll. */
 var order_head_touch_slop = 24;
 var touch_finger_down = false;
@@ -132,13 +136,23 @@ function schedule_order_table_head()
 }
 
 /**
- * Buttons, toolbar links, menu items, and sort headers.
+ * Controls that run on click.
+ * A phone often uses the first tap for :hover and never sends the click,
+ * so the finger-up runs that click once. The follow-up click is swallowed.
  * Row taps and the Разкрой / Витрини tabs already run on their own touch.
  * @param {EventTarget} node
  * @returns {Element|null}
  */
 function touch_activate_control(node)
 {
+    if (!node)
+    {
+        return null;
+    }
+    if (node.nodeType !== 1)
+    {
+        node = node.parentElement;
+    }
     if (!node || !node.closest)
     {
         return null;
@@ -148,16 +162,134 @@ function touch_activate_control(node)
     {
         return null;
     }
-    if (node.closest(".visibleRows, [data-dynamic-view]"))
+    if (node.closest(".visibleRows, [data-dynamic-view], [data-progress-step]"))
     {
         return null;
     }
-    var el = node.closest("button, a.btn, a.dropdown-item, th[data-sort-by]");
+    var el = node.closest("button, summary, a[href], [data-bs-toggle], th[data-sort-by]");
     if (!el || el.disabled || el.classList.contains("disabled") || el.getAttribute("aria-disabled") === "true")
     {
         return null;
     }
+    if (control_focuses_text_field(el))
+    {
+        return null;
+    }
     return el;
+}
+
+/**
+ * A replayed click cannot raise the phone keyboard.
+ * Buttons that open a text field focus it from their own touch.
+ * @param {Element} el
+ * @returns {boolean}
+ */
+function control_focuses_text_field(el)
+{
+    var id = el.getAttribute("aria-controls");
+    var field = id ? document.getElementById(id) : null;
+    return !!(field && (field.tagName === "INPUT" || field.tagName === "TEXTAREA"));
+}
+
+/**
+ * Header cell painted over this point while the mobile header is pinned.
+ * @param {number} x
+ * @param {number} y
+ * @returns {HTMLTableCellElement|null}
+ */
+function pinned_order_head_cell_at(x, y)
+{
+    var found = null;
+    order_list_tables().forEach(function (table)
+    {
+        var head = table.tHead;
+        if (!head || found)
+        {
+            return;
+        }
+        var table_hit = null;
+        Array.prototype.forEach.call(head.rows, function (row)
+        {
+            Array.prototype.forEach.call(row.cells, function (cell)
+            {
+                var transform = cell.style.transform;
+                if (!transform || transform === "none")
+                {
+                    return;
+                }
+                var rect = cell.getBoundingClientRect();
+                if (rect.width <= 0 || rect.height <= 0)
+                {
+                    return;
+                }
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom)
+                {
+                    table_hit = cell;
+                }
+            });
+        });
+        if (table_hit)
+        {
+            found = table_hit;
+        }
+    });
+    return found;
+}
+
+/**
+ * True when the touch landed in the table under the painted header.
+ * A menu or dialog above the table keeps its own tap.
+ * @param {Event} event
+ * @param {Element} cell
+ * @returns {boolean}
+ */
+function tap_is_under_pinned_header(event, cell)
+{
+    var table = cell.closest("table");
+    var target = event.target;
+    return !!(table && target && table.contains(target));
+}
+
+/**
+ * A phone tap often never produces the click that closes a Bootstrap menu
+ * and drops focus from its button. Do that for every open menu.
+ * The toggle itself is left alone so its own tap can open or close it.
+ * @param {EventTarget} target
+ * @returns {void}
+ */
+function settle_touch_menus(target)
+{
+    var node = target && target.nodeType === 1 ? target : (target && target.parentElement);
+    if (!node || !node.closest || typeof bootstrap === "undefined" || !bootstrap.Dropdown)
+    {
+        return;
+    }
+    if (node.closest("[data-bs-toggle='dropdown']"))
+    {
+        return;
+    }
+    var toggles = document.querySelectorAll(".dropdown-toggle.show");
+    Array.prototype.forEach.call(toggles, function (toggle)
+    {
+        bootstrap.Dropdown.getOrCreateInstance(toggle).hide();
+        if (document.activeElement === toggle)
+        {
+            toggle.blur();
+        }
+    });
+}
+
+/**
+ * Keep a pinned-header tap from opening the order row underneath.
+ * @param {Event} event
+ * @returns {void}
+ */
+function claim_pinned_header_tap(event)
+{
+    touch_gesture_activated = true;
+    touch_activate_until = Date.now() + 700;
+    event.preventDefault();
+    event.stopImmediatePropagation();
 }
 
 /** The phone sends a second click after the touch. That click must not run the control again. */
@@ -182,6 +314,10 @@ document.addEventListener("pointerdown", function (event)
         return;
     }
     order_head_gesture_moves = false;
+    if (event.isPrimary)
+    {
+        order_head_touch_cell = pinned_order_head_cell_at(event.clientX, event.clientY);
+    }
     hold_order_table_head();
 }, { capture: true });
 
@@ -195,6 +331,7 @@ document.addEventListener("touchstart", function (event)
     {
         order_head_touch_x = event.touches[0].clientX;
         order_head_touch_y = event.touches[0].clientY;
+        order_head_touch_cell = pinned_order_head_cell_at(order_head_touch_x, order_head_touch_y);
     }
 }, { passive: true, capture: true });
 
@@ -216,11 +353,23 @@ document.addEventListener("touchmove", function (event)
 
 document.addEventListener("pointerup", function (event)
 {
-    if (event.pointerType === "mouse" || !event.isPrimary || order_head_gesture_moves)
+    if (event.pointerType === "mouse" || !event.isPrimary)
     {
         return;
     }
-    var el = touch_activate_control(event.target);
+    var pinned = order_head_touch_cell;
+    order_head_touch_cell = null;
+    var header_tap = pinned && tap_is_under_pinned_header(event, pinned);
+    if (header_tap)
+    {
+        claim_pinned_header_tap(event);
+    }
+    if (order_head_gesture_moves)
+    {
+        return;
+    }
+    settle_touch_menus(event.target);
+    var el = header_tap ? touch_activate_control(pinned) : touch_activate_control(event.target);
     if (!el)
     {
         return;
@@ -243,6 +392,10 @@ document.addEventListener("touchend", function (event)
     touch_finger_down = false;
     if (order_head_gesture_moves)
     {
+        if (touch_gesture_activated && event.cancelable)
+        {
+            event.preventDefault();
+        }
         order_head_hold_pin = false;
         schedule_order_table_head();
         return;
@@ -262,6 +415,7 @@ document.addEventListener("touchcancel", function ()
 {
     touch_finger_down = false;
     order_head_hold_pin = false;
+    order_head_touch_cell = null;
 }, { passive: true, capture: true });
 
 document.addEventListener("mousedown", swallow_touch_ghost, true);

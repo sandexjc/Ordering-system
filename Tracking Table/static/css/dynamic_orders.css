@@ -347,6 +347,11 @@ mark.search-highlight
 		border-width: 0;
 		pointer-events: none;
 	}
+
+	.dynamic-search.is-open .dynamic-search-input
+	{
+		width: min(10.4rem, 35.75vw);
+	}
 }
 
 /* =============================================================================

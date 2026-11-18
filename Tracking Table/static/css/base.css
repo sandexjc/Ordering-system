@@ -729,6 +729,44 @@ table.table-order-details thead tr th:not(:first-child) {
 		border-color: var(--bs-btn-border-color);
 	}
 
+	/* A tap leaves :hover and :focus on the last control. Only an open menu stays lit. */
+	.candy-box-toggle:not(.show) .candy-box span
+	{
+		transform: scale(1);
+	}
+
+	.nav-link.dropdown-toggle:not(.show) .navbar-user-icon-head,
+	.nav-link.dropdown-toggle:not(.show) .navbar-user-icon-shoulders
+	{
+		transform: none;
+	}
+
+	.navbar .nav-link:not(.show):hover,
+	.navbar .nav-link:not(.show):focus
+	{
+		color: var(--bs-navbar-color);
+	}
+
+	.candy-box-toggle.show .candy-box span
+	{
+		transform: scale(1.45);
+	}
+
+	.nav-link.dropdown-toggle.show .navbar-user-icon-head
+	{
+		transform: translateY(-1px) scale(1.18);
+	}
+
+	.nav-link.dropdown-toggle.show .navbar-user-icon-shoulders
+	{
+		transform: scale(1.08);
+	}
+
+	.dropdown-toggle:focus-visible:not(.show)
+	{
+		outline: 0;
+	}
+
 	.table-hover > tbody > tr:hover > *
 	{
 		background-color: transparent;
