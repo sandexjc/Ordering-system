@@ -177,6 +177,7 @@ Optional variables supported in settings include:
 - `DJANGO_FEATURES__ORDER_WEIGHT`
 - `DJANGO_FEATURES__BROWSER_COOKIE_FILTER`
 - `DJANGO_FEATURES__DB_BACKUP`
+- `DJANGO_FEATURES__RESPONSIVE_SCALE`
 - `DJANGO_DEVICE_COOKIE__MAX_AGE`
 - `DJANGO_DEVICE_COOKIE__MAX_SECRETS`
 - `DJANGO_DYNAMIC_CONTENT__SEARCH_MIN_LENGTH`
@@ -190,6 +191,8 @@ Optional variables supported in settings include:
 - `DJANGO_BACKUP_DIR`
 - `DJANGO_BACKUP_AT`
 - `DJANGO_BACKUP_KEEP_DAYS`
+
+`DJANGO_FEATURES__RESPONSIVE_SCALE` chooses narrow-screen scaling (default `False`). Off is the previous behavior: the page shrinks so the layout keeps its minimum width. That minimum is 1000px on the order and vitrine boards, 600px on profile, users, create-user, change-password, and vitrine prices, and 500px on sign-in, set-password, and device activation. On is the current behavior: the page stays at normal size and wide tables scroll sideways. Restart the app after changing it.
 
 `DJANGO_FEATURES__DB_BACKUP` turns database backups on (default `False`). The app still starts when it is off. `DJANGO_BACKUP_DIR` is the directory for the daily backup files. A relative path is kept as given, and `~` is expanded. `DJANGO_BACKUP_AT` is the local time of day in `HH:MM` (default `02:00`, timezone `Europe/Sofia`). `DJANGO_BACKUP_KEEP_DAYS` is how many daily files to keep (default `14`). The daily export and the import command are described in Database backup.
 
@@ -467,6 +470,7 @@ App-specific assets under `accounts/static`, `vitrine/static`, etc. are outside 
 ```text
 static/js/
   core/
+    viewport.js
     boot.js
   orders/
     row-expand/
@@ -504,11 +508,12 @@ static/js/
 **`main/templates/layout/base.html`**
 
 1. jQuery, Bootstrap
-2. `orders/row-expand/{transitions,open-close,bind-rows}.js`
-3. `orders/details/{spinner,error,fetch}.js`
-4. `orders/actions/{progress-delete,edit-submit,alerts,properties,history}.js`
-5. `core/boot.js`
-6. optional `vitrine_scripts`
+2. `core/viewport.js`
+3. `orders/row-expand/{transitions,open-close,bind-rows}.js`
+4. `orders/details/{spinner,error,fetch}.js`
+5. `orders/actions/{progress-delete,edit-submit,alerts,properties,history}.js`
+6. `core/boot.js`
+7. optional `vitrine_scripts`
 
 **`main/templates/dynamic/orders.html`** (after `{{ block.super }}`)
 
@@ -529,13 +534,14 @@ static/js/
 
 **Login**
 
-- `accounts/templates/accounts/login.html`, `activate-device.html`, and `set-password.html` use their own layout and do not load `core/boot.js`.
+- `accounts/templates/accounts/login.html`, `activate-device.html`, and `set-password.html` use their own layout. They load `core/viewport.js` and `accounts/js/login-base.js`, and they do not load `core/boot.js`.
 
 ### File → main exports
 
 | File | Functions / role |
 |------|------------------|
-| `core/boot.js` | side effects: `handle_orders()` and pins the orders and vitrine headers on small screens |
+| `core/viewport.js` | `set_viewport_scale`, `responsive_viewport_scale` |
+| `core/boot.js` | side effects: `handle_orders()`. Legacy scaling shrinks the page below 1000px. Responsive scaling pins the orders and vitrine headers on small screens |
 | `orders/row-expand/transitions.js` | `_cancelPendingTransitionAndLockHeight`, `onHiddenRowContentUpdated` |
 | `orders/row-expand/open-close.js` | `focusClosedOrderRow`, `openHiddenRow`, `closeHiddenRow` |
 | `orders/row-expand/bind-rows.js` | `handle_orders` |

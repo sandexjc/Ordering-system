@@ -37,6 +37,7 @@ DJANGO_FEATURES__ORDER_WEIGHT = env_bool("DJANGO_FEATURES__ORDER_WEIGHT", defaul
 DJANGO_FEATURES__VITRINE_OFFERS = env_bool("DJANGO_FEATURES__VITRINE_OFFERS", default=True)
 DJANGO_FEATURES__BROWSER_COOKIE_FILTER = env_bool("DJANGO_FEATURES__BROWSER_COOKIE_FILTER", default=False)
 DJANGO_FEATURES__DB_BACKUP = env_bool("DJANGO_FEATURES__DB_BACKUP", default=False)
+DJANGO_FEATURES__RESPONSIVE_SCALE = env_bool("DJANGO_FEATURES__RESPONSIVE_SCALE", default=False)
 
 # Dynamic content properties (used when DJANGO_FEATURES__DYNAMIC_CONTENT_LOADING is on)
 DJANGO_DYNAMIC_CONTENT__SEARCH_MIN_LENGTH = env_int("DJANGO_DYNAMIC_CONTENT__SEARCH_MIN_LENGTH", default=2)
@@ -132,6 +133,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'accounts.helpers.users.context_processors.accounts_roles',
                 'accounts.helpers.users.context_processors.appearance',
+                'main.context_processors.viewport_scale',
             ],
         },
     },

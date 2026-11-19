@@ -659,70 +659,71 @@ table.table-order-details thead tr th:not(:first-child) {
 }
 
 /* =============================================================================
-   Narrow screens
+   Narrow screens, responsive scaling only
    The page stays at normal size. Wide order tables scroll inside their box.
+   Legacy scaling leaves the 1000px minimum in place and shrinks the page.
    ============================================================================= */
 
 @media (max-width: 999px)
 {
-	.navbar.fixed-min-width,
-	.WebFooter.fixed-min-width,
-	.top-space.fixed-min-width,
-	.table-div.fixed-min-width,
-	.modal.fixed-min-width,
-	.modal-dialog.fixed-min-width,
-	.container-fluid.fixed-min-width
+	html[data-viewport-scale="responsive"] .navbar.fixed-min-width,
+	html[data-viewport-scale="responsive"] .WebFooter.fixed-min-width,
+	html[data-viewport-scale="responsive"] .top-space.fixed-min-width,
+	html[data-viewport-scale="responsive"] .table-div.fixed-min-width,
+	html[data-viewport-scale="responsive"] .modal.fixed-min-width,
+	html[data-viewport-scale="responsive"] .modal-dialog.fixed-min-width,
+	html[data-viewport-scale="responsive"] .container-fluid.fixed-min-width
 	{
 		min-width: 0;
 	}
 
-	.table-div.fixed-min-width
+	html[data-viewport-scale="responsive"] .table-div.fixed-min-width
 	{
 		width: 100%;
 	}
 
-	.modal-backdrop
+	html[data-viewport-scale="responsive"] .modal-backdrop
 	{
 		min-width: 0;
 	}
 
-	.profile-page,
-	.create-user-page,
-	.change-password-page,
-	.vitrine-price-settings-page
+	html[data-viewport-scale="responsive"] .profile-page,
+	html[data-viewport-scale="responsive"] .create-user-page,
+	html[data-viewport-scale="responsive"] .change-password-page,
+	html[data-viewport-scale="responsive"] .vitrine-price-settings-page
 	{
 		width: 100%;
 		min-width: 0;
 	}
 
-	.FilterNav .nav
+	html[data-viewport-scale="responsive"] .FilterNav .nav
 	{
 		flex-wrap: wrap;
 		gap: 0.35rem;
 	}
 
-	.table-scroll,
-	#dynamic-orders-table-container
+	html[data-viewport-scale="responsive"] .table-scroll,
+	html[data-viewport-scale="responsive"] #dynamic-orders-table-container
 	{
 		overflow-x: auto;
 		max-width: 100%;
 		container-type: inline-size;
 	}
 
-	a,
-	button,
-	.btn,
-	label,
-	select,
-	summary,
-	img
+	html[data-viewport-scale="responsive"] a,
+	html[data-viewport-scale="responsive"] button,
+	html[data-viewport-scale="responsive"] .btn,
+	html[data-viewport-scale="responsive"] label,
+	html[data-viewport-scale="responsive"] select,
+	html[data-viewport-scale="responsive"] summary,
+	html[data-viewport-scale="responsive"] img
 	{
 		touch-action: manipulation;
 	}
 
 	/* The first tap was only painting :hover, and the click never arrived. */
-	.btn:hover:not(:active),
-	.btn:focus:not(:active)
+	html[data-viewport-scale="responsive"] .btn:hover:not(:active),
+	html[data-viewport-scale="responsive"] .btn:focus:not(:active)
 	{
 		color: var(--bs-btn-color);
 		background-color: var(--bs-btn-bg);
@@ -730,70 +731,70 @@ table.table-order-details thead tr th:not(:first-child) {
 	}
 
 	/* A tap leaves :hover and :focus on the last control. Only an open menu stays lit. */
-	.candy-box-toggle:not(.show) .candy-box span
+	html[data-viewport-scale="responsive"] .candy-box-toggle:not(.show) .candy-box span
 	{
 		transform: scale(1);
 	}
 
-	.nav-link.dropdown-toggle:not(.show) .navbar-user-icon-head,
-	.nav-link.dropdown-toggle:not(.show) .navbar-user-icon-shoulders
+	html[data-viewport-scale="responsive"] .nav-link.dropdown-toggle:not(.show) .navbar-user-icon-head,
+	html[data-viewport-scale="responsive"] .nav-link.dropdown-toggle:not(.show) .navbar-user-icon-shoulders
 	{
 		transform: none;
 	}
 
-	.navbar .nav-link:not(.show):hover,
-	.navbar .nav-link:not(.show):focus
+	html[data-viewport-scale="responsive"] .navbar .nav-link:not(.show):hover,
+	html[data-viewport-scale="responsive"] .navbar .nav-link:not(.show):focus
 	{
 		color: var(--bs-navbar-color);
 	}
 
-	.candy-box-toggle.show .candy-box span
+	html[data-viewport-scale="responsive"] .candy-box-toggle.show .candy-box span
 	{
 		transform: scale(1.45);
 	}
 
-	.nav-link.dropdown-toggle.show .navbar-user-icon-head
+	html[data-viewport-scale="responsive"] .nav-link.dropdown-toggle.show .navbar-user-icon-head
 	{
 		transform: translateY(-1px) scale(1.18);
 	}
 
-	.nav-link.dropdown-toggle.show .navbar-user-icon-shoulders
+	html[data-viewport-scale="responsive"] .nav-link.dropdown-toggle.show .navbar-user-icon-shoulders
 	{
 		transform: scale(1.08);
 	}
 
-	.dropdown-toggle:focus-visible:not(.show)
+	html[data-viewport-scale="responsive"] .dropdown-toggle:focus-visible:not(.show)
 	{
 		outline: 0;
 	}
 
-	.table-hover > tbody > tr:hover > *
+	html[data-viewport-scale="responsive"] .table-hover > tbody > tr:hover > *
 	{
 		background-color: transparent;
 	}
 
-	.nav-tabs .nav-link:hover,
-	.nav-tabs .nav-link:focus
+	html[data-viewport-scale="responsive"] .nav-tabs .nav-link:hover,
+	html[data-viewport-scale="responsive"] .nav-tabs .nav-link:focus
 	{
 		isolation: auto;
 		border-color: transparent;
 	}
 
-	.nav-tabs .nav-link.active:hover,
-	.nav-tabs .nav-link.active:focus
+	html[data-viewport-scale="responsive"] .nav-tabs .nav-link.active:hover,
+	html[data-viewport-scale="responsive"] .nav-tabs .nav-link.active:focus
 	{
 		border-color: var(--bs-nav-tabs-link-active-border-color);
 	}
 
-	.table-scroll > .table,
-	#dynamic-orders-table-container > .table
+	html[data-viewport-scale="responsive"] .table-scroll > .table,
+	html[data-viewport-scale="responsive"] #dynamic-orders-table-container > .table
 	{
 		width: max-content;
 		min-width: 1000px;
 	}
 
-	.table-scroll .hiddenRows,
-	#dynamic-orders-table-container .hiddenRows
+	html[data-viewport-scale="responsive"] .table-scroll .hiddenRows,
+	html[data-viewport-scale="responsive"] #dynamic-orders-table-container .hiddenRows
 	{
 		position: sticky;
 		left: 0;
@@ -803,16 +804,16 @@ table.table-order-details thead tr th:not(:first-child) {
 		margin-right: 0;
 	}
 
-	.table-scroll .hidden-table,
-	.table-scroll .hidden-buttons,
-	#dynamic-orders-table-container .hidden-table,
-	#dynamic-orders-table-container .hidden-buttons
+	html[data-viewport-scale="responsive"] .table-scroll .hidden-table,
+	html[data-viewport-scale="responsive"] .table-scroll .hidden-buttons,
+	html[data-viewport-scale="responsive"] #dynamic-orders-table-container .hidden-table,
+	html[data-viewport-scale="responsive"] #dynamic-orders-table-container .hidden-buttons
 	{
 		width: 100%;
 		min-width: 0;
 	}
 
-	.table-content-brake td.no-padding-cell
+	html[data-viewport-scale="responsive"] .table-content-brake td.no-padding-cell
 	{
 		overflow: visible;
 	}

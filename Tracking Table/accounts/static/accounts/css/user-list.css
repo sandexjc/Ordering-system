@@ -113,21 +113,21 @@ body
 
 @media (max-width: 999px)
 {
-    .user-list-page
+    html[data-viewport-scale="responsive"] .user-list-page
     {
         width: 100%;
         min-width: 0;
         padding: 1rem;
     }
 
-    .user-list-table .table
+    html[data-viewport-scale="responsive"] .user-list-table .table
     {
         width: max-content;
         min-width: 48rem;
         table-layout: auto;
     }
 
-    .user-list-helper-inner.is-open
+    html[data-viewport-scale="responsive"] .user-list-helper-inner.is-open
     {
         position: sticky;
         left: 0;

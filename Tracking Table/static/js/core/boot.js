@@ -7,12 +7,23 @@
  *   - main/templates/layout/base.html  (end of default scripts block)
  *
  * Depends on (must load first):
+ *   - core/viewport.js          → set_viewport_scale, responsive_viewport_scale
  *   - orders/row-expand/bind-rows.js → handle_orders
  *
  * Side effects on load:
- *   1. Binds expandable order-row click handlers present at initial render
- *   2. Keeps the orders and vitrine table headers pinned on small screens
+ *   1. Legacy scale: shrink the page when width < 1000px
+ *      Responsive scale: leave that shrink off and pin narrow table headers
+ *   2. Binds expandable order-row click handlers present at initial render
+ *   3. Replays a phone tap as one click. This does not depend on the scale mode.
  */
+
+/** Minimum required viewport width is 1000 px */
+const MIN_VIEWPORT_WIDTH = 1000;
+/** Current viewport size */
+const viewport_width = window.innerWidth;
+
+/** Set viewport scale based on min required viewport width and current viewport width */
+set_viewport_scale(viewport_width, MIN_VIEWPORT_WIDTH);
 
 /** Set per order required events and callbacks */
 handle_orders();
@@ -45,7 +56,8 @@ function place_order_table_head()
  */
 function pin_order_table_head()
 {
-    var narrow = window.matchMedia("(max-width: 999px)").matches;
+    var narrow = responsive_viewport_scale()
+        && window.matchMedia("(max-width: 999px)").matches;
 
     order_list_tables().forEach(function (table)
     {
@@ -423,20 +435,27 @@ document.addEventListener("mouseup", swallow_touch_ghost, true);
 document.addEventListener("click", swallow_touch_ghost, true);
 
 place_order_table_head();
-pin_order_table_head();
-window.addEventListener("scroll", schedule_order_table_head, { passive: true });
-window.addEventListener("resize", function ()
+if (responsive_viewport_scale())
 {
-    place_order_table_head();
-    schedule_order_table_head();
-});
-
-var order_table_container = document.getElementById("dynamic-orders-table-container");
-if (order_table_container && window.MutationObserver)
-{
-    new MutationObserver(function ()
+    pin_order_table_head();
+    window.addEventListener("scroll", schedule_order_table_head, { passive: true });
+    window.addEventListener("resize", function ()
     {
         place_order_table_head();
         schedule_order_table_head();
-    }).observe(order_table_container, { childList: true });
+    });
+
+    var order_table_container = document.getElementById("dynamic-orders-table-container");
+    if (order_table_container && window.MutationObserver)
+    {
+        new MutationObserver(function ()
+        {
+            place_order_table_head();
+            schedule_order_table_head();
+        }).observe(order_table_container, { childList: true });
+    }
+}
+else
+{
+    window.addEventListener("resize", place_order_table_head);
 }

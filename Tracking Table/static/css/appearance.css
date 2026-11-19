@@ -21,8 +21,9 @@ html[data-text="large"]
 
 /*
  * Wide windows scale the page the way browser zoom does. The font-size
- * above is reset so the two do not stack. Narrow windows keep text size only;
- * the viewport meta tag already fits those screens.
+ * above is reset so the two do not stack. Narrow windows keep text size only.
+ * Legacy viewport scaling also shrinks those screens to the layout minimum.
+ * Responsive scaling leaves them at normal size.
  */
 @media (min-width: 1000px)
 {

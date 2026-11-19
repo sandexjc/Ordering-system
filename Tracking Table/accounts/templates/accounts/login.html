@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 {% load django_bootstrap5 %}
 {% load static %}
-<html>
+<html data-viewport-scale="{% if responsive_viewport_scale %}responsive{% else %}legacy{% endif %}">
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1" id="viewport-scale-meta">
 		<title>TTable · Вход</title>
 		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/5.3.3/css/bootstrap.css' %}">
 		{% include "layout/favicon.html" %}
@@ -45,6 +45,8 @@
 		</div>
 		<script type="text/javascript" src="{% static 'jquery/jquery-3.7.1.min.js' %}"></script>
 		<script type="text/javascript" src="{% static 'bootstrap/5.3.3/js/bootstrap.bundle.js' %}"></script>
+		<script type="text/javascript" src="{% static 'js/core/viewport.js' %}"></script>
 		<script type="text/javascript" src="{% static 'js/core/auto-dismiss-alerts.js' %}"></script>
+		<script type="text/javascript" src="{% static 'accounts/js/login-base.js' %}"></script>
 	</body>
 </html>

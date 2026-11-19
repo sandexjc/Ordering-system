@@ -1,3 +1,10 @@
+/**
+ * Keep the settings page viewport behavior aligned with other account/admin forms.
+ */
+const MIN_VIEWPORT_WIDTH = 600;
+const viewport_width = window.innerWidth;
+set_viewport_scale(viewport_width, MIN_VIEWPORT_WIDTH);
+
 function normalizeDecimal(value) {
     const cleaned = String(value ?? "")
         .trim()

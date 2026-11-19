@@ -324,20 +324,49 @@ mark.search-highlight
    Interactive order-details progress table
    ============================================================================= */
 
+/* Previous scaling stacks the progress table when the layout is actually narrow. */
+@media (max-width: 767.98px)
+{
+	html:not([data-viewport-scale="responsive"]) #dynamic-orders-root .table-order-details-interactive thead
+	{
+		display: none;
+	}
+
+	html:not([data-viewport-scale="responsive"]) #dynamic-orders-root .table-order-details-interactive .order-progress-item-row
+	{
+		display: flex;
+		flex-direction: column;
+	}
+
+	html:not([data-viewport-scale="responsive"]) #dynamic-orders-root .table-order-details-interactive .order-progress-item-row > td
+	{
+		display: block;
+		width: 100%;
+		max-width: 100%;
+		padding-top: 0.35rem;
+		padding-bottom: 0.35rem;
+	}
+
+	html:not([data-viewport-scale="responsive"]) #dynamic-orders-root .table-order-details-interactive .order-progress-item-row > td:first-child
+	{
+		font-size: 0.9rem;
+	}
+}
+
 @media (max-width: 999px)
 {
-	.hiddenRows .order-details
+	html[data-viewport-scale="responsive"] .hiddenRows .order-details
 	{
 		overflow-x: auto;
 		max-width: 100%;
 	}
 
-	.hiddenRows .table-order-details
+	html[data-viewport-scale="responsive"] .hiddenRows .table-order-details
 	{
 		min-width: 36rem;
 	}
 
-	.dynamic-search:hover:not(.is-open) .dynamic-search-input
+	html[data-viewport-scale="responsive"] .dynamic-search:hover:not(.is-open) .dynamic-search-input
 	{
 		width: 0;
 		min-width: 0;
@@ -348,7 +377,7 @@ mark.search-highlight
 		pointer-events: none;
 	}
 
-	.dynamic-search.is-open .dynamic-search-input
+	html[data-viewport-scale="responsive"] .dynamic-search.is-open .dynamic-search-input
 	{
 		width: min(10.4rem, 35.75vw);
 	}

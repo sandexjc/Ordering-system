@@ -132,6 +132,10 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+}
+
+html[data-viewport-scale="responsive"] .profile-device-modal-body
+{
     container-type: inline-size;
 }
 
