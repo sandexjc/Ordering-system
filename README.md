@@ -425,7 +425,7 @@ What each one changes:
 - **Тема** switches light and dark surfaces. `data-bs-theme` follows the saved theme.
 - **Фон** sets the page background: the city image, a flat color, or warm paper.
 - **Акцент** colors the navbar and solid primary buttons. **Сиво** keeps the gray navbar and the usual blue primary buttons. **Прозрачен** lets the page background show through the navbar; those primary buttons stay blue. Outline danger, success, warning, and info buttons stay semantic.
-- **Размер на текста** sets the root font size.
+- **Размер на текста** sets the root font size. Responsive scaling zooms the whole page at every width, so a narrow screen stays in step when the size changes. Legacy scaling zooms wide windows and changes only the font size on a narrow one.
 - **Оформление** changes spacing on order and vitrine list rows (`.visibleRows`) only. **Стандартно** is the current spacing. **Компактно** and **Плътно** tighten line height and the gap between stacked lines. Profile forms, modals, and opened order details stay as they are.
 - **Анимации** **Изключено** shortens the order-row open and close and the profile section arrow. Save-button spinners still run. The form shows **Включено** / **Изключено**. The model choice labels stay **Нормално** / **Намалено** so they match the existing migration.
 

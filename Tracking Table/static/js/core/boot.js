@@ -459,3 +459,19 @@ else
 {
     window.addEventListener("resize", place_order_table_head);
 }
+
+/* Text size and row density change header height without a window resize. */
+if (window.MutationObserver)
+{
+    new MutationObserver(function ()
+    {
+        place_order_table_head();
+        if (responsive_viewport_scale())
+        {
+            schedule_order_table_head();
+        }
+    }).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-text", "data-density"]
+    });
+}

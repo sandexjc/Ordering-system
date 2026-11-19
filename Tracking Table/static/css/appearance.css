@@ -21,10 +21,36 @@ html[data-text="large"]
 
 /*
  * Wide windows scale the page the way browser zoom does. The font-size
- * above is reset so the two do not stack. Narrow windows keep text size only.
- * Legacy viewport scaling also shrinks those screens to the layout minimum.
- * Responsive scaling leaves them at normal size.
+ * above is reset so the two do not stack.
+ *
+ * Responsive scaling does the same at every width. Font-size alone on a
+ * narrow screen grows rem content while the navbar and other px chrome
+ * stay put, so medium and large leave the bar shorter than the page.
+ * Legacy narrow screens keep font-size only: the viewport tag already
+ * fits those screens, and a second zoom would shrink them again.
  */
+html[data-viewport-scale="responsive"][data-text="small"],
+html[data-viewport-scale="responsive"][data-text="medium"],
+html[data-viewport-scale="responsive"][data-text="large"]
+{
+	font-size: 100%;
+}
+
+html[data-viewport-scale="responsive"][data-text="small"]
+{
+	zoom: 0.8;
+}
+
+html[data-viewport-scale="responsive"][data-text="medium"]
+{
+	zoom: 0.9;
+}
+
+html[data-viewport-scale="responsive"][data-text="large"]
+{
+	zoom: 1;
+}
+
 @media (min-width: 1000px)
 {
 	html[data-text="small"],
