@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import force_bytes
@@ -68,14 +68,13 @@ def send_set_password_email(
         "set_password_url": set_password_url,
         "link_valid_minutes": settings.PASSWORD_RESET_TIMEOUT // 60,
     }
-    body = render_to_string(email_template, context)
     html_body = render_to_string(email_template.replace(".txt", ".html"), context)
-    email = SetPasswordEmailMessage(
+    email = EmailMessage(
         subject,
-        body,
+        html_body,
         settings.EMAIL_FROM_ADDRESS,
         [token_user.email],
     )
-    email.attach_alternative(html_body, "text/html")
+    email.content_subtype = "html"
     email.send(fail_silently=False)
     return True

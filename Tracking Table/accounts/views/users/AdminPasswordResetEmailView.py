@@ -3,7 +3,11 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 
-from accounts.helpers.users.send_set_password_email import send_set_password_email
+from accounts.helpers.users.send_set_password_email import (
+    CHANGE_PASSWORD_EMAIL_SUBJECT,
+    CHANGE_PASSWORD_EMAIL_TEMPLATE,
+    send_set_password_email,
+)
 from accounts.mixins import AdminRequiredMixin
 from accounts.models import User
 
@@ -25,7 +29,12 @@ class AdminPasswordResetEmail(AdminRequiredMixin, View):
     def post(self, request, pk):
         user = get_object_or_404(User, pk=pk)
         try:
-            sent = send_set_password_email(request, user)
+            sent = send_set_password_email(
+                request,
+                user,
+                subject=CHANGE_PASSWORD_EMAIL_SUBJECT,
+                email_template=CHANGE_PASSWORD_EMAIL_TEMPLATE,
+            )
         except Exception:
             return self._respond(request, False)
 
