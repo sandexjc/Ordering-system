@@ -205,7 +205,7 @@ Then open `http://127.0.0.1:8000/`.
 
 ## Database backup
 
-When `DJANGO_FEATURES__DB_BACKUP` is on and `DJANGO_BACKUP_DIR` is set, `runserver` writes one JSON backup a day at `DJANGO_BACKUP_AT` in `Europe/Sofia`. The timer lives in that server process. It does not run for other management commands.
+When `DJANGO_FEATURES__DB_BACKUP` is on and `DJANGO_BACKUP_DIR` is set, Passenger writes one JSON backup a day at `DJANGO_BACKUP_AT` in `Europe/Sofia`. The timer starts from `passenger_wsgi.py` and lives in that process. `runserver` and management commands do not start it. On a development machine, write a file with `export_backup`.
 
 If the server is not running at that time, that day's file is skipped. Starting the server later does not write the missed file.
 

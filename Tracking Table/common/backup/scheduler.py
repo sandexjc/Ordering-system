@@ -12,28 +12,26 @@ from django.utils import timezone
 from common.backup.export_backup import export_backup
 
 
+# Held while checking _started, so two callers cannot both start a thread.
 _start_lock = threading.Lock()
+
+# True after this process has started the daily export thread.
 _started = False
 
 
 def server_process(argv=None, environ=None):
-    """
-    True for the runserver process that should own the daily export.
-
-    The autoreload parent is skipped. With --noreload there is one process,
-    and that process owns the export. Other management commands do not.
-    """
+    # True when Passenger loaded this process through passenger_wsgi.py.
+    # runserver and management commands do not own the daily export.
     argv = sys.argv if argv is None else argv
     environ = os.environ if environ is None else environ
-    if "runserver" not in argv:
-        return False
-    if "--noreload" in argv:
+    if environ.get("_ORDERING_WSGI_SERVER") == "1":
         return True
-    return environ.get("RUN_MAIN") == "true"
+    script = os.path.basename(argv[0]) if argv else ""
+    return script == "passenger_wsgi.py"
 
 
 def next_backup_at(now):
-    """Next local DJANGO_BACKUP_AT. A time already passed today waits until tomorrow."""
+    # Next local DJANGO_BACKUP_AT. A time already passed today waits until tomorrow.
     hour, minute = (int(part) for part in settings.DJANGO_BACKUP_AT.split(":"))
     if now > _at_clock(now, hour, minute):
         now = now + timedelta(days=1)
@@ -41,7 +39,7 @@ def next_backup_at(now):
 
 
 def start_backup_scheduler():
-    """Start the daily export thread once in the running server process."""
+    # Start the daily export thread once in the Passenger process.
     global _started
 
     if not server_process():
@@ -68,7 +66,7 @@ def _backup_loop():
 
 
 def _sleep_until(target):
-    """Sleep until target. A second sleep happens only if the first returns early."""
+    # Sleep until target. A second sleep happens only if the first returns early.
     while True:
         remaining = (target - timezone.localtime()).total_seconds()
         if remaining <= 0:
